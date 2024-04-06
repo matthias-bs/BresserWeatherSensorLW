@@ -10,7 +10,8 @@ This is early stage of development - stay tuned.
 * [x] BLE sensor data reception
 * [x] LoRaWAN join
 * [x] LoRaWAN data uplink
-* [ ] LoRaWAN network time request & RTC setting
+* [x] LoRaWAN network time request & RTC setting
+* [ ] Energy saving / battery discharge protection
 * [ ] Wakeup time adjustment
 * [ ] LoRaWAN control downlink
 * [ ] LoRaWAN status uplink
