@@ -15,6 +15,7 @@ This is early stage of development - stay tuned.
 * [x] Wakeup time adjustment
 * [x] LoRaWAN control downlink
 * [x] LoRaWAN status uplink
-* [ ] Periodic LinkCheck
+* [x] Periodic LinkCheck
+* [ ] Node/network status/debug information
 * [ ] setDeviceStatus(battLevel)
 * [ ] RP2040 specific implementation
