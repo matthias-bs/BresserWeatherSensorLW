@@ -120,7 +120,7 @@ DistanceSensor_A02YYUW distanceSensor(&Serial1);
 #endif
 #endif
 
-void gen_payload(uint8_t port, LoraEncoder &encoder)
+void genPayload(uint8_t port, LoraEncoder &encoder)
 {
     // unused
     (void)port;
@@ -128,7 +128,7 @@ void gen_payload(uint8_t port, LoraEncoder &encoder)
     weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
 }
 
-void get_payload_stage1(uint8_t port, LoraEncoder &encoder)
+void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
 // uint8_t result;
 #ifdef ADC_EN
@@ -541,6 +541,28 @@ void get_payload_stage1(uint8_t port, LoraEncoder &encoder)
     }
 }
 
-void get_payload_stage2(uint8_t port, LoraEncoder &encoder)
+void getPayloadStage2(uint8_t port, LoraEncoder &encoder)
 {
+}
+
+void deviceDecodeDownlink(uint8_t port, uint8_t *payload, size_t size)
+{
+#ifdef RAINDATA_EN
+    if (port > 0)
+    {
+        if (payload[0] == CMD_RESET_RAINGAUGE)
+        {
+            if (size == 1)
+            {
+                log_d("Reset raingauge");
+                rainGauge.reset();
+            }
+            else if (size == 2)
+            {
+                log_d("Reset raingauge - flags: 0x%X", payload[1]);
+                rainGauge.reset(payload[1] & 0xF);
+            }
+        }
+    }
+#endif
 }

@@ -49,7 +49,7 @@
  * \param port LoRaWAN port
  * \param encoder uplink encoder object
 */
-void gen_payload(uint8_t port, LoraEncoder & encoder);
+void genPayload(uint8_t port, LoraEncoder & encoder);
 
 /*!
  * \brief Prepare / get payload at startup
@@ -63,7 +63,7 @@ void gen_payload(uint8_t port, LoraEncoder & encoder);
  * \param port LoRaWAN port
  * \param encoder uplink encoder object
  */
-void get_payload_stage1(uint8_t port, LoraEncoder & encoder);
+void getPayloadStage1(uint8_t port, LoraEncoder & encoder);
 
 /*!
  * \brief Get payload befor uplink
@@ -76,6 +76,15 @@ void get_payload_stage1(uint8_t port, LoraEncoder & encoder);
  * \param port LoRaWAN port
  * \param encoder uplink encoder object
  */
-void get_payload_stage2(uint8_t port, LoraEncoder & encoder);
+void getPayloadStage2(uint8_t port, LoraEncoder & encoder);
+
+/*!
+ * \brief Decode device specific downlink messages
+ * 
+ * \param port LoRaWAN port
+ * \param payload downlink message payload
+ * \param size downlink message size (bytes)
+ */
+void deviceDecodeDownlink(uint8_t port, uint8_t *payload, size_t size);
 
 #endif // PAYLOAD_H
