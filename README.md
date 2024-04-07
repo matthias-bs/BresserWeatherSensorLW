@@ -11,8 +11,8 @@ This is early stage of development - stay tuned.
 * [x] LoRaWAN join
 * [x] LoRaWAN data uplink
 * [x] LoRaWAN network time request & RTC setting
-* [ ] Energy saving / battery discharge protection
-* [ ] Wakeup time adjustment
+* [x] Energy saving / battery deep-discharge protection
+* [x] Wakeup time adjustment
 * [ ] LoRaWAN control downlink
 * [ ] LoRaWAN status uplink
 * [ ] RP2040 specific implementation
