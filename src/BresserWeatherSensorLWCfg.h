@@ -1,19 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////
-// BresserWeatherSensorTTNCfg.h
+// BresserWeatherSensorLWCfg.h
 //
-// User specific configuration for BresserWeatherSensorTTN.ino
+// User specific configuration for BresserWeatherSensorLW.ino
 //
 // - Enabling or disabling of features
 // - Voltage thresholds for power saving
 // - Timing configuration
 // - Timezone
 //
-// created: 08/2022
+// created: 04/2024
 //
 //
 // MIT License
 //
-// Copyright (c) 2022 Matthias Prinke
+// Copyright (c) 2024 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,38 +36,7 @@
 //
 // History:
 //
-// 20220819 Created from BresserWeatherSensorTTN.ino
-// 20221011 Changed timezone handling
-// 20221113 Fixed ADC defines
-// 20221117 Enabled FORCE_JOIN_AFTER_SLEEP_TIMEOUT per default
-//          Added defines for power saving -
-//              BATTERY_WEAK, BATTERY_LOW, SLEEP_INTERVAL_LONG
-// 20221228 Modified DEBUG_PRINTF/DEBUG_PRINTF_TS macros to use
-//          Arduino logging functions
-// 20221230 Added WEATHERSENSOR_DATA_REQUIRED
-// 20220112 Removed LMIC_ENABLE_DeviceTimeReq; must be defined in
-//          ~/Arduino/libraries/MCCI_LoRaWAN_LMIC_library/project_config/
-//          lmic_project_config.h
-//          in order to be recognized!!!
-// 20230121 Added configuration for TTGO LoRa32 V1
-// 20230209 Added configurations for TTGO LoRa32 V2/V21new,
-//          Adafruit Feather ESP32-S2 and Adafruit Feather ESP32
-// 20230211 Added integration of Theengs Decoder (https://github.com/theengs/decoder)
-//          for support of additional BLE sensors
-// 20230217 Added integration of A02YYUW (DFRobot SEN0311)
-//          ultrasonic distance sensor
-//          (https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311)
-// 20230714 Added LIGHTNINGSENSOR_EN
-// 20230927 Added configuration for Adafruit Feather RP2040
-// 20231005 Added SESSION_IN_PREFERENCES and NVS_LOG
-// 20231008 [RP2040] Added configuration for distance sensor
-// 20231009 Added configuration for FIREBEETLE_COVER_LORA
-//          Improved config for Firebeetle Cover LoRa and
-//          Adafruit Feather ESP32-S2 (default battery voltage thresholds)
-//          Renamed FIREBEETLE_COVER_LORA in FIREBEETLE_ESP32_COVER_LORA
-// 20231102 Added ARDUINO_THINGPULSE_EPULSE_FEATHER for special
-//          VBAT voltage divider
-// 20240325 Added configuration for M5Stack Core2 with M5Stack Module LoRa868
+// 20240407 Created from BresserWeatherSensorTTNCfg.h
 //
 // Note:
 // Depending on board package file date, either
@@ -85,6 +54,68 @@
 
 #include <vector>
 #include <string>
+
+// Downlink messages
+// ------------------
+//
+// CMD_SET_WEATHERSENSOR_TIMEOUT
+// (seconds)
+// byte0: 0xA0
+// byte1: ws_timeout[ 7: 0]
+//
+// CMD_SET_SLEEP_INTERVAL
+// (seconds)
+// byte0: 0xA8
+// byte1: sleep_interval[15:8]
+// byte2: sleep_interval[ 7:0]
+
+// CMD_SET_SLEEP_INTERVAL_LONG
+// (seconds)
+// byte0: 0xA9
+// byte1: sleep_interval_long[15:8]
+// byte2: sleep_interval_long[ 7:0]
+//
+// CMD_RESET_RAINGAUGE
+// byte0: 0xB0
+// byte1: flags[7:0] (optional)
+//
+// CMD_GET_CONFIG
+// byte0: 0xB1
+//
+// CMD_GET_DATETIME
+// byte0: 0x86
+//
+// CMD_SET_DATETIME
+// byte0: 0x88
+// byte1: unixtime[31:24]
+// byte2: unixtime[23:16]
+// byte3: unixtime[15: 8]
+// byte4: unixtime[ 7: 0]
+//
+// Response uplink messages
+// -------------------------
+//
+// CMD_GET_DATETIME -> FPort=2
+// byte0: unixtime[31:24]
+// byte1: unixtime[23:16]
+// byte2: unixtime[15: 8]
+// byte3: unixtime[ 7: 0]
+// byte4: rtc_source[ 7: 0]
+//
+// CMD_GET_CONFIG -> FPort=3
+// byte0: ws_timeout[ 7: 0]
+// byte1: sleep_interval[15: 8]
+// byte2: sleep_interval[ 7:0]
+// byte3: sleep_interval_long[15:8]
+// byte4: sleep_interval_long[ 7:0]
+
+#define CMD_SET_WEATHERSENSOR_TIMEOUT   0xA0
+#define CMD_SET_SLEEP_INTERVAL          0xA8
+#define CMD_SET_SLEEP_INTERVAL_LONG     0xA9
+#define CMD_RESET_RAINGAUGE             0xB0
+#define CMD_GET_CONFIG                  0xB1
+#define CMD_GET_DATETIME                0x86
+#define CMD_SET_DATETIME                0x88
 
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"
@@ -120,36 +151,24 @@
 #define SESSION_IN_PREFERENCES
 #endif
 
-// Battery voltage thresholds for energy saving
+// Battery voltage thresholds for energy saving & deep-discharge prevention
 
 // If SLEEP_EN is defined and battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
-#if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
-// External voltage divider required
-#pragma message("External voltage divider required for battery voltage measurement.")
-#pragma message("Setting BATTERY_WEAK 0 (no power-saving).")
-#define BATTERY_WEAK 0
-#elif defined(FIREBEETLE_ESP32_COVER_LORA)
-#pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic).")
-#pragma message("Setting BATTERY_WEAK 0 (no power-saving).")
-#define BATTERY_WEAK 0
-#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
-#pragma message("Setting BATTERY_WEAK 0 (no power-saving).")
-#define BATTERY_WEAK 0
-#else
-#define BATTERY_WEAK 3500
-#endif
-
 // Go to sleep mode immediately after start if battery voltage <= BATTERY_LOW [mV]
 #if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
 // External voltage divider required
-#pragma message("Setting BATTERY_LOW 0 (no deep-discharge prevention).")
-#define BATTERY_LOW 0
-#elif defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
-#pragma message("Setting BATTERY_LOW 0 (no deep-discharge prevention).")
-#define BATTERY_LOW 0
-#else
-#define BATTERY_LOW 3200
+#pragma message("External voltage divider required for battery voltage measurement.")
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
+#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+#pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic)."
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
+#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#pragma message("Energy saving at weak battery not implemented yet.")
+#pragma message("Battery deep-discharge prevention not implemented yet.")
 #endif
+
+#define BATTERY_WEAK 3500
+#define BATTERY_LOW 3200
 
 // Enable sleep mode - sleep after successful transmission to TTN (recommended!)
 #define SLEEP_EN
