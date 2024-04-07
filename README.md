@@ -15,4 +15,5 @@ This is early stage of development - stay tuned.
 * [x] Wakeup time adjustment
 * [x] LoRaWAN control downlink
 * [ ] LoRaWAN status uplink
+* [ ] Periodic LinkCheck
 * [ ] RP2040 specific implementation
