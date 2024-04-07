@@ -56,6 +56,15 @@
 uint16_t getVoltage(void);
 
 /*!
+ * \brief Get battery voltage
+ * 
+ * Returns the battery voltage or zero if not available (board specific)
+ * 
+ * \returns Voltage in mV or zero if not available
+ */
+uint16_t getBatteryVoltage(void);
+
+/*!
  * \brief Get an additional voltage
  * 
  * Returns the voltage of the specified ADC channel

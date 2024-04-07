@@ -80,6 +80,10 @@ getVoltage(void)
     return voltage;
 }
 
+uint16_t getBatteryVoltage(void)
+{
+    return getVoltage();
+}
 //
 // Get an additional voltage
 //
@@ -114,4 +118,10 @@ getVoltage(pin_size_t pin, uint8_t samples, float divider)
     return voltage;
 }
 #endif
+#else
+uint16_t getBatteryVoltage(void)
+{
+    return 0;
+}
 #endif
+
