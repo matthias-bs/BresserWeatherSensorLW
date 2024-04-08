@@ -553,7 +553,11 @@ void setup()
   LoRaWANEvent_t downlinkDetails;
 
   // perform an uplink & optionally receive downlink
-  state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, &uplinkDetails, &downlinkDetails);
+  if (fcntUp % 64 == 0) {
+    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, true, &uplinkDetails, &downlinkDetails);
+  } else {
+    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize);
+  }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
 
   // Check if downlink was received
