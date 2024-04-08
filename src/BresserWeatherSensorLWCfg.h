@@ -268,7 +268,7 @@
 // #define PIN_ADC0_IN         A0
 // #define PIN_ADC1_IN         A1
 // #define PIN_ADC2_IN         A2
-#ifdef LORAWAN_NODE
+#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
 #define PIN_ADC3_IN A3
 #endif
 
