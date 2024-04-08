@@ -115,6 +115,17 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
     SX1276 radio = new Module(PIN_LORA_NSS, PIN_LORA_DIO0, PIN_LORA_RST, PIN_LORA_DIO1);
 
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32_V2)
+    #define PIN_LORA_NSS      14
+    #define PIN_LORA_RST      27
+    #define PIN_LORA_DIO0     32
+    #define PIN_LORA_DIO1     33
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+    #pragma message("NOT TESTED!!!")
+    #pragma message("ARDUINO_ADAFRUIT_FEATHER_ESP32_V2 defined; assuming RFM95W FeatherWing will be used")
+    #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
+    SX1276 radio = new Module(PIN_LORA_NSS, PIN_LORA_DIO0, PIN_LORA_RST, PIN_LORA_DIO1);
+
 #else
   #pragma message ("Unknown board - no automagic pinmap available")
 
