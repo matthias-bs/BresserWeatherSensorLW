@@ -17,5 +17,5 @@ This is early stage of development - stay tuned.
 * [x] LoRaWAN status uplink
 * [x] Periodic LinkCheck
 * [ ] Node/network status/debug information
-* [ ] setDeviceStatus(battLevel)
+* [x] setDeviceStatus(battLevel)
 * [ ] RP2040 specific implementation
