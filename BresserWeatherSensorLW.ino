@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // BresserWeatherSensorLW.ino
-// 
-// Bresser 868 MHz Weather Sensor Radio Receiver 
-// based on ESP32 and RFM95W/SX1276/SX1262 - 
+//
+// Bresser 868 MHz Weather Sensor Radio Receiver
+// based on ESP32 and RFM95W/SX1276/SX1262 -
 // sends data to a LoRaWAN network (e.g. The Things Network)
 //
 // The radio transceiver is used with RadioLib
@@ -21,11 +21,11 @@
 // ESP32Time by Felix Biego (https://github.com/fbiego/ESP32Time)
 // ESP32AnalogRead by Kevin Harrington (madhephaestus) (https://github.com/madhephaestus/ESP32AnalogRead)
 // OneWireNg by Piotr Stolarz (https://github.com/pstolarz/OneWireNg)
-// DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library) 
+// DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library)
 //
 // Library dependencies (tested versions):
 // ---------------------------------------
-// (install via normal Arduino Library installer:) 
+// (install via normal Arduino Library installer:)
 // RadioLib                             6.5.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
@@ -46,17 +46,17 @@
 // MIT License
 //
 // Copyright (c) 2024 Matthias Prinke
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -74,7 +74,7 @@
 //          https://github.com/radiolib-org/radiolib-persistence/blob/main/examples/LoRaWAN_ESP32/LoRaWAN_ESP32.ino
 //
 // ToDo:
-// - 
+// -
 //
 // Notes:
 // - Pin mapping of radio transceiver module is done in two places:
@@ -84,19 +84,19 @@
 // - If joining the network or transmitting uplink data fails,
 //   the controller will go into deep sleep
 // - Weather sensor data is only received at startup; this avoids
-//   reconfiguration of the RFM95W module and its SW drivers - 
-//   i.e. to work as a weather data relay to TTN, enabling sleep mode 
+//   reconfiguration of the RFM95W module and its SW drivers -
+//   i.e. to work as a weather data relay to TTN, enabling sleep mode
 //   is basically the only useful option
 // - The ESP32's RTC RAM/the RP2040's Flash (via Preferences library) is used
 //   to store information about the LoRaWAN network session;
 //   this speeds up the connection after a restart significantly
 // - The ESP32's Bluetooth LE interface is used to access sensor data (option)
 // - settimeofday()/gettimeofday() must be used to access the ESP32's RTC time
-// - Arduino ESP32 package has built-in time zone handling, see 
+// - Arduino ESP32 package has built-in time zone handling, see
 //   https://github.com/SensorsIot/NTP-time-for-ESP8266-and-ESP32/blob/master/NTP_Example/NTP_Example.ino
 //
 ///////////////////////////////////////////////////////////////////////////////
-/*! \file BresserWeatherSensorLW.ino */ 
+/*! \file BresserWeatherSensorLW.ino */
 
 #if !defined(ESP32)
 #pragma error("This is not the example your device is looking for - ESP32 only")
@@ -112,10 +112,11 @@ Preferences store;
 /// ESP32 preferences (stored in flash memory)
 static Preferences preferences;
 
-struct sPrefs {
-  uint8_t   ws_timeout;           //!< preferences: weather sensor timeout
-  uint16_t  sleep_interval;       //!< preferences: sleep interval
-  uint16_t  sleep_interval_long;  //!< preferences: sleep interval long
+struct sPrefs
+{
+  uint8_t ws_timeout;           //!< preferences: weather sensor timeout
+  uint16_t sleep_interval;      //!< preferences: sleep interval
+  uint16_t sleep_interval_long; //!< preferences: sleep interval long
 } prefs;
 
 // LoRaWAN config, credentials & pinmap
@@ -189,22 +190,24 @@ uint32_t sleepDuration(void)
 {
   uint32_t sleep_interval = prefs.sleep_interval;
   longSleep = false;
-  
+
   uint16_t voltage = getBatteryVoltage();
   // Long sleep interval if battery is weak
-  if (voltage && voltage <= BATTERY_WEAK) {
-      sleep_interval = prefs.sleep_interval_long;
-      longSleep = true;
+  if (voltage && voltage <= BATTERY_WEAK)
+  {
+    sleep_interval = prefs.sleep_interval_long;
+    longSleep = true;
   }
 
   // If the real time is available, align the wake-up time to the
   // to next non-fractional multiple of sleep_interval past the hour
-  if (rtcLastClockSync) {
-      struct tm timeinfo;
-      time_t t_now = rtc.getLocalEpoch();
-      localtime_r(&t_now, &timeinfo);        
+  if (rtcLastClockSync)
+  {
+    struct tm timeinfo;
+    time_t t_now = rtc.getLocalEpoch();
+    localtime_r(&t_now, &timeinfo);
 
-      sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);  
+    sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
   }
 
   return sleep_interval;
@@ -227,138 +230,154 @@ void gotoSleep(uint32_t seconds)
 }
 
 /// Print date and time (i.e. local time)
-void printDateTime(void) {
-        struct tm timeinfo;
-        char tbuf[25];
-        
-        time_t tnow = rtc.getLocalEpoch();
-        localtime_r(&tnow, &timeinfo);
-        strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-        log_i("%s", tbuf);
+void printDateTime(void)
+{
+  struct tm timeinfo;
+  char tbuf[25];
+
+  time_t tnow = rtc.getLocalEpoch();
+  localtime_r(&tnow, &timeinfo);
+  strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
+  log_i("%s", tbuf);
 }
 
-// TODO: separate sensor sepcific parts from generic parts
-void decodeDownlink(uint8_t port, uint8_t *payload, size_t size) {
-    log_v("Port: %d", port);
-    //char buf[255];
-    //*buf = '\0';
+// TODO: separate sensor specific parts from generic parts
+void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
+{
+  log_v("Port: %d", port);
+  // char buf[255];
+  //*buf = '\0';
 
-    if (port > 0) {
-        // for (size_t i = 0; i < nBuffer; i++) {
-        //       sprintf(&buf[strlen(buf)], "%02X ", pBuffer[i]);
-        // }
-        //log_v("Data: %s", buf);
+  if (port > 0)
+  {
+    // for (size_t i = 0; i < nBuffer; i++) {
+    //       sprintf(&buf[strlen(buf)], "%02X ", pBuffer[i]);
+    // }
+    // log_v("Data: %s", buf);
 
-        if ((payload[0] == CMD_GET_DATETIME) && (size == 1)) {
-            log_d("Get date/time");
-            uplinkReq = CMD_GET_DATETIME;
-        }
-        if ((payload[0] == CMD_GET_CONFIG) && (size == 1)) {
-            log_d("Get config");
-            uplinkReq = CMD_GET_CONFIG; 
-        }
-        if ((payload[0] == CMD_SET_DATETIME) && (size == 5)) {
-            
-            time_t set_time = payload[4] | (payload[3] << 8) | (payload[2] << 16) | (payload[1] << 24);
-            rtc.setTime(set_time);
-            rtcLastClockSync = rtc.getLocalEpoch();
-            #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-                char tbuf[25];
-                struct tm timeinfo;
-           
-                localtime_r(&set_time, &timeinfo);
-                strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-                log_d("Set date/time: %s", tbuf);
-            #endif
-        }
-        if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2)) {
-            log_d("Set weathersensor_timeout: %u s", payload[1]);
-            preferences.begin("BWS-TTN", false);
-            preferences.putUChar("ws_timeout", payload[1]);
-            preferences.end();
-        }
-        if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3)){
-            prefs.sleep_interval = payload[2] | (payload[1] << 8);
-            log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-            preferences.begin("BWS-TTN", false);
-            preferences.putUShort("sleep_int", prefs.sleep_interval);
-            preferences.end();            
-        }
-        if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3)){
-            prefs.sleep_interval_long = payload[2] | (payload[1] << 8);
-            log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-            preferences.begin("BWS-TTN", false);
-            preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
-            preferences.end();            
-        }
+    if ((payload[0] == CMD_GET_DATETIME) && (size == 1))
+    {
+      log_d("Get date/time");
+      uplinkReq = CMD_GET_DATETIME;
     }
-    if (uplinkReq == 0) {
-        sleepReq = true;
+    if ((payload[0] == CMD_GET_CONFIG) && (size == 1))
+    {
+      log_d("Get config");
+      uplinkReq = CMD_GET_CONFIG;
     }
+    if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
+    {
+
+      time_t set_time = payload[4] | (payload[3] << 8) | (payload[2] << 16) | (payload[1] << 24);
+      rtc.setTime(set_time);
+      rtcLastClockSync = rtc.getLocalEpoch();
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
+      char tbuf[25];
+      struct tm timeinfo;
+
+      localtime_r(&set_time, &timeinfo);
+      strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
+      log_d("Set date/time: %s", tbuf);
+#endif
+    }
+    if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2))
+    {
+      log_d("Set weathersensor_timeout: %u s", payload[1]);
+      preferences.begin("BWS-TTN", false);
+      preferences.putUChar("ws_timeout", payload[1]);
+      preferences.end();
+    }
+    if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
+    {
+      prefs.sleep_interval = payload[2] | (payload[1] << 8);
+      log_d("Set sleep_interval: %u s", prefs.sleep_interval);
+      preferences.begin("BWS-TTN", false);
+      preferences.putUShort("sleep_int", prefs.sleep_interval);
+      preferences.end();
+    }
+    if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
+    {
+      prefs.sleep_interval_long = payload[2] | (payload[1] << 8);
+      log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
+      preferences.begin("BWS-TTN", false);
+      preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
+      preferences.end();
+    }
+  }
+  if (uplinkReq == 0)
+  {
+    sleepReq = true;
+  }
 }
 
 void sendCfgUplink(void)
 {
-    log_d("--- Uplink Configuration/Status ---");
-    
-    uint8_t uplinkPayload[5];
-    uint8_t port;
+  log_d("--- Uplink Configuration/Status ---");
 
+  uint8_t uplinkPayload[5];
+  uint8_t port;
+
+  //
+  // Encode data as byte array for LoRaWAN transmission
+  //
+  LoraEncoder encoder(uplinkPayload);
+
+  if (uplinkReq == CMD_GET_DATETIME)
+  {
+    log_d("Date/Time");
+    port = 2;
+    time_t t_now = rtc.getLocalEpoch();
+    encoder.writeUint8((t_now >> 24) & 0xff);
+    encoder.writeUint8((t_now >> 16) & 0xff);
+    encoder.writeUint8((t_now >> 8) & 0xff);
+    encoder.writeUint8(t_now & 0xff);
+
+    // time source & status, see below
     //
-    // Encode data as byte array for LoRaWAN transmission
+    // bits 0..3 time source
+    //    0x00 = GPS
+    //    0x01 = RTC
+    //    0x02 = LORA
+    //    0x03 = unsynched
+    //    0x04 = set (source unknown)
     //
-    LoraEncoder encoder(uplinkPayload);
+    // bits 4..7 esp32 sntp time status (not used)
+    // TODO add flags for succesful LORA time sync/manual sync
+    encoder.writeUint8((rtcSyncReq) ? 0x03 : 0x02);
+  }
+  else if (uplinkReq)
+  {
+    log_d("Config");
+    port = 3;
+    encoder.writeUint8(prefs.ws_timeout);
+    encoder.writeUint8(prefs.sleep_interval >> 8);
+    encoder.writeUint8(prefs.sleep_interval & 0xFF);
+    encoder.writeUint8(prefs.sleep_interval_long >> 8);
+    encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
+  }
+  else
+  {
+    log_v("");
+    return;
+  }
+  log_v("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
 
-    if (uplinkReq == CMD_GET_DATETIME) {
-        log_d("Date/Time");
-        port = 2;
-        time_t t_now = rtc.getLocalEpoch();
-        encoder.writeUint8((t_now >> 24) & 0xff);
-        encoder.writeUint8((t_now >> 16) & 0xff);
-        encoder.writeUint8((t_now >>  8) & 0xff);
-        encoder.writeUint8( t_now        & 0xff);
+  for (int i = 0; i < encoder.getLength(); i++)
+  {
+    Serial.printf("%02X ", uplinkPayload[i]);
+  }
+  Serial.println();
 
-        // time source & status, see below
-        //
-        // bits 0..3 time source
-        //    0x00 = GPS
-        //    0x01 = RTC
-        //    0x02 = LORA
-        //    0x03 = unsynched
-        //    0x04 = set (source unknown)
-        //
-        // bits 4..7 esp32 sntp time status (not used)
-        // TODO add flags for succesful LORA time sync/manual sync
-        encoder.writeUint8((rtcSyncReq) ? 0x03 : 0x02);
-    } else if (uplinkReq) {
-        log_d("Config");
-        port = 3;
-        encoder.writeUint8(prefs.ws_timeout);
-        encoder.writeUint8(prefs.sleep_interval >> 8);
-        encoder.writeUint8(prefs.sleep_interval & 0xFF);
-        encoder.writeUint8(prefs.sleep_interval_long >> 8);
-        encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
-    } else {
-      log_v("");
-        return;
-    }
-    log_v("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
+  // wait before sending uplink
+  uint32_t minimumDelay = uplinkIntervalSeconds * 1000UL;
+  uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
+  uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
 
-    for (int i=0; i<encoder.getLength(); i++) {
-      Serial.printf("%02X ", uplinkPayload[i]);
-    }
-    Serial.println();
-
-    // wait before sending uplink
-    uint32_t minimumDelay = uplinkIntervalSeconds * 1000UL;
-    uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
-    uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
-
-    log_d("Configuration uplink will be sent in %u s", delayMs/1000);
-    delay(delayMs);
-    log_d("Sending configuration uplink now.");
-    int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-    debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
+  log_d("Configuration uplink will be sent in %u s", delayMs / 1000);
+  delay(delayMs);
+  log_d("Sending configuration uplink now.");
+  int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
+  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
 }
 
 // setup & execute all device functions ...
@@ -378,16 +397,17 @@ void setup()
   preferences.begin("BWS-LW", false);
   prefs.ws_timeout = preferences.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
   log_d("Preferences: weathersensor_timeout: %u s", prefs.ws_timeout);
-  prefs.sleep_interval      = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
+  prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
   log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
   log_d("Preferences: sleep_interval_long:   %u s", prefs.sleep_interval_long);
   preferences.end();
 
   uint16_t voltage = getBatteryVoltage();
-  if (voltage &&  voltage <= BATTERY_LOW) {
-      log_i("Battery low!");
-      gotoSleep(sleepDuration());
+  if (voltage && voltage <= BATTERY_LOW)
+  {
+    log_i("Battery low!");
+    gotoSleep(sleepDuration());
   }
 
   // build payload byte array
@@ -479,15 +499,23 @@ void setup()
   // ##### close the store
   store.end();
 
-  // ToDo
-  // set battery fill level - the LoRaWAN network server
-  // may periodically request this information
+  // Set battery fill level - 
+  // the LoRaWAN network server may periodically request this information
   // 0 = external power source
   // 1 = lowest (empty battery)
   // 254 = highest (full battery)
   // 255 = unable to measure
-  //uint8_t battLevel = 146;
-  //node.setDeviceStatus(battLevel);
+  uint8_t battLevel;
+  if (voltage == 0) {
+    battLevel = 255;
+  } else {
+    battLevel = static_cast<uint8_t>(
+      static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT));
+    battLevel = (battLevel == 0) ? 1 : battLevel;
+    battLevel = (battLevel == 255) ? 254 : battLevel;
+  }
+  log_d("Battery level: %u", battLevel);
+  node.setDeviceStatus(battLevel);
 
   // Check if clock was never synchronized or sync interval has expired
   if ((rtcLastClockSync == 0) || ((rtc.getLocalEpoch() - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60)))
@@ -495,6 +523,17 @@ void setup()
     log_i("RTC sync required");
     rtcSyncReq = true;
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
+  }
+
+  // Retrieve the last uplink frame counter
+  uint32_t fcntUp = node.getFcntUp();
+
+  // Send a confirmed uplink every 64th frame
+  // and also request the LinkCheck command
+  if (fcntUp % 64 == 0)
+  {
+    Serial.println(F("[LoRaWAN] Requesting LinkCheck"));
+    node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
   }
 
   // ----- and now for the main event -----
@@ -508,8 +547,8 @@ void setup()
   getPayloadStage2(1, encoder);
 
   uint8_t port = 1;
-  uint8_t downlinkPayload[MAX_DOWNLINK_SIZE];  // Make sure this fits your plans!
-  size_t  downlinkSize;         // To hold the actual payload size rec'd
+  uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
+  size_t downlinkSize;                        // To hold the actual payload size rec'd
   LoRaWANEvent_t uplinkDetails;
   LoRaWANEvent_t downlinkDetails;
 
@@ -518,16 +557,39 @@ void setup()
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
 
   // Check if downlink was received
-  if(state != RADIOLIB_LORAWAN_NO_DOWNLINK) {
+  if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
+  {
     // Did we get a downlink with data for us
-    if (downlinkSize > 0) {
-      Serial.println(F("Downlink data: "));
+    if (downlinkSize > 0)
+    {
+      log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
       decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
       deviceDecodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
-    } else {
-      Serial.println(F("<MAC commands only>"));
     }
+    else
+    {
+      log_d("<MAC commands only>");
+    }
+
+    // print RSSI (Received Signal Strength Indicator)
+    log_d("[LoRaWAN] RSSI:\t\t%f dBm", radio.getRSSI());
+
+    // print SNR (Signal-to-Noise Ratio)
+    log_d("[LoRaWAN] SNR:\t\t%f dB", radio.getSNR());
+
+    // print frequency error
+    log_d("[LoRaWAN] Frequency error:\t%f Hz", radio.getFrequencyError());
+
+    // print extra information about the event
+    log_d("[LoRaWAN] Event information:");
+    log_d("[LoRaWAN] Confirmed:\t%d", downlinkDetails.confirmed);
+    log_d("[LoRaWAN] Confirming:\t%d", downlinkDetails.confirming);
+    log_d("[LoRaWAN] Datarate:\t%d", downlinkDetails.datarate);
+    log_d("[LoRaWAN] Frequency:\t%7.3f MHz", downlinkDetails.freq);
+    log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
+    log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fcnt);
+    log_d("[LoRaWAN] Port:\t\t%u", downlinkDetails.port);
   }
 
   uint32_t networkTime = 0;
@@ -538,18 +600,29 @@ void setup()
     Serial.println(networkTime);
     Serial.print(F("[LoRaWAN] DeviceTime second:\t1/"));
     Serial.println(fracSecond);
-    
+
     // Update the system time with the time read from the network
     rtc.setTime(networkTime);
-    
-    // Save clock sync timestamp and clear flag 
+
+    // Save clock sync timestamp and clear flag
     rtcLastClockSync = rtc.getLocalEpoch();
     rtcSyncReq = false;
     log_d("RTC sync completed");
     printDateTime();
   }
 
-  if (uplinkReq) {
+  uint8_t margin = 0;
+  uint8_t gwCnt = 0;
+  if (node.getMacLinkCheckAns(&margin, &gwCnt) == RADIOLIB_ERR_NONE)
+  {
+    Serial.print(F("[LoRaWAN] LinkCheck margin:\t"));
+    Serial.println(margin);
+    Serial.print(F("[LoRaWAN] LinkCheck count:\t"));
+    Serial.println(gwCnt);
+  }
+
+  if (uplinkReq)
+  {
     sendCfgUplink();
   }
 
@@ -562,7 +635,6 @@ void setup()
 
   // wait until next uplink - observing legal & TTN FUP constraints
   gotoSleep(sleepDuration());
-  //gotoSleep(uplinkIntervalSeconds);
 }
 
 // The ESP32 wakes from deep-sleep and starts from the very beginning.
