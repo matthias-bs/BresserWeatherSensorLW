@@ -225,11 +225,10 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   // Using arbitrary settings for CI workflow with FQBN esp32:esp32:esp32
   // LoRaWAN_Node board
   // https://github.com/matthias-bs/LoRaWAN_Node
-  #define PIN_LMIC_NSS      14
-  #define PIN_LMIC_RST      12
-  #define PIN_LMIC_DIO0     4
-  #define PIN_LMIC_DIO1     16
-  #define PIN_LMIC_DIO2     17
+  #define PIN_LORA_NSS      14
+  #define PIN_LORA_RST      12
+  #define PIN_LORA_IRQ       4
+  #define PIN_LORA_GPIO     16
   #define LORA_CHIP SX1276
 
   // SX1262  pin order: Module(NSS/CS, DIO1, RESET, BUSY);
