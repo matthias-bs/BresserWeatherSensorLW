@@ -160,7 +160,7 @@
 #pragma message("External voltage divider required for battery voltage measurement.")
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
-#pragma message("On-board voltage divider must be enabled for battery voltage measurement - see schematic."
+#pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic).")
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
 #pragma message("Energy saving at weak battery not implemented yet.")
