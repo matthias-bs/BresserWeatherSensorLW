@@ -15,7 +15,7 @@ jobs:
         board:
           - esp32:esp32:esp32:DebugLevel=none
           - esp32:esp32:esp32:DebugLevel=verbose
-          #- esp32:esp32:firebeetle32
+          - esp32:esp32:firebeetle32
           #- esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_V1
           #- esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_V2
           - esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_v21new
