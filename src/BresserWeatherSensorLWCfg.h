@@ -170,10 +170,11 @@
 #define BATTERY_WEAK 3500
 #define BATTERY_LOW 3200
 
-// Enable sleep mode - sleep after successful transmission to TTN (recommended!)
-#define SLEEP_EN
+// Battery voltage limits in mV (usable range for the device) for battery state calculation
+#define BATTERY_DISCHARGE_LIMIT 3200
+#define BATTERY_CHARGE_LIMIT 4200
 
-// If SLEEP_EN is defined, MCU will sleep for SLEEP_INTERVAL seconds after succesful transmission
+// Sleep for SLEEP_INTERVAL seconds after succesful transmission
 #define SLEEP_INTERVAL 360
 
 // Long sleep interval, MCU will sleep for SLEEP_INTERVAL_LONG seconds if battery voltage <= BATTERY_WEAK
