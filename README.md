@@ -16,6 +16,7 @@ This is early stage of development - stay tuned.
 * [x] LoRaWAN control downlink
 * [x] LoRaWAN status uplink
 * [x] Periodic LinkCheck
-* [ ] Node/network status/debug information
+* [x] Node/network status/debug information
 * [x] setDeviceStatus(battLevel)
+* [ ] Log messages
 * [ ] RP2040 specific implementation
