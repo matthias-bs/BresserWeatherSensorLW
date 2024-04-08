@@ -44,8 +44,8 @@ This is early stage of development - stay tuned.
  
 ## Supported Hardware
 
-  | Status  | Setup                                                                                                                       | Board (/ Revision)   | Define                 | Radio Module | Notes    |
- | -------------------------------------------------------------- | ------------------ | ---------------------------- | ---------------------- | -------- | ------- |
+  |  Status       | Setup                                                                                                               | Board (/ Revision)   | Define                 | Radio Module | Notes    |
+  | ---------     | ------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------------------- | ------------ | -------- |
   |  :hourglass:  | [LILYGO®TTGO-LORA32 V1](https://github.com/Xinyuan-LilyGo/TTGO-LoRa-Series) | TTGO LoRa32-OLED /<br>TTGO LoRa32 V1 (No TFCard) | ARDUINO_TTGO_LORA32_V1 | SX1276 (HPD13A) | -   |
   |  :hourglass:  | [LILYGO®TTGO-LORA32 V2](https://github.com/LilyGO/TTGO-LORA32) | TTGO LoRa32-OLED /<br>TTGO LoRa32 V2             | ARDUINO_TTGO_LoRa32_V2 | SX1276 (HPD13A) | For LMIC only: Wire DIO1 to GPIO33 |
   |  :white_check_mark:  |  [LILYGO®TTGO-LORA32 V2.1](https://www.lilygo.cc/products/lora3?variant=42272562282677) | TTGO LoRa32-OLED /<br>TTGO LoRa32 V2.1 (1.6.1) | ARDUINO_TTGO_LoRa32_v21new |  SX1276 (HPD13A) | - |
