@@ -19,4 +19,5 @@ This is early stage of development - stay tuned.
 * [x] Node/network status/debug information
 * [x] setDeviceStatus(battLevel)
 * [ ] Log messages
+* [ ] Supported ESP32 boards
 * [ ] RP2040 specific implementation
