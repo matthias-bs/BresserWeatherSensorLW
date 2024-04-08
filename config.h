@@ -43,7 +43,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 // pinmap could not be determined - see the notes for more info
 
 // See https://github.com/espressif/arduino-esp32/pull/9250
-//#define FIREBEETLE_ESP32_COVER_LORA
+#define FIREBEETLE_ESP32_COVER_LORA
 
 // Adafruit
 #if defined(ARDUINO_FEATHER_ESP32)
@@ -221,6 +221,16 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 
 #else
   #pragma message ("Unknown board - no automagic pinmap available")
+
+  // Using arbitrary settings for CI workflow with FQBN esp32:esp32:esp32
+  // LoRaWAN_Node board
+  // https://github.com/matthias-bs/LoRaWAN_Node
+  #define PIN_LMIC_NSS      14
+  #define PIN_LMIC_RST      12
+  #define PIN_LMIC_DIO0     4
+  #define PIN_LMIC_DIO1     16
+  #define PIN_LMIC_DIO2     17
+  #define LORA_CHIP SX1276
 
   // SX1262  pin order: Module(NSS/CS, DIO1, RESET, BUSY);
   // SX1262 radio = new Module(8, 14, 12, 13);
