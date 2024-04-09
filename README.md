@@ -22,7 +22,7 @@ This is early stage of development - stay tuned.
 * [x] Periodic LinkCheck
 * [x] Node/network status/debug information
 * [x] setDeviceStatus(battLevel)
-* [ ] Log messages
+* [x] Log messages
 * [x] Supported boards
 * [ ] RP2040 specific implementation
 
