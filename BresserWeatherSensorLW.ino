@@ -29,7 +29,7 @@
 // RadioLib                             6.5.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.24.1
+// BresserWeatherSensorReceiver         0.25.0
 // ESP32AnalogRead                      0.2.2 (optional)
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
@@ -77,6 +77,7 @@
 // -
 //
 // Notes:
+// - The lines with "#pragma message()" in the compiler output are not errors, but useful hints!
 // - Pin mapping of radio transceiver module is done in two places:
 //   - BresserWeatherSensorLW:       config.h
 //   - BresserWeatherSensorReceiver: WeatherSensorCfg.h
@@ -174,16 +175,14 @@ void print_wakeup_reason()
   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
   if (wakeup_reason == ESP_SLEEP_WAKEUP_TIMER)
   {
-    Serial.println(F("Wake from sleep"));
+    log_i("Wake from sleep");
   }
   else
   {
-    Serial.print(F("Wake not caused by deep sleep: "));
-    Serial.println(wakeup_reason);
+    log_i("Wake not caused by deep sleep: %u", wakeup_reason);
   }
 
-  Serial.print(F("Boot count: "));
-  Serial.println(bootCount++);
+  log_i("Boot count: %u", bootCount++);
 }
 
 uint32_t sleepDuration(void)
@@ -224,7 +223,7 @@ void gotoSleep(uint32_t seconds)
 
   // if this appears in the serial debug, we didn't go to sleep!
   // so take defensive action so we don't continually uplink
-  Serial.println(F("\n\n### Sleep failed, delay of 5 minutes & then restart ###\n"));
+  log_w("\n\n### Sleep failed, delay of 5 minutes & then restart ###");
   delay(5UL * 60UL * 1000UL);
   ESP.restart();
 }
@@ -373,11 +372,11 @@ void sendCfgUplink(void)
   uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
   uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
 
-  log_d("Configuration uplink will be sent in %u s", delayMs / 1000);
+  log_d("Sending configuration uplink in %u s", delayMs / 1000);
   delay(delayMs);
   log_d("Sending configuration uplink now.");
   int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
+  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 }
 
 // setup & execute all device functions ...
@@ -387,7 +386,7 @@ void setup()
   while (!Serial)
     ;          // wait for serial to be initalised
   delay(2000); // give time to switch to the serial monitor
-  Serial.println(F("\nSetup"));
+  log_i("\nSetup");
   print_wakeup_reason();
 
   // Set time zone
@@ -420,12 +419,12 @@ void setup()
   int16_t state = 0; // return value for calls to RadioLib
 
   // setup the radio based on the pinmap (connections) in config.h
-  Serial.println(F("Initalise the radio"));
+  log_v("Initalise the radio");
   radio.reset();
   state = radio.begin();
-  debug(state != RADIOLIB_ERR_NONE, F("Initalise radio failed"), state, true);
+  debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
 
-  Serial.println(F("Recalling LoRaWAN nonces & session"));
+  log_d("Recalling LoRaWAN nonces & session");
   // ##### setup the flash storage
   store.begin("radiolib");
   // ##### if we have previously saved nonces, restore them
@@ -434,7 +433,7 @@ void setup()
     uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
     store.getBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // get them to the store
     state = node.setBufferNonces(buffer);                               // send them to LoRaWAN
-    debug(state != RADIOLIB_ERR_NONE, F("Restoring nonces buffer failed"), state, false);
+    debug(state != RADIOLIB_ERR_NONE, "Restoring nonces buffer failed", state, false);
   }
 
   // recall session from RTC deep-sleep preserved variable
@@ -442,45 +441,41 @@ void setup()
   // if we have booted at least once we should have a session to restore, so report any failure
   // otherwise no point saying there's been a failure when it was bound to fail with an empty
   // LWsession var. At this point, bootCount has already been incremented, hence the > 2
-  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), F("Restoring session buffer failed"), state, false);
+  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restoring session buffer failed", state, false);
 
   // process the restored session or failing that, create a new one &
   // return flag to indicate a fresh join is required
-  Serial.println(F("Setup LoRaWAN session"));
+  log_d("Setup LoRaWAN session");
   state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey, false);
   // see comment above, no need to report a failure that is bound to occur on first boot
-  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), F("Restore session failed"), state, false);
+  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restore session failed", state, false);
 
   // loop until successful join
   while (state != RADIOLIB_ERR_NONE)
   {
-    Serial.println(F("Join ('login') to the LoRaWAN Network"));
+    log_d("Join ('login') to the LoRaWAN Network");
     state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey, true);
 
     if (state < RADIOLIB_ERR_NONE)
     {
-      Serial.print(F("Join failed: "));
-      Serial.println(state);
+      log_d("Join failed: %d", state);
 
       // how long to wait before join attempts. This is an interim solution pending
       // implementation of TS001 LoRaWAN Specification section #7 - this doc applies to v1.0.4 & v1.1
       // it sleeps for longer & longer durations to give time for any gateway issues to resolve
       // or whatever is interfering with the device <-> gateway airwaves.
       uint32_t sleepForSeconds = min((bootCountSinceUnsuccessfulJoin++ + 1UL) * 60UL, 3UL * 60UL);
-      Serial.print(F("Boots since unsuccessful join: "));
-      Serial.println(bootCountSinceUnsuccessfulJoin);
-      Serial.print(F("Retrying join in "));
-      Serial.print(sleepForSeconds);
-      Serial.println(F(" seconds"));
+      log_i("Boots since unsuccessful join: %u", bootCountSinceUnsuccessfulJoin);
+      log_i("Retrying join in %u seconds", sleepForSeconds);
 
       gotoSleep(sleepForSeconds);
     }
     else
     { // join was successful
-      Serial.println(F("Joined"));
+      log_i("Joined");
 
       // ##### save the join counters (nonces) to permanent store
-      Serial.println(F("Saving nonces to flash"));
+      log_d("Saving nonces to flash");
       uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
       uint8_t *persist = node.getBufferNonces();                          // get pointer to nonces
       memcpy(buffer, persist, RADIOLIB_LORAWAN_NONCES_BUF_SIZE);          // copy in to buffer
@@ -532,12 +527,12 @@ void setup()
   // and also request the LinkCheck command
   if (fcntUp % 64 == 0)
   {
-    Serial.println(F("[LoRaWAN] Requesting LinkCheck"));
+    log_i("[LoRaWAN] Requesting LinkCheck");
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
   }
 
   // ----- and now for the main event -----
-  Serial.println(F("Sending uplink"));
+  log_i("Sending uplink");
 
   // read some inputs
   // uint8_t Digital2 = digitalRead(2);
@@ -558,7 +553,7 @@ void setup()
   } else {
     state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize);
   }
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false);
+  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
   // Check if downlink was received
   if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
@@ -600,10 +595,8 @@ void setup()
   uint8_t fracSecond = 0;
   if (node.getMacDeviceTimeAns(&networkTime, &fracSecond, true) == RADIOLIB_ERR_NONE)
   {
-    Serial.print(F("[LoRaWAN] DeviceTime Unix:\t"));
-    Serial.println(networkTime);
-    Serial.print(F("[LoRaWAN] DeviceTime second:\t1/"));
-    Serial.println(fracSecond);
+    log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
+    log_i("[LoRaWAN] DeviceTime second:\t1/%u", fracSecond);
 
     // Update the system time with the time read from the network
     rtc.setTime(networkTime);
@@ -619,10 +612,8 @@ void setup()
   uint8_t gwCnt = 0;
   if (node.getMacLinkCheckAns(&margin, &gwCnt) == RADIOLIB_ERR_NONE)
   {
-    Serial.print(F("[LoRaWAN] LinkCheck margin:\t"));
-    Serial.println(margin);
-    Serial.print(F("[LoRaWAN] LinkCheck count:\t"));
-    Serial.println(gwCnt);
+    log_d("[LoRaWAN] LinkCheck margin:\t%d", margin);
+    log_d("[LoRaWAN] LinkCheck count:\t%u", gwCnt);
   }
 
   if (uplinkReq)
@@ -630,8 +621,7 @@ void setup()
     sendCfgUplink();
   }
 
-  Serial.print(F("FcntUp: "));
-  Serial.println(node.getFcntUp());
+  log_d("FcntUp: %u", node.getFcntUp());
 
   // now save session to RTC memory
   uint8_t *persist = node.getBufferSession();

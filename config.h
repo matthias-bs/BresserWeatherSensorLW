@@ -252,12 +252,9 @@ LoRaWANNode node(&radio, &Region, subBand);
 
 
 // Helper function to display any issues
-void debug(bool isFail, const __FlashStringHelper* message, int state, bool Freeze) {
+void debug(bool isFail, const char* message, int state, bool Freeze) {
   if (isFail) {
-    Serial.print(message);
-    Serial.print("(");
-    Serial.print(state);
-    Serial.println(")");
+    log_w("%s (%d)", message, state);
     while (Freeze);
   }
 }
