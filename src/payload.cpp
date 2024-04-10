@@ -78,6 +78,13 @@ extern bool longSleep;
 extern bool rtcSyncReq;
 extern time_t rtcLastClockSync;
 extern ESP32Time rtc;
+// FIXME
+extern struct sPrefs
+{
+  uint8_t ws_timeout;           //!< preferences: weather sensor timeout
+  uint16_t sleep_interval;      //!< preferences: sleep interval
+  uint16_t sleep_interval_long; //!< preferences: sleep interval long
+} prefs;
 
 /// Bresser Weather Sensor Receiver
 WeatherSensor weatherSensor;
@@ -158,7 +165,8 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
     weatherSensor.begin();
     weatherSensor.clearSlots();
-    bool decode_ok = weatherSensor.getData(180 /* prefs.ws_timeout*/ * 1000, DATA_ALL_SLOTS);
+    log_i("Waiting for Weather Sensor Data; timeout %u s", prefs.ws_timeout);
+    bool decode_ok = weatherSensor.getData(prefs.ws_timeout * 1000, DATA_ALL_SLOTS);
 
     if (decode_ok)
     {
