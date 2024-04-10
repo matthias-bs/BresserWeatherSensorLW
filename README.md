@@ -26,6 +26,7 @@ This is early stage of development - stay tuned.
 * [x] Supported boards
 * [x] Enforce minimum uplink interval
 * [x] RP2040 specific implementation
+* [ ] Separate LoRaWAN network and application code
 
 ## Features
 
