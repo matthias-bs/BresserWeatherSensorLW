@@ -30,6 +30,7 @@
 //
 // History:
 // 20240405 Created
+// 20240410 Added RP2040 specific implementation
 //
 // ToDo:
 // -
@@ -37,6 +38,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "adc.h"
+#include "../logging.h"
 
 #ifdef ADC_EN
 
@@ -82,7 +84,12 @@ getVoltage(void)
 
 uint16_t getBatteryVoltage(void)
 {
+    #if defined(ARDUINO_ARCH_RP2040)
+    // Not implemented - no default VBAT input circuit (connect external divider to A0)
+    return 0;
+    #else
     return getVoltage();
+    #endif
 }
 //
 // Get an additional voltage

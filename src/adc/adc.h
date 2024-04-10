@@ -30,6 +30,7 @@
 //
 // History:
 // 20240405 Created
+// 20240410 Added RP2040 specific implementation
 //
 // ToDo:
 // -
@@ -39,6 +40,7 @@
 #if !defined(_ADC_H)
 #define _ADC_H
 
+#include <Arduino.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #ifdef ADC_EN
 #ifdef ESP32
