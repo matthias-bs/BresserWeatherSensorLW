@@ -73,6 +73,7 @@
 //          https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Reference/LoRaWAN_Reference.ino
 //          https://github.com/radiolib-org/radiolib-persistence/blob/main/examples/LoRaWAN_ESP32/LoRaWAN_ESP32.ino
 // 20240410 Added RP2040 specific implementation
+//          Added minimum sleep interval (and thus uplink interval)
 //
 // ToDo:
 // -
@@ -228,6 +229,7 @@ uint32_t sleepDuration(void)
     sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
   }
 
+  sleep_interval = max(sleep_interval, SLEEP_INTERVAL_MIN);
   return sleep_interval;
 }
 

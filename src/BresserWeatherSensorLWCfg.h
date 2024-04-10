@@ -234,6 +234,9 @@
 #define BATTERY_DISCHARGE_LIMIT 3200
 #define BATTERY_CHARGE_LIMIT 4200
 
+// Minimum sleep interval (in seconds)
+#define SLEEP_INTERVAL_MIN 60
+
 // Sleep for SLEEP_INTERVAL seconds after succesful transmission
 #define SLEEP_INTERVAL 360
 
@@ -244,19 +247,19 @@
 #define CLOCK_SYNC_INTERVAL 24 * 60
 
 // Force deep sleep after a certain time, even if transmission was not completed
-#define FORCE_SLEEP
+//#define FORCE_SLEEP
 
 // Force a new join procedure (instead of re-join) after encountering sleep timeout
-#define FORCE_JOIN_AFTER_SLEEP_TIMEOUT
+//#define FORCE_JOIN_AFTER_SLEEP_TIMEOUT
 
 // During initialization (not joined), force deep sleep after SLEEP_TIMEOUT_INITIAL (if enabled)
-#define SLEEP_TIMEOUT_INITIAL 1800
+//#define SLEEP_TIMEOUT_INITIAL 1800
 
 // If already joined, force deep sleep after SLEEP_TIMEOUT_JOINED seconds (if enabled)
-#define SLEEP_TIMEOUT_JOINED 600
+//#define SLEEP_TIMEOUT_JOINED 600
 
 // Additional timeout to be applied after joining if Network Time Request pending
-#define SLEEP_TIMEOUT_EXTRA 300
+//#define SLEEP_TIMEOUT_EXTRA 300
 
 // Timeout for weather sensor data reception (seconds)
 #define WEATHERSENSOR_TIMEOUT 180
