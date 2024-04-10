@@ -37,6 +37,7 @@
 // History:
 //
 // 20240407 Created from BresserWeatherSensorTTNCfg.h
+// 20240410 Removed obsolete defines
 //
 // Note:
 // Depending on board package file date, either
@@ -206,11 +207,6 @@
 // Enable LORAWAN debug mode - this generates dummy weather data and skips weather sensor reception
 // #define LORAWAN_DEBUG
 
-// LoRaWAN session info is stored in RTC RAM on ESP32 and in Preferences (flash) on RP2040
-#if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
-#define SESSION_IN_PREFERENCES
-#endif
-
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
 // If SLEEP_EN is defined and battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
@@ -246,21 +242,6 @@
 // RTC to network time sync interval (in minutes)
 #define CLOCK_SYNC_INTERVAL 24 * 60
 
-// Force deep sleep after a certain time, even if transmission was not completed
-//#define FORCE_SLEEP
-
-// Force a new join procedure (instead of re-join) after encountering sleep timeout
-//#define FORCE_JOIN_AFTER_SLEEP_TIMEOUT
-
-// During initialization (not joined), force deep sleep after SLEEP_TIMEOUT_INITIAL (if enabled)
-//#define SLEEP_TIMEOUT_INITIAL 1800
-
-// If already joined, force deep sleep after SLEEP_TIMEOUT_JOINED seconds (if enabled)
-//#define SLEEP_TIMEOUT_JOINED 600
-
-// Additional timeout to be applied after joining if Network Time Request pending
-//#define SLEEP_TIMEOUT_EXTRA 300
-
 // Timeout for weather sensor data reception (seconds)
 #define WEATHERSENSOR_TIMEOUT 180
 
@@ -288,7 +269,7 @@
 // * ESP32-S2 does not provide BLE!
 #if !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) && !defined(ARDUINO_ARCH_RP2040)
 // #define MITHERMOMETER_EN
-//#define THEENGSDECODER_EN
+#define THEENGSDECODER_EN
 #endif
 
 // Enable Bresser Soil Temperature/Moisture Sensor
