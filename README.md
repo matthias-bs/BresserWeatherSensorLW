@@ -24,7 +24,8 @@ This is early stage of development - stay tuned.
 * [x] setDeviceStatus(battLevel)
 * [x] Log messages
 * [x] Supported boards
-* [ ] RP2040 specific implementation
+* [ ] Enforce minimum uplink interval
+* [x] RP2040 specific implementation
 
 ## Features
 
