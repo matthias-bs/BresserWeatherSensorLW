@@ -229,7 +229,7 @@ uint32_t sleepDuration(void)
     sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
   }
 
-  sleep_interval = max(sleep_interval, SLEEP_INTERVAL_MIN);
+  sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
   return sleep_interval;
 }
 
