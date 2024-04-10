@@ -72,6 +72,7 @@
 //          https://github.com/matthias-bs/BresserWeatherSensorTTN (v0.12.2)
 //          https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Reference/LoRaWAN_Reference.ino
 //          https://github.com/radiolib-org/radiolib-persistence/blob/main/examples/LoRaWAN_ESP32/LoRaWAN_ESP32.ino
+// 20240410 Added RP2040 specific implementation
 //
 // ToDo:
 // -
@@ -88,9 +89,11 @@
 //   reconfiguration of the RFM95W module and its SW drivers -
 //   i.e. to work as a weather data relay to TTN, enabling sleep mode
 //   is basically the only useful option
-// - The ESP32's RTC RAM/the RP2040's Flash (via Preferences library) is used
-//   to store information about the LoRaWAN network session;
-//   this speeds up the connection after a restart significantly
+// - For LoRaWAN Specification 1.1.0, a small set of data (the "nonces") have to be stored persistently -
+//   this implementation uses Flash (via Preferences library
+// - Storing LoRaWAN network session information speeds up the connection (join) after a restart -
+//   this implementation uses the ESP32's RTC RAM or a variable located in the RP2040's RAM, respectively.
+//   In the latter case, an uninitialzed linker section is used for this purpose.
 // - The ESP32's Bluetooth LE interface is used to access sensor data (option)
 // - settimeofday()/gettimeofday() must be used to access the ESP32's RTC time
 // - Arduino ESP32 package has built-in time zone handling, see
@@ -99,8 +102,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 /*! \file BresserWeatherSensorLW.ino */
 
-#if !defined(ESP32)
-#pragma error("This is not the example your device is looking for - ESP32 only")
+#if !defined(ESP32) && !defined(ARDUINO_ARCH_RP2040)
+#pragma error("This is not the example your device is looking for - ESP32 & RP2040 only")
 #endif
 
 // LoRa_Serialization
@@ -120,6 +123,14 @@ struct sPrefs
   uint16_t sleep_interval_long; //!< preferences: sleep interval long
 } prefs;
 
+// Logging macros for RP2040
+#include "src/logging.h"
+
+#if defined(ARDUINO_ARCH_RP2040)
+#include "src/rp2040/pico_rtc_utils.h"
+#include <hardware/rtc.h>
+#endif
+
 // LoRaWAN config, credentials & pinmap
 #include "config.h"
 
@@ -136,23 +147,31 @@ const char *TZ_INFO = TZINFO_STR;
 // The maximum allowed for all data rates is 51 bytes.
 const uint8_t PAYLOAD_SIZE = 51;
 
-// utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
-// puts these in to the RTC memory which is preserved during deep-sleep
-RTC_DATA_ATTR uint16_t bootCount = 1;
-RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
-RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
-
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
 // Stored in RTC RAM
 RTC_DATA_ATTR bool runtimeExpired = false; //!< flag indicating if runtime has expired at least once
 RTC_DATA_ATTR bool longSleep;              //!< last sleep interval; 0 - normal / 1 - long
 RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchonization to network time
+
+// utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
+// puts these in to the RTC memory which is preserved during deep-sleep
+RTC_DATA_ATTR uint16_t bootCount = 1;
+RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
+RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
 #else
-// Save to/restored from Watchdog SCRATCH registers
+// Saved to/restored from Watchdog SCRATCH registers
 bool runtimeExpired;     //!< flag indicating if runtime has expired at least once
 bool longSleep;          //!< last sleep interval; 0 - normal / 1 - long
 time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network time
+
+// utilities & vars to support deep-sleep
+// Saved to/restored from Watchdog SCRATCH registers
+uint16_t bootCount;
+uint16_t bootCountSinceUnsuccessfulJoin;
+
+// RP2040 RAM is preserved during sleep; we just have to ensure that it is not initialized at startup (after reset)
+uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".uninitialized_data")));
 #endif
 
 /// Sleep request
@@ -167,6 +186,7 @@ bool rtcSyncReq = false;
 /// Real time clock
 ESP32Time rtc;
 
+#if defined(ESP32)
 // abbreviated version from the Arduino-ESP32 package, see
 // https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
 // for the complete set of options
@@ -181,9 +201,8 @@ void print_wakeup_reason()
   {
     log_i("Wake not caused by deep sleep: %u", wakeup_reason);
   }
-
-  log_i("Boot count: %u", bootCount++);
 }
+#endif
 
 uint32_t sleepDuration(void)
 {
@@ -212,6 +231,8 @@ uint32_t sleepDuration(void)
   return sleep_interval;
 }
 
+#if defined(ESP32)
+
 // put device in to lowest power deep-sleep mode
 void gotoSleep(uint32_t seconds)
 {
@@ -227,6 +248,42 @@ void gotoSleep(uint32_t seconds)
   delay(5UL * 60UL * 1000UL);
   ESP.restart();
 }
+
+#else
+// put device in to lowest power deep-sleep mode
+void gotoSleep(uint32_t seconds)
+{
+  log_i("Sleeping for %lu s", seconds);
+  time_t t_now = rtc.getLocalEpoch();
+  datetime_t dt;
+  epoch_to_datetime(&t_now, &dt);
+  rtc_set_datetime(&dt);
+  sleep_us(64);
+  pico_sleep(seconds);
+
+  // Save variables to be retained after reset
+  watchdog_hw->scratch[3] = (bootCountSinceUnsuccessfulJoin << 16) | bootCount;
+  watchdog_hw->scratch[2] = rtcLastClockSync;
+  
+  if (runtimeExpired) {
+      watchdog_hw->scratch[1] |= 1;
+  } else {
+      watchdog_hw->scratch[1] &= ~1;
+  }
+  if (longSleep) {
+      watchdog_hw->scratch[1] |= 2;
+  } else {
+      watchdog_hw->scratch[1] &= ~2;
+  }
+  // Save the current time, because RTC will be reset (SIC!)
+  rtc_get_datetime(&dt);
+  time_t now = datetime_to_epoch(&dt, NULL);
+  watchdog_hw->scratch[0] = now;
+  log_i("Now: %llu", now);
+  
+  rp2040.restart();
+}
+#endif
 
 /// Print date and time (i.e. local time)
 void printDateTime(void)
@@ -387,7 +444,34 @@ void setup()
     ;          // wait for serial to be initalised
   delay(2000); // give time to switch to the serial monitor
   log_i("\nSetup");
+
+#if defined(ARDUINO_ARCH_RP2040)
+  // see pico-sdk/src/rp2_common/hardware_rtc/rtc.c
+  rtc_init();
+
+  // Restore variables and RTC after reset
+  time_t time_saved = watchdog_hw->scratch[0];
+  datetime_t dt;
+  epoch_to_datetime(&time_saved, &dt);
+
+  // Set HW clock (only used in sleep mode)
+  rtc_set_datetime(&dt);
+
+  // Set SW clock
+  rtc.setTime(time_saved);
+
+  runtimeExpired = ((watchdog_hw->scratch[1] & 1) == 1);
+  longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
+  rtcLastClockSync = watchdog_hw->scratch[2];
+  bootCount = watchdog_hw->scratch[3] & 0xFFFF;
+  if (bootCount == 0) {
+    bootCount = 1;
+  }
+  bootCountSinceUnsuccessfulJoin = watchdog_hw->scratch[3] >> 16;
+#else
   print_wakeup_reason();
+#endif
+  log_i("Boot count: %u", bootCount++);
 
   // Set time zone
   setenv("TZ", TZ_INFO, 1);
@@ -494,18 +578,21 @@ void setup()
   // ##### close the store
   store.end();
 
-  // Set battery fill level - 
+  // Set battery fill level -
   // the LoRaWAN network server may periodically request this information
   // 0 = external power source
   // 1 = lowest (empty battery)
   // 254 = highest (full battery)
   // 255 = unable to measure
   uint8_t battLevel;
-  if (voltage == 0) {
+  if (voltage == 0)
+  {
     battLevel = 255;
-  } else {
+  }
+  else
+  {
     battLevel = static_cast<uint8_t>(
-      static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT));
+        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT));
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
@@ -548,9 +635,12 @@ void setup()
   LoRaWANEvent_t downlinkDetails;
 
   // perform an uplink & optionally receive downlink
-  if (fcntUp % 64 == 0) {
+  if (fcntUp % 64 == 0)
+  {
     state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, true, &uplinkDetails, &downlinkDetails);
-  } else {
+  }
+  else
+  {
     state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize);
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
