@@ -201,7 +201,7 @@
 // The Thingpulse ePulse Feather board has the same pinout as
 // the Adafruit Feather ESP32 board, but a different VBAT voltage divider!
 // See https://github.com/matthias-bs/BresserWeatherSensorTTN/issues/55
-// #define ARDUINO_THINGPULSE_EPULSE_FEATHER
+//#define ARDUINO_THINGPULSE_EPULSE_FEATHER
 #endif
 
 // Enable LORAWAN debug mode - this generates dummy weather data and skips weather sensor reception
@@ -218,9 +218,6 @@
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
 #pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic).")
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
-#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
-#pragma message("Energy saving at weak battery not implemented yet.")
-#pragma message("Battery deep-discharge prevention not implemented yet.")
 #endif
 
 #define BATTERY_WEAK 3500
