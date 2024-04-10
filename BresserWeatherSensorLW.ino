@@ -74,6 +74,7 @@
 //          https://github.com/radiolib-org/radiolib-persistence/blob/main/examples/LoRaWAN_ESP32/LoRaWAN_ESP32.ino
 // 20240410 Added RP2040 specific implementation
 //          Added minimum sleep interval (and thus uplink interval)
+//          Added M5Stack Core2 initialization
 //
 // ToDo:
 // -
@@ -130,6 +131,10 @@ struct sPrefs
 #if defined(ARDUINO_ARCH_RP2040)
 #include "src/rp2040/pico_rtc_utils.h"
 #include <hardware/rtc.h>
+#endif
+
+#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#include <M5Unified.h>
 #endif
 
 // LoRaWAN config, credentials & pinmap
@@ -266,23 +271,29 @@ void gotoSleep(uint32_t seconds)
   // Save variables to be retained after reset
   watchdog_hw->scratch[3] = (bootCountSinceUnsuccessfulJoin << 16) | bootCount;
   watchdog_hw->scratch[2] = rtcLastClockSync;
-  
-  if (runtimeExpired) {
-      watchdog_hw->scratch[1] |= 1;
-  } else {
-      watchdog_hw->scratch[1] &= ~1;
+
+  if (runtimeExpired)
+  {
+    watchdog_hw->scratch[1] |= 1;
   }
-  if (longSleep) {
-      watchdog_hw->scratch[1] |= 2;
-  } else {
-      watchdog_hw->scratch[1] &= ~2;
+  else
+  {
+    watchdog_hw->scratch[1] &= ~1;
+  }
+  if (longSleep)
+  {
+    watchdog_hw->scratch[1] |= 2;
+  }
+  else
+  {
+    watchdog_hw->scratch[1] &= ~2;
   }
   // Save the current time, because RTC will be reset (SIC!)
   rtc_get_datetime(&dt);
   time_t now = datetime_to_epoch(&dt, NULL);
   watchdog_hw->scratch[0] = now;
   log_i("Now: %llu", now);
-  
+
   rp2040.restart();
 }
 #endif
@@ -441,9 +452,18 @@ void sendCfgUplink(void)
 // setup & execute all device functions ...
 void setup()
 {
+#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+  auto cfg = M5.config();
+  cfg.clear_display = true; // default=true. clear the screen when begin.
+  cfg.output_power = true;  // default=true. use external port 5V output.
+  cfg.internal_imu = false; // default=true. use internal IMU.
+  cfg.internal_rtc = true;  // default=true. use internal RTC.
+  cfg.internal_spk = false; // default=true. use internal speaker.
+  cfg.internal_mic = false; // default=true. use internal microphone.
+  M5.begin(cfg);
+#endif
+
   Serial.begin(115200);
-  while (!Serial)
-    ;          // wait for serial to be initalised
   delay(2000); // give time to switch to the serial monitor
   log_i("\nSetup");
 
@@ -466,7 +486,8 @@ void setup()
   longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
   rtcLastClockSync = watchdog_hw->scratch[2];
   bootCount = watchdog_hw->scratch[3] & 0xFFFF;
-  if (bootCount == 0) {
+  if (bootCount == 0)
+  {
     bootCount = 1;
   }
   bootCountSinceUnsuccessfulJoin = watchdog_hw->scratch[3] >> 16;
