@@ -195,6 +195,18 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma error ("ARDUINO_CUBECELL_BOARD_V2 awaiting pin map")
 
 
+#elif defined(ARDUINO_M5STACK_CORE2) || defined(ARDUINO_M5STACK_Core2)
+  // Note: Depending on board package file date, either variant is used - 
+  //       see https://github.com/espressif/arduino-esp32/issues/9423!
+  #define PIN_LORA_NSS      33
+  #define PIN_LORA_RST      26
+  #define PIN_LORA_IRQ      36
+  #define PIN_LORA_GPIO     RADIOLIB_NC
+  //#define PIN_LORA_GPIO     35 // manual connection  - only required for LMIC
+  #pragma message("ARDUINO_M5STACK_CORE2 defined; assuming M5Stack Module LoRa868 will be used")
+  #define LORA_CHIP SX1276
+
+
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
   // https://wiki.dfrobot.com/FireBeetle_ESP32_IOT_Microcontroller(V3.0)__Supports_Wi-Fi_&_Bluetooth__SKU__DFR0478
   // https://wiki.dfrobot.com/FireBeetle_Covers_LoRa_Radio_868MHz_SKU_TEL0125
@@ -207,17 +219,6 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #define LORA_CHIP SX1276
 
-
-#elif defined(ARDUINO_M5STACK_CORE2) || defined(ARDUINO_M5STACK_Core2)
-  // Note: Depending on board package file date, either variant is used - 
-  //       see https://github.com/espressif/arduino-esp32/issues/9423!
-  #define PIN_LORA_NSS      33
-  #define PIN_LORA_RST      26
-  #define PIN_LORA_IRQ      36
-  #define PIN_LORA_GPIO     RADIOLIB_NC
-  //#define PIN_LORA_GPIO     35 // manual connection  - only required for LMIC
-  #pragma message("ARDUINO_M5STACK_CORE2 defined; assuming M5Stack Module LoRa868 will be used")
-  #define LORA_CHIP SX1276
 
 #else
   #pragma message ("Unknown board - no automagic pinmap available")
