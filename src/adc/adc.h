@@ -42,12 +42,13 @@
 
 #include <Arduino.h>
 #include "../BresserWeatherSensorLWCfg.h"
-#ifdef ADC_EN
-#ifdef ESP32
+
+#if defined(ESP32) && defined(ADC_EN)
 // ESP32 calibrated Analog Input Reading
 #include <ESP32AnalogRead.h>
 #endif
 
+#if defined(ADC_EN)
 /*!
  * \brief Get supply / battery voltage
  * 
@@ -56,6 +57,7 @@
  * \returns Voltage in mV
  */
 uint16_t getVoltage(void);
+#endif
 
 /*!
  * \brief Get battery voltage
@@ -74,11 +76,10 @@ uint16_t getBatteryVoltage(void);
  * 
  * \returns Voltage in mV
  */
-#if defined(ESP32)
+#if defined(ESP32) && defined(ADC_EN)
 uint16_t getVoltage(ESP32AnalogRead &adc, uint8_t samples, float divider);
-#else
+#elif defined(ARDUINO_ARCH_RP2040)
 uint16_t getVoltage(pin_size_t pin, uint8_t samples, float divider);
-#endif
 #endif
 
 #endif // _ADC_H

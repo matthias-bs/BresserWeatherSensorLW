@@ -40,9 +40,11 @@
 #include "adc.h"
 #include "../logging.h"
 
-#ifdef ADC_EN
+#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#include <M5Unified.h>
+#endif
 
-#ifdef ESP32
+#if defined(ESP32) && defined(ADC_EN)
 // ESP32 ADC with calibration
 ESP32AnalogRead adc; //!< ADC object for supply voltage measurement
 
@@ -63,13 +65,14 @@ ESP32AnalogRead adc3; //!< ADC object
 //
 // Get supply / battery voltage
 //
+#if defined(ADC_EN)
 uint16_t
 getVoltage(void)
 {
     float voltage_raw = 0;
     for (uint8_t i = 0; i < UBATT_SAMPLES; i++)
     {
-#ifdef ESP32
+#if defined(ESP32)
         voltage_raw += float(adc.readMiliVolts());
 #else
         voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
@@ -81,20 +84,27 @@ getVoltage(void)
 
     return voltage;
 }
+#endif
 
 uint16_t getBatteryVoltage(void)
 {
     #if defined(ARDUINO_ARCH_RP2040)
     // Not implemented - no default VBAT input circuit (connect external divider to A0)
     return 0;
-    #else
+    #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+    uint16_t voltage = M5.Power.getBatteryVoltage();
+    log_d("Voltage = %dmV", voltage);
+    return voltage;
+    #elif defined(ADC_EN)
     return getVoltage();
+    #else
+    return 0;
     #endif
 }
 //
 // Get an additional voltage
 //
-#if defined(ESP32)
+#if defined(ESP32) && defined(ADC_EN)
 uint16_t
 getVoltage(ESP32AnalogRead &adc, uint8_t samples, float divider)
 {
@@ -109,7 +119,7 @@ getVoltage(ESP32AnalogRead &adc, uint8_t samples, float divider)
 
     return voltage;
 }
-#else
+#elif defined(ARDUINO_ARCH_RP2040)
 uint16_t
 getVoltage(pin_size_t pin, uint8_t samples, float divider)
 {
@@ -125,10 +135,3 @@ getVoltage(pin_size_t pin, uint8_t samples, float divider)
     return voltage;
 }
 #endif
-#else
-uint16_t getBatteryVoltage(void)
-{
-    return 0;
-}
-#endif
-
