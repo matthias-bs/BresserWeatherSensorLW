@@ -4,13 +4,20 @@
 [![GitHub release](https://img.shields.io/github/release/matthias-bs/BresserWeatherSensorLW?maxAge=3600)](https://github.com/matthias-bs/BresserWeatherSensorLW/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/main/LICENSE)
 
-Bresser 868 MHz Weather Sensor Radio Receiver based on ESP32/RP2040 and SX1262/SX1276 &mdash; sends data to a LoRaWAN Network
+Bresser 868 MHz Weather Sensor Radio Receiver based on ESP32/RP2040 and SX1262/SX1276 &mdash; sends data to a [LoRaWAN Network](https://lora-alliance.org/)
 
 This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN) based on [RadioLib](https://github.com/jgromes/RadioLib) instead of [MCCI Arduino LoRaWAN Library](https://github.com/mcci-catena/arduino-lorawan) for LoRaWAN communication.
 
-**Note 1:** RadioLib's LoRaWAN implementation is currently in beta stage.
+## Important Notes
 
-**Note 2:** Helium Network is not supported (requires LoRaWAN v1.0.x)
+* RadioLib's LoRaWAN implementation is currently in beta stage.
+* Helium Network is not supported (requires LoRaWAN v1.0.x)
+* This should not be the first Arduino sketch ever you are trying to flash to your board - try somthing simple (`blink.ino`) first to get familiar with the tools and workflow.
+* If you are new to LoRaWAN
+   * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
+   * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
+
+## Status
 
 This project is in early stage of development - stay tuned.
 
