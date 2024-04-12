@@ -8,7 +8,9 @@ Bresser 868 MHz Weather Sensor Radio Receiver based on ESP32/RP2040 and SX1262/S
 
 This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN) based on [RadioLib](https://github.com/jgromes/RadioLib) instead of [MCCI Arduino LoRaWAN Library](https://github.com/mcci-catena/arduino-lorawan) for LoRaWAN communication.
 
-**Note:** RadioLib's LoRaWAN implementation is currently in beta stage.
+**Note 1:** RadioLib's LoRaWAN implementation is currently in beta stage.
+
+**Note 2:** Helium Network is not supported (requires LoRaWAN v1.0.x)
 
 This project is in early stage of development - stay tuned.
 
