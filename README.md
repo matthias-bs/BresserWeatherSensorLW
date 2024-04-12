@@ -78,6 +78,6 @@ Radio chip: SX1276
 Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 ```
 
-** Documentation will be updated soon! **
+**Documentation will be updated soon!**
 
 Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md)
