@@ -17,6 +17,22 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
 
+## Features
+
+* Single 868 MHz Radio Transceiver for both Sensor Data Reception and LoRaWAN Connection
+* Compatible to LoRaWAN Specification 1.1.0 / RP001 Regional Parameters 1.1 revision A
+* Tested with [The Things Network](https://www.thethingsnetwork.org/)
+* Supports multiple 868 MHz Sensors (e.g. Weather Sensor and Soil Moisture Sensor or Indoor Thermometer/Hygrometer)
+* See [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) for supported sensors
+* Low Power Design (using ESP32 Deep Sleep Mode / RP2040 Sleep State)
+* Fast LoRaWAN Joining after Deep Sleep (using ESP32 RTC RAM / RP2040 RAM)
+* [ATC MiThermometer](https://github.com/pvvx/ATC_MiThermometer) Bluetooth Low Energy Thermometer/Hygrometer Integration (optional)
+* [Theengs Decoder](https://github.com/theengs/decoder) Bluetooth Low Energy Sensors Integration (optional)
+* OneWire Temperature Sensor Integration (optional)
+* ESP32/RP2040 Analog Digital Converter Integration (optional)
+* [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
+* [Remote Configuration via LoRaWAN Downlink](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#remote-configuration-via-lorawan-downlink)
+
 ## Status
 
 This project is in early stage of development - stay tuned.
@@ -40,21 +56,6 @@ This project is in early stage of development - stay tuned.
 * [ ] Fix battery voltage measurement for HW targets FIREBEETLE_ESP32_COVER_LORA & LORAWAN_NODE
 * [ ] Separate LoRaWAN network and application code
 
-## Features
-
-* Single 868 MHz Radio Transceiver for both Sensor Data Reception and LoRaWAN Connection
-* Compatible to LoRaWAN Specification 1.1.0 / RP001 Regional Parameters 1.1 revision A
-* Tested with [The Things Network](https://www.thethingsnetwork.org/)
-* Supports multiple 868 MHz Sensors (e.g. Weather Sensor and Soil Moisture Sensor or Indoor Thermometer/Hygrometer)
-* See [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) for supported sensors
-* Low Power Design (using ESP32 Deep Sleep Mode / RP2040 Sleep State)
-* Fast LoRaWAN Joining after Deep Sleep (using ESP32 RTC RAM / RP2040 RAM)
-* [ATC MiThermometer](https://github.com/pvvx/ATC_MiThermometer) Bluetooth Low Energy Thermometer/Hygrometer Integration (optional)
-* [Theengs Decoder](https://github.com/theengs/decoder) Bluetooth Low Energy Sensors Integration (optional)
-* OneWire Temperature Sensor Integration (optional)
-* ESP32/RP2040 Analog Digital Converter Integration (optional)
-* [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
-* [Remote Configuration via LoRaWAN Downlink](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#remote-configuration-via-lorawan-downlink)
  
 ## Supported Hardware
 
