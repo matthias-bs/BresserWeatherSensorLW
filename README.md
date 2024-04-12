@@ -16,6 +16,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
+* You currently need the latest version (HEAD) of [RadioLib](https://github.com/jgromes/RadioLib)
 
 ## Features
 
