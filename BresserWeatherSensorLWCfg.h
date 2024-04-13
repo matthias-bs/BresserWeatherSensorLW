@@ -38,7 +38,7 @@
 //
 // 20240407 Created from BresserWeatherSensorTTNCfg.h
 // 20240410 Removed obsolete defines
-// 20240413 Added ESP32-S3 PowerFeather
+// 20240413 Refactored ADC handling
 //
 // Note:
 // Depending on board package file date, either
@@ -192,10 +192,10 @@
     !defined(ARDUINO_FEATHER_ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) &&       \
     !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2)
 // Use pinning for LoRaWAN Node
-//#define LORAWAN_NODE
+#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-#define FIREBEETLE_ESP32_COVER_LORA
+//#define FIREBEETLE_ESP32_COVER_LORA
 #endif
 
 #if defined(ARDUINO_FEATHER_ESP32)
@@ -252,11 +252,8 @@
 // Enable rain data statistics
 #define RAINDATA_EN
 
-#if !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2)
-// Enable battery / supply voltage measurement
-// Note: For M5Stack Core2 use 'float batVoltage = M5.Axp.GetBatVoltage();'
+// Enable battery / supply voltage uplink
 #define ADC_EN
-#endif
 
 // Enable OneWire temperature measurement
 // #define ONEWIRE_EN
@@ -292,35 +289,34 @@
 // Adafruit Feather ESP32:      on-board connection to VBAT
 // Adafruit Feather ESP32-S2:   no VBAT input circuit
 // Adafruit Feather RP2040:     no VBAT input circuit (connect external divider to A0)
-#ifdef ADC_EN
 #if defined(ARDUINO_TTGO_LoRa32_V1) || defined(ARDUINO_TTGO_LoRa32_V2) || defined(ARDUINO_TTGO_LoRa32_v21new)
 #define PIN_ADC_IN 35
 #elif defined(ARDUINO_FEATHER_ESP32)
 #define PIN_ADC_IN A13
-#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+#elif defined(LORAWAN_NODE)
+// External Li-Ion Battery connected to solar charger
+#define PIN_ADC_IN A3
+#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+// On-board VB
+#define PIN_ADC_IN A0
+#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
 // Unused
 #define PIN_ADC_IN -1
-#elif defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
-#define PIN_ADC_IN A0
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define PIN_ADC_IN A0
 #else
 #define PIN_ADC_IN 34
 #endif
+
+// Additional ADC pins
+#if defined(LORAWAN_NODE)
+#define PIN_SUPPLY_IN A0
 #endif
 
-// Additional ADC pins (default: FireBeetle ESP32)
-// #define PIN_ADC0_IN         A0
-// #define PIN_ADC1_IN         A1
-// #define PIN_ADC2_IN         A2
-#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
-#define PIN_ADC3_IN A3
-#endif
-
-#ifdef PIN_ADC0_IN
+#ifdef PIN_SUPPLY_IN
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
-const float ADC0_DIV = 0.5;
-const uint8_t ADC0_SAMPLES = 10;
+const float SUPPLY_DIV = 0.5;
+const uint8_t SUPPLY_SAMPLES = 10;
 #endif
 
 #ifdef PIN_ADC1_IN

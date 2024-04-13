@@ -86,7 +86,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 // pinmap could not be determined - see the notes for more info
 
 // See https://github.com/espressif/arduino-esp32/pull/9250
-#define FIREBEETLE_ESP32_COVER_LORA
+//#define FIREBEETLE_ESP32_COVER_LORA
 
 // Adafruit
 #if defined(ARDUINO_FEATHER_ESP32)
@@ -272,7 +272,6 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma message("FIREBEETLE_ESP32_COVER_LORA defined; assuming FireBeetle ESP32 with FireBeetle Cover LoRa will be used")
   #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #define LORA_CHIP SX1276
-
 
 #else
   #pragma message ("Unknown board - no automagic pinmap available")

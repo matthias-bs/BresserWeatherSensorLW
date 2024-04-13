@@ -34,6 +34,7 @@
 // History:
 //
 // 20240402 Created
+// 20240413 Refactored ADC handling
 //
 // ToDo:
 // -
@@ -44,12 +45,9 @@
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
 #include <ESP32Time.h>
-#include "BresserWeatherSensorLWCfg.h"
+#include "../BresserWeatherSensorLWCfg.h"
 #include "adc/adc.h"
 
-#if defined(ESP32) && defined(ADC_EN) && defined(PIN_ADC3_IN)
-extern ESP32AnalogRead adc3;
-#endif
 
 #if defined(MITHERMOMETER_EN)
 // BLE Temperature/Humidity Sensor
@@ -137,15 +135,10 @@ void genPayload(uint8_t port, LoraEncoder &encoder)
 
 void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
-// uint8_t result;
-#ifdef ADC_EN
-    uint16_t supply_voltage = getVoltage();
+#ifdef PIN_SUPPLY_IN
+    uint16_t supply_voltage = getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
 #endif
-#if defined(ADC_EN) && defined(PIN_ADC3_IN)
-    // FIXME linker error
-    uint16_t battery_voltage = getVoltage(adc3, ADC3_SAMPLES, ADC3_DIV);
-    // uint16_t  battery_voltage     = 0;
-#endif
+    uint16_t battery_voltage = getBatteryVoltage();
     bool mithermometer_valid = false;
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     float indoor_temp_c;
@@ -346,10 +339,10 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
             log_i("Distance:         ---- mm");
         }
 #endif
-#ifdef ADC_EN
+#ifdef PIN_SUPPLY_IN
         log_i("Supply  Voltage:   %4d   mV", supply_voltage);
 #endif
-#if defined(ADC_EN) && defined(PIN_ADC3_IN)
+#if defined(ADC_EN) && defined(PIN_ADC_IN)
         log_i("Battery Voltage:   %4d   mV", battery_voltage);
 #endif
 
@@ -464,10 +457,10 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
         }
 
 // Voltages / auxiliary sensor data
-#ifdef ADC_EN
+#ifdef PIN_SUPPLY_IN
         encoder.writeUint16(supply_voltage);
 #endif
-#if defined(ADC_EN) && defined(PIN_ADC3_IN)
+#if defined(PIN_ADC_IN)
         encoder.writeUint16(battery_voltage);
 #endif
 #ifdef ONEWIRE_EN

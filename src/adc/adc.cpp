@@ -31,6 +31,7 @@
 // History:
 // 20240405 Created
 // 20240410 Added RP2040 specific implementation
+// 20240413 Refactored ADC handling
 // 20240414 Added ESP32-S3 PowerFeather
 //
 // ToDo:
@@ -47,36 +48,18 @@
 #include <PowerFeather.h>
 #endif
 
-#if defined(ESP32) && defined(ADC_EN)
-// ESP32 ADC with calibration
-ESP32AnalogRead adc; //!< ADC object for supply voltage measurement
 
-// ESP32 ADC with calibration
-#if defined(PIN_ADC0_IN)
-ESP32AnalogRead adc0; //!< ADC object
-#endif
-#if defined(PIN_ADC1_IN)
-ESP32AnalogRead adc1; //!< ADC object
-#endif
-#if defined(PIN_ADC2_IN)
-ESP32AnalogRead adc2; //!< ADC object
-#endif
-#if defined(PIN_ADC3_IN)
-ESP32AnalogRead adc3; //!< ADC object
-#endif
-#endif
 //
-// Get supply / battery voltage
+// Get voltage
 //
-#if defined(ADC_EN)
 uint16_t
-getVoltage(void)
+getVoltage(uint8_t pin, uint8_t samples, float div)
 {
     float voltage_raw = 0;
     for (uint8_t i = 0; i < UBATT_SAMPLES; i++)
     {
 #if defined(ESP32)
-        voltage_raw += float(adc.readMiliVolts());
+        voltage_raw += float(analogReadMilliVolts(PIN_ADC_IN));
 #else
         voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
 #endif
@@ -87,7 +70,7 @@ getVoltage(void)
 
     return voltage;
 }
-#endif
+
 
 uint16_t getBatteryVoltage(void)
 {
@@ -104,37 +87,4 @@ uint16_t getBatteryVoltage(void)
     return 0;
     #endif
 }
-//
-// Get an additional voltage
-//
-#if defined(ESP32) && defined(ADC_EN)
-uint16_t
-getVoltage(ESP32AnalogRead &adc, uint8_t samples, float divider)
-{
-    float voltage_raw = 0;
-    for (uint8_t i = 0; i < samples; i++)
-    {
-        voltage_raw += float(adc.readMiliVolts());
-    }
-    uint16_t voltage = int(voltage_raw / samples / divider);
 
-    log_d("Voltage = %dmV", voltage);
-
-    return voltage;
-}
-#elif defined(ARDUINO_ARCH_RP2040)
-uint16_t
-getVoltage(pin_size_t pin, uint8_t samples, float divider)
-{
-    float voltage_raw = 0;
-    for (uint8_t i = 0; i < samples; i++)
-    {
-        voltage_raw += float(analogRead(pin)) / 4095.0 * 3.3;
-    }
-    uint16_t voltage = int(voltage_raw / samples / divider);
-
-    log_d("Voltage = %dmV", voltage);
-
-    return voltage;
-}
-#endif
