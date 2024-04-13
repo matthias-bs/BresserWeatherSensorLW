@@ -87,7 +87,8 @@ jobs:
             "TheengsDecoder@1.7.5"
             "Preferences@2.1.0"
             "M5Unified@0.1.13"
-            "M5Core2@0.1.9")
+            "M5Core2@0.1.9"
+            "powerfeather-sdk@1.0.5")
           for i in "${required_libs[@]}"
           do
             arduino-cli lib install "$i"
