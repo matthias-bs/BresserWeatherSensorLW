@@ -31,6 +31,7 @@
 // History:
 // 20240405 Created
 // 20240410 Added RP2040 specific implementation
+// 20240413 Refactored ADC handling
 //
 // ToDo:
 // -
@@ -43,21 +44,17 @@
 #include <Arduino.h>
 #include "../../BresserWeatherSensorLWCfg.h"
 
-#if defined(ESP32) && defined(ADC_EN)
-// ESP32 calibrated Analog Input Reading
-#include <ESP32AnalogRead.h>
-#endif
 
-#if defined(ADC_EN)
 /*!
  * \brief Get supply / battery voltage
  * 
- * Returns the default voltage measurement provided by the specified board.
+ * Returns a voltage measurement with oversampling and divider
  * 
  * \returns Voltage in mV
  */
-uint16_t getVoltage(void);
-#endif
+
+uint16_t getVoltage(uint8_t pin = PIN_ADC_IN, uint8_t samples = UBATT_SAMPLES, float divider = UBATT_DIV);
+
 
 /*!
  * \brief Get battery voltage
@@ -67,19 +64,5 @@ uint16_t getVoltage(void);
  * \returns Voltage in mV or zero if not available
  */
 uint16_t getBatteryVoltage(void);
-
-/*!
- * \brief Get an additional voltage
- * 
- * Returns the voltage of the specified ADC channel
- * (architecture, board and configuration specific)
- * 
- * \returns Voltage in mV
- */
-#if defined(ESP32) && defined(ADC_EN)
-uint16_t getVoltage(ESP32AnalogRead &adc, uint8_t samples, float divider);
-#elif defined(ARDUINO_ARCH_RP2040)
-uint16_t getVoltage(pin_size_t pin, uint8_t samples, float divider);
-#endif
 
 #endif // _ADC_H
