@@ -1,3 +1,45 @@
+///////////////////////////////////////////////////////////////////////////////
+// config.h
+// 
+//  RadioLib / LoRaWAN specific configuration including radio module wiring
+//
+//  based on https://github.com/radiolib-org/radiolib-persistence
+//
+// created: 04/2024
+//
+//
+// MIT License
+//
+// Copyright (c) 2024 Matthias Prinke
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//
+// History:
+//
+// 20240412 Created
+//
+// ToDo:
+// - 
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
@@ -43,7 +85,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 // pinmap could not be determined - see the notes for more info
 
 // See https://github.com/espressif/arduino-esp32/pull/9250
-#define FIREBEETLE_ESP32_COVER_LORA
+//#define FIREBEETLE_ESP32_COVER_LORA
 
 // Adafruit
 #if defined(ARDUINO_FEATHER_ESP32)
@@ -218,7 +260,6 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma message("FIREBEETLE_ESP32_COVER_LORA defined; assuming FireBeetle ESP32 with FireBeetle Cover LoRa will be used")
   #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #define LORA_CHIP SX1276
-
 
 #else
   #pragma message ("Unknown board - no automagic pinmap available")

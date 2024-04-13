@@ -38,6 +38,7 @@
 //
 // 20240407 Created from BresserWeatherSensorTTNCfg.h
 // 20240410 Removed obsolete defines
+// 20240413 Refactored ADC handling
 //
 // Note:
 // Depending on board package file date, either
@@ -296,7 +297,11 @@
 #define PIN_ADC_IN 35
 #elif defined(ARDUINO_FEATHER_ESP32)
 #define PIN_ADC_IN A13
-#elif defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
+#elif defined(LORAWAN_NODE)
+// External Li-Ion Battery connected to solar charger
+#define PIN_ADC_IN A3
+#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+// On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define PIN_ADC_IN A0
@@ -305,18 +310,15 @@
 #endif
 #endif
 
-// Additional ADC pins (default: FireBeetle ESP32)
-// #define PIN_ADC0_IN         A0
-// #define PIN_ADC1_IN         A1
-// #define PIN_ADC2_IN         A2
-#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
-#define PIN_ADC3_IN A3
+// Additional ADC pins
+#if defined(LORAWAN_NODE)
+#define PIN_SUPPLY_IN A0
 #endif
 
-#ifdef PIN_ADC0_IN
+#ifdef PIN_SUPPLY_IN
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
-const float ADC0_DIV = 0.5;
-const uint8_t ADC0_SAMPLES = 10;
+const float SUPPLY_DIV = 0.5;
+const uint8_t SUPPLY_SAMPLES = 10;
 #endif
 
 #ifdef PIN_ADC1_IN
