@@ -252,11 +252,8 @@
 // Enable rain data statistics
 #define RAINDATA_EN
 
-#if !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2)
-// Enable battery / supply voltage measurement
-// Note: For M5Stack Core2 use 'float batVoltage = M5.Axp.GetBatVoltage();'
+// Enable battery / supply voltage uplink
 #define ADC_EN
-#endif
 
 // Enable OneWire temperature measurement
 // #define ONEWIRE_EN
@@ -292,7 +289,6 @@
 // Adafruit Feather ESP32:      on-board connection to VBAT
 // Adafruit Feather ESP32-S2:   no VBAT input circuit
 // Adafruit Feather RP2040:     no VBAT input circuit (connect external divider to A0)
-#ifdef ADC_EN
 #if defined(ARDUINO_TTGO_LoRa32_V1) || defined(ARDUINO_TTGO_LoRa32_V2) || defined(ARDUINO_TTGO_LoRa32_v21new)
 #define PIN_ADC_IN 35
 #elif defined(ARDUINO_FEATHER_ESP32)
@@ -310,7 +306,6 @@
 #define PIN_ADC_IN A0
 #else
 #define PIN_ADC_IN 34
-#endif
 #endif
 
 // Additional ADC pins
