@@ -59,7 +59,6 @@ getVoltage(uint8_t pin, uint8_t samples, float div)
         voltage_raw += float(analogReadMilliVolts(PIN_ADC_IN));
 #else
         voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
-        #pragma message("Doh!")
 #endif
     }
     uint16_t voltage = int(voltage_raw / UBATT_SAMPLES / UBATT_DIV);
