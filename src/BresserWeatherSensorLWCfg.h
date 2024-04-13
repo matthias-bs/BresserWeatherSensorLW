@@ -303,6 +303,9 @@
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
 // On-board VB
 #define PIN_ADC_IN A0
+#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+// Unused
+#define PIN_ADC_IN -1
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define PIN_ADC_IN A0
 #else
