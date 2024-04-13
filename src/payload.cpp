@@ -44,7 +44,7 @@
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
 #include <ESP32Time.h>
-#include "BresserWeatherSensorLWCfg.h"
+#include "../BresserWeatherSensorLWCfg.h"
 #include "adc/adc.h"
 
 #if defined(ESP32) && defined(ADC_EN) && defined(PIN_ADC3_IN)

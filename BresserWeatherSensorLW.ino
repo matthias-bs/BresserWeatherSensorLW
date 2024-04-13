@@ -142,7 +142,7 @@ struct sPrefs
 
 #include <RadioLib.h>
 #include <ESP32Time.h>
-#include "src/BresserWeatherSensorLWCfg.h"
+#include "BresserWeatherSensorLWCfg.h"
 #include "src/payload.h"
 #include "src/adc/adc.h"
 

@@ -41,7 +41,7 @@
 #define _ADC_H
 
 #include <Arduino.h>
-#include "../BresserWeatherSensorLWCfg.h"
+#include "../../BresserWeatherSensorLWCfg.h"
 
 #if defined(ESP32) && defined(ADC_EN)
 // ESP32 calibrated Analog Input Reading

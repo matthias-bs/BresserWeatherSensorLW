@@ -191,10 +191,10 @@
     !defined(ARDUINO_FEATHER_ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) &&       \
     !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2)
 // Use pinning for LoRaWAN Node
-//#define LORAWAN_NODE
+#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-#define FIREBEETLE_ESP32_COVER_LORA
+//#define FIREBEETLE_ESP32_COVER_LORA
 #endif
 
 #if defined(ARDUINO_FEATHER_ESP32)
