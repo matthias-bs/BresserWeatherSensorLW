@@ -31,6 +31,7 @@
 // History:
 // 20240405 Created
 // 20240410 Added RP2040 specific implementation
+// 20240414 Added ESP32-S3 PowerFeather
 //
 // ToDo:
 // -
@@ -42,6 +43,8 @@
 
 #if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
 #include <M5Unified.h>
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+#include <PowerFeather.h>
 #endif
 
 #if defined(ESP32) && defined(ADC_EN)

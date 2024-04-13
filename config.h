@@ -1,3 +1,46 @@
+///////////////////////////////////////////////////////////////////////////////
+// config.h
+// 
+// RadioLib / LoRaWAN specific configuration including radio module wiring
+//
+// based on https://github.com/radiolib-org/radiolib-persistence
+//
+// created: 04/2024
+//
+//
+// MIT License
+//
+// Copyright (c) 2024 Matthias Prinke
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//
+// History:
+//
+// 20240412 Created
+// 20240413 Added ESP32-S3 PowerFeather
+//
+// ToDo:
+// - 
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
@@ -65,6 +108,17 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #define PIN_LORA_DIO2     RADIOLIB_NC
     #pragma message("NOT TESTED!!!")
     #pragma message("ARDUINO_ADAFRUIT_FEATHER_ESP32_V2 defined; assuming RFM95W FeatherWing will be used")
+    #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
+    #define LORA_CHIP SX1276
+
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+    #define PIN_LORA_NSS      14
+    #define PIN_LORA_RST      27
+    #define PIN_LORA_IRQ      32
+    #define PIN_LORA_GPIO     33
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+    #pragma message("NOT TESTED!!!")
+    #pragma message("ARDUINO_ESP32S3_POWERFEATHER defined; assuming RFM95W FeatherWing will be used")
     #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
     #define LORA_CHIP SX1276
 

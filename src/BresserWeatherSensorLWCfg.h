@@ -38,6 +38,7 @@
 //
 // 20240407 Created from BresserWeatherSensorTTNCfg.h
 // 20240410 Removed obsolete defines
+// 20240413 Added ESP32-S3 PowerFeather
 //
 // Note:
 // Depending on board package file date, either
@@ -296,6 +297,9 @@
 #define PIN_ADC_IN 35
 #elif defined(ARDUINO_FEATHER_ESP32)
 #define PIN_ADC_IN A13
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+// Unused
+#define PIN_ADC_IN -1
 #elif defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)

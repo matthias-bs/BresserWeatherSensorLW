@@ -75,6 +75,7 @@
 // 20240410 Added RP2040 specific implementation
 //          Added minimum sleep interval (and thus uplink interval)
 //          Added M5Stack Core2 initialization
+// 20240414 Added ESP32-S3 PowerFeather
 //
 // ToDo:
 // -
