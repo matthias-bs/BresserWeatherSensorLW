@@ -339,10 +339,10 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
             log_i("Distance:         ---- mm");
         }
 #endif
-#ifdef ADC_EN
+#ifdef PIN_SUPPLY_IN
         log_i("Supply  Voltage:   %4d   mV", supply_voltage);
 #endif
-#if defined(ADC_EN) && defined(PIN_ADC3_IN)
+#if defined(ADC_EN) && defined(PIN_ADC_IN)
         log_i("Battery Voltage:   %4d   mV", battery_voltage);
 #endif
 
@@ -457,10 +457,10 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
         }
 
 // Voltages / auxiliary sensor data
-#ifdef ADC_EN
+#ifdef PIN_SUPPLY_IN
         encoder.writeUint16(supply_voltage);
 #endif
-#if defined(ADC_EN) && defined(PIN_ADC3_IN)
+#if defined(PIN_ADC_IN)
         encoder.writeUint16(battery_voltage);
 #endif
 #ifdef ONEWIRE_EN
