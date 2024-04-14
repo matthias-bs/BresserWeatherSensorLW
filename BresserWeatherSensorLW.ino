@@ -121,7 +121,6 @@ static Preferences preferences;
 
 struct sPrefs
 {
-  uint8_t ws_timeout;           //!< preferences: weather sensor timeout
   uint16_t sleep_interval;      //!< preferences: sleep interval
   uint16_t sleep_interval_long; //!< preferences: sleep interval long
 } prefs;
