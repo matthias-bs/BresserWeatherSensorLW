@@ -33,6 +33,7 @@
 // 20240410 Added RP2040 specific implementation
 // 20240413 Refactored ADC handling
 // 20240414 Added ESP32-S3 PowerFeather
+//          Added getSupplyVoltage()
 //
 // ToDo:
 // -
@@ -46,6 +47,7 @@
 #include <M5Unified.h>
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
 #include <PowerFeather.h>
+using namespace PowerFeather;
 #endif
 
 
@@ -81,6 +83,15 @@ uint16_t getBatteryVoltage(void)
     uint16_t voltage = M5.Power.getBatteryVoltage();
     log_d("Voltage = %dmV", voltage);
     return voltage;
+    #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+    uint16_t voltage;
+    Result res = Board.getBatteryVoltage(voltage);
+    if (res == Result::Ok) {
+      log_d("Voltage = %dmV", voltage);
+      return voltage;
+    } else {
+      return 0;
+    }
     #elif defined(ADC_EN)
     return getVoltage();
     #else
@@ -88,3 +99,20 @@ uint16_t getBatteryVoltage(void)
     #endif
 }
 
+uint16_t getSupplyVoltage(void)
+{
+    #if defined(ARDUINO_ESP32S3_POWERFEATHER)
+    uint16_t voltage;
+    Result res = Board.getSupplyVoltage(voltage);
+    if (res == Result::Ok) {
+      log_d("Voltage = %dmV", voltage);
+      return voltage;
+    } else {
+      return 0;
+    }
+    #elif defined(PIN_SUPPLY_IN)
+      return getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
+    #else
+      return 0;
+    #endif
+}
