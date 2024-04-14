@@ -55,7 +55,7 @@ This project is in early stage of development - stay tuned.
 * [x] Enforce minimum uplink interval
 * [x] RP2040 specific implementation
 * [x] Fix battery voltage measurement for HW targets FIREBEETLE_ESP32_COVER_LORA & LORAWAN_NODE
-* [ ] Separate LoRaWAN network and application code
+* [x] Separate LoRaWAN network and application code
 
  
 ## Supported Hardware
