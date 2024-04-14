@@ -35,6 +35,7 @@
 //
 // 20240402 Created
 // 20240413 Refactored ADC handling
+// 20240414 Added separation between LoRaWAN and application layer
 //
 // ToDo:
 // -
@@ -45,9 +46,9 @@
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
 #include <ESP32Time.h>
+#include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "adc/adc.h"
-
 
 #if defined(MITHERMOMETER_EN)
 // BLE Temperature/Humidity Sensor
@@ -71,18 +72,11 @@
 #include <DistanceSensor_A02YYUW.h>
 #endif
 
-extern bool runtimeExpired;
-extern bool longSleep;
-extern bool rtcSyncReq;
 extern time_t rtcLastClockSync;
 extern ESP32Time rtc;
-// FIXME
-extern struct sPrefs
-{
-  uint8_t ws_timeout;           //!< preferences: weather sensor timeout
-  uint16_t sleep_interval;      //!< preferences: sleep interval
-  uint16_t sleep_interval_long; //!< preferences: sleep interval long
-} prefs;
+
+/// Preferences (stored in flash memory)
+static Preferences appPrefs;
 
 /// Bresser Weather Sensor Receiver
 WeatherSensor weatherSensor;
@@ -125,6 +119,17 @@ DistanceSensor_A02YYUW distanceSensor(&Serial1);
 #endif
 #endif
 
+uint8_t decodeDownlinkApp(uint8_t *payload, size_t size)
+{
+    if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2))
+    {
+        log_d("Set weathersensor_timeout: %u s", payload[1]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ws_timeout", payload[1]);
+        appPrefs.end();
+    }
+}
+
 void genPayload(uint8_t port, LoraEncoder &encoder)
 {
     // unused
@@ -158,8 +163,13 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
     weatherSensor.begin();
     weatherSensor.clearSlots();
-    log_i("Waiting for Weather Sensor Data; timeout %u s", prefs.ws_timeout);
-    bool decode_ok = weatherSensor.getData(prefs.ws_timeout * 1000, DATA_ALL_SLOTS);
+    appPrefs.begin("BWS-LW-APP", false);
+    uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
+    log_d("Preferences: weathersensor_timeout: %u s", ws_timeout);
+    appPrefs.end();
+
+    log_i("Waiting for Weather Sensor Data; timeout %u s", ws_timeout);
+    bool decode_ok = weatherSensor.getData(ws_timeout * 1000, DATA_ALL_SLOTS);
 
     if (decode_ok)
     {
@@ -380,16 +390,6 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
             encoder.writeUint32(0);
         }
 #endif
-
-        // LoRaWAN node status flags
-        encoder.writeBitmap(0,
-                            0,
-                            0,
-                            0,
-                            0,
-                            longSleep,
-                            rtcSyncReq,
-                            runtimeExpired);
 
         // Sensor status flags
         encoder.writeBitmap(0,

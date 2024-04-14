@@ -75,6 +75,7 @@
 // 20240410 Added RP2040 specific implementation
 //          Added minimum sleep interval (and thus uplink interval)
 //          Added M5Stack Core2 initialization
+// 20240414 Added separation between LoRaWAN and application layer
 //
 // ToDo:
 // -
@@ -113,9 +114,9 @@
 
 // ##### load the ESP32 preferences facilites
 #include <Preferences.h>
-Preferences store;
+static Preferences store;
 
-/// ESP32 preferences (stored in flash memory)
+/// Preferences (stored in flash memory)
 static Preferences preferences;
 
 struct sPrefs
@@ -135,6 +136,11 @@ struct sPrefs
 
 #if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
 #include <M5Unified.h>
+#endif
+
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+#include <PowerFeather.h>
+using namespace PowerFeather;
 #endif
 
 // LoRaWAN config, credentials & pinmap
@@ -310,7 +316,6 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
-// TODO: separate sensor specific parts from generic parts
 void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   log_v("Port: %d", port);
@@ -329,12 +334,12 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       log_d("Get date/time");
       uplinkReq = CMD_GET_DATETIME;
     }
-    if ((payload[0] == CMD_GET_CONFIG) && (size == 1))
+    else if ((payload[0] == CMD_GET_CONFIG) && (size == 1))
     {
       log_d("Get config");
       uplinkReq = CMD_GET_CONFIG;
     }
-    if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
+    else if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
     {
 
       time_t set_time = payload[4] | (payload[3] << 8) | (payload[2] << 16) | (payload[1] << 24);
@@ -349,28 +354,23 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       log_d("Set date/time: %s", tbuf);
 #endif
     }
-    if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2))
-    {
-      log_d("Set weathersensor_timeout: %u s", payload[1]);
-      preferences.begin("BWS-TTN", false);
-      preferences.putUChar("ws_timeout", payload[1]);
-      preferences.end();
-    }
-    if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
+    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
     {
       prefs.sleep_interval = payload[2] | (payload[1] << 8);
       log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-      preferences.begin("BWS-TTN", false);
+      preferences.begin("BWS-LW", false);
       preferences.putUShort("sleep_int", prefs.sleep_interval);
       preferences.end();
     }
-    if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
+    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
     {
       prefs.sleep_interval_long = payload[2] | (payload[1] << 8);
       log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-      preferences.begin("BWS-TTN", false);
+      preferences.begin("BWS-LW", false);
       preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
       preferences.end();
+    } else {
+      uplinkReq = decodeDownlinkApp(payload, size);
     }
   }
   if (uplinkReq == 0)
@@ -463,6 +463,10 @@ void setup()
   M5.begin(cfg);
 #endif
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  Board.init();
+#endif
+
   Serial.begin(115200);
   delay(2000); // give time to switch to the serial monitor
   log_i("\nSetup");
@@ -520,6 +524,16 @@ void setup()
   uint8_t uplinkPayload[PAYLOAD_SIZE];
 
   LoraEncoder encoder(uplinkPayload);
+  
+  // LoRaWAN node status flags
+  encoder.writeBitmap(0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      longSleep,
+                      rtcSyncReq,
+                      runtimeExpired);
 
   getPayloadStage1(1, encoder);
 

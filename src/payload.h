@@ -32,6 +32,7 @@
 // History:
 //
 // 20240402 Created
+// 20240414 Added separation between LoRaWAN and application layer
 //
 // ToDo:
 // -
@@ -41,7 +42,18 @@
 #if !defined(_PAYLOAD_H)
 #define _PAYLOAD_H
 #include <LoraMessage.h>
-//#include "settings.h"
+
+
+/*!
+ * \brief Decode app layer specific downlink messages
+ *
+ * \param payload downlink message payload
+ * \param size payload size in bytes
+ * 
+ * \returns config uplink request or 0
+*/
+uint8_t decodeDownlinkApp(uint8_t *payload, size_t size);
+
 
 /*!
  * \brief Generate payload (by emulation)
