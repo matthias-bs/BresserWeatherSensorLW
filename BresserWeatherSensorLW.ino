@@ -29,7 +29,6 @@
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
 // BresserWeatherSensorReceiver         0.25.0
-// ESP32AnalogRead                      0.2.2 (optional)
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
@@ -75,6 +74,7 @@
 //          Added minimum sleep interval (and thus uplink interval)
 //          Added M5Stack Core2 initialization
 // 20240414 Added separation between LoRaWAN and application layer
+//          Fixed battLevel calculation
 //
 // ToDo:
 // -
