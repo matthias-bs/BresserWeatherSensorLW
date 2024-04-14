@@ -42,95 +42,36 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "payload.h"
-#include "WeatherSensorCfg.h"
-#include <WeatherSensor.h>
-#include <ESP32Time.h>
-#include <Preferences.h>
-#include "../BresserWeatherSensorLWCfg.h"
-#include "adc/adc.h"
+#include "AppLayer.h"
 
-#if defined(MITHERMOMETER_EN)
-// BLE Temperature/Humidity Sensor
-#include <ATC_MiThermometer.h>
-#endif
-#if defined(THEENGSDECODER_EN)
-#include "BleSensors/BleSensors.h"
-#endif
-#ifdef RAINDATA_EN
-#include "RainGauge.h"
-#endif
-#ifdef LIGHTNINGSENSOR_EN
-#include "Lightning.h"
-#endif
-#ifdef ONEWIRE_EN
-// Dallas/Maxim OneWire Temperature Sensor
-#include <DallasTemperature.h>
-#endif
-#ifdef DISTANCESENSOR_EN
-// A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor
-#include <DistanceSensor_A02YYUW.h>
-#endif
 
-extern time_t rtcLastClockSync;
-extern ESP32Time rtc;
-
-/// Preferences (stored in flash memory)
-static Preferences appPrefs;
-
-/// Bresser Weather Sensor Receiver
-WeatherSensor weatherSensor;
-
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-std::vector<std::string> knownBLEAddresses = KNOWN_BLE_ADDRESSES;
-#endif
-
-#ifdef MITHERMOMETER_EN
-// Setup BLE Temperature/Humidity Sensors
-ATC_MiThermometer bleSensors(knownBLEAddresses); //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
-#endif
-#ifdef THEENGSDECODER_EN
-BleSensors bleSensors(knownBLEAddresses);
-#endif
-
-#ifdef RAINDATA_EN
-/// Rain data statistics
-RainGauge rainGauge;
-#endif
-
-#ifdef LIGHTNINGSENSOR_EN
-/// Lightning sensor post-processing
-Lightning lightningProc;
-#endif
-
-#ifdef ONEWIRE_EN
-// Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-OneWire oneWire(PIN_ONEWIRE_BUS); //!< OneWire bus
-
-// Pass our oneWire reference to Dallas Temperature.
-DallasTemperature temp_sensors(&oneWire); //!< Dallas temperature sensors connected to OneWire bus
-#endif
-
-#ifdef DISTANCESENSOR_EN
-#if defined(ESP32)
-DistanceSensor_A02YYUW distanceSensor(&Serial2);
-#else
-DistanceSensor_A02YYUW distanceSensor(&Serial1);
-#endif
-#endif
-
-uint8_t decodeDownlinkApp(uint8_t *payload, size_t size)
+uint8_t
+AppLayer::decodeDownlink(uint8_t *payload, size_t size)
 {
-    if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2))
+    if (payload[0] == CMD_RESET_RAINGAUGE)
+    {
+        if (size == 1)
+        {
+            log_d("Reset raingauge");
+            rainGauge.reset();
+        }
+        else if (size == 2)
+        {
+            log_d("Reset raingauge - flags: 0x%X", payload[1]);
+            rainGauge.reset(payload[1] & 0xF);
+        }
+    }
+    else if ((payload[0] == CMD_SET_WS_TIMEOUT) && (size == 2))
     {
         log_d("Set weathersensor_timeout: %u s", payload[1]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("ws_timeout", payload[1]);
         appPrefs.end();
     }
+    return 0;
 }
 
-void genPayload(uint8_t port, LoraEncoder &encoder)
+void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
 {
     // unused
     (void)port;
@@ -138,7 +79,7 @@ void genPayload(uint8_t port, LoraEncoder &encoder)
     weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
 }
 
-void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
 #ifdef PIN_SUPPLY_IN
     uint16_t supply_voltage = getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
@@ -178,11 +119,11 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 #ifdef RAINDATA_EN
         // Check if time is valid
-        if (rtcLastClockSync > 0)
+        if (*rtcLastClockSync > 0)
         {
             // Get local date and time
             struct tm timeinfo;
-            time_t tnow = rtc.getLocalEpoch();
+            time_t tnow = rtc->getLocalEpoch();
             localtime_r(&tnow, &timeinfo);
 
             // Find weather sensor and determine rain gauge overflow limit
@@ -209,10 +150,10 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 #ifdef LIGHTNINGSENSOR_EN
         // Check if time is valid
-        if (rtcLastClockSync > 0)
+        if (*rtcLastClockSync > 0)
         {
             // Get local date and time
-            time_t tnow = rtc.getLocalEpoch();
+            time_t tnow = rtc->getLocalEpoch();
 
             // Find lightning sensor
             int ls = weatherSensor.findType(SENSOR_TYPE_LIGHTNING);
@@ -542,28 +483,18 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     }
 }
 
-void getPayloadStage2(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
 {
 }
 
-void deviceDecodeDownlink(uint8_t port, uint8_t *payload, size_t size)
+void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder)
 {
-#ifdef RAINDATA_EN
-    if (port > 0)
+    if (cmd == CMD_GET_WS_TIMEOUT)
     {
-        if (payload[0] == CMD_RESET_RAINGAUGE)
-        {
-            if (size == 1)
-            {
-                log_d("Reset raingauge");
-                rainGauge.reset();
-            }
-            else if (size == 2)
-            {
-                log_d("Reset raingauge - flags: 0x%X", payload[1]);
-                rainGauge.reset(payload[1] & 0xF);
-            }
-        }
+        appPrefs.begin("BWS-LW-APP", false);
+        uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
+        appPrefs.end();
+        encoder.writeUint8(ws_timeout);
+        port = CMD_GET_WS_TIMEOUT;
     }
-#endif
 }

@@ -149,7 +149,7 @@ using namespace PowerFeather;
 #include <RadioLib.h>
 #include <ESP32Time.h>
 #include "BresserWeatherSensorLWCfg.h"
-#include "src/payload.h"
+#include "src/AppLayer.h"
 #include "src/adc/adc.h"
 
 // Time zone info
@@ -197,6 +197,9 @@ bool rtcSyncReq = false;
 
 /// Real time clock
 ESP32Time rtc;
+
+/// Application layer
+AppLayer appLayer(&rtc, &rtcLastClockSync);
 
 #if defined(ESP32)
 // abbreviated version from the Arduino-ESP32 package, see
@@ -334,10 +337,10 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       log_d("Get date/time");
       uplinkReq = CMD_GET_DATETIME;
     }
-    else if ((payload[0] == CMD_GET_CONFIG) && (size == 1))
+    else if ((payload[0] == CMD_GET_LW_CONFIG) && (size == 1))
     {
       log_d("Get config");
-      uplinkReq = CMD_GET_CONFIG;
+      uplinkReq = CMD_GET_LW_CONFIG;
     }
     else if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
     {
@@ -370,7 +373,7 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
       preferences.end();
     } else {
-      uplinkReq = decodeDownlinkApp(payload, size);
+      uplinkReq = appLayer.decodeDownlink(payload, size);
     }
   }
   if (uplinkReq == 0)
@@ -394,7 +397,7 @@ void sendCfgUplink(void)
   if (uplinkReq == CMD_GET_DATETIME)
   {
     log_d("Date/Time");
-    port = 2;
+    port = CMD_GET_DATETIME;
     time_t t_now = rtc.getLocalEpoch();
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
@@ -414,11 +417,10 @@ void sendCfgUplink(void)
     // TODO add flags for succesful LORA time sync/manual sync
     encoder.writeUint8((rtcSyncReq) ? 0x03 : 0x02);
   }
-  else if (uplinkReq)
+  else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
-    log_d("Config");
-    port = 3;
-    encoder.writeUint8(prefs.ws_timeout);
+    log_d("LoRaWAN Config");
+    port = CMD_GET_LW_CONFIG;
     encoder.writeUint8(prefs.sleep_interval >> 8);
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
@@ -426,8 +428,7 @@ void sendCfgUplink(void)
   }
   else
   {
-    log_v("");
-    return;
+    appLayer.getConfigPayload(uplinkReq, port, encoder);
   }
   log_v("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
 
@@ -505,8 +506,6 @@ void setup()
   printDateTime();
 
   preferences.begin("BWS-LW", false);
-  prefs.ws_timeout = preferences.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
-  log_d("Preferences: weathersensor_timeout: %u s", prefs.ws_timeout);
   prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
   log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
@@ -535,7 +534,7 @@ void setup()
                       rtcSyncReq,
                       runtimeExpired);
 
-  getPayloadStage1(1, encoder);
+  appLayer.getPayloadStage1(1, encoder);
 
   int16_t state = 0; // return value for calls to RadioLib
 
@@ -658,12 +657,9 @@ void setup()
   // ----- and now for the main event -----
   log_i("Sending uplink");
 
-  // read some inputs
-  // uint8_t Digital2 = digitalRead(2);
-  // uint16_t Analog1 = analogRead(A1);
 
   // get payload immediately before uplink - not used here
-  getPayloadStage2(1, encoder);
+  appLayer.getPayloadStage2(1, encoder);
 
   uint8_t port = 1;
   uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
@@ -691,7 +687,6 @@ void setup()
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
       decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
-      deviceDecodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
     }
     else
     {
