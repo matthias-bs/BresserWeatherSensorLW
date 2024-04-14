@@ -19,7 +19,6 @@
 // BresserWeatherSensorTTN by Matthias Prinke (https://github.com/matthias-bs/BresserWeatherSensorTTN)
 // Lora-Serialization by Joscha Feth (https://github.com/thesolarnomad/lora-serialization)
 // ESP32Time by Felix Biego (https://github.com/fbiego/ESP32Time)
-// ESP32AnalogRead by Kevin Harrington (madhephaestus) (https://github.com/madhephaestus/ESP32AnalogRead)
 // OneWireNg by Piotr Stolarz (https://github.com/pstolarz/OneWireNg)
 // DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library)
 //
@@ -624,10 +623,14 @@ void setup()
   {
     battLevel = 255;
   }
+  else if (voltage > BATTERY_CHARGE_LIMIT)
+  {
+    battLevel = 0;
+  }
   else
   {
     battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT));
+        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT) * 255);
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
