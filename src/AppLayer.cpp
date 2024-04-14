@@ -61,6 +61,11 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
             rainGauge.reset(payload[1] & 0xF);
         }
     }
+    else if ((payload[0] == CMD_GET_WS_TIMEOUT) && (size == 1))
+    {
+        log_d("Get weathersensor_timeout");
+        return CMD_GET_WS_TIMEOUT;
+    }
     else if ((payload[0] == CMD_SET_WS_TIMEOUT) && (size == 2))
     {
         log_d("Set weathersensor_timeout: %u s", payload[1]);
