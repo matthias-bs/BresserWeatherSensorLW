@@ -124,7 +124,7 @@ private:
 
 public:
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors(knownBLEAddresses)
+    AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors(KNOWN_BLE_ADDRESSES)
 #else
     AppLayer(ESP32Time *rtc, time_t *clocksync)
 #endif
