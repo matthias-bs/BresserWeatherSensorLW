@@ -19,7 +19,6 @@
 // BresserWeatherSensorTTN by Matthias Prinke (https://github.com/matthias-bs/BresserWeatherSensorTTN)
 // Lora-Serialization by Joscha Feth (https://github.com/thesolarnomad/lora-serialization)
 // ESP32Time by Felix Biego (https://github.com/fbiego/ESP32Time)
-// ESP32AnalogRead by Kevin Harrington (madhephaestus) (https://github.com/madhephaestus/ESP32AnalogRead)
 // OneWireNg by Piotr Stolarz (https://github.com/pstolarz/OneWireNg)
 // DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library)
 //
@@ -30,7 +29,6 @@
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
 // BresserWeatherSensorReceiver         0.25.0
-// ESP32AnalogRead                      0.2.2 (optional)
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
@@ -75,7 +73,9 @@
 // 20240410 Added RP2040 specific implementation
 //          Added minimum sleep interval (and thus uplink interval)
 //          Added M5Stack Core2 initialization
-// 20240414 Added ESP32-S3 PowerFeather
+// 20240414 Added separation between LoRaWAN and application layer
+//          Fixed battLevel calculation
+// 20240415 Added ESP32-S3 PowerFeather
 //
 // ToDo:
 // -
@@ -114,14 +114,13 @@
 
 // ##### load the ESP32 preferences facilites
 #include <Preferences.h>
-Preferences store;
+static Preferences store;
 
-/// ESP32 preferences (stored in flash memory)
+/// Preferences (stored in flash memory)
 static Preferences preferences;
 
 struct sPrefs
 {
-  uint8_t ws_timeout;           //!< preferences: weather sensor timeout
   uint16_t sleep_interval;      //!< preferences: sleep interval
   uint16_t sleep_interval_long; //!< preferences: sleep interval long
 } prefs;
@@ -138,13 +137,18 @@ struct sPrefs
 #include <M5Unified.h>
 #endif
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+#include <PowerFeather.h>
+using namespace PowerFeather;
+#endif
+
 // LoRaWAN config, credentials & pinmap
 #include "config.h"
 
 #include <RadioLib.h>
 #include <ESP32Time.h>
 #include "BresserWeatherSensorLWCfg.h"
-#include "src/payload.h"
+#include "src/AppLayer.h"
 #include "src/adc/adc.h"
 
 // Time zone info
@@ -192,6 +196,9 @@ bool rtcSyncReq = false;
 
 /// Real time clock
 ESP32Time rtc;
+
+/// Application layer
+AppLayer appLayer(&rtc, &rtcLastClockSync);
 
 #if defined(ESP32)
 // abbreviated version from the Arduino-ESP32 package, see
@@ -311,7 +318,6 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
-// TODO: separate sensor specific parts from generic parts
 void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   log_v("Port: %d", port);
@@ -330,12 +336,12 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       log_d("Get date/time");
       uplinkReq = CMD_GET_DATETIME;
     }
-    if ((payload[0] == CMD_GET_CONFIG) && (size == 1))
+    else if ((payload[0] == CMD_GET_LW_CONFIG) && (size == 1))
     {
       log_d("Get config");
-      uplinkReq = CMD_GET_CONFIG;
+      uplinkReq = CMD_GET_LW_CONFIG;
     }
-    if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
+    else if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
     {
 
       time_t set_time = payload[4] | (payload[3] << 8) | (payload[2] << 16) | (payload[1] << 24);
@@ -350,28 +356,23 @@ void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
       log_d("Set date/time: %s", tbuf);
 #endif
     }
-    if ((payload[0] == CMD_SET_WEATHERSENSOR_TIMEOUT) && (size == 2))
-    {
-      log_d("Set weathersensor_timeout: %u s", payload[1]);
-      preferences.begin("BWS-TTN", false);
-      preferences.putUChar("ws_timeout", payload[1]);
-      preferences.end();
-    }
-    if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
+    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
     {
       prefs.sleep_interval = payload[2] | (payload[1] << 8);
       log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-      preferences.begin("BWS-TTN", false);
+      preferences.begin("BWS-LW", false);
       preferences.putUShort("sleep_int", prefs.sleep_interval);
       preferences.end();
     }
-    if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
+    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
     {
       prefs.sleep_interval_long = payload[2] | (payload[1] << 8);
       log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-      preferences.begin("BWS-TTN", false);
+      preferences.begin("BWS-LW", false);
       preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
       preferences.end();
+    } else {
+      uplinkReq = appLayer.decodeDownlink(payload, size);
     }
   }
   if (uplinkReq == 0)
@@ -395,7 +396,7 @@ void sendCfgUplink(void)
   if (uplinkReq == CMD_GET_DATETIME)
   {
     log_d("Date/Time");
-    port = 2;
+    port = CMD_GET_DATETIME;
     time_t t_now = rtc.getLocalEpoch();
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
@@ -415,11 +416,10 @@ void sendCfgUplink(void)
     // TODO add flags for succesful LORA time sync/manual sync
     encoder.writeUint8((rtcSyncReq) ? 0x03 : 0x02);
   }
-  else if (uplinkReq)
+  else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
-    log_d("Config");
-    port = 3;
-    encoder.writeUint8(prefs.ws_timeout);
+    log_d("LoRaWAN Config");
+    port = CMD_GET_LW_CONFIG;
     encoder.writeUint8(prefs.sleep_interval >> 8);
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
@@ -427,8 +427,7 @@ void sendCfgUplink(void)
   }
   else
   {
-    log_v("");
-    return;
+    appLayer.getConfigPayload(uplinkReq, port, encoder);
   }
   log_v("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
 
@@ -462,6 +461,10 @@ void setup()
   cfg.internal_spk = false; // default=true. use internal speaker.
   cfg.internal_mic = false; // default=true. use internal microphone.
   M5.begin(cfg);
+#endif
+
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  Board.init();
 #endif
 
   Serial.begin(115200);
@@ -502,8 +505,6 @@ void setup()
   printDateTime();
 
   preferences.begin("BWS-LW", false);
-  prefs.ws_timeout = preferences.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
-  log_d("Preferences: weathersensor_timeout: %u s", prefs.ws_timeout);
   prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
   log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
@@ -521,8 +522,18 @@ void setup()
   uint8_t uplinkPayload[PAYLOAD_SIZE];
 
   LoraEncoder encoder(uplinkPayload);
+  
+  // LoRaWAN node status flags
+  encoder.writeBitmap(0,
+                      0,
+                      0,
+                      0,
+                      0,
+                      longSleep,
+                      rtcSyncReq,
+                      runtimeExpired);
 
-  getPayloadStage1(1, encoder);
+  appLayer.getPayloadStage1(1, encoder);
 
   int16_t state = 0; // return value for calls to RadioLib
 
@@ -613,10 +624,14 @@ void setup()
   {
     battLevel = 255;
   }
+  else if (voltage > BATTERY_CHARGE_LIMIT)
+  {
+    battLevel = 0;
+  }
   else
   {
     battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT));
+        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT) * 255);
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
@@ -645,12 +660,9 @@ void setup()
   // ----- and now for the main event -----
   log_i("Sending uplink");
 
-  // read some inputs
-  // uint8_t Digital2 = digitalRead(2);
-  // uint16_t Analog1 = analogRead(A1);
 
   // get payload immediately before uplink - not used here
-  getPayloadStage2(1, encoder);
+  appLayer.getPayloadStage2(1, encoder);
 
   uint8_t port = 1;
   uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
@@ -678,7 +690,6 @@ void setup()
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
       decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
-      deviceDecodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
     }
     else
     {
