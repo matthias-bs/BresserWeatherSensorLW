@@ -60,11 +60,6 @@
 // Downlink messages
 // ------------------
 //
-// CMD_SET_WEATHERSENSOR_TIMEOUT
-// (seconds)
-// byte0: 0xA0
-// byte1: ws_timeout[ 7: 0]
-//
 // CMD_SET_SLEEP_INTERVAL
 // (seconds)
 // byte0: 0xA8
@@ -76,10 +71,6 @@
 // byte0: 0xA9
 // byte1: sleep_interval_long[15:8]
 // byte2: sleep_interval_long[ 7:0]
-//
-// CMD_RESET_RAINGAUGE
-// byte0: 0xB0
-// byte1: flags[7:0] (optional)
 //
 // CMD_GET_CONFIG
 // byte0: 0xB1
@@ -94,19 +85,35 @@
 // byte3: unixtime[15: 8]
 // byte4: unixtime[ 7: 0]
 //
+// CMD_GET_WS_TIMEOUT
+// byte0: C0
+// 
+// CMD_SET_WS_TIMEOUT
+// (seconds)
+// byte0: 0xC1
+// byte1: ws_timeout[ 7: 0]
+//
+// CMD_RESET_RAINGAUGE
+// byte0: 0xC3
+// byte1: flags[7:0] (optional)
 
 // To Do:
+// CMD_GET_SENSORS_INC
+// byte0: 0xC4
 
 // CMD_SET_SENSORS_INC
-// byte0: 0xC1
+// byte0: 0xC5
 // byte1: sensors_inc0[31:24]
 // byte2: sensors_inc0[23:16]
 // byte3: sensors_inc0[15: 8]
 // byte4: sensors_inc0[ 7: 0]
 // ...
 //
+// CMD_GET_SENSORS_EXC
+// byte0: C6
+//
 // CMD_SET_SENSORS_EXC
-// byte0: 0xC3
+// byte0: 0xC7
 // byte1: sensors_exc0[31:24]
 // byte2: sensors_exc0[23:16]
 // byte3: sensors_exc0[15: 8]
@@ -114,7 +121,10 @@
 // ...
 //
 // CMD_GET_BLE_ADDR
-// byte0: 0xC5
+// byte0: 0xC8
+//
+// CMD_SET_BLE_ADDR
+// byte0: 0xC9
 // byte1: ble_addr0[47:24]
 // byte2: ble_addr0[23:32]
 // byte3: ble_addr0[31:24]
@@ -123,40 +133,42 @@
 // byte6: ble_addr0[ 7: 0]
 // ...
 
-// Response uplink messages
-// -------------------------
+// Response uplink messages -> port = cmd
+// --------------------------------------
 //
-// CMD_GET_DATETIME -> FPort=2
+// CMD_GET_DATETIME
 // byte0: unixtime[31:24]
 // byte1: unixtime[23:16]
 // byte2: unixtime[15: 8]
 // byte3: unixtime[ 7: 0]
 // byte4: rtc_source[ 7: 0]
 //
-// CMD_GET_CONFIG -> FPort=3
-// byte0: ws_timeout[ 7: 0]
+// CMD_GET_LW_CONFIG
 // byte1: sleep_interval[15: 8]
 // byte2: sleep_interval[ 7:0]
 // byte3: sleep_interval_long[15:8]
 // byte4: sleep_interval_long[ 7:0]
+//
+// CMD_GET_WS_TIMEOUT
+// byte0: ws_timeout[ 7: 0]
+//
 
 // To Do:
-
-// CMD_GET_SENSORS_INC -> FPort=4
+// CMD_GET_SENSORS_INC
 // byte0: sensors_inc0[31:24]
 // byte1: sensors_inc0[23:16]
 // byte2: sensors_inc0[15: 8]
 // byte3: sensors_inc0[ 7: 0]
 // ...
 //
-// CMD_GET_SENSORS_EXC -> FPort=5
+// CMD_GET_SENSORS_EXC
 // byte0: sensors_exc0[31:24]
 // byte1: sensors_exc0[23:16]
 // byte2: sensors_exc0[15: 8]
 // byte3: sensors_exc0[ 7: 0]
 // ...
 //
-// CMD_GET_BLE_ADDR -> FPort = 6
+// CMD_GET_BLE_ADDR
 // byte0: ble_addr0[47:24]
 // byte1: ble_addr0[23:32]
 // byte2: ble_addr0[31:24]
@@ -165,19 +177,24 @@
 // byte5: ble_addr0[ 7: 0]
 // ...
 
-#define CMD_SET_WEATHERSENSOR_TIMEOUT   0xA0
+// LoRaWAN network layer
 #define CMD_SET_SLEEP_INTERVAL          0xA8
 #define CMD_SET_SLEEP_INTERVAL_LONG     0xA9
-#define CMD_RESET_RAINGAUGE             0xB0
-#define CMD_GET_CONFIG                  0xB1
+
+#define CMD_GET_LW_CONFIG               0xB1
 #define CMD_GET_DATETIME                0x86
 #define CMD_SET_DATETIME                0x88
-#define CMD_GET_SENSORS_INC             0xC0
-#define CMD_SET_SENSORS_INC             0xC1
-#define CMD_GET_SENSORS_EXC             0xC2
-#define CMD_SET_SENSORS_EXC             0xC3
-#define CMD_GET_BLE_ADDR                0xC4
-#define CMD_SET_BLE_ADDR                0xC5
+
+// Application layer
+#define CMD_GET_WS_TIMEOUT              0xC0
+#define CMD_SET_WS_TIMEOUT              0xC1
+#define CMD_RESET_RAINGAUGE             0xC3
+#define CMD_GET_SENSORS_INC             0xC4
+#define CMD_SET_SENSORS_INC             0xC5
+#define CMD_GET_SENSORS_EXC             0xC6
+#define CMD_SET_SENSORS_EXC             0xC7
+#define CMD_GET_BLE_ADDR                0xC8
+#define CMD_SET_BLE_ADDR                0xC9
 
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"
