@@ -26,7 +26,6 @@
     "RadioLib": "jgromes/RadioLib#semver:^6.5.0",
     "lora-serialization": "thesolarnomad/lora-serialization#semver:^3.2.1",
     "ESP32Time": "fbiego/ESP32Time#semver:^2.0.6",
-    "ESP32AnalogRead": "madhephaestus/ESP32AnalogRead#semver:^0.2.2",
     "OneWireNg": "https://github.com/pstolarz/OneWireNg#semver:^0.13.3",
     "Arduino-Temperature-Control-Library": "milesburton/Arduino-Temperature-Control-Library#semver:^3.9.1",
     "NimBLE-Arduino": "h2zero/NimBLE-Arduino#semver:^1.4.1",
