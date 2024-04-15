@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // config.h
 // 
-//  RadioLib / LoRaWAN specific configuration including radio module wiring
+// RadioLib / LoRaWAN specific configuration including radio module wiring
 //
-//  based on https://github.com/radiolib-org/radiolib-persistence
+// based on https://github.com/radiolib-org/radiolib-persistence
 //
 // created: 04/2024
 //
@@ -34,6 +34,7 @@
 // History:
 //
 // 20240412 Created
+// 20240413 Added ESP32-S3 PowerFeather
 //
 // ToDo:
 // - 
@@ -107,6 +108,17 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #define PIN_LORA_DIO2     RADIOLIB_NC
     #pragma message("NOT TESTED!!!")
     #pragma message("ARDUINO_ADAFRUIT_FEATHER_ESP32_V2 defined; assuming RFM95W FeatherWing will be used")
+    #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
+    #define LORA_CHIP SX1276
+
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+    #define PIN_LORA_NSS      15
+    #define PIN_LORA_RST      45
+    #define PIN_LORA_IRQ      16
+    #define PIN_LORA_GPIO     18
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+    #pragma message("NOT TESTED!!!")
+    #pragma message("ARDUINO_ESP32S3_POWERFEATHER defined; assuming RFM95W FeatherWing will be used")
     #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
     #define LORA_CHIP SX1276
 

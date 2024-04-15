@@ -75,6 +75,7 @@
 //          Added M5Stack Core2 initialization
 // 20240414 Added separation between LoRaWAN and application layer
 //          Fixed battLevel calculation
+// 20240415 Added ESP32-S3 PowerFeather
 //
 // ToDo:
 // -

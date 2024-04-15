@@ -65,4 +65,14 @@ uint16_t getVoltage(uint8_t pin = PIN_ADC_IN, uint8_t samples = UBATT_SAMPLES, f
  */
 uint16_t getBatteryVoltage(void);
 
+/*!
+ * \brief Get supply voltage
+ * 
+ * Returns the battery voltage or zero if not available (board specific)
+ * 
+ * \returns Voltage in mV or zero if not available
+ */
+
+uint16_t getSupplyVoltage(void);
+
 #endif // _ADC_H
