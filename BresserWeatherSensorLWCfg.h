@@ -313,7 +313,7 @@
 #elif defined(LORAWAN_NODE)
 // External Li-Ion Battery connected to solar charger
 #define PIN_ADC_IN A3
-#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+#elif defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_heltec_wifi_32_lora_V3)
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
