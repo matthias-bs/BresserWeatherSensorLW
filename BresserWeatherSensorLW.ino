@@ -76,6 +76,7 @@
 // 20240414 Added separation between LoRaWAN and application layer
 //          Fixed battLevel calculation
 // 20240415 Added ESP32-S3 PowerFeather
+// 20240416 Added enabling of 3.3V power supply for FeatherWing on ESP32-S3 PowerFeather
 //
 // ToDo:
 // -
@@ -465,6 +466,7 @@ void setup()
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   Board.init();
+  Board.enable3V3(true);
 #endif
 
   Serial.begin(115200);
