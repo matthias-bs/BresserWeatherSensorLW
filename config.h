@@ -117,7 +117,6 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #define PIN_LORA_IRQ      16
     #define PIN_LORA_GPIO     18
     #define PIN_LORA_DIO2     RADIOLIB_NC
-    #pragma message("NOT TESTED!!!")
     #pragma message("ARDUINO_ESP32S3_POWERFEATHER defined; assuming RFM95W FeatherWing will be used")
     #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
     #define LORA_CHIP SX1276
