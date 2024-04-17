@@ -54,8 +54,8 @@
 #if !defined(_LWCFG_H)
 #define _LWCFG_H
 
-#include <vector>
-#include <string>
+//#include <vector>
+//#include <string>
 
 // Downlink messages
 // ------------------
@@ -207,7 +207,8 @@
 #if !defined(ARDUINO_TTGO_LoRa32_V1) && !defined(ARDUINO_TTGO_LoRa32_V2) &&               \
     !defined(ARDUINO_TTGO_LoRa32_v21new) && !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) && \
     !defined(ARDUINO_FEATHER_ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) &&       \
-    !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2)
+    !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2) && \
+    !defined(ARDUINO_ESP32S3_POWERFEATHER)
 // Use pinning for LoRaWAN Node
 #define LORAWAN_NODE
 
