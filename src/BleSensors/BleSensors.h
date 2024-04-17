@@ -35,6 +35,7 @@
 // History:
 //
 // 20230211 Created
+// 20240417 Added additional constructor and method setAddresses()
 //
 // ToDo:
 // - 
@@ -76,7 +77,19 @@ class BleSensors {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
         };
+        
+        BleSensors(void) {
+        };
 
+        /*
+         * \brief Set BLE MAC addresses of known sensors
+         * 
+         * \param known_sensors vector of BLE MAC addresses (see constructor)
+         */
+        void setAddresses(std::vector<std::string> known_sensors) {
+            _known_sensors = known_sensors;
+            data.resize(known_sensors.size());
+        };
         /*!
         \brief Initialization.
         */
