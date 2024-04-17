@@ -79,6 +79,8 @@ uint16_t getBatteryVoltage(void)
     #if defined(ARDUINO_ARCH_RP2040)
     // Not implemented - no default VBAT input circuit (connect external divider to A0)
     return 0;
+    #elif defined(ARDUINO_heltec_wifi_32_lora_V3)
+    return 0;
     #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
     uint16_t voltage = M5.Power.getBatteryVoltage();
     log_d("Voltage = %dmV", voltage);
