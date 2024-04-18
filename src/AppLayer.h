@@ -33,6 +33,7 @@
 //
 // 20240402 Created
 // 20240414 Added separation between LoRaWAN and application layer
+// 20240417 Added sensor configuration functions
 //
 // ToDo:
 // -
@@ -75,8 +76,8 @@
 class AppLayer
 {
 private:
-    ESP32Time *rtc;
-    time_t *rtcLastClockSync;
+    ESP32Time *_rtc;
+    time_t *_rtcLastClockSync;
 
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
@@ -85,6 +86,7 @@ private:
     WeatherSensor weatherSensor;
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    std::vector<std::string> knownBLEAddressesDef;
     std::vector<std::string> knownBLEAddresses;
 #endif
 
@@ -124,16 +126,29 @@ private:
 
 public:
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors(KNOWN_BLE_ADDRESSES)
+    //AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors(KNOWN_BLE_ADDRESSES)
+    AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors()
 #else
     AppLayer(ESP32Time *rtc, time_t *clocksync)
 #endif
     {
-        rtc = rtc;
-        rtcLastClockSync = clocksync;
+        _rtc = rtc;
+        _rtcLastClockSync = clocksync;
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-        knownBLEAddresses = KNOWN_BLE_ADDRESSES;
+        knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
+        knownBLEAddresses = getBleAddr();
+        if (knownBLEAddresses.size() == 0) {
+            // No addresses stored in Preferences, use default
+            knownBLEAddresses = knownBLEAddressesDef;
+        }
+        bleSensors = BleSensors(knownBLEAddresses);
+        log_v("BLE Addresses:");
+        for(const std::string& s : knownBLEAddresses)
+        {
+            (void)s;
+            log_v("%s", s.c_str());
+        }
 #endif
     };
 
@@ -182,7 +197,42 @@ public:
      */
     void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
 
+    /*!
+     * Get configuration data for uplink
+     *
+     * Get the configuration data requested in a downlink command and
+     * prepare it as payload in a uplink response.
+     * 
+     * \param cmd command
+     * \param port uplink port
+     * \param encoder uplink data encoder object
+     */
     void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
-};
 
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    /*!
+     * Set BLE addresses in Preferences and bleSensors object
+     * 
+     * \param bytes MAC addresses (6 bytes per address)
+     * \param size size in bytes
+     */
+    void setBleAddr(uint8_t *bytes, uint8_t size);
+    
+    /*!
+     * Get BLE addresses from Preferences
+     * 
+     * \param bytes buffer for addresses
+     * 
+     * \returns number of bytes copied into buffer
+     */
+    uint8_t getBleAddr(uint8_t *bytes);
+
+    /*!
+     * Get BLE addresses from Preferences
+     *
+     * \returns BLE addresses
+     */
+    std::vector<std::string> getBleAddr(void);
+#endif
+};
 #endif // _APPLAYER_H

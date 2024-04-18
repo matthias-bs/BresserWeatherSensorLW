@@ -28,7 +28,7 @@
 // RadioLib                             6.5.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.25.0
+// BresserWeatherSensorReceiver         0.26.0
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
@@ -465,13 +465,15 @@ void setup()
 #endif
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  Board.init();
-  Board.enable3V3(true);
+  delay(2000);
+  Board.init(); // Note: Battery capacity / type has to be set for voltage measurement
+  Board.enable3V3(true); // Power supply for FeatherWing
+  Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
 #endif
 
   Serial.begin(115200);
   delay(2000); // give time to switch to the serial monitor
-  log_i("\nSetup");
+  log_i("Setup");
 
 #if defined(ARDUINO_ARCH_RP2040)
   // see pico-sdk/src/rp2_common/hardware_rtc/rtc.c
