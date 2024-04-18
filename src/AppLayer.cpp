@@ -181,11 +181,11 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 #ifdef RAINDATA_EN
     // Check if time is valid
-    if (*rtcLastClockSync > 0)
+    if (*_rtcLastClockSync > 0)
     {
         // Get local date and time
         struct tm timeinfo;
-        time_t tnow = rtc->getLocalEpoch();
+        time_t tnow = _rtc->getLocalEpoch();
         localtime_r(&tnow, &timeinfo);
 
         // Find weather sensor and determine rain gauge overflow limit
@@ -212,10 +212,10 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 #ifdef LIGHTNINGSENSOR_EN
     // Check if time is valid
-    if (*rtcLastClockSync > 0)
+    if (*_rtcLastClockSync > 0)
     {
         // Get local date and time
-        time_t tnow = rtc->getLocalEpoch();
+        time_t tnow = _rtc->getLocalEpoch();
 
         // Find lightning sensor
         int ls = weatherSensor.findType(SENSOR_TYPE_LIGHTNING);

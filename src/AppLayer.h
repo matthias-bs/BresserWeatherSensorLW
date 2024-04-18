@@ -76,8 +76,8 @@
 class AppLayer
 {
 private:
-    ESP32Time *rtc;
-    time_t *rtcLastClockSync;
+    ESP32Time *_rtc;
+    time_t *_rtcLastClockSync;
 
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
@@ -132,8 +132,8 @@ public:
     AppLayer(ESP32Time *rtc, time_t *clocksync)
 #endif
     {
-        rtc = rtc;
-        rtcLastClockSync = clocksync;
+        _rtc = rtc;
+        _rtcLastClockSync = clocksync;
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
         knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
