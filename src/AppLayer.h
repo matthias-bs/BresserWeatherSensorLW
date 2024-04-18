@@ -146,6 +146,7 @@ public:
         log_v("BLE Addresses:");
         for(const std::string& s : knownBLEAddresses)
         {
+            (void)s;
             log_v("%s", s.c_str());
         }
 #endif
@@ -232,6 +233,6 @@ public:
      * \returns BLE addresses
      */
     std::vector<std::string> getBleAddr(void);
-};
 #endif
+};
 #endif // _APPLAYER_H

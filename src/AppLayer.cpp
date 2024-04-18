@@ -115,6 +115,7 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
         log_d("Get BLE sensors MAC addresses");
         return CMD_GET_BLE_ADDR;
     }
+    #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if ((payload[0] == CMD_SET_BLE_ADDR) && ((size - 1) % 6 == 0))
     {
         log_d("Set BLE sensors MAC addresses");
@@ -130,6 +131,7 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
         }
         setBleAddr(&payload[1], size - 1);
     }
+    #endif
     return 0;
 }
 
@@ -574,6 +576,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
             encoder.writeUint8(payload[i]);
         }
     }
+    #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)
     {
         uint8_t payload[48];
@@ -583,6 +586,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
             encoder.writeUint8(payload[i]);
         }
     }
+    #endif
 }
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
