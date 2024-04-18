@@ -58,6 +58,8 @@ This project is in early stage of development - stay tuned.
 * [x] RP2040 specific implementation
 * [x] Fix battery voltage measurement for HW targets FIREBEETLE_ESP32_COVER_LORA & LORAWAN_NODE
 * [x] Separate LoRaWAN network and application code
+* [ ] Change LoRaWAN control downlink / status uplink messages
+* [ ] Update Javascript encoders/decoders
 
  
 ## Supported Hardware
