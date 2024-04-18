@@ -137,6 +137,7 @@ void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
 {
     // unused
     (void)port;
+    (void)encoder;
     weatherSensor.genMessage(0, 0xfff0, SENSOR_TYPE_WEATHER1);
     weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
 }
@@ -541,6 +542,8 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
 {
+    (void)port;
+    (void)encoder;
 }
 
 void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder)
@@ -582,6 +585,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
     }
 }
 
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
 void AppLayer::setBleAddr(uint8_t *bytes, uint8_t size)
 {
     appPrefs.begin("BWS-LW-APP", false);
@@ -622,3 +626,4 @@ std::vector<std::string> AppLayer::getBleAddr(void)
 
     return bleAddr;
 }
+#endif

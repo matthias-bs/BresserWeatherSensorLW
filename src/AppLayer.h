@@ -208,6 +208,7 @@ public:
      */
     void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
 
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     /*!
      * Set BLE addresses in Preferences and bleSensors object
      * 
@@ -232,5 +233,5 @@ public:
      */
     std::vector<std::string> getBleAddr(void);
 };
-
+#endif
 #endif // _APPLAYER_H
