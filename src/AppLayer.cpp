@@ -37,6 +37,7 @@
 // 20240413 Refactored ADC handling
 // 20240414 Added separation between LoRaWAN and application layer
 // 20240417 Added sensor configuration functions
+// 20240419 Modified downlink decoding
 //
 //
 // ToDo:
@@ -47,42 +48,42 @@
 #include "AppLayer.h"
 
 uint8_t
-AppLayer::decodeDownlink(uint8_t *payload, size_t size)
+AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
-    if (payload[0] == CMD_RESET_RAINGAUGE)
+    if (port == CMD_RESET_RAINGAUGE)
     {
         if (size == 1)
         {
-            log_d("Reset raingauge");
-            rainGauge.reset();
+            log_d("Reset raingauge - flags: 0x%X", payload[0]);
+            rainGauge.reset(payload[0] & 0xF);
         }
-        else if (size == 2)
-        {
-            log_d("Reset raingauge - flags: 0x%X", payload[1]);
-            rainGauge.reset(payload[1] & 0xF);
-        }
+        return 0;
     }
-    else if ((payload[0] == CMD_GET_WS_TIMEOUT) && (size == 1))
+
+    if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] = 0x00) && (size == 1))
     {
         log_d("Get weathersensor_timeout");
         return CMD_GET_WS_TIMEOUT;
     }
-    else if ((payload[0] == CMD_SET_WS_TIMEOUT) && (size == 2))
+
+    if ((port == CMD_SET_WS_TIMEOUT) && (size == 1))
     {
-        log_d("Set weathersensor_timeout: %u s", payload[1]);
+        log_d("Set weathersensor_timeout: %u s", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
-        appPrefs.putUChar("ws_timeout", payload[1]);
+        appPrefs.putUChar("ws_timeout", payload[0]);
         appPrefs.end();
     }
-    else if ((payload[0] == CMD_GET_SENSORS_INC) && (size == 1))
+
+    if ((port == CMD_GET_SENSORS_INC) && (payload[0] = 0x00) && (size == 1))
     {
         log_d("Get sensors include list");
         return CMD_GET_SENSORS_INC;
     }
-    else if ((payload[0] == CMD_SET_SENSORS_INC) && ((size - 1) % 4 == 0))
+
+    if ((port == CMD_SET_SENSORS_INC) && (size % 4 == 0))
     {
         log_d("Set sensors include list");
-        for (size_t i = 0; i < size - 1; i += 4)
+        for (size_t i = 0; i < size; i += 4)
         {
             log_d("%08X:",
                   (payload[i] << 24) |
@@ -90,14 +91,17 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
                       (payload[i + 2] << 8) |
                       payload[i + 3]);
         }
-        weatherSensor.setSensorsInc(&payload[1], size - 1);
+        weatherSensor.setSensorsInc(payload, size);
+        return 0;
     }
-    else if ((payload[0] == CMD_GET_SENSORS_EXC) && (size == 1))
+
+    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] = 0x00) && (size == 1))
     {
         log_d("Get sensors exclude list");
         return CMD_GET_SENSORS_EXC;
     }
-    else if ((payload[0] == CMD_SET_SENSORS_EXC) && ((size - 1) % 4 == 0))
+
+    if ((port == CMD_SET_SENSORS_EXC) && (size % 4 == 0))
     {
         log_d("Set sensors exclude list");
         for (size_t i = 0; i < size - 1; i += 4)
@@ -108,15 +112,17 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
                       (payload[i + 2] << 8) |
                       payload[i + 3]);
         }
-        weatherSensor.setSensorsExc(&payload[1], size - 1);
+        weatherSensor.setSensorsExc(payload, size);
     }
-    else if ((payload[0] == CMD_GET_SENSORS_EXC) && (size == 1))
+
+    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get BLE sensors MAC addresses");
         return CMD_GET_BLE_ADDR;
     }
-    #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    else if ((payload[0] == CMD_SET_BLE_ADDR) && ((size - 1) % 6 == 0))
+
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    if ((port == CMD_SET_BLE_ADDR) && (size % 6 == 0))
     {
         log_d("Set BLE sensors MAC addresses");
         for (size_t i = 0; i < size - 1; i += 6)
@@ -129,9 +135,10 @@ AppLayer::decodeDownlink(uint8_t *payload, size_t size)
                   payload[i + 4],
                   payload[i + 5]);
         }
-        setBleAddr(&payload[1], size - 1);
+        setBleAddr(payload, size);
+        return 0;
     }
-    #endif
+#endif
     return 0;
 }
 
@@ -566,6 +573,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         {
             encoder.writeUint8(payload[i]);
         }
+        port = CMD_GET_SENSORS_INC;
     }
     else if (cmd == CMD_GET_SENSORS_EXC)
     {
@@ -575,8 +583,9 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         {
             encoder.writeUint8(payload[i]);
         }
+        port = CMD_GET_SENSORS_EXC;
     }
-    #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)
     {
         uint8_t payload[48];
@@ -585,8 +594,9 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         {
             encoder.writeUint8(payload[i]);
         }
+        port = CMD_GET_BLE_ADDR;
     }
-    #endif
+#endif
 }
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)

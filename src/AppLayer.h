@@ -34,6 +34,7 @@
 // 20240402 Created
 // 20240414 Added separation between LoRaWAN and application layer
 // 20240417 Added sensor configuration functions
+// 20240419 Modified downlink decoding
 //
 // ToDo:
 // -
@@ -155,12 +156,13 @@ public:
     /*!
      * \brief Decode app layer specific downlink messages
      *
+     * \param port downlink message port
      * \param payload downlink message payload
      * \param size payload size in bytes
      *
      * \returns config uplink request or 0
      */
-    uint8_t decodeDownlink(uint8_t *payload, size_t size);
+    uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
 
     /*!
      * \brief Generate payload (by emulation)
