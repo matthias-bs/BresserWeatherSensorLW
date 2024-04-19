@@ -186,12 +186,6 @@ uint16_t bootCountSinceUnsuccessfulJoin;
 uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".uninitialized_data")));
 #endif
 
-/// Sleep request
-bool sleepReq = false;
-
-/// Uplink request - command received via downlink
-uint8_t uplinkReq = 0;
-
 /// RTC sync request flag - set (if due) in setup() / cleared in UserRequestNetworkTimeCb()
 bool rtcSyncReq = false;
 
@@ -319,75 +313,75 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
-void decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
+uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   log_v("Port: %d", port);
   // char buf[255];
   //*buf = '\0';
 
-  if (port > 0)
+  // if (port > 0)
+  // {
+  // for (size_t i = 0; i < nBuffer; i++) {
+  //       sprintf(&buf[strlen(buf)], "%02X ", pBuffer[i]);
+  // }
+  // log_v("Data: %s", buf);
+  if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
   {
-    // for (size_t i = 0; i < nBuffer; i++) {
-    //       sprintf(&buf[strlen(buf)], "%02X ", pBuffer[i]);
-    // }
-    // log_v("Data: %s", buf);
+    log_d("Get date/time");
+    return CMD_GET_DATETIME;
+  }
 
-    if ((payload[0] == CMD_GET_DATETIME) && (size == 1))
-    {
-      log_d("Get date/time");
-      uplinkReq = CMD_GET_DATETIME;
-    }
-    else if ((payload[0] == CMD_GET_LW_CONFIG) && (size == 1))
-    {
-      log_d("Get config");
-      uplinkReq = CMD_GET_LW_CONFIG;
-    }
-    else if ((payload[0] == CMD_SET_DATETIME) && (size == 5))
-    {
-
-      time_t set_time = payload[4] | (payload[3] << 8) | (payload[2] << 16) | (payload[1] << 24);
-      rtc.setTime(set_time);
-      rtcLastClockSync = rtc.getLocalEpoch();
+  if ((port == CMD_SET_DATETIME) && (size == 4))
+  {
+    time_t set_time = (payload[0] << 24) | (payload[1] << 16) | (payload[2] << 8) | payload[3];
+    rtc.setTime(set_time);
+    rtcLastClockSync = rtc.getLocalEpoch();
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-      char tbuf[25];
-      struct tm timeinfo;
+    char tbuf[25];
+    struct tm timeinfo;
 
-      localtime_r(&set_time, &timeinfo);
-      strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-      log_d("Set date/time: %s", tbuf);
+    localtime_r(&set_time, &timeinfo);
+    strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
+    log_d("Set date/time: %s", tbuf);
 #endif
-    }
-    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL) && (size == 3))
-    {
-      prefs.sleep_interval = payload[2] | (payload[1] << 8);
-      log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-      preferences.begin("BWS-LW", false);
-      preferences.putUShort("sleep_int", prefs.sleep_interval);
-      preferences.end();
-    }
-    else if ((payload[0] == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 3))
-    {
-      prefs.sleep_interval_long = payload[2] | (payload[1] << 8);
-      log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-      preferences.begin("BWS-LW", false);
-      preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
-      preferences.end();
-    } else {
-      uplinkReq = appLayer.decodeDownlink(payload, size);
-    }
+    return 0;
   }
-  if (uplinkReq == 0)
+
+  if ((port == CMD_SET_SLEEP_INTERVAL) && (size == 2))
   {
-    sleepReq = true;
+    prefs.sleep_interval = (payload[0] << 8) | payload[1];
+    log_d("Set sleep_interval: %u s", prefs.sleep_interval);
+    preferences.begin("BWS-LW", false);
+    preferences.putUShort("sleep_int", prefs.sleep_interval);
+    preferences.end();
+    return 0;
   }
+
+  if ((port == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 2))
+  {
+    prefs.sleep_interval_long = (payload[0] << 8) | payload[1];
+    log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
+    preferences.begin("BWS-LW", false);
+    preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
+    preferences.end();
+    return 0;
+  }
+
+  if ((port == CMD_GET_LW_CONFIG) && (payload[0] == 0x00) && (size == 1))
+  {
+    log_d("Get config");
+    return CMD_GET_LW_CONFIG;
+  }
+
+  return appLayer.decodeDownlink(port, payload, size);
 }
 
-void sendCfgUplink(void)
+void sendCfgUplink(uint8_t uplinkReq)
 {
   log_d("--- Uplink Configuration/Status ---");
 
   uint8_t uplinkPayload[5];
-  uint8_t port;
+  uint8_t port = uplinkReq;
 
   //
   // Encode data as byte array for LoRaWAN transmission
@@ -397,7 +391,6 @@ void sendCfgUplink(void)
   if (uplinkReq == CMD_GET_DATETIME)
   {
     log_d("Date/Time");
-    port = CMD_GET_DATETIME;
     time_t t_now = rtc.getLocalEpoch();
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
@@ -420,7 +413,6 @@ void sendCfgUplink(void)
   else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
     log_d("LoRaWAN Config");
-    port = CMD_GET_LW_CONFIG;
     encoder.writeUint8(prefs.sleep_interval >> 8);
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
@@ -466,8 +458,8 @@ void setup()
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
-  Board.init(); // Note: Battery capacity / type has to be set for voltage measurement
-  Board.enable3V3(true); // Power supply for FeatherWing
+  Board.init();           // Note: Battery capacity / type has to be set for voltage measurement
+  Board.enable3V3(true);  // Power supply for FeatherWing
   Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
 #endif
 
@@ -526,7 +518,7 @@ void setup()
   uint8_t uplinkPayload[PAYLOAD_SIZE];
 
   LoraEncoder encoder(uplinkPayload);
-  
+
   // LoRaWAN node status flags
   encoder.writeBitmap(0,
                       0,
@@ -664,7 +656,6 @@ void setup()
   // ----- and now for the main event -----
   log_i("Sending uplink");
 
-
   // get payload immediately before uplink - not used here
   appLayer.getPayloadStage2(1, encoder);
 
@@ -685,6 +676,9 @@ void setup()
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
+  /// Uplink request - command received via downlink
+  uint8_t uplinkReq = 0;
+
   // Check if downlink was received
   if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
   {
@@ -693,7 +687,8 @@ void setup()
     {
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
-      decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
+
+      uplinkReq = decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
     }
     else
     {
@@ -747,7 +742,7 @@ void setup()
 
   if (uplinkReq)
   {
-    sendCfgUplink();
+    sendCfgUplink(uplinkReq);
   }
 
   log_d("FcntUp: %u", node.getFcntUp());
