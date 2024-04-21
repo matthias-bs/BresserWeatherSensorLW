@@ -672,7 +672,7 @@ void setup()
   }
   else
   {
-    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize);
+    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, false, nullptr, &downlinkDetails);
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
