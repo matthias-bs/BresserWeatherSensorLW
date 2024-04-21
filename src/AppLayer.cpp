@@ -60,7 +60,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         return 0;
     }
 
-    if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] = 0x00) && (size == 1))
+    if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get weathersensor_timeout");
         return CMD_GET_WS_TIMEOUT;
@@ -74,7 +74,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         appPrefs.end();
     }
 
-    if ((port == CMD_GET_SENSORS_INC) && (payload[0] = 0x00) && (size == 1))
+    if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get sensors include list");
         return CMD_GET_SENSORS_INC;
@@ -95,7 +95,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         return 0;
     }
 
-    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] = 0x00) && (size == 1))
+    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get sensors exclude list");
         return CMD_GET_SENSORS_EXC;
