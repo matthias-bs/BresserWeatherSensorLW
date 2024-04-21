@@ -104,10 +104,10 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | ----------- | ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
 | [X] / [X] / [X] / [X] | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
 | [X] / [ ] / [-] / [-] | CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
-| [X] / [ ] / [-] / [-]  | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
-| [X] / [ ] / [-] / [-]  | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| [X] / [X] / [-] / [-]  | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| [X] / [X] / [-] / [-]  | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
 | [X] / [X] / [X] / [X]  | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
-| [X] / [ ] / [ ] / [ ]  | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
+| [X] / [/] / [ ] / [ ]  | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | [X] / [ ] / [-] / [-]  | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | [X] / [ ] / [ ] / [ ]  | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
 | [X] / [ ] / [ ] / [ ]  | CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
@@ -117,7 +117,17 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | [X] / [ ] / [ ] / [ ]  | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | [X] / [ ] / [-] / [-]  | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
 
-
+| Parameter          | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| <ws_timeout>       | Weather sensor receive timeout in seconds; 0...255                          |
+| <sleep_interval>   | Sleep interval (regular) in seconds; 0...65535                              |
+| <sleep_interval>   | Sleep interval (energy saving mode) in seconds; 0...65535                   |
+| \<epoch\>            | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
+| <reset_flags>      | Raingauge reset flags; 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF" |
+| <rtc_source>       | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
+| <sensors_incN>     | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty; empty list => all IDs |
+| <sensors_excN>     | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty                        |
+| <ble_addrN>        | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
 
 :warning: Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
 
