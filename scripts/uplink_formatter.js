@@ -2,8 +2,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // uplink_formatter.js
 // 
-// Bresser 5-in-1/6-in-1 868 MHz Weather Sensor Radio Receiver 
-// based on ESP32 and RFM95W - 
+// Bresser 868 MHz Weather Sensor Radio Receiver 
+// based on ESP32 and SX1262/SX1276 - 
 // sends data to a LoRaWAN network (e.g. The Things Network)
 //
 // This script allows to decode payload received from The Things Network -
@@ -14,26 +14,30 @@
 // ----------
 // (see constants for ports below)
 // port = CMD_SET_WS_TIMEOUT, {"timeout": <timeout_in_seconds>}
-// port = CMD_SET_SLEEP_INTERVAL, {"cmd": "", "interval": <interval_in_seconds>}
-// port = CMD_SET_SLEEP_INTERVAL_LONG, {"cmd": "", "interval": <interval_in_seconds>}
-// port = CMD_GET_DATETIME, payload = 0x00
+// port = CMD_SET_SLEEP_INTERVAL, {"sleep_interval": <interval_in_seconds>}
+// port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
+// port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
-// port = CMD_RESET_RAINGAUGE, {"flags": <flags>}
-// port = CMD_GET_LW_CONFIG, payload = 0x00
-// port = CMD_GET_WS_TIMEOUT, payload = 0x00
-// port = CMD_GET_SENSORS_INC, payload = 0x00
-// port = CMD_GET_SENSORS_EXC, payload = 0x00
-// port = CMD_GET_BLE_ADDR, payload = 0x00
+// port = CMD_RESET_RAINGAUGE, {"reset_flags": <flags>}
+// port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
+// port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
+// port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
+// port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
+// port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
+// port = CMD_GET_SENSORS_EXC, {"cmd": "CMD_GET_SENSORS_EXC"} / payload = 0x00
+// port = CMD_SET_SENSORS_EXC, {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}
+// port = CMD_GET_BLE_ADDR, {"cmd": "CMD_GET_BLE_ADDR"} / payload = 0x00
+// port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
 //
 // Responses:
 // -----------
 // (The response uses the same port as the request.)
-// CMD_GET_LW_CONFIG {"sleep_interval": <interval_in_seconds>,
-//                    "sleep_interval_long": <interval_in_seconds>}
+// CMD_GET_LW_CONFIG {"sleep_interval": <sleep_interval>,
+//                    "sleep_interval_long": <sleep_interval_long>}
 // 
-// CMD_GET_DATETIME {"epoch": <unix_epoch_time>, "rtc_source":<rtc_source>}
+// CMD_GET_DATETIME {"epoch": <unix_epoch_time>, "rtc_source": <rtc_source>}
 //
-// CMD_GET_WS_TIMEOUT {"ws_timeout": <timeout_in_seconds>}
+// CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
 // CMD_GET_SENSORS_INC {"sensors_inc": [<sensors_inc0>, ...]}
 //
@@ -41,10 +45,11 @@
 //
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
-// <timeout_in_seconds> : 0...255
-// <interval>           : 0...65535
-// <epoch>              : unix epoch time, see https://www.epochconverter.com/
-// <flags>              : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly)
+// <ws_timeout>         : 0...255
+// <sleep_interval>     : 0...65535
+// <sleep_interval>     : 0...65535
+// <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
+// <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
@@ -99,6 +104,8 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_INC = 0xC4;
     const CMD_GET_SENSORS_EXC = 0xC6;
     const CMD_GET_BLE_ADDR = 0xC8;
+
+    const ONEWIRE_EN = 0;
 
     var rtc_source_code = {
         0x00: "GPS",
@@ -191,24 +198,24 @@ function decoder(bytes, port) {
     uint32BE.BYTES = 4;
 
     var mac48 = function (bytes) {
-        var res = []; 
+        var res = [];
         var size = bytes.length;
-        var j=0;
+        var j = 0;
         for (var i = 0; i < bytes.length; i += 6) {
-            res[j++] = bytes[i].toString(16) + ":" + bytes[i+1].toString(16) + ":" + bytes[i+2].toString(16) + ":" +
-                  bytes[i+3].toString(16) + ":" + bytes[i+4].toString(16) + ":" + bytes[i+5].toString(16);
+            res[j++] = bytes[i].toString(16) + ":" + bytes[i + 1].toString(16) + ":" + bytes[i + 2].toString(16) + ":" +
+                bytes[i + 3].toString(16) + ":" + bytes[i + 4].toString(16) + ":" + bytes[i + 5].toString(16);
         }
         return res;
     }
     mac48.BYTES = bytes.length;
 
     var id32 = function (bytes) {
-        var res = []; 
+        var res = [];
         var size = bytes.length;
-        var j=0;
+        var j = 0;
         for (var i = 0; i < bytes.length; i += 4) {
-            res[j++] = "0x" + bytes[i].toString(16) + bytes[i+1].toString(16) + bytes[i+2].toString(16) +
-                              bytes[i+3].toString(16);
+            res[j++] = "0x" + bytes[i].toString(16) + bytes[i + 1].toString(16) + bytes[i + 2].toString(16) +
+                bytes[i + 3].toString(16);
         }
         return res;
     }
@@ -358,23 +365,44 @@ function decoder(bytes, port) {
 
 
     if (port === 1) {
-        return decode(
-            bytes,
-            [bitmap_node, bitmap_sensors, temperature, uint8,
-                uint16fp1, uint16fp1, uint16fp1,
-                rawfloat, uint16, temperature,
-                temperature, uint8, temperature, uint8,
-                rawfloat, rawfloat, rawfloat, rawfloat,
-                unixtime, uint16, uint8
-            ],
-            ['status_node', 'status', 'air_temp_c', 'humidity',
-                'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                'rain_mm', 'supply_v', 'water_temp_c',
-                'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
-                'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
-                'lightning_time', 'lightning_events', 'lightning_distance_km'
-            ]
-        );
+        if (ONEWIRE_EN) {
+            return decode(
+                bytes,
+                [bitmap_node, bitmap_sensors, temperature, uint8,
+                    uint16fp1, uint16fp1, uint16fp1,
+                    rawfloat, uint16, temperature,
+                    temperature, uint8, temperature, uint8,
+                    rawfloat, rawfloat, rawfloat, rawfloat,
+                    unixtime, uint16, uint8
+                ],
+                ['status_node', 'status', 'air_temp_c', 'humidity',
+                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
+                    'rain_mm', 'supply_v', 'water_temp_c',
+                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
+                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
+                    'lightning_time', 'lightning_events', 'lightning_distance_km'
+                ]
+            );
+        } else {
+            return decode(
+                bytes,
+                [bitmap_node, bitmap_sensors, temperature, uint8,
+                    uint16fp1, uint16fp1, uint16fp1,
+                    rawfloat, uint16,
+                    temperature, uint8, temperature, uint8,
+                    rawfloat, rawfloat, rawfloat, rawfloat,
+                    unixtime, uint16, uint8
+                ],
+                ['status_node', 'status', 'air_temp_c', 'humidity',
+                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
+                    'rain_mm', 'supply_v',
+                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
+                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
+                    'lightning_time', 'lightning_events', 'lightning_distance_km'
+                ]
+            );
+        }
+
     } else if (port === CMD_GET_DATETIME) {
         return decode(
             bytes,
