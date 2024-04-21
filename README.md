@@ -97,3 +97,57 @@ Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 **Documentation will be updated soon!**
 
 Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md)
+
+## Remote Configuration Commands / Status Requests via LoRaWAN
+
+| Command                       | Port | Downlink                                                                  | Uplink         |
+| ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
+| CMD_GET_DATETIME              | 0x86 | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
+| CMD_SET_DATETIME              | 0x88 | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
+| CMD_SET_SLEEP_INTERVAL        | 0xA8 | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| CMD_GET_LW_CONFIG             | 0xB1 | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
+| CMD_GET_WS_TIMEOUT            | 0xC0 | 0x00                                                                      | ws_timeout[7:0] |
+| CMD_SET_WS_TIMEOUT            | 0xC1 | ws_timeout[7:0]                                                           | n.a.            |
+| CMD_RESET_RAINGAUGE           | 0xC3 | flags[7:0]                                                                | n.a.            |
+| CMD_GET_SENSORS_INC           | 0xC4 | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
+
+| CMD_SET_SENSORS_EXC           | 0xC6 | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc[16:8]<br>sensors_inc[7:0]<br>... |
+
+| CMD_GET_CONFIG                | 0xB1 |         |                 |                 |                 |               |                 |                 |
+|    response:               |  |  3       | seconds   | ws_timeout[ 7: 0] | sleep_interval[15: 8] | sleep_interval[ 7: 0] | sleep_interval_long[15: 8] | sleep_interval_long[ 7: 0] |
+| CMD_GET_DATETIME              | 0x86 |         |                 |                 |                |                 |
+|   response:            |      | 2       | epoch   | unixtime[31:24] | unixtime[23:16] | unixtime[15:8] | unixtime[7:0] |
+| CMD_SET_DATETIME              | 0x88 |         |epoch   | unixtime[31:24] | unixtime[23:16] | unixtime[15:8] | unixtime[7:0] |
+
+<table>
+    <thead>
+        <tr>
+            <th>Command</th>
+            <th>Port</th>
+            <th>Downlink</th>
+            <th>Uplink</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>CMD_GET_DATETIME</td>
+            <td>0x86</td>
+            <td>0x00</td>
+            <td rowspan=5></td>
+        </tr>
+        <tr>
+            <td>L3 Name B</td>
+        </tr>
+        <tr>
+            <td rowspan=2>L2 Name B</td>
+            <td>L3 Name C</td>
+        </tr>
+        <tr>
+            <td>L3 Name D</td>
+        </tr>
+    </tbody>
+</table>
+
+:warning: Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
+
