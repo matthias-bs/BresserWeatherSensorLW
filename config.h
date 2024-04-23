@@ -35,6 +35,7 @@
 //
 // 20240412 Created
 // 20240413 Added ESP32-S3 PowerFeather
+// 20240426 Added define ARDUINO_heltec_wifi_lora_32_V3
 //
 // ToDo:
 // - 
@@ -188,7 +189,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma message("ARDUINO_heltec_wifi_lora_32_V2")
   #define LORA_CHIP SX1276
 
-#elif defined(ARDUINO_heltec_wifi_32_lora_V3)
+#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
   // Use pinning for Heltec WiFi LoRa32 V3
   #define PIN_LORA_NSS   SS
   #define PIN_LORA_RST   RST_LoRa
