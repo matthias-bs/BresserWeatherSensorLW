@@ -372,12 +372,11 @@ function decodeDownlink(input) {
         case CMD_GET_DATETIME:
         case CMD_GET_LW_CONFIG:
         case CMD_GET_WS_TIMEOUT:
-        case CMD_RESET_RAINGAUGE:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
         case CMD_GET_BLE_ADDR:
             return {
-                data: [],
+                data: [0],
                 warnings: [],
                 errors: []
             };
