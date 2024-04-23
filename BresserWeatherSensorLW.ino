@@ -395,7 +395,7 @@ void sendCfgUplink(uint8_t uplinkReq)
 {
   log_d("--- Uplink Configuration/Status ---");
 
-  uint8_t uplinkPayload[5];
+  uint8_t uplinkPayload[48];
   uint8_t port = uplinkReq;
 
   //
