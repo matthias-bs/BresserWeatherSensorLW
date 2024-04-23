@@ -107,7 +107,7 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | :white_check_mark:  | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
 | :white_check_mark:  | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
 | :white_check_mark:  | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
-| [X] / [/] / [X] / [X]  | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
+| :white_check_mark:  | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | :white_check_mark:  | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | :white_check_mark:  | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
 | [X] / [X] / [X] / [X]  | CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
