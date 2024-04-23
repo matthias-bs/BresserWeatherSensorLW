@@ -197,13 +197,17 @@ function decoder(bytes, port) {
     };
     uint32BE.BYTES = 4;
 
+    function byte2hex(byte) {
+        return ('0' + byte.toString(16)).slice(-2);
+    }
+
     var mac48 = function (bytes) {
         var res = [];
         var size = bytes.length;
         var j = 0;
         for (var i = 0; i < bytes.length; i += 6) {
-            res[j++] = bytes[i].toString(16) + ":" + bytes[i + 1].toString(16) + ":" + bytes[i + 2].toString(16) + ":" +
-                bytes[i + 3].toString(16) + ":" + bytes[i + 4].toString(16) + ":" + bytes[i + 5].toString(16);
+            res[j++] = byte2hex(bytes[i]) + ":" + byte2hex(bytes[i + 1]) + ":" + byte2hex(bytes[i + 2]) + ":" +
+                byte2hex(bytes[i + 3]) + ":" + byte2hex(bytes[i + 4]) + ":" + byte2hex(bytes[i + 5]);
         }
         return res;
     }
@@ -214,8 +218,7 @@ function decoder(bytes, port) {
         var size = bytes.length;
         var j = 0;
         for (var i = 0; i < bytes.length; i += 4) {
-            res[j++] = "0x" + bytes[i].toString(16) + bytes[i + 1].toString(16) + bytes[i + 2].toString(16) +
-                bytes[i + 3].toString(16);
+            res[j++] = "0x" + byte2hex(bytes[i]) + byte2hex(bytes[i + 1]) + byte2hex(bytes[i + 2]) + byte2hex(bytes[i + 3]);
         }
         return res;
     }
