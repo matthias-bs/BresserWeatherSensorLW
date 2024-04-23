@@ -102,8 +102,8 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 
 | Test Status<br>Req. script / Req. sketch / Rsp. sketch / Rsp. script| Command                       | Port | Downlink                                                                  | Uplink         |
 | ----------- | ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
-| [X] / [X] / [X] / [X] | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
-| [X] / [ ] / [-] / [-] | CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
+| :white_check_mark: | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
+| :white_check_mark: | CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
 | :white_check_mark:  | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
 | :white_check_mark:  | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
 | :white_check_mark:  | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
