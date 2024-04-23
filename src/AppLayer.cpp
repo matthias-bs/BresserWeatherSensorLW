@@ -38,6 +38,7 @@
 // 20240414 Added separation between LoRaWAN and application layer
 // 20240417 Added sensor configuration functions
 // 20240419 Modified downlink decoding
+// 20240424 Fixes in decodeDownlink()
 //
 //
 // ToDo:
@@ -50,6 +51,7 @@
 uint8_t
 AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
+#ifdef RAINDATA_EN
     if (port == CMD_RESET_RAINGAUGE)
     {
         if (size == 1)
@@ -59,6 +61,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         }
         return 0;
     }
+#endif
 
     if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] == 0x00) && (size == 1))
     {
@@ -115,7 +118,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         weatherSensor.setSensorsExc(payload, size);
     }
 
-    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
+    if ((port == CMD_GET_BLE_ADDR) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get BLE sensors MAC addresses");
         return CMD_GET_BLE_ADDR;
