@@ -39,6 +39,7 @@
 // 20240407 Created from BresserWeatherSensorTTNCfg.h
 // 20240410 Removed obsolete defines
 // 20240413 Refactored ADC handling
+// 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
 //
 // Note:
 // Depending on board package file date, either
@@ -283,6 +284,7 @@
 #if !defined(ARDUINO_TTGO_LoRa32_V1) && !defined(ARDUINO_TTGO_LoRa32_V2) &&               \
     !defined(ARDUINO_TTGO_LoRa32_v21new) && !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) && \
     !defined(ARDUINO_FEATHER_ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) &&       \
+    !defined(ARDUINO_heltec_wifi_32_lora_V3) && !defined(ARDUINO_heltec_wifi_lora_32_V3) && \
     !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2) && \
     !defined(ARDUINO_ESP32S3_POWERFEATHER)
 // Use pinning for LoRaWAN Node
@@ -390,7 +392,7 @@
 #elif defined(LORAWAN_NODE)
 // External Li-Ion Battery connected to solar charger
 #define PIN_ADC_IN A3
-#elif defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_heltec_wifi_32_lora_V3)
+#elif defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)

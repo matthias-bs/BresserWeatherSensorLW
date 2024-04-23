@@ -34,6 +34,7 @@
 // 20240413 Refactored ADC handling
 // 20240414 Added ESP32-S3 PowerFeather
 //          Added getSupplyVoltage()
+// 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
 //
 // ToDo:
 // -
@@ -79,7 +80,7 @@ uint16_t getBatteryVoltage(void)
     #if defined(ARDUINO_ARCH_RP2040)
     // Not implemented - no default VBAT input circuit (connect external divider to A0)
     return 0;
-    #elif defined(ARDUINO_heltec_wifi_32_lora_V3)
+    #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
     return 0;
     #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
     uint16_t voltage = M5.Power.getBatteryVoltage();
