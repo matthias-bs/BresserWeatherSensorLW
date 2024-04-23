@@ -28,7 +28,7 @@
 // RadioLib                             6.5.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.26.0
+// BresserWeatherSensorReceiver         0.27.0
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
@@ -77,6 +77,7 @@
 //          Fixed battLevel calculation
 // 20240415 Added ESP32-S3 PowerFeather
 // 20240416 Added enabling of 3.3V power supply for FeatherWing on ESP32-S3 PowerFeather
+// 20240423 Removed rtcSyncReq & runtimeExpired, added rtcTimeSource
 //
 // ToDo:
 // -
@@ -159,10 +160,28 @@ const char *TZ_INFO = TZINFO_STR;
 // The maximum allowed for all data rates is 51 bytes.
 const uint8_t PAYLOAD_SIZE = 51;
 
+// Time source & status, see below
+//
+// bits 0..3 time source
+//    0x00 = GPS
+//    0x01 = RTC
+//    0x02 = LORA
+//    0x03 = unsynched
+//    0x04 = set (source unknown)
+//
+// bits 4..7 esp32 sntp time status (not used)
+enum class E_TIME_SOURCE : uint8_t
+{
+    E_GPS       = 0x00,
+    E_RTC       = 0x01,
+    E_LORA      = 0x02,
+    E_UNSYNCHED = 0x04,
+    E_SET       = 0x08
+};
+
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
 // Stored in RTC RAM
-RTC_DATA_ATTR bool runtimeExpired = false; //!< flag indicating if runtime has expired at least once
 RTC_DATA_ATTR bool longSleep;              //!< last sleep interval; 0 - normal / 1 - long
 RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchonization to network time
 
@@ -170,10 +189,11 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchoniza
 // puts these in to the RTC memory which is preserved during deep-sleep
 RTC_DATA_ATTR uint16_t bootCount = 1;
 RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
+RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource;
 RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
+
 #else
 // Saved to/restored from Watchdog SCRATCH registers
-bool runtimeExpired;     //!< flag indicating if runtime has expired at least once
 bool longSleep;          //!< last sleep interval; 0 - normal / 1 - long
 time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network time
 
@@ -184,10 +204,10 @@ uint16_t bootCountSinceUnsuccessfulJoin;
 
 // RP2040 RAM is preserved during sleep; we just have to ensure that it is not initialized at startup (after reset)
 uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".uninitialized_data")));
-#endif
 
-/// RTC sync request flag - set (if due) in setup() / cleared in UserRequestNetworkTimeCb()
-bool rtcSyncReq = false;
+/// RTC time source
+E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
+#endif
 
 /// Real time clock
 ESP32Time rtc;
@@ -275,14 +295,6 @@ void gotoSleep(uint32_t seconds)
   watchdog_hw->scratch[3] = (bootCountSinceUnsuccessfulJoin << 16) | bootCount;
   watchdog_hw->scratch[2] = rtcLastClockSync;
 
-  if (runtimeExpired)
-  {
-    watchdog_hw->scratch[1] |= 1;
-  }
-  else
-  {
-    watchdog_hw->scratch[1] &= ~1;
-  }
   if (longSleep)
   {
     watchdog_hw->scratch[1] |= 2;
@@ -336,6 +348,8 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     time_t set_time = (payload[0] << 24) | (payload[1] << 16) | (payload[2] << 8) | payload[3];
     rtc.setTime(set_time);
     rtcLastClockSync = rtc.getLocalEpoch();
+    rtcTimeSource = E_TIME_SOURCE::E_SET;
+
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
     char tbuf[25];
     struct tm timeinfo;
@@ -372,7 +386,8 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     log_d("Get config");
     return CMD_GET_LW_CONFIG;
   }
-
+  
+  log_d("appLayer.decodeDownlink(port=%d, payload[0]=0x%02X, size=%d)", port, payload[0], size);
   return appLayer.decodeDownlink(port, payload, size);
 }
 
@@ -397,18 +412,7 @@ void sendCfgUplink(uint8_t uplinkReq)
     encoder.writeUint8((t_now >> 8) & 0xff);
     encoder.writeUint8(t_now & 0xff);
 
-    // time source & status, see below
-    //
-    // bits 0..3 time source
-    //    0x00 = GPS
-    //    0x01 = RTC
-    //    0x02 = LORA
-    //    0x03 = unsynched
-    //    0x04 = set (source unknown)
-    //
-    // bits 4..7 esp32 sntp time status (not used)
-    // TODO add flags for succesful LORA time sync/manual sync
-    encoder.writeUint8((rtcSyncReq) ? 0x03 : 0x02);
+    encoder.writeUint8(static_cast<uint8_t>(rtcTimeSource));
   }
   else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
@@ -422,7 +426,7 @@ void sendCfgUplink(uint8_t uplinkReq)
   {
     appLayer.getConfigPayload(uplinkReq, port, encoder);
   }
-  log_v("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
+  log_d("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
 
   for (int i = 0; i < encoder.getLength(); i++)
   {
@@ -482,7 +486,6 @@ void setup()
   // Set SW clock
   rtc.setTime(time_saved);
 
-  runtimeExpired = ((watchdog_hw->scratch[1] & 1) == 1);
   longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
   rtcLastClockSync = watchdog_hw->scratch[2];
   bootCount = watchdog_hw->scratch[3] & 0xFFFF;
@@ -495,6 +498,10 @@ void setup()
   print_wakeup_reason();
 #endif
   log_i("Boot count: %u", bootCount++);
+
+  if (bootCount == 1) {
+    rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
+  }
 
   // Set time zone
   setenv("TZ", TZ_INFO, 1);
@@ -526,8 +533,8 @@ void setup()
                       0,
                       0,
                       longSleep,
-                      rtcSyncReq,
-                      runtimeExpired);
+                      0,
+                      0);
 
   appLayer.getPayloadStage1(1, encoder);
 
@@ -638,7 +645,6 @@ void setup()
   if ((rtcLastClockSync == 0) || ((rtc.getLocalEpoch() - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60)))
   {
     log_i("RTC sync required");
-    rtcSyncReq = true;
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
   }
 
@@ -688,7 +694,9 @@ void setup()
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
 
-      uplinkReq = decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
+      if (downlinkDetails.port > 0) {
+        uplinkReq = decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
+      }
     }
     else
     {
@@ -727,7 +735,7 @@ void setup()
 
     // Save clock sync timestamp and clear flag
     rtcLastClockSync = rtc.getLocalEpoch();
-    rtcSyncReq = false;
+    rtcTimeSource = E_TIME_SOURCE::E_LORA;
     log_d("RTC sync completed");
     printDateTime();
   }
