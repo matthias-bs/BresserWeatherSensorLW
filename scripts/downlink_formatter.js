@@ -159,29 +159,28 @@ function uint32BE(bytes) {
     return bytesToIntBE(bytes);
 }
 
+function byte2hex(byte) {
+    return ('0' + byte.toString(16)).slice(-2);
+}
+
 function mac48(bytes) {
     var res = [];
-    var size = bytes.length;
     var j = 0;
     for (var i = 0; i < bytes.length; i += 6) {
-        res[j++] = bytes[i].toString(16) + ":" + bytes[i + 1].toString(16) + ":" + bytes[i + 2].toString(16) + ":" +
-            bytes[i + 3].toString(16) + ":" + bytes[i + 4].toString(16) + ":" + bytes[i + 5].toString(16);
+        res[j++] = byte2hex(bytes[i]) + ":" + byte2hex(bytes[i + 1]) + ":" + byte2hex(bytes[i + 2]) + ":" +
+            byte2hex(bytes[i + 3]) + ":" + byte2hex(bytes[i + 4]) + ":" + byte2hex(bytes[i + 5]);
     }
     return res;
 }
-//mac48.BYTES = bytes.length;
 
 function id32(bytes) {
     var res = [];
-    //var size = bytes.length;
     var j = 0;
     for (var i = 0; i < bytes.length; i += 4) {
-        res[j++] = "0x" + bytes[i].toString(16) + bytes[i + 1].toString(16) + bytes[i + 2].toString(16) +
-            bytes[i + 3].toString(16);
+        res[j++] = "0x" + byte2hex(bytes[i]) + byte2hex(bytes[i + 1]) + byte2hex(bytes[i + 2]) + byte2hex(bytes[i + 3]);
     }
     return res;
 }
-//id32.BYTES = bytes.length;
 
 // Encode Downlink from JSON to bytes
 function encodeDownlink(input) {
@@ -239,7 +238,7 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
-    } 
+    }
     if (input.data.hasOwnProperty('sleep_interval')) {
         return {
             bytes: [
@@ -264,7 +263,7 @@ function encodeDownlink(input) {
     }
     else if (input.data.hasOwnProperty('epoch')) {
         if (typeof input.data.epoch == "string") {
-            if (input.data.epoch.substr(0,2) == "0x") {
+            if (input.data.epoch.substr(0, 2) == "0x") {
                 value = parseInt(input.data.epoch.substr(2), 16);
             } else {
                 return {
@@ -296,7 +295,7 @@ function encodeDownlink(input) {
         };
     } else if (input.data.hasOwnProperty('reset_flags')) {
         if (typeof input.data.epoch == "string") {
-            if (input.data.reset_flags.substr(0,2) == "0x") {
+            if (input.data.reset_flags.substr(0, 2) == "0x") {
                 value = parseInt(input.data.reset_flags.substr(2), 16);
             } else {
                 return {
@@ -383,7 +382,7 @@ function decodeDownlink(input) {
         case CMD_SET_DATETIME:
             return {
                 data: {
-                     unixtime: "0x" + uint32BE(input.bytes.slice(0, 4)).toString(16)
+                    unixtime: "0x" + uint32BE(input.bytes.slice(0, 4)).toString(16)
                 }
             };
         case CMD_SET_SLEEP_INTERVAL:
@@ -421,13 +420,13 @@ function decodeDownlink(input) {
                 data: {
                     sensors_exc: id32(input.bytes)
                 }
-           };
+            };
         case CMD_SET_BLE_ADDR:
             return {
                 data: {
                     ble_addr: mac48(input.bytes)
                 }
-           };
+            };
         case CMD_GET_LW_CONFIG:
             return {
                 data: {
