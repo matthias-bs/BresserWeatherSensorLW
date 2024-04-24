@@ -60,7 +60,9 @@ This project is in early stage of development - stay tuned.
 * [x] Separate LoRaWAN network and application code
 * [x] Change LoRaWAN control downlink / status uplink messages
 * [x] Update Javascript encoders/decoders
-* [ ] Implement using of BLE sensor addresses configured via downlink
+* [x] Implement using of BLE sensor addresses configured via downlink
+* [ ] Update documentation
+* [ ] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
 
  
 ## Supported Hardware
