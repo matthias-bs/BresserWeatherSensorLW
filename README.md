@@ -103,12 +103,12 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
 
-| Command                       | Port | Downlink                                                                  | Uplink         |
-| ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
+| Command                       | Port       | Downlink                                                                  | Uplink         |
+| ----------------------------- | ---------- | ------------------------------------------------------------------------- | -------------- |
 | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
 | CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
-| CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
-| CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
+| CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
 | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
 | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
@@ -120,21 +120,22 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>...<br>:warning: Configured addresses are not applied yet. The SW still uses the default from `BresserWeatherSensorLWCfg.h` | n.a. |
 
-| Parameter          | Description                                                                 |
-| ------------------ | --------------------------------------------------------------------------- |
-| <ws_timeout>       | Weather sensor receive timeout in seconds; 0...255                          |
-| <sleep_interval>   | Sleep interval (regular) in seconds; 0...65535                              |
-| <sleep_interval>   | Sleep interval (energy saving mode) in seconds; 0...65535                   |
-| \<epoch\>            | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
-| <reset_flags>      | Raingauge reset flags; 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF" |
-| <rtc_source>       | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
-| <sensors_incN>     | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty; empty list => all IDs |
-| <sensors_excN>     | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty                        |
-| <ble_addrN>        | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
+| Parameter             | Description                                                                 |
+| --------------------- | --------------------------------------------------------------------------- |
+| <ws_timeout>          | Weather sensor receive timeout in seconds; 0...255                          |
+| <sleep_interval>      | Sleep interval (regular) in seconds; 0...65535                              |
+| <sleep_interval_long> | Sleep interval (energy saving mode) in seconds; 0...65535                   |
+| \<epoch\>             | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
+| <reset_flags>         | Raingauge reset flags; 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF" |
+| <rtc_source>          | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
+| <sensors_incN>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty; empty list => all IDs |
+| <sensors_excN>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; may be empty                        |
+| <ble_addrN>           | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
 
 > [!WARNING]
 > Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
 
 
 > [!IMPORTANT]
-> To set sensors_inc / sensors_exc to an empty list, set the first ID in CMD_SET_SENSORS_INC / CMD_SET_SENSORS_EXC to 0x00000000.
+> To set sensors_inc / sensors_exc to the compile time default configuration, set the first ID in CMD_SET_SENSORS_INC / CMD_SET_SENSORS_EXC to 0x00000000.
+> To set the BLE sensor addresses to the compile time default configuration, set the first address in CMD_SET_BLE_ADDR to 0x000000000000.
