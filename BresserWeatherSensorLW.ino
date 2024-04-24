@@ -78,6 +78,7 @@
 // 20240415 Added ESP32-S3 PowerFeather
 // 20240416 Added enabling of 3.3V power supply for FeatherWing on ESP32-S3 PowerFeather
 // 20240423 Removed rtcSyncReq & runtimeExpired, added rtcTimeSource
+// 20240424 Added appLayer.begin()
 //
 // ToDo:
 // -
@@ -506,6 +507,9 @@ void setup()
   // Set time zone
   setenv("TZ", TZ_INFO, 1);
   printDateTime();
+
+  // Initialize Application Layer
+  appLayer.begin();
 
   preferences.begin("BWS-LW", false);
   prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
