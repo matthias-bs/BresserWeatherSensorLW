@@ -153,9 +153,9 @@ public:
         {
             // No addresses stored in Preferences, use default
             knownBLEAddresses = knownBLEAddressesDef;
-            log_d("Using BLE Addresses from BresserWeatherSensorLWCfg.h:");
+            log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
         } else {
-            log_d("Using BLE Addresses from Preferences:");
+            log_d("Using BLE addresses from Preferences:");
         }
         bleSensors = BleSensors(knownBLEAddresses);
         
