@@ -58,8 +58,9 @@ This project is in early stage of development - stay tuned.
 * [x] RP2040 specific implementation
 * [x] Fix battery voltage measurement for HW targets FIREBEETLE_ESP32_COVER_LORA & LORAWAN_NODE
 * [x] Separate LoRaWAN network and application code
-* [ ] Change LoRaWAN control downlink / status uplink messages
-* [ ] Update Javascript encoders/decoders
+* [x] Change LoRaWAN control downlink / status uplink messages
+* [x] Update Javascript encoders/decoders
+* [ ] Implement using of BLE sensor addresses configured via downlink
 
  
 ## Supported Hardware
@@ -100,22 +101,22 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
 
-| Test Status<br>Req. script / Req. sketch / Rsp. sketch / Rsp. script| Command                       | Port | Downlink                                                                  | Uplink         |
-| ----------- | ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
-| :white_check_mark: | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
-| :white_check_mark: | CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
-| :white_check_mark:  | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
-| :white_check_mark:  | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
-| :white_check_mark:  | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
-| :white_check_mark:  | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
-| :white_check_mark:  | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
-| :white_check_mark:  | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
-| :white_check_mark:  | CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
-| :white_check_mark:  | CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
-| :white_check_mark:  | CMD_GET_SENSORS_EXC           | 0xC6 (198) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
-| :white_check_mark:  | CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
-| [X] / [X] / [X] / [X]  | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
-| [X] / [ ] / [-] / [-]  | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+| Command                       | Port | Downlink                                                                  | Uplink         |
+| ----------------------------- | ---- | ------------------------------------------------------------------------- | -------------- |
+| CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
+| CMD_SET_DATETIME              | 0x88 (136) | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
+| CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | interval[15:8]<br>interval[7:0]                                           | n.a.           |
+| CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
+| CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
+| CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
+| CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
+| CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
+| CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
+| CMD_GET_SENSORS_EXC           | 0xC6 (198) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
+| CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
+| CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
+| CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>...<br>:warning: Configured addresses are not applied yet. The SW still uses the default from `BresserWeatherSensorLWCfg.h` | n.a. |
 
 | Parameter          | Description                                                                 |
 | ------------------ | --------------------------------------------------------------------------- |
