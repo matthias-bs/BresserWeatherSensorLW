@@ -39,6 +39,7 @@
 // 20240417 Added sensor configuration functions
 // 20240419 Modified downlink decoding
 // 20240424 Fixes in decodeDownlink()
+//          Fixed getBleAddr()
 //
 //
 // ToDo:
@@ -637,7 +638,11 @@ std::vector<std::string> AppLayer::getBleAddr(void)
     appPrefs.getBytes("ble", addrBytes, size);
     for (size_t i = 0; i < size; i += 6)
     {
-        bleAddr.push_back(BLEAddress(&addrBytes[i]).toString());
+        char addr[18];
+        snprintf(addr, 18, "%02X:%02X:%02X:%02X:%02X:%02X", 
+            addrBytes[i], addrBytes[i+1], addrBytes[i+2], addrBytes[i+3],addrBytes[i+4],addrBytes[i+5]
+        );
+        bleAddr.push_back(addr);
     }
     appPrefs.end();
 

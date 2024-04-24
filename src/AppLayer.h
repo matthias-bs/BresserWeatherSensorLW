@@ -35,6 +35,7 @@
 // 20240414 Added separation between LoRaWAN and application layer
 // 20240417 Added sensor configuration functions
 // 20240419 Modified downlink decoding
+// 20240424 Fixed BLE address initialization from Preferences, added begin()
 //
 // ToDo:
 // -
@@ -127,7 +128,6 @@ private:
 
 public:
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    //AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors(KNOWN_BLE_ADDRESSES)
     AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors()
 #else
     AppLayer(ESP32Time *rtc, time_t *clocksync)
@@ -135,20 +135,34 @@ public:
     {
         _rtc = rtc;
         _rtcLastClockSync = clocksync;
+    };
 
+    /*!
+     * \brief AppLayer initialization
+     *
+     * BleSensors() requires Preferences, which uses the Flash FS,
+     * which is not available before the sketches' begin() is called -
+     * thus the following cannot be handled by the constructor.
+     */
+    void begin(void)
+    {
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
         knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
         knownBLEAddresses = getBleAddr();
-        if (knownBLEAddresses.size() == 0) {
+        if (knownBLEAddresses.size() == 0)
+        {
             // No addresses stored in Preferences, use default
             knownBLEAddresses = knownBLEAddressesDef;
+            log_d("Using BLE Addresses from BresserWeatherSensorLWCfg.h:");
+        } else {
+            log_d("Using BLE Addresses from Preferences:");
         }
         bleSensors = BleSensors(knownBLEAddresses);
-        log_v("BLE Addresses:");
-        for(const std::string& s : knownBLEAddresses)
+        
+        for (const std::string &s : knownBLEAddresses)
         {
             (void)s;
-            log_v("%s", s.c_str());
+            log_d("%s", s.c_str());
         }
 #endif
     };
@@ -204,7 +218,7 @@ public:
      *
      * Get the configuration data requested in a downlink command and
      * prepare it as payload in a uplink response.
-     * 
+     *
      * \param cmd command
      * \param port uplink port
      * \param encoder uplink data encoder object
@@ -214,17 +228,17 @@ public:
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     /*!
      * Set BLE addresses in Preferences and bleSensors object
-     * 
+     *
      * \param bytes MAC addresses (6 bytes per address)
      * \param size size in bytes
      */
     void setBleAddr(uint8_t *bytes, uint8_t size);
-    
+
     /*!
      * Get BLE addresses from Preferences
-     * 
+     *
      * \param bytes buffer for addresses
-     * 
+     *
      * \returns number of bytes copied into buffer
      */
     uint8_t getBleAddr(uint8_t *bytes);
