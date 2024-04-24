@@ -40,6 +40,7 @@
 // 20240419 Modified downlink decoding
 // 20240424 Fixes in decodeDownlink()
 //          Fixed getBleAddr()
+//          Implemented resetting of knownBLEAddresses to defaults
 //
 //
 // ToDo:
@@ -139,7 +140,10 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
                   payload[i + 4],
                   payload[i + 5]);
         }
+
+        // Note: New addresses will be applied only after restart.
         setBleAddr(payload, size);
+
         return 0;
     }
 #endif
@@ -609,13 +613,6 @@ void AppLayer::setBleAddr(uint8_t *bytes, uint8_t size)
     appPrefs.begin("BWS-LW-APP", false);
     appPrefs.putBytes("ble", bytes, size);
     appPrefs.end();
-
-    std::vector<std::string> bleAddr;
-    for (size_t i = 0; i < size; i += 6)
-    {
-        bleAddr.push_back(BLEAddress(&bytes[i]).toString());
-    }
-    bleSensors.setAddresses(bleAddr);
 }
 
 uint8_t AppLayer::getBleAddr(uint8_t *payload)
@@ -634,17 +631,34 @@ std::vector<std::string> AppLayer::getBleAddr(void)
 
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t size = appPrefs.getBytesLength("ble");
-    char addrBytes[48];
+    uint8_t addrBytes[48];
     appPrefs.getBytes("ble", addrBytes, size);
+    appPrefs.end();
+
+    if (size < 6)
+    {
+        // return empty list
+        return bleAddr;
+    }
+
+    uint8_t check = 0;
+    for (size_t i = 0; i < 6; i++)
+    {
+        check |= addrBytes[i];
+    }
+    if (check == 0)
+    {
+        // First address is 00:00:00:00:00:00, return empty list
+        return bleAddr;
+    }
+
     for (size_t i = 0; i < size; i += 6)
     {
         char addr[18];
-        snprintf(addr, 18, "%02X:%02X:%02X:%02X:%02X:%02X", 
-            addrBytes[i], addrBytes[i+1], addrBytes[i+2], addrBytes[i+3],addrBytes[i+4],addrBytes[i+5]
-        );
+        snprintf(addr, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
+                 addrBytes[i], addrBytes[i + 1], addrBytes[i + 2], addrBytes[i + 3], addrBytes[i + 4], addrBytes[i + 5]);
         bleAddr.push_back(addr);
     }
-    appPrefs.end();
 
     return bleAddr;
 }
