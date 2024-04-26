@@ -36,6 +36,7 @@
 // 20240417 Added sensor configuration functions
 // 20240419 Modified downlink decoding
 // 20240424 Fixed BLE address initialization from Preferences, added begin()
+// 20240426 Moved bleAddrInit() out of begin()
 //
 // ToDo:
 // -
@@ -140,11 +141,23 @@ public:
     /*!
      * \brief AppLayer initialization
      *
-     * BleSensors() requires Preferences, which uses the Flash FS,
-     * which is not available before the sketches' begin() is called -
-     * thus the following cannot be handled by the constructor.
      */
     void begin(void)
+    {
+        bleAddrInit();
+    };
+
+    /*
+     * \brief Initialize list of known BLE addresses from defaults or Preferences
+     *
+     * If available, addresses from Preferences are used, otherwise defaults from
+     * BresserWeatherSensorLWCfg.h.
+     * 
+     * BleSensors() requires Preferences, which uses the Flash FS,
+     * which is not available before the sketches' begin() is called -
+     * thus the following cannot be handled by the constructor!
+     */
+    void bleAddrInit(void)
     {
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
         knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
@@ -166,6 +179,7 @@ public:
         }
 #endif
     };
+
 
     /*!
      * \brief Decode app layer specific downlink messages

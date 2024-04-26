@@ -41,6 +41,7 @@
 // 20240424 Fixes in decodeDownlink()
 //          Fixed getBleAddr()
 //          Implemented resetting of knownBLEAddresses to defaults
+// 20240426 Added BLE address initialization after updating via downlink
 //
 //
 // ToDo:
@@ -141,8 +142,8 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
                   payload[i + 5]);
         }
 
-        // Note: New addresses will be applied only after restart.
         setBleAddr(payload, size);
+        bleAddrInit();
 
         return 0;
     }
