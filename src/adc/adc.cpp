@@ -35,6 +35,8 @@
 // 20240414 Added ESP32-S3 PowerFeather
 //          Added getSupplyVoltage()
 // 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
+// 20240427 Added ADC input control and battery voltage measurement
+//          for ARDUINO_heltec_wifi_lora_32_V3
 //
 // ToDo:
 // -
@@ -81,7 +83,12 @@ uint16_t getBatteryVoltage(void)
     // Not implemented - no default VBAT input circuit (connect external divider to A0)
     return 0;
     #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
-    return 0;
+    // Enable ADC input switch, measure voltage and disable ADC input switch
+    pinMode(ADC_CTRL, OUTPUT);
+    digitalWrite(ADC_CTRL, LOW);
+    delay(100);
+    getVoltage();
+    pinMode(ADC_CTRL, INPUT);
     #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
     uint16_t voltage = M5.Power.getBatteryVoltage();
     log_d("Voltage = %dmV", voltage);
