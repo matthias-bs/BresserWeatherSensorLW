@@ -103,6 +103,8 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
 
+### Using Raw Data
+
 | Command                       | Port       | Downlink                                                                  | Uplink         |
 | ----------------------------- | ---------- | ------------------------------------------------------------------------- | -------------- |
 | CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
@@ -119,6 +121,26 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
 | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+
+### Using the Javascript Uplink/Downlink Formatters
+
+| Command                       | Downlink                                                                  | Uplink         |
+| ----------------------------- | ------------------------------------------------------------------------- | -------------- |
+| CMD_GET_DATETIME              | {"cmd": "CMD_GET_DATETIME"}                                               | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8]<br>unixtime[7:0]<br>rtc_source[7:0] |
+| CMD_SET_DATETIME              | unixtime[31:24]<br>unixtime[23:16]<br>unixtime[15:8] <br> unixtime[7:0]   | n.a.           |
+| CMD_SET_SLEEP_INTERVAL        | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
+| CMD_SET_SLEEP_INTERVAL_LONG   | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
+| CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
+| CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | ws_timeout[7:0] |
+| CMD_SET_WS_TIMEOUT            | ws_timeout[7:0]                                                           | n.a.            |
+| CMD_RESET_RAINGAUGE           | flags[7:0]                                                                | n.a.            |
+| CMD_GET_SENSORS_INC           | {"cmd": "CMD_GET_SENSORS_INC"}                                            | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
+| CMD_SET_SENSORS_INC           | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
+| CMD_GET_SENSORS_EXC           | {"cmd": "CMD_GET_SENSORS_EXC"}                                            | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
+| CMD_SET_SENSORS_EXC           | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
+| CMD_GET_BLE_ADDR              | {"cmd": "CMD_GET_BLE_ADDR"}                                               | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
+| CMD_SET_BLE_ADDR              | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+
 
 | Parameter             | Description                                                                 |
 | --------------------- | --------------------------------------------------------------------------- |
