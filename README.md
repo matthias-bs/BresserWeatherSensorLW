@@ -125,7 +125,11 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 > To set the BLE sensor addresses to the compile time default configuration, set the first address in CMD_SET_BLE_ADDR to 0x000000000000.
 
 > [!NOTE]
-> 'Default values' 
+> **Default values**<br>
+> Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
+> BLE addresses: see `BresserWeatherSensorLWCfg.h`<br>
+> Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
+> Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
 
 ### Using Raw Data
 
