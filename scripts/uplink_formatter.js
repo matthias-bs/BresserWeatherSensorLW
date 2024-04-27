@@ -13,7 +13,7 @@
 // Commands:
 // ----------
 // (see constants for ports below)
-// port = CMD_SET_WS_TIMEOUT, {"timeout": <timeout_in_seconds>}
+// port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <timeout_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL, {"sleep_interval": <interval_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
@@ -28,6 +28,9 @@
 // port = CMD_SET_SENSORS_EXC, {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}
 // port = CMD_GET_BLE_ADDR, {"cmd": "CMD_GET_BLE_ADDR"} / payload = 0x00
 // port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
+// port = CMD_GET_BLE_CONFIG, {"cmd": "CMD_GET_BLE_CONFIG"} / payload = 0x00
+// port = CMD_SET_BLE_CONFIG, {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
+
 //
 // Responses:
 // -----------
@@ -45,6 +48,8 @@
 //
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
+// CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
+//
 // <ws_timeout>         : 0...255
 // <sleep_interval>     : 0...65535
 // <sleep_interval>     : 0...65535
@@ -53,6 +58,8 @@
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
+// <ble_active>         : BLE scan mode - 0: passive / 1: active
+// <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
 
 // Based on:
@@ -89,6 +96,7 @@
 // 20230821 Created
 // 20240420 Updated for BresserWeatherSensorLW, 
 //          renamed from ttn_uplink_formatter.js
+// 20240427 Added BLE configuration
 //
 // ToDo:
 // -  
@@ -104,6 +112,7 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_INC = 0xC4;
     const CMD_GET_SENSORS_EXC = 0xC6;
     const CMD_GET_BLE_ADDR = 0xC8;
+    const CMD_GET_BLE_CONFIG = 0xCA;
 
     const ONEWIRE_EN = 0;
 
@@ -453,6 +462,13 @@ function decoder(bytes, port) {
             ],
             ['ble_addr'
             ]
+        );
+    } else if (port == CMD_GET_BLE_CONFIG) {
+        return decode(
+            bytes,
+            [uint8, uint8
+            ],
+            ['ble_active', 'ble_scantime']
         );
     }
 
