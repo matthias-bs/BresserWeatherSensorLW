@@ -27,6 +27,8 @@
 // port = CMD_SET_SENSORS_EXC, {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}
 // port = CMD_GET_BLE_ADDR, {"cmd": "CMD_GET_BLE_ADDR"} / payload = 0x00
 // port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
+// port = CMD_GET_BLE_CONFIG, {"cmd": "CMD_GET_BLE_CONFIG"} / payload = 0x00
+// port = CMD_SET_BLE_CONFIG, {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
 //
 // Responses:
 // -----------
@@ -44,6 +46,8 @@
 //
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
+// CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
+//
 // <ws_timeout>         : 0...255
 // <sleep_interval>     : 0...65535
 // <sleep_interval>     : 0...65535
@@ -52,6 +56,8 @@
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
+// <ble_active>         : BLE scan mode - 0: passive / 1: active
+// <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
 //
 //
@@ -89,6 +95,7 @@
 // 20230821 Created
 // 20240420 Updated for BresserWeatherSensorLW, 
 //          renamed from downlink_formatter.js
+// 20240427 Added BLE configuration
 //
 // ToDo:
 // -  
@@ -110,6 +117,8 @@ const CMD_GET_SENSORS_EXC = 0xC6;
 const CMD_SET_SENSORS_EXC = 0xC7;
 const CMD_GET_BLE_ADDR = 0xC8;
 const CMD_SET_BLE_ADDR = 0xC9;
+const CMD_GET_BLE_CONFIG = 0xCA;
+const CMD_SET_BLE_CONFIG = 0xCB;
 
 
 // Source of Real Time Clock setting
@@ -238,6 +247,14 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
+        else if (input.data.cmd == "CMD_GET_BLE_CONFIG") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_BLE_CONFIG,
+                warnings: [],
+                errors: []
+            };
+        }
     }
     if (input.data.hasOwnProperty('sleep_interval')) {
         return {
@@ -351,6 +368,14 @@ function encodeDownlink(input) {
         return {
             bytes: output,
             fPort: CMD_SET_BLE_ADDR,
+            warnings: [],
+            errors: []
+        };
+    }
+    else if (input.data.hasOwnProperty('ble_active') && input.data.hasOwnProperty('ble_scantime')) {
+        return {
+            bytes: [input.data.ble_active, input.data.ble_scantime],
+            fPort: CMD_SET_BLE_CONFIG,
             warnings: [],
             errors: []
         };
