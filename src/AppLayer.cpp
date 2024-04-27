@@ -42,6 +42,7 @@
 //          Fixed getBleAddr()
 //          Implemented resetting of knownBLEAddresses to defaults
 // 20240426 Added BLE address initialization after updating via downlink
+// 20240427 Added BLE configuration/status via LoRaWAN
 //
 //
 // ToDo:
@@ -78,6 +79,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("ws_timeout", payload[0]);
         appPrefs.end();
+        return 0;
     }
 
     if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
@@ -121,13 +123,27 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         weatherSensor.setSensorsExc(payload, size);
     }
 
+    if ((port == CMD_GET_BLE_CONFIG) && (payload == 0x00) && (size == 1)) {
+        log_d("Get BLE config");
+        return CMD_GET_BLE_CONFIG;
+    }
+
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    if ((port == CMD_SET_BLE_CONFIG) && (size == 2))
+    {
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ble_active", payload[0]);
+        appPrefs.putUChar("ble_scantime", payload[1]);
+        appPrefs.end();
+        return 0;
+    }
+
     if ((port == CMD_GET_BLE_ADDR) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get BLE sensors MAC addresses");
         return CMD_GET_BLE_ADDR;
     }
 
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     if ((port == CMD_SET_BLE_ADDR) && (size % 6 == 0))
     {
         log_d("Set BLE sensors MAC addresses");
@@ -174,8 +190,14 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     // Set sensor data invalid
     bleSensors.resetData();
 
+    appPrefs.begin("BWS-LW-APP", false);
+    uint8_t ble_active = appPrefs.getUChar("ble_active", BLE_SCAN_MODE);
+    uint8_t ble_scantime = appPrefs.getUChar("ble_scantime", BLE_SCAN_TIME);
+    log_d("Preferences: ble_active: %u", ble_active);
+    log_d("Preferences: ble_scantime: %u s", ble_scantime);
+    appPrefs.end();
     // Get sensor data - run BLE scan for <bleScanTime>
-    bleSensors.getData(BLE_SCAN_TIME);
+    bleSensors.getData(ble_scantime, ble_active);
 #endif
 #ifdef LIGHTNINGSENSOR_EN
     time_t lightn_ts;
@@ -573,6 +595,16 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         appPrefs.end();
         encoder.writeUint8(ws_timeout);
         port = CMD_GET_WS_TIMEOUT;
+    }
+    else if (cmd == CMD_GET_BLE_CONFIG)
+    {
+        appPrefs.begin("BWS-LW-APP", false);
+        uint8_t ble_active = appPrefs.getUChar("ble_active", BLE_SCAN_MODE);
+        uint8_t ble_scantime = appPrefs.getUChar("ble_scantime", BLE_SCAN_TIME);
+        appPrefs.end();
+        encoder.writeUint8(ble_active);
+        encoder.writeUint8(ble_scantime);
+        port = CMD_GET_BLE_CONFIG;
     }
     else if (cmd == CMD_GET_SENSORS_INC)
     {
