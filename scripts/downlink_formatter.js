@@ -399,6 +399,7 @@ function decodeDownlink(input) {
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
         case CMD_GET_BLE_ADDR:
+        case CMD_GET_BLE_CONFIG:
             return {
                 data: [0],
                 warnings: [],
@@ -457,6 +458,13 @@ function decodeDownlink(input) {
                 data: {
                     sleep_interval: uint16BE(input.bytes.slice(1, 2)),
                     sleep_interval_long: uint16BE(input.bytes.slice(3, 4))
+                }
+            };
+        case CMD_GET_BLE_CONFIG:
+            return {
+                data: {
+                    ble_active: uint8(input.bytes[0]),
+                    ble_timeout: uint8(input.bytes[1])
                 }
             };
         default:
