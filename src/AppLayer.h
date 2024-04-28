@@ -76,6 +76,11 @@
 #include <DistanceSensor_A02YYUW.h>
 #endif
 
+/*!
+ * LoRaWAN node application layer
+ *
+ * Contails all device specific methods and attributes
+ */
 class AppLayer
 {
 private:
@@ -89,15 +94,18 @@ private:
     WeatherSensor weatherSensor;
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    /// Default BLE MAC addresses
     std::vector<std::string> knownBLEAddressesDef;
+    /// Actual BLE MAC addresses; either from Preferences or from defaults
     std::vector<std::string> knownBLEAddresses;
 #endif
 
 #ifdef MITHERMOMETER_EN
-    // Setup BLE Temperature/Humidity Sensors
+    /// BLE Temperature/Humidity Sensors
     ATC_MiThermometer bleSensors; //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
 #endif
 #ifdef THEENGSDECODER_EN
+    /// Bluetooth Low Energy sensors
     BleSensors bleSensors;
 #endif
 
@@ -121,16 +129,30 @@ private:
 
 #ifdef DISTANCESENSOR_EN
 #if defined(ESP32)
+    /// Ultrasonic distance sensor
     DistanceSensor_A02YYUW distanceSensor(&Serial2);
 #else
+    /// Ultrasonic distance sensor
     DistanceSensor_A02YYUW distanceSensor(&Serial1);
 #endif
 #endif
 
 public:
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    /*!
+     * \brief Constructor with BLE sensors
+     *
+     * \param rtc Real time clock object
+     * \param clocksync Timestamp of last clock synchronization
+     */
     AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors()
 #else
+    /*!
+     * \brief Constructor without BLE sensors
+     *
+     * \param rtc Real time clock object
+     * \param clocksync Timestamp of last clock synchronization
+     */
     AppLayer(ESP32Time *rtc, time_t *clocksync)
 #endif
     {
