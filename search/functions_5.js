@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['setbleaddr_38',['setBleAddr',['../class_app_layer.html#a7673f6a864910942e622c7b78081ab26',1,'AppLayer']]]
+  ['resetdata_38',['resetData',['../class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6',1,'BleSensors']]]
 ];

@@ -89,11 +89,13 @@ $(document).ready(function(){initNavTree('class_app_layer.html',''); initResizab
 <div class="title">AppLayer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="_app_layer_8h_source.html">AppLayer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8902127a1eb11b9741f829794c2306dd"><td class="memItemLeft" align="right" valign="top"><a id="a8902127a1eb11b9741f829794c2306dd"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>AppLayer</b> (ESP32Time *rtc, time_t *clocksync)</td></tr>
+<tr class="memitem:a8902127a1eb11b9741f829794c2306dd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">AppLayer</a> (ESP32Time *rtc, time_t *clocksync)</td></tr>
+<tr class="memdesc:a8902127a1eb11b9741f829794c2306dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with BLE sensors.  <a href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">More...</a><br /></td></tr>
 <tr class="separator:a8902127a1eb11b9741f829794c2306dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8292cd2853576c6178c018f25020820"><td class="memItemLeft" align="right" valign="top"><a id="ac8292cd2853576c6178c018f25020820"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">begin</a> (void)</td></tr>
@@ -123,6 +125,55 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>bleAddrInit</b> (void
 <tr class="memitem:a50c5619afaca9f1a2d29904ae9bb4b29"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a> (void)</td></tr>
 <tr class="separator:a50c5619afaca9f1a2d29904ae9bb4b29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>LoRaWAN node application layer</p>
+<p>Contails all device specific methods and attributes </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a8902127a1eb11b9741f829794c2306dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8902127a1eb11b9741f829794c2306dd">&#9670;&nbsp;</a></span>AppLayer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">AppLayer::AppLayer </td>
+          <td>(</td>
+          <td class="paramtype">ESP32Time *&#160;</td>
+          <td class="paramname"><em>rtc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">time_t *&#160;</td>
+          <td class="paramname"><em>clocksync</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor with BLE sensors. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rtc</td><td>Real time clock object </td></tr>
+    <tr><td class="paramname">clocksync</td><td>Timestamp of last clock synchronization </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a3a16ef6e33cfd0ff29ee3248780cb3e8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3a16ef6e33cfd0ff29ee3248780cb3e8">&#9670;&nbsp;</a></span>decodeDownlink()</h2>
