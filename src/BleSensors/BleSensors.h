@@ -66,16 +66,15 @@ typedef struct BleDataS ble_sensors_t; //!< Shortcut for struct BleDataS
 
 
 /*!
-  \class Ble_Sensors
-  \brief BLE Sensor (e.g. thermometer/hygrometer) client
-*/
+ * \brief BLE Sensor (e.g. thermometer/hygrometer) client
+ */
 class BleSensors {
     public:
         /*!
-        \brief Constructor.
-        
-        \param known_sensors    Vector of BLE MAC addresses of known sensors, e.g. {"11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF"}
-        */
+         * \brief Constructor.
+         *
+         * \param known_sensors    Vector of BLE MAC addresses of known sensors, e.g. {"11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF"}
+         */
         BleSensors(std::vector<std::string> known_sensors) {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
