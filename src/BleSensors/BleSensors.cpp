@@ -46,11 +46,14 @@
 
 #include "BleSensors.h"
 
+/*!
+ * \brief Callbacks for advertised BLE devices
+ */
 class MyAdvertisedDeviceCallbacks: public NimBLEAdvertisedDeviceCallbacks {
 public:
-  NimBLEScan*                   m_pBLEScan;
-  std::vector<std::string>      m_knownBLEAddresses;
-  std::vector<ble_sensors_t>*   m_sensorData;
+  NimBLEScan*                   m_pBLEScan; //!< NimBLEScan object
+  std::vector<std::string>      m_knownBLEAddresses; //<! MAC addresses of known sensors
+  std::vector<ble_sensors_t>*   m_sensorData; //<! Sensor data
 
 private:
   int m_devices_found = 0; //!< Number of known devices found
