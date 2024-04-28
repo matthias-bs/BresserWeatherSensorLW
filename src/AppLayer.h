@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-// payload.h
+// AppLayer.h
 //
-// Create data payload from sensor or simulated data
+// LoRaWAN node application layer
 //
 // created: 04/2024
 //

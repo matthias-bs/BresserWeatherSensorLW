@@ -1,7 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// payload.cpp
+// AppLayer.cpp
 //
-// Create data payload from sensor or simulated data
+// LoRaWAN node application layer
+//
+// - Create data payload from sensor or simulated data
+// - Decode sensor specific commands
+// - Encode sensor specific status responses
+// - Retain sensor specific parameters
 //
 // This implementation is specific for the BresserWeatherSensorLW project
 //
@@ -123,12 +128,12 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         weatherSensor.setSensorsExc(payload, size);
     }
 
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     if ((port == CMD_GET_BLE_CONFIG) && (payload == 0x00) && (size == 1)) {
         log_d("Get BLE config");
         return CMD_GET_BLE_CONFIG;
     }
-
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    
     if ((port == CMD_SET_BLE_CONFIG) && (size == 2))
     {
         appPrefs.begin("BWS-LW-APP", false);
