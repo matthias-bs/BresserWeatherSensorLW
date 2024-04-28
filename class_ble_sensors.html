@@ -101,8 +101,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">BleSensors</a> (std::vector&lt; std::string &gt; known_sensors)</td></tr>
 <tr class="memdesc:a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">More...</a><br /></td></tr>
 <tr class="separator:a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae410003ea61c2eee2004a92d9395e928"><td class="memItemLeft" align="right" valign="top"><a id="ae410003ea61c2eee2004a92d9395e928"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setAddresses</b> (std::vector&lt; std::string &gt; known_sensors)</td></tr>
+<tr class="memitem:ae410003ea61c2eee2004a92d9395e928"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">setAddresses</a> (std::vector&lt; std::string &gt; known_sensors)</td></tr>
+<tr class="memdesc:ae410003ea61c2eee2004a92d9395e928"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set BLE MAC addresses of known sensors.  <a href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">More...</a><br /></td></tr>
 <tr class="separator:ae410003ea61c2eee2004a92d9395e928"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af496499868213e31c9757b0158e869a0"><td class="memItemLeft" align="right" valign="top"><a id="af496499868213e31c9757b0158e869a0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">begin</a> (void)</td></tr>
@@ -197,6 +197,40 @@ std::vector&lt; <a class="el" href="struct_ble_data_s.html">ble_sensors_t</a> &g
   <table class="params">
     <tr><td class="paramname">duration</td><td>Scan duration in seconds </td></tr>
     <tr><td class="paramname">activeScan</td><td>0: passive scan / 1: active scan </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae410003ea61c2eee2004a92d9395e928"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae410003ea61c2eee2004a92d9395e928">&#9670;&nbsp;</a></span>setAddresses()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void BleSensors::setAddresses </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::string &gt;&#160;</td>
+          <td class="paramname"><em>known_sensors</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set BLE MAC addresses of known sensors. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">known_sensors</td><td>vector of BLE MAC addresses (see constructor) </td></tr>
   </table>
   </dd>
 </dl>
