@@ -74,6 +74,7 @@ This project is in early stage of development - stay tuned.
   * [Enabling Debug Output](#enabling-debug-output)
   * [Test Run](#test-run)
 * [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
+  * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)
   * [Parameters](#parameters)
   * [Using Raw Data](#using-raw-data)
@@ -174,6 +175,33 @@ Watch your board's debug output in the serial console and the LoRaWAN communicat
 Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding raw data to / from JSON format.
 
 See [The Things Network MQTT Integration and Payload Formatters](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#the-things-network-mqtt-integration-payload-formatters) and [TS013-1.0.0 Payload Codec API](https://resources.lora-alliance.org/technical-specifications/ts013-1-0-0-payload-codec-api) for more details.
+
+### The Things Network Payload Formatters Setup
+
+#### Uplink Formatter
+
+Decode uplink payload (a sequence of bytes) into JSON format, i.e. data structures which are readable/suitable for further processing.
+
+In The Things Network Console:
+1. Go to "Payload formatters" -> "Uplink"
+2. Select "Formatter type": "Custom Javascript formatter"
+3. "Formatter code": Paste [scripts/uplink_formatter.js](scripts/uplink_formatter.js)
+4. Apply "Save changes"
+
+![TTN Uplink Formatter](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/38b66478-688a-4028-974a-c517cddae662)
+
+> [!NOTE]
+> The actual payload depends on the options selected in the Arduino sketch - the decoder must be edited accordingly (add or remove data types and JSON identifiers. The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
+
+#### Downlink Formatter
+
+Encode downlink payload from JSON to a sequence of bytes.
+
+In The Things Network Console:
+1. Go to "Payload formatters" -> "Downlink"
+2. Select "Formatter type": "Custom Javascript formatter"
+3. "Formatter code": Paste [scripts/downlink_formatter.js](scripts/downlink_formatter.js)
+4. Apply "Save changes"
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
 
