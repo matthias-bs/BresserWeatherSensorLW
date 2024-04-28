@@ -1,7 +1,6 @@
 var hierarchy =
 [
     [ "AppLayer", "class_app_layer.html", null ],
-    [ "Ble_Sensors", "class_ble___sensors.html", null ],
     [ "BleDataS", "struct_ble_data_s.html", null ],
     [ "BleSensors", "class_ble_sensors.html", null ],
     [ "NimBLEAdvertisedDeviceCallbacks", null, [
