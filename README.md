@@ -62,9 +62,26 @@ This project is in early stage of development - stay tuned.
 * [x] Update Javascript encoders/decoders
 * [x] Implement using of BLE sensor addresses configured via downlink
 * [ ] Update documentation
-* [ ] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
+* [x] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
 
- 
+## Contents
+
+* [Supported Hardware](#supported-hardware)
+* [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
+* [Software Build Configuration](#software-build-configuration)
+  * [Required Configuration](#required-configuration)
+  * [Optional Configuration](#optional-configuration)
+  * [Enabling Debug Output](#enabling-debug-output)
+  * [Test Run](#test-run)
+* [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
+* [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)
+  * [Parameters](#parameters)
+  * [Using Raw Data](#using-raw-data)
+  * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
+* [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
+* [References](#references)
+* [Legal](#legal)
+
 ## Supported Hardware
 
   |  Status       | Setup                                                                                                               | Board (/ Revision)   | Define (Prefix: ARDUINO_) | Radio Module | Notes    |
@@ -97,11 +114,70 @@ Radio chip: SX1276
 Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 ```
 
-**Documentation will be updated soon!**
+## LoRaWAN Network Service Configuration
 
-Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md)
+Create an account and set up a device configuration in your LoRaWAN network provider's web console, e.g. [The Things Network](https://www.thethingsnetwork.org/).
+
+* LoRaWAN v1.1
+* Regional Parameters 1.1 Revision A
+* Device class A
+* Over the air activation (OTAA)
+
+## Software Build Configuration
+
+### Required Configuration
+
+* Install the Arduino ESP32 board package in the Arduino IDE
+* Select your ESP32 board
+* Install all libraries as listed in the section [package.json](package.json) &mdash; section dependencies &mdash; via the Arduino IDE Library Manager 
+* Clone (or download and unpack) the latest ([BresserWeatherSensorLW Release](https://github.com/matthias-bs/BresserWeatherSensorLW/releases))
+* Set your LoRaWAN Network Service credentials &mdash; `RADIOLIB_LORAWAN_DEV_EUI`, `RADIOLIB_LORAWAN_NWK_KEY` and `RADIOLIB_LORAWAN_APP_KEY` &mdash in [secrets.h](secrets.h):
+
+```
+// The Device EUI & two keys can be generated on the TTN console
+
+// Replace with your Device EUI
+#define RADIOLIB_LORAWAN_DEV_EUI   0x---------------
+
+// Replace with your App Key
+#define RADIOLIB_LORAWAN_APP_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--
+
+// Put your Nwk Key here
+#define RADIOLIB_LORAWAN_NWK_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--
+```
+
+* Load the sketch [BresserWeatherSensorLW.ino](BresserWeatherSensorLW.ino)
+* Compile
+
+### Optional Configuration
+
+In [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
+
+* Configure your time zone by editing `TZ_INFO`
+* Disable sensor/interface features which you do not want to use
+* Adjust battery voltage levels
+* Configure the timing parameters if required
+* If enabled, configure your ATC MiThermometer's / Theengs Decoder's BLE MAC Address by by editing `KNOWN_BLE_ADDRESSES`
+* Configure the ADC's input pins, dividers and oversampling settings as needed
+* Disable sensor decoders wich are not needed
+
+### Enabling Debug Output
+
+[Debug Output Configuration in Arduino IDE](Debug_Output.md)
+
+### Test Run
+
+Watch your board's debug output in the serial console and the LoRaWAN communication in your network provider's web console.
+
+## LoRaWAN Payload Formatters
+
+Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding raw data to / from JSON format.
+
+See [The Things Network MQTT Integration and Payload Formatters](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#the-things-network-mqtt-integration-payload-formatters) and [TS013-1.0.0 Payload Codec API](https://resources.lora-alliance.org/technical-specifications/ts013-1-0-0-payload-codec-api) for more details.
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
+
+Many software parameters can be defined at compile time, i.e. in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h). A few [parameters](#parameters) can also be changed and queried at run time via LoRaWAN, either [using raw data](#using-raw-data) or [using Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters).
 
 ### Parameters
 
@@ -160,7 +236,7 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | ----------------------------- | ------------------------------------------------------------------------- | ---------------------------- |
 | CMD_GET_DATETIME              | {"cmd": "CMD_GET_DATETIME"}                                               | {"epoch": \<epoch\>}         |
 | CMD_SET_DATETIME              | {"epoch": \<epoch\>}                                                      | n.a.                         |
-| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>"                                      | n.a.                         |
+| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>"}                                     | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
 | CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
@@ -194,6 +270,6 @@ Based on
 * [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
 * [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
 
-# Legal
+## Legal
 
 > This project is in no way affiliated with, authorized, maintained, sponsored or endorsed by Bresser GmbH or any of its affiliates or subsidiaries.
