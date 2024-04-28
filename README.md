@@ -75,6 +75,12 @@ This project is in early stage of development - stay tuned.
   * [Test Run](#test-run)
 * [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
+* [MQTT Integration](#mqtt-integration)
+  * [The Things Network MQTT Integration](#the-things-network-mqtt-integration)
+* [Datacake Integration](#datacake-integration)
+  * [Datacake / The Things Network Setup](#datacake--the-things-network-setup)
+  * [Desktop Dashboard](#desktop-dashboard)
+  * [Mobile Dashboard](#mobile-dashboard)
 * [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)
   * [Parameters](#parameters)
   * [Using Raw Data](#using-raw-data)
@@ -191,7 +197,7 @@ In The Things Network Console:
 ![TTN Uplink Formatter](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/38b66478-688a-4028-974a-c517cddae662)
 
 > [!NOTE]
-> The actual payload depends on the options selected in the Arduino sketch - the decoder must be edited accordingly (add or remove data types and JSON identifiers. The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
+> The actual payload depends on the options selected in the Arduino sketch [BresserWeatherSensorsLW.cfg](BresserWeatherSensorsLW.cfg) &mdash; the decoder must be edited accordingly (add or remove data types and JSON identifiers). The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
 
 #### Downlink Formatter
 
@@ -202,6 +208,45 @@ In The Things Network Console:
 2. Select "Formatter type": "Custom Javascript formatter"
 3. "Formatter code": Paste [scripts/downlink_formatter.js](scripts/downlink_formatter.js)
 4. Apply "Save changes"
+
+## MQTT Integration
+
+### The Things Network MQTT Integration
+
+TTN provides an MQTT broker.
+How to receive and decode the payload with an MQTT client -
+see https://www.thethingsnetwork.org/forum/t/some-clarity-on-mqtt-topics/44226/2
+
+V3 topic:
+
+`v3/<ttn app id><at symbol>ttn/devices/<ttn device id>/up`
+
+  
+v3 message key field jsonpaths:
+  
+```
+<ttn device id> = .end_device_ids.device_id
+<ttn app id> = .end_device_ids.application_ids.application_id  // (not including the <at symbol>ttn in the topic)
+<payload> = .uplink_message.frm_payload
+```  
+
+
+JSON-Path with Uplink-Decoder (see [scripts/uplink_formatter.js](scripts/uplink_formatter.js))
+
+`.uplink_message.decoded_payload.bytes.<variable>`
+
+## Datacake Integration
+
+### Datacake / The Things Network Setup
+
+YouTube Video: [Get started for free with LoRaWaN on The Things Network and Datacake IoT Platform](https://youtu.be/WGVFgYp3k3s)
+
+### Desktop Dashboard
+
+![Datacake_Dashboard_Desktop](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/2a876ba1-06b9-4ea3-876c-2fad3d559b01)
+
+### Mobile Dashboard
+![Datacake_Dashboard_Mobile](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/fbc0948c-bfd8-4d7d-9780-c113d576d3cf)
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
 
