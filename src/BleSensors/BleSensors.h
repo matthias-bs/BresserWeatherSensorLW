@@ -83,7 +83,7 @@ class BleSensors {
         BleSensors(void) {
         };
 
-        /*
+        /*!
          * \brief Set BLE MAC addresses of known sensors
          * 
          * \param known_sensors vector of BLE MAC addresses (see constructor)
