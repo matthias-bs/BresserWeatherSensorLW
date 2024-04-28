@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['m_5fpblescan_16',['m_pBLEScan',['../class_my_advertised_device_callbacks.html#a91798abf3122cb6a3fb912e1348a364d',1,'MyAdvertisedDeviceCallbacks']]],
-  ['myadvertiseddevicecallbacks_17',['MyAdvertisedDeviceCallbacks',['../class_my_advertised_device_callbacks.html',1,'']]]
+  ['m_5fknownbleaddresses_16',['m_knownBLEAddresses',['../class_my_advertised_device_callbacks.html#a517b072519394342162ae760dcb8fbbd',1,'MyAdvertisedDeviceCallbacks']]],
+  ['m_5fsensordata_17',['m_sensorData',['../class_my_advertised_device_callbacks.html#a6c635b0441f41875bee0e31771a25851',1,'MyAdvertisedDeviceCallbacks']]],
+  ['myadvertiseddevicecallbacks_18',['MyAdvertisedDeviceCallbacks',['../class_my_advertised_device_callbacks.html',1,'']]]
 ];
