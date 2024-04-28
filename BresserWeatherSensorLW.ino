@@ -592,7 +592,7 @@ void setup()
       // or whatever is interfering with the device <-> gateway airwaves.
       uint32_t sleepForSeconds = min((bootCountSinceUnsuccessfulJoin++ + 1UL) * 60UL, 3UL * 60UL);
       log_i("Boots since unsuccessful join: %u", bootCountSinceUnsuccessfulJoin);
-      log_i("Retrying join in %u seconds", sleepForSeconds);
+      log_i("Retrying join in %u seconds", (unsigned int)sleepForSeconds);
 
       gotoSleep(sleepForSeconds);
     }
