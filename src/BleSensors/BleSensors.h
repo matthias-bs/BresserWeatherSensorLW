@@ -36,6 +36,7 @@
 //
 // 20230211 Created
 // 20240417 Added additional constructor and method setAddresses()
+// 20240427 Added paramter activeScan to getData()
 //
 // ToDo:
 // - 
@@ -108,7 +109,7 @@ class BleSensors {
         
         \param duration     Scan duration in seconds
         */                
-        unsigned getData(uint32_t duration);
+        unsigned getData(uint32_t duration, bool activeScan = true);
         
         /*!
         \brief Set sensor data invalid.
