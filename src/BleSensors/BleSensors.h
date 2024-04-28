@@ -51,7 +51,9 @@
 #include <NimBLEDevice.h>       //!< https://github.com/h2zero/NimBLE-Arduino
 #include <decoder.h>            //!< https://github.com/theengs/decoder
 
-// Local Sensor Data
+/*!
+ * BLE sensor data
+ */
 struct BleDataS {
       bool     valid;              //!< data valid
       float    temperature;        //!< temperature in degC
