@@ -184,6 +184,8 @@ void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
 
 void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
+    (void)port; // suppress warning regarding unused parameter
+
 #ifdef PIN_SUPPLY_IN
     uint16_t supply_voltage = getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
 #endif
@@ -602,6 +604,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         encoder.writeUint8(ws_timeout);
         port = CMD_GET_WS_TIMEOUT;
     }
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_CONFIG)
     {
         appPrefs.begin("BWS-LW-APP", false);
@@ -612,6 +615,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         encoder.writeUint8(ble_scantime);
         port = CMD_GET_BLE_CONFIG;
     }
+#endif
     else if (cmd == CMD_GET_SENSORS_INC)
     {
         uint8_t payload[48];
