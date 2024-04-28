@@ -67,6 +67,7 @@ This project is in early stage of development - stay tuned.
 ## Contents
 
 * [Supported Hardware](#supported-hardware)
+  * [Predefined Pinout and Radio Chip Configurations](#predefined-pinout-and-radio-chip-configurations)
 * [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
 * [Software Build Configuration](#software-build-configuration)
   * [Required Configuration](#required-configuration)
@@ -111,6 +112,11 @@ This project is in early stage of development - stay tuned.
 
 :white_check_mark: &mdash; confirmed
 
+### Predefined Pinout and Radio Chip Configurations
+
+By selecting a Board and a Board Revision in the Arduino IDE, a define is passed to the preprocessor/compiler. For the boards listed in [Supported Hardware](#supported-hardware), the default configuration is assumed based on this define. If this is not what you need, you have to switch to Manual Configuration.
+
+If you are not using the Arduino IDE, you can use the defines in [Supported Hardware](#supported-hardware) with your specific tool chain to get the same result.
 
 If enabled in the Arduino IDE Preferences ("Verbose Output"), the preprosessor will provide some output regarding the selected configuration, e.g.
 
