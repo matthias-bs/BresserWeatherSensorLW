@@ -52,7 +52,7 @@
 #include <decoder.h>            //!< https://github.com/theengs/decoder
 
 /*!
- * BLE sensor data
+ * \brief BLE sensor data
  */
 struct BleDataS {
       bool     valid;              //!< data valid
