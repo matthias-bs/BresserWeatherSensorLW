@@ -197,7 +197,7 @@ In The Things Network Console:
 ![TTN Uplink Formatter](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/38b66478-688a-4028-974a-c517cddae662)
 
 > [!NOTE]
-> The actual payload depends on the options selected in the Arduino sketch [BresserWeatherSensorsLW.cfg](BresserWeatherSensorsLW.cfg) &mdash; the decoder must be edited accordingly (add or remove data types and JSON identifiers). The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
+> The actual payload depends on the options selected in the Arduino sketch (see) [BresserWeatherSensorsLW.cfg](BresserWeatherSensorsLW.cfg)) &mdash; the decoder must be edited accordingly (add or remove data types and JSON identifiers). The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
 
 #### Downlink Formatter
 
