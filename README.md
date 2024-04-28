@@ -174,3 +174,26 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
 | CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
 | CMD_SET_BLE_CONFIG            | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}              | n.a.                         |
+
+
+## Doxygen Generated Source Code Documentation
+
+[https://matthias-bs.github.io/BresserWeatherSensorTTN/index.html](https://matthias-bs.github.io/BresserWeatherSensorLW/)
+
+## References
+
+Based on
+* [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) by Matthias Prinke
+* [RadioLib](https://github.com/jgromes/RadioLib) by Jan Gromeš
+* [Lora-Serialization](https://github.com/thesolarnomad/lora-serialization) by Joscha Feth
+* [ESP32Time](https://github.com/fbiego/ESP32Time) by Felix Biego
+* [OneWireNg](https://github.com/pstolarz/OneWireNg) by Piotr Stolarz
+* [DallasTemperature / Arduino-Temperature-Control-Library](https://github.com/milesburton/Arduino-Temperature-Control-Library) by Miles Burton
+* [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) by h2zero
+* [Theengs Decoder](https://github.com/theengs/decoder) by [Theengs Project](https://github.com/theengs)
+* [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
+* [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
+
+# Legal
+
+> This project is in no way affiliated with, authorized, maintained, sponsored or endorsed by Bresser GmbH or any of its affiliates or subsidiaries.
