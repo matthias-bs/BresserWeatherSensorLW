@@ -463,7 +463,7 @@ function decoder(bytes, port) {
             ['ble_addr'
             ]
         );
-    } else if (port == CMD_GET_BLE_CONFIG) {
+    } else if (port === CMD_GET_BLE_CONFIG) {
         return decode(
             bytes,
             [uint8, uint8
