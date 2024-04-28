@@ -79,7 +79,10 @@ class BleSensors {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
         };
-        
+
+        /*!
+         * \brief Constructor.
+         */
         BleSensors(void) {
         };
 
