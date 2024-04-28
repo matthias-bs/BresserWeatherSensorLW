@@ -12,7 +12,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 
 * RadioLib's LoRaWAN implementation is currently in beta stage.
 * Helium Network is not supported (requires LoRaWAN v1.0.x)
-* This should not be the first Arduino sketch you are ever trying to flash to your board - try somthing simple (`blink.ino`) first to get familiar with the tools and workflow.
+* This should not be the first Arduino sketch you are ever trying to flash to your board - try somthing simple first (e.g. `blink.ino`) to get familiar with the tools and workflow.
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
