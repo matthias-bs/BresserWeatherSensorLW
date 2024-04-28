@@ -61,7 +61,7 @@ This project is in early stage of development - stay tuned.
 * [x] Change LoRaWAN control downlink / status uplink messages
 * [x] Update Javascript encoders/decoders
 * [x] Implement using of BLE sensor addresses configured via downlink
-* [ ] Update documentation
+* [x] Update documentation
 * [x] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
 
 ## Contents
@@ -160,7 +160,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 ```
 
 * Load the sketch [BresserWeatherSensorLW.ino](BresserWeatherSensorLW.ino)
-* Compile
+* Compile and Upload
 
 ### Optional Configuration
 
