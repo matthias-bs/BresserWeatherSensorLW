@@ -77,7 +77,7 @@
 #endif
 
 /*!
- * LoRaWAN node application layer
+ * \brief LoRaWAN node application layer
  *
  * Contails all device specific methods and attributes
  */
