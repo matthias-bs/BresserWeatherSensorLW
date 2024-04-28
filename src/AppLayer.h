@@ -169,7 +169,7 @@ public:
         bleAddrInit();
     };
 
-    /*
+    /*!
      * \brief Initialize list of known BLE addresses from defaults or Preferences
      *
      * If available, addresses from Preferences are used, otherwise defaults from
