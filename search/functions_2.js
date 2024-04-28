@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['clearscanresults_31',['clearScanResults',['../class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588',1,'BleSensors']]]
+  ['clearscanresults_32',['clearScanResults',['../class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588',1,'BleSensors']]]
 ];

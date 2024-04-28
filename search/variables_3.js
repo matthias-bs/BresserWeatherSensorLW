@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rssi_45',['rssi',['../struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44',1,'BleDataS']]]
+  ['m_5fpblescan_46',['m_pBLEScan',['../class_my_advertised_device_callbacks.html#a91798abf3122cb6a3fb912e1348a364d',1,'MyAdvertisedDeviceCallbacks']]]
 ];
