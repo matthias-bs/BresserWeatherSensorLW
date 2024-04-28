@@ -66,6 +66,7 @@ private:
     return spr;
   }
 
+  // Callback on scan result
   void onResult(BLEAdvertisedDevice* advertisedDevice) {
     TheengsDecoder decoder;
     bool device_found = false;
