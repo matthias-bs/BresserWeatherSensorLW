@@ -281,10 +281,10 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 > [!NOTE]
 > **Default values**<br>
-> Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
-> BLE addresses: see `BresserWeatherSensorLWCfg.h`<br>
-> Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
-> Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
+> * Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
+> * BLE addresses and scan parameters: see `BresserWeatherSensorLWCfg.h`<br>
+> * Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
+> * Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
 
 ### Using Raw Data
 
