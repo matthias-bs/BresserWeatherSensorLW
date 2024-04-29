@@ -314,7 +314,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 2. Convert interval to hex: 300 = 0x012C
 3. Set payload to 0x01 0x2C
 4. Send downlink via The Things Network Console
-![TTN Downlink as Hex]()
+![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/b300d750-0138-4c7f-ac4d-52b6dc612fb6)
+
 
 ##### Example 2: Set Date/Time
 
