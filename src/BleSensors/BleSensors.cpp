@@ -35,6 +35,7 @@
 // History:
 //
 // 20230211 Created
+// 20240427 Added paramter activeScan to getData()
 //
 // ToDo:
 // - 
@@ -45,14 +46,17 @@
 
 #include "BleSensors.h"
 
+/*!
+ * \brief Callbacks for advertised BLE devices
+ */
 class MyAdvertisedDeviceCallbacks: public NimBLEAdvertisedDeviceCallbacks {
 public:
-  NimBLEScan*                   m_pBLEScan;
-  std::vector<std::string>      m_knownBLEAddresses;
-  std::vector<ble_sensors_t>*   m_sensorData;
+  NimBLEScan*                   m_pBLEScan; /// NimBLEScan object
+  std::vector<std::string>      m_knownBLEAddresses; /// MAC addresses of known sensors
+  std::vector<ble_sensors_t>*   m_sensorData; /// Sensor data
 
 private:
-  int m_devices_found = 0; //!< Number of known devices found
+  int m_devices_found = 0; /// Number of known devices found
 
   std::string convertServiceData(std::string deviceServiceData) {
     int serviceDataLength = (int)deviceServiceData.length();
@@ -62,6 +66,7 @@ private:
     return spr;
   }
 
+  // Callback on scan result
   void onResult(BLEAdvertisedDevice* advertisedDevice) {
     TheengsDecoder decoder;
     bool device_found = false;
@@ -148,7 +153,7 @@ void BleSensors::resetData(void)
 /**
  * \brief Get BLE sensor data
  */
-unsigned BleSensors::getData(uint32_t duration) {
+unsigned BleSensors::getData(uint32_t duration, bool activeScan) {
     // From https://github.com/theengs/decoder/blob/development/examples/ESP32/ScanAndDecode/ScanAndDecode.ino:
     // MyAdvertisedDeviceCallbacks are still triggered multiple times; this makes keeping track of received
     // sensors difficult. Setting ScanFilterMode to CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE seems to
@@ -170,7 +175,7 @@ unsigned BleSensors::getData(uint32_t duration) {
     myCb->m_sensorData = &data;
     
     _pBLEScan->setAdvertisedDeviceCallbacks(myCb);
-    _pBLEScan->setActiveScan(true); // Set active scanning, this will get more data from the advertiser.
+    _pBLEScan->setActiveScan(activeScan); // Set active scanning, this will get more data from the advertiser.
     _pBLEScan->setInterval(97); // How often the scan occurs / switches channels; in milliseconds,
     _pBLEScan->setWindow(37);  // How long to scan during the interval; in milliseconds.
     _pBLEScan->setMaxResults(0); // do not store the scan results, use callback only.

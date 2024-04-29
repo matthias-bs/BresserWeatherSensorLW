@@ -42,6 +42,7 @@
 // 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
 // 20240427 Added voltage divider and ADC input control pin
 //          for ARDUINO_heltec_wifi_lora_32_V3
+//          Added BLE configuration/status via LoRaWAN
 //
 // Note:
 // Depending on board package file date, either
@@ -115,8 +116,8 @@
 #define CMD_SET_SLEEP_INTERVAL_LONG 0xA9
 
 // Downlink (command):
-// byte1: sleep_interval_long[15:8]
-// byte2: sleep_interval_long[ 7:0]
+// byte0: sleep_interval_long[15:8]
+// byte1: sleep_interval_long[ 7:0]
 
 // Uplink: n.a.
 
@@ -145,7 +146,7 @@
 #define CMD_GET_WS_TIMEOUT              0xC0
 
 // Downlink (command)
-// byte0: 
+// byte0: 0x00
 
 // Uplink (response):
 // byte0: ws_timeout[ 7: 0]
@@ -261,14 +262,39 @@
 // Port: CMD_SET_BLE_ADDR
 #define CMD_SET_BLE_ADDR 0xC9
 
-// Uplink (command):
-// byte1: ble_addr0[47:24]
-// byte2: ble_addr0[23:32]
-// byte3: ble_addr0[31:24]
-// byte4: ble_addr0[23:16]
-// byte5: ble_addr0[15: 8]
-// byte6: ble_addr0[ 7: 0]
+// Downlink (command):
+// byte0: ble_addr0[47:24]
+// byte1: ble_addr0[23:32]
+// byte2: ble_addr0[31:24]
+// byte3: ble_addr0[23:16]
+// byte4: ble_addr0[15: 8]
+// byte5: ble_addr0[ 7: 0]
 // ...
+
+// Response: n.a.
+
+// CMD_GET_BLE_CONFIG
+// -------------------
+// Note: Scan time in seconds
+// Port: CMD_GET_BLE_CONFIG
+#define CMD_GET_BLE_CONFIG 0xCA
+
+// Downlink (command):
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: 0x01 (active scan) / 0x00 (passive scan)
+// byte1: scan_time[7:0]
+
+// CMD_SET_BLE_CONFIG
+// -------------------
+// Note: Scan time in seconds
+// Port: CMD_SET_BLE_CONFIG
+#define CMD_SET_BLE_CONFIG 0xCB
+
+// Uplink (command):
+// byte0: active_scan - 0x01 (active scan) / 0x00 (passive scan)
+// byte1: scan_time[7:0]
 
 // Response: n.a.
 
@@ -480,6 +506,8 @@ const uint8_t UBATT_SAMPLES = 10;
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
 // BLE scan time in seconds
 #define BLE_SCAN_TIME 31
+// BLE scan mode (0: passive / 1: active)
+#define BLE_SCAN_MODE 1
 
 // List of known sensors' BLE addresses
 #define KNOWN_BLE_ADDRESSES \

@@ -36,6 +36,7 @@
 //
 // 20230211 Created
 // 20240417 Added additional constructor and method setAddresses()
+// 20240427 Added paramter activeScan to getData()
 //
 // ToDo:
 // - 
@@ -50,7 +51,9 @@
 #include <NimBLEDevice.h>       //!< https://github.com/h2zero/NimBLE-Arduino
 #include <decoder.h>            //!< https://github.com/theengs/decoder
 
-// Local Sensor Data
+/*!
+ * \brief BLE sensor data
+ */
 struct BleDataS {
       bool     valid;              //!< data valid
       float    temperature;        //!< temperature in degC
@@ -63,25 +66,27 @@ typedef struct BleDataS ble_sensors_t; //!< Shortcut for struct BleDataS
 
 
 /*!
-  \class Ble_Sensors
-  \brief BLE Sensor (e.g. thermometer/hygrometer) client
-*/
+ * \brief BLE Sensor (e.g. thermometer/hygrometer) client
+ */
 class BleSensors {
     public:
         /*!
-        \brief Constructor.
-        
-        \param known_sensors    Vector of BLE MAC addresses of known sensors, e.g. {"11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF"}
-        */
+         * \brief Constructor.
+         *
+         * \param known_sensors    Vector of BLE MAC addresses of known sensors, e.g. {"11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF"}
+         */
         BleSensors(std::vector<std::string> known_sensors) {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
         };
-        
+
+        /*!
+         * \brief Constructor.
+         */
         BleSensors(void) {
         };
 
-        /*
+        /*!
          * \brief Set BLE MAC addresses of known sensors
          * 
          * \param known_sensors vector of BLE MAC addresses (see constructor)
@@ -90,38 +95,40 @@ class BleSensors {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
         };
+
         /*!
-        \brief Initialization.
-        */
+         * \brief Initialization.
+         */
         void begin(void) {
         };
         
         /*!
-        \brief Delete results from BLEScan buffer to release memory.
-        */        
+         * \brief Delete results from BLEScan buffer to release memory.
+         */        
         void clearScanResults(void) {
             _pBLEScan->clearResults();
         };
         
         /*!
-        \brief Get data from sensors by running a BLE scan.
-        
-        \param duration     Scan duration in seconds
-        */                
-        unsigned getData(uint32_t duration);
+         * \brief Get data from sensors by running a BLE scan.
+         * 
+         * \param duration     Scan duration in seconds
+         * \param activeScan   0: passive scan / 1: active scan
+         */                
+        unsigned getData(uint32_t duration, bool activeScan = true);
         
         /*!
-        \brief Set sensor data invalid.
-        */                        
+         * \brief Set sensor data invalid.
+         */                        
         void resetData(void);
         
         /*!
-        \brief Sensor data.
-        */
+         * \brief Sensor data.
+         */
         std::vector<ble_sensors_t>  data;
         
     protected:
-        std::vector<std::string> _known_sensors;
-        NimBLEScan*              _pBLEScan;
+        std::vector<std::string> _known_sensors; /// MAC addresses of known sensors
+        NimBLEScan*              _pBLEScan;      /// NimBLEScan object
 };
 #endif
