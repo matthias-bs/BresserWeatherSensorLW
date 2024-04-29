@@ -315,7 +315,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 3. Set payload to 0x01 0x2C
 4. Send downlink via The Things Network Console
 
-![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/b300d750-0138-4c7f-ac4d-52b6dc612fb6)
+![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/4b616cd9-4f50-4407-8032-44d240abc09b)
 
 
 ##### Example 2: Set Date/Time
@@ -353,7 +353,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
    the correct port is selected automatically
 2. Send downlink via The Things Network Console
 
-![TTN Downlink as JSON](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/324c3b3c-d670-4d56-a968-6d33db2ace0c)
+![TTN Downlink as JSON](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/2133676f-5d08-4d71-b580-e628c15b1229)
 
 
 ##### Example 2: Set Date/Time
