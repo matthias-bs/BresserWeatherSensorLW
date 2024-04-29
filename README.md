@@ -314,6 +314,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 2. Convert interval to hex: 300 = 0x012C
 3. Set payload to 0x01 0x2C
 4. Send downlink via The Things Network Console
+
 ![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/b300d750-0138-4c7f-ac4d-52b6dc612fb6)
 
 
@@ -351,7 +352,9 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 1. Build payload as JSON string: `{"sleep_interval": 360}` &mdash;
    the correct port is selected automatically
 2. Send downlink via The Things Network Console
-![TTN Downlink as JSON]()
+
+![TTN Downlink as JSON](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/324c3b3c-d670-4d56-a968-6d33db2ace0c)
+
 
 ##### Example 2: Set Date/Time
 1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
