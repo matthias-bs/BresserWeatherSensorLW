@@ -66,6 +66,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 
 * [Supported Hardware](#supported-hardware)
   * [Predefined Pinout and Radio Chip Configurations](#predefined-pinout-and-radio-chip-configurations)
+  * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
 * [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
 * [Software Build Configuration](#software-build-configuration)
   * [Required Configuration](#required-configuration)
@@ -124,8 +125,48 @@ ARDUINO_ADAFRUIT_FEATHER_ESP32S2 defined; assuming RFM95W FeatherWing will be us
 Radio chip: SX1276
 Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 ```
+### User-Defined Pinout and Radio Chip Configurations
 
-## LoRaWAN Network Service Configuration
+#### Required Information
+* Check the board manufacturer's datasheet, pinout specifications and schematic.
+* Check the board's pin definitions file (`pins_arduino.h`) in the [arduino-esp32 project](https://github.com/espressif/arduino-esp32/tree/master/variants)
+
+* Which LoRaWAN radio chip is used? SX1262 or SX1276?
+* Which pins are used for SPI (SCK, MISO and MOSI)?
+* On-board LoRaWAN radio chip:
+  * Which GPIO pins are connected to NSS (CSN), RST, IRQ and GPIO?
+* Separate LoRaWAN module:
+  * Which GPIO pins are available (i.e. otherwise unconnected) for NSS (CSN), RST, IRQ and GPIO?
+  * Connect the ESP32 board with the LoRaWAN module according to the selected GPIO pins.
+  * Connect the SPI and power supply pins as required.
+
+> [!NOTE]
+> Alternative pin names:
+> SX1262: IRQ => DIO0, GPIO => BUSY
+> SX1276: IRQ => DIO0, GPIO => DIO1 
+
+> [!IMPORTANT]
+> With the information above, the source code in both [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) and [BresserWeatherSensorLW](https://github.com/matthias-bs/BresserWeatherSensorLW) has to be modified!
+
+#### BresserWeatherSensorReceiver Configuration
+
+In `WeatherSensorCfg.h`:
+
+* Select or create a code section which will actually be used by the C++ preprocessor (`#if defined(<YOUR_BOARD_DEFINE>) ...).
+* Set the radio chip according to your hardware by (un-)commenting `USE_SX1262` or `USE_SX1276`.
+* Set the pin definitions `PIN_RECEIVER_CS`, `PIN_RECEIVER_IRQ`, `PIN_RECEIVER_GPIO` and `PIN_RECEIVER_RST` according to your hardware.
+* Cross check in the compiler log messages if the desired settings are actually used.
+
+#### BresserWeatherSensorLW
+
+In `config.h`:
+
+* Select or create a code section which will actually be used by the C++ preprocessor (`#if defined(<YOUR_BOARD_DEFINE>) ...).
+* Set the radio chip according to your hardware defining `LORA_CHIP`.
+* Set the pin definitions `#define PIN_LORA_NSS`, `PIN_LORA_RST`, `PIN_LORA_IRQ` and `PIN_LORA_GPIO` according to your hardware.
+* Cross check in the compiler log messages if the desired settings are actually used.
+
+### LoRaWAN Network Service Configuration
 
 Create an account and set up a device configuration in your LoRaWAN network provider's web console, e.g. [The Things Network](https://www.thethingsnetwork.org/).
 
