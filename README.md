@@ -307,6 +307,22 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
 | CMD_SET_BLE_CONFIG            | 0xCB (203) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
 
+#### The Things Network Examples
+
+##### Example 1: Set SLEEP_INTERVAL to 360 seconds
+1. Set port for CMD_SET_SLEEP_INTERVAL to 168
+2. Convert interval to hex: 300 = 0x012C
+3. Set payload to 0x01 0x2C
+4. Send downlink via The Things Network Console
+![TTN Downlink as Hex]()
+
+##### Example 2: Set Date/Time
+
+1. Set port for CMD_SET_DATETIME to 136
+2. Get epoch (e.g. from https://www.epochconverter.com/hex) (Example: 0x63B2BC32); add an offset (estimated) for time until received (Example: + 64 / 0x40 seconds => 0x63B2BC**7**2) 
+3. Set payload to 0x63 0xB2 0xBC 0x72
+4. Send downlink via The Things Network Console
+
 ### Using the Javascript Uplink/Downlink Formatters
 
 | Command                       | Downlink                                                                  | Uplink                       |
@@ -328,6 +344,18 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
 | CMD_SET_BLE_CONFIG            | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}              | n.a.                         |
 
+#### The Things Network Examples 
+
+##### Example 1: Set SLEEP_INTERVAL to 360 seconds
+1. Build payload as JSON string: `{"sleep_interval": 360}` &mdash;
+   the correct port is selected automatically
+2. Send downlink via The Things Network Console
+![TTN Downlink as JSON]()
+
+##### Example 2: Set Date/Time
+1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
+2. Build payload as JSON string: {"epoch": 1692729897} 
+3. Send downlink via The Things Network Console
 
 ## Doxygen Generated Source Code Documentation
 
