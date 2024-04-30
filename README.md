@@ -148,6 +148,27 @@ Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 > [!IMPORTANT]
 > With the information above, the source code in both [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) and [BresserWeatherSensorLW](https://github.com/matthias-bs/BresserWeatherSensorLW) has to be modified!
 
+#### Board Identification
+
+To find out which `#define` is set for identifying your board:
+
+In the Arduino IDE &mdash;
+
+* In the `File` menu, open `Preferences` and enable the checkbox "Show verbose output during **compile**"
+* In the `Tools` menu, select your board (and board variant, if available)
+* Compile any sketch (e.g. `Blink`from the Arduino examples)
+* Search for a string starting with `-DARDUINO_` in the output window (e.g. `-DARDUINO_FEATHER_ESP32`)
+
+The string which resembles your board name &mdash; without the preceding `-D` &mdash; is the wanted define (e.g. `ARDUINO_FEATHER_ESP32`).
+
+This can be used by the C++ preprocessor to select board specific code, e.g.
+
+```
+#if defined(ARDUINO_FEATHER_ESP32)
+  // Put Adafruit Feather ESP32 specific code here
+#endif
+```
+
 #### BresserWeatherSensorReceiver Configuration
 
 In `WeatherSensorCfg.h`:
