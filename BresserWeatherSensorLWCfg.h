@@ -409,6 +409,8 @@
 // External voltage divider required
 #pragma message("External voltage divider required for battery voltage measurement.")
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
+// unused
+#define PIN_ADC_IN -1
 #elif defined(LORAWAN_NODE)
 // External Li-Ion Battery connected to solar charger
 #define PIN_ADC_IN A3
