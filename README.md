@@ -207,7 +207,7 @@ The battery voltage is used for:
 * Monitoring battery status via uplink (e.g. for optimization of transmission interval)
 
 > [!NOTE]
-> **The following section is meant as a general introduction. Actual implementations may vary. Consult you board's documentation for details!**
+> **The following section is meant as a general introduction. Actual implementations may vary. Consult you board's documentation for details!**<br>
 > The boards used in this project can be supplied by 5V via USB or by another supply voltage via a second power supply connector. Many have an integrated lithium-ion battery charger. A lithium-ion battery has a voltage range of ~2.4...4.2V. The usable voltage range for the board depends on the actual circuit. If a voltage regulator is used (and no voltage converter), the usable battery voltage range is ~3.3...4.2V.
 
 The MCUs used in this project have an integrated ADC with an input voltage range of 0...3.3V. Therefore, the battery voltage has to be reduced by a voltage divider to provide a voltage range suitable for the ADC.
