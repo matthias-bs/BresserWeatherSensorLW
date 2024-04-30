@@ -67,6 +67,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 * [Supported Hardware](#supported-hardware)
   * [Predefined Pinout and Radio Chip Configurations](#predefined-pinout-and-radio-chip-configurations)
   * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
+  * [User-Defined Battery Voltage Measurement](#user-defined-battery-voltage-measurement)
 * [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
 * [Software Build Configuration](#software-build-configuration)
   * [Required Configuration](#required-configuration)
@@ -186,6 +187,51 @@ In `config.h`:
 * Set the radio chip according to your hardware defining `LORA_CHIP`.
 * Set the pin definitions `#define PIN_LORA_NSS`, `PIN_LORA_RST`, `PIN_LORA_IRQ` and `PIN_LORA_GPIO` according to your hardware.
 * Cross check in the compiler log messages if the desired settings are actually used.
+
+#### Provide Feedback
+
+If your setup is working &mdash; congratulations! Be nice and provide your insights to the project to help others!
+
+### User-Defined Battery Voltage Measurement
+
+> [!WARNING]
+> Exceeding the allowed supply voltage or analog digital converter (ADC) input voltage range or reversing the polarity will destroy your board! 
+
+#### Overview
+
+While the battery voltage measurement is not crutial for operation, it is still important if the device is powered from a battery.
+
+The battery voltage is used for:
+* Providing battery status to the LoRaWAN network server on request
+* Battery deep-discharge protection and energy saving mode
+* Monitoring battery status via uplink (e.g. for optimization of transmission interval)
+
+> [!NOTE]
+> **The following section is meant as a general introduction. Actual implementations may vary. Consult you board's documentation for details!**
+> The boards used in this project can be supplied by 5V via USB or by another supply voltage via a second power supply connector. Many have an integrated lithium-ion battery charger. A lithium-ion battery has a voltage range of ~2.4...4.2V. The usable voltage range for the board depends on the actual circuit. If a voltage regulator is used (and no voltage converter), the usable battery voltage range is ~3.3...4.2V.
+
+The MCUs used in this project have an integrated ADC with an input voltage range of 0...3.3V. Therefore, the battery voltage has to be reduced by a voltage divider to provide a voltage range suitable for the ADC.
+
+The ADC input circuitry may come in a few different flavors:
+1. A voltage divider is directly connected to the battery and to the ADC input
+2. Resistors for a voltage divider are present, but solder bridges are required to actually connect them
+3. A voltage divider is implemented, but an electronic switch has to be enabled for using it
+4. A voltage divider has to be implemented as external circuit
+
+Last, but not least, some boards provide a separate battery monitoring chip.
+
+Only the cases 1 and 2 will be covered here.
+
+#### ADC Input Pin and Voltage Divider Ratio
+
+Find the voltage divider and the ADC input pin used for battery voltage measurement (if available) in your board's circuit diagram.
+
+In `BresserWeatherSensorLWCfg.h`:
+* Add a code section with your board definition (see [Board Identification](#board-identification)).
+* Define `PIN_ADC_IN` with your board specific pin.
+* Define `UBATT_DIV` with your voltage divider ratio if it differs from the default value of `0.5`.
+
+The function `getBatteryVoltage()` in [adc.cpp](https://github.com/matthias-bs/BresserWeatherSensorLW/src/adc.cpp) provides the battery voltage. Any board specific implementation should be placed there. `getBatteryVoltage()` returns `0` for any unknown board or a known board with out a default ADC input circuit to indicate that the battery voltage cannot be measured.
 
 ### LoRaWAN Network Service Configuration
 
