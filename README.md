@@ -65,7 +65,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 ## Contents
 
 * [Supported Hardware](#supported-hardware)
-  * [Predefined Pinout and Radio Chip Configurations](#predefined-pinout-and-radio-chip-configurations)
+  * [Predefined Board Configurations](#predefined-board-configurations)
   * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
   * [User-Defined Battery Voltage Measurement](#user-defined-battery-voltage-measurement)
 * [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
@@ -112,7 +112,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 
 :white_check_mark: &mdash; confirmed
 
-### Predefined Pinout and Radio Chip Configurations
+### Predefined Board Configurations
 
 By selecting a Board and a Board Revision in the Arduino IDE, a define is passed to the preprocessor/compiler. For the boards listed in [Supported Hardware](#supported-hardware), the default configuration is assumed based on this define. If this is not what you need, you have to switch to Manual Configuration.
 
