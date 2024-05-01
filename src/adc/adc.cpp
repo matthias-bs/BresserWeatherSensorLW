@@ -37,6 +37,7 @@
 // 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
 // 20240427 Added ADC input control and battery voltage measurement
 //          for ARDUINO_heltec_wifi_lora_32_V3
+// 20240430 Modified getBatteryVoltage()
 //
 // ToDo:
 // -
@@ -53,37 +54,37 @@
 using namespace PowerFeather;
 #endif
 
-
 //
 // Get voltage
 //
 uint16_t
 getVoltage(uint8_t pin, uint8_t samples, float div)
 {
-    float voltage_raw = 0;
-    for (uint8_t i = 0; i < UBATT_SAMPLES; i++)
-    {
+  float voltage_raw = 0;
+  for (uint8_t i = 0; i < UBATT_SAMPLES; i++)
+  {
 #if defined(ESP32)
-        voltage_raw += float(analogReadMilliVolts(PIN_ADC_IN));
+    voltage_raw += float(analogReadMilliVolts(PIN_ADC_IN));
 #else
-        voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
+    voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
 #endif
-    }
-    uint16_t voltage = int(voltage_raw / UBATT_SAMPLES / UBATT_DIV);
+  }
+  uint16_t voltage = int(voltage_raw / UBATT_SAMPLES / UBATT_DIV);
 
-    log_d("Voltage = %dmV", voltage);
+  log_d("Voltage = %dmV", voltage);
 
-    return voltage;
+  return voltage;
 }
-
 
 uint16_t getBatteryVoltage(void)
 {
-    #if defined(ARDUINO_ARCH_RP2040)
-    // Not implemented - no default VBAT input circuit (connect external divider to A0)
-    return 0;
-    #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
-    // Enable ADC input switch, measure voltage and disable ADC input switch
+#if defined(ARDUINO_TTGO_LoRa32_V1) || defined(ARDUINO_TTGO_LoRa32_V2) || defined(ARDUINO_TTGO_LoRa32_v21new) || \
+    defined(ARDUINO_FEATHER_ESP32) || defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA) ||           \
+    defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
+  // Here come the good guys...
+  return getVoltage();
+#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+     // Enable ADC input switch, measure voltage and disable ADC input switch
     uint16_t voltage;
     pinMode(ADC_CTRL, OUTPUT);
     digitalWrite(ADC_CTRL, LOW);
@@ -91,40 +92,61 @@ uint16_t getBatteryVoltage(void)
     voltage = getVoltage();
     pinMode(ADC_CTRL, INPUT);
     return voltage;
-    #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
-    uint16_t voltage = M5.Power.getBatteryVoltage();
+#elif defined(ARDUINO_ARCH_RP2040)
+  // Not implemented - no default VBAT input circuit (connect external divider to A0)
+  return 0;
+
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+  // Not implemented - no default VBAT input circuit (connect external divider to A0)
+  return 0;
+
+#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+  return 0;
+
+#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+  // battery monitoring chip
+  uint16_t voltage = M5.Power.getBatteryVoltage();
+  log_d("Voltage = %dmV", voltage);
+  return voltage;
+
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+  // battery monitoring chip
+  uint16_t voltage;
+  Result res = Board.getBatteryVoltage(voltage);
+  if (res == Result::Ok)
+  {
     log_d("Voltage = %dmV", voltage);
     return voltage;
-    #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
-    uint16_t voltage;
-    Result res = Board.getBatteryVoltage(voltage);
-    if (res == Result::Ok) {
-      log_d("Voltage = %dmV", voltage);
-      return voltage;
-    } else {
-      return 0;
-    }
-    #elif defined(ADC_EN)
-    return getVoltage();
-    #else
+  }
+  else
+  {
     return 0;
-    #endif
+  }
+
+#else
+  // Unknown implementation - zero indicates battery voltage measurement not available
+  return 0;
+
+#endif
 }
 
 uint16_t getSupplyVoltage(void)
 {
-    #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-    uint16_t voltage;
-    Result res = Board.getSupplyVoltage(voltage);
-    if (res == Result::Ok) {
-      log_d("Voltage = %dmV", voltage);
-      return voltage;
-    } else {
-      return 0;
-    }
-    #elif defined(PIN_SUPPLY_IN)
-      return getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
-    #else
-      return 0;
-    #endif
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  uint16_t voltage;
+  Result res = Board.getSupplyVoltage(voltage);
+  if (res == Result::Ok)
+  {
+    log_d("Voltage = %dmV", voltage);
+    return voltage;
+  }
+  else
+  {
+    return 0;
+  }
+#elif defined(PIN_SUPPLY_IN)
+  return getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
+#else
+  return 0;
+#endif
 }

@@ -43,6 +43,7 @@
 // 20240427 Added voltage divider and ADC input control pin
 //          for ARDUINO_heltec_wifi_lora_32_V3
 //          Added BLE configuration/status via LoRaWAN
+// 20240430 Modified battery voltage measurement
 //
 // Note:
 // Depending on board package file date, either
@@ -329,22 +330,10 @@
 //#define ARDUINO_THINGPULSE_EPULSE_FEATHER
 #endif
 
-// Enable LORAWAN debug mode - this generates dummy weather data and skips weather sensor reception
-// #define LORAWAN_DEBUG
-
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
-// If SLEEP_EN is defined and battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
+// If battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
 // Go to sleep mode immediately after start if battery voltage <= BATTERY_LOW [mV]
-#if defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
-// External voltage divider required
-#pragma message("External voltage divider required for battery voltage measurement.")
-#pragma message("No power-saving & deep-discharge protection implemented yet.")
-#elif defined(FIREBEETLE_ESP32_COVER_LORA)
-#pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic).")
-#pragma message("No power-saving & deep-discharge protection implemented yet.")
-#endif
-
 #define BATTERY_WEAK 3500
 #define BATTERY_LOW 3200
 
@@ -405,6 +394,7 @@
 // #define DISTANCESENSOR_EN
 #endif
 
+
 // ADC for supply/battery voltage measurement
 // Defaults:
 // ---------
@@ -417,19 +407,38 @@
 #define PIN_ADC_IN 35
 #elif defined(ARDUINO_FEATHER_ESP32)
 #define PIN_ADC_IN A13
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+// External voltage divider required
+#pragma message("External voltage divider required for battery voltage measurement.")
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
+// unused
+#define PIN_ADC_IN -1
 #elif defined(LORAWAN_NODE)
 // External Li-Ion Battery connected to solar charger
 #define PIN_ADC_IN A3
-#elif defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+#pragma message("On-board voltage divider must be enabled for battery voltage measurement (see schematic).")
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
 // On-board VB
 #define PIN_ADC_IN A0
+#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+// On-board VB
+#define PIN_ADC_IN A0
+#elif defined(ESP32S3_POWERFEATHER)
+// unused
+#define PIN_ADC_IN -1
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
 // Unused
 #define PIN_ADC_IN -1
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+#pragma message("External voltage divider required for battery voltage measurement.")
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
 #define PIN_ADC_IN A0
 #else
-#define PIN_ADC_IN 34
+#pragma message("Unknown battery voltage measurement circuit.")
+#pragma message("No power-saving & deep-discharge protection implemented yet.")
+// unused
+#define PIN_ADC_IN -1
 #endif
 
 // Additional ADC pins
