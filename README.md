@@ -12,12 +12,12 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 
 * RadioLib's LoRaWAN implementation is currently in beta stage.
 * Helium Network is not supported (requires LoRaWAN v1.0.x)
-* This should not be the first Arduino sketch ever you are trying to flash to your board - try somthing simple (`blink.ino`) first to get familiar with the tools and workflow.
+* This should not be the first Arduino sketch you are ever trying to flash to your board - try somthing simple first (e.g. `blink.ino`) to get familiar with the tools and workflow.
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
 * You currently need the latest version (HEAD) of [RadioLib](https://github.com/jgromes/RadioLib)
-* Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) stand-alone before using it with BresserWeatherSensorLW
+* Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * LoRaWAN downlink commands (and responses) are not compatible with [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
 
 ## Features
@@ -36,9 +36,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 * [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
 * [Remote Configuration via LoRaWAN Downlink](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#remote-configuration-via-lorawan-downlink)
 
-## Status
-
-This project is in early stage of development - stay tuned.
+## Project Status
 
 * [x] Weather sensor data reception
 * [x] BLE sensor data reception
@@ -61,10 +59,35 @@ This project is in early stage of development - stay tuned.
 * [x] Change LoRaWAN control downlink / status uplink messages
 * [x] Update Javascript encoders/decoders
 * [x] Implement using of BLE sensor addresses configured via downlink
-* [ ] Update documentation
-* [ ] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
+* [x] Update documentation
+* [x] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
 
- 
+## Contents
+
+* [Supported Hardware](#supported-hardware)
+  * [Predefined Pinout and Radio Chip Configurations](#predefined-pinout-and-radio-chip-configurations)
+* [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
+* [Software Build Configuration](#software-build-configuration)
+  * [Required Configuration](#required-configuration)
+  * [Optional Configuration](#optional-configuration)
+  * [Enabling Debug Output](#enabling-debug-output)
+  * [Test Run](#test-run)
+* [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
+  * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
+* [MQTT Integration](#mqtt-integration)
+  * [The Things Network MQTT Integration](#the-things-network-mqtt-integration)
+* [Datacake Integration](#datacake-integration)
+  * [Datacake / The Things Network Setup](#datacake--the-things-network-setup)
+  * [Desktop Dashboard](#desktop-dashboard)
+  * [Mobile Dashboard](#mobile-dashboard)
+* [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)
+  * [Parameters](#parameters)
+  * [Using Raw Data](#using-raw-data)
+  * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
+* [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
+* [References](#references)
+* [Legal](#legal)
+
 ## Supported Hardware
 
   |  Status       | Setup                                                                                                               | Board (/ Revision)   | Define (Prefix: ARDUINO_) | Radio Module | Notes    |
@@ -87,6 +110,11 @@ This project is in early stage of development - stay tuned.
 
 :white_check_mark: &mdash; confirmed
 
+### Predefined Pinout and Radio Chip Configurations
+
+By selecting a Board and a Board Revision in the Arduino IDE, a define is passed to the preprocessor/compiler. For the boards listed in [Supported Hardware](#supported-hardware), the default configuration is assumed based on this define. If this is not what you need, you have to switch to Manual Configuration.
+
+If you are not using the Arduino IDE, you can use the defines in [Supported Hardware](#supported-hardware) with your specific tool chain to get the same result.
 
 If enabled in the Arduino IDE Preferences ("Verbose Output"), the preprosessor will provide some output regarding the selected configuration, e.g.
 
@@ -97,11 +125,136 @@ Radio chip: SX1276
 Pin config: RST->0 , IRQ->5 , NSS->6 , GPIO->11
 ```
 
-**Documentation will be updated soon!**
+## LoRaWAN Network Service Configuration
 
-Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md)
+Create an account and set up a device configuration in your LoRaWAN network provider's web console, e.g. [The Things Network](https://www.thethingsnetwork.org/).
+
+* LoRaWAN v1.1
+* Regional Parameters 1.1 Revision A
+* Device class A
+* Over the air activation (OTAA)
+
+## Software Build Configuration
+
+### Required Configuration
+
+* Install the Arduino ESP32 board package in the Arduino IDE
+* Select your ESP32 board
+* Install all libraries as listed in the section [package.json](package.json) &mdash; section dependencies &mdash; via the Arduino IDE Library Manager 
+* Clone (or download and unpack) the latest ([BresserWeatherSensorLW Release](https://github.com/matthias-bs/BresserWeatherSensorLW/releases))
+* Set your LoRaWAN Network Service credentials &mdash; `RADIOLIB_LORAWAN_DEV_EUI`, `RADIOLIB_LORAWAN_NWK_KEY` and `RADIOLIB_LORAWAN_APP_KEY` &mdash in [secrets.h](secrets.h):
+
+```
+// The Device EUI & two keys can be generated on the TTN console
+
+// Replace with your Device EUI
+#define RADIOLIB_LORAWAN_DEV_EUI   0x---------------
+
+// Replace with your App Key
+#define RADIOLIB_LORAWAN_APP_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--
+
+// Put your Nwk Key here
+#define RADIOLIB_LORAWAN_NWK_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--
+```
+
+* Load the sketch [BresserWeatherSensorLW.ino](BresserWeatherSensorLW.ino)
+* Compile and Upload
+
+### Optional Configuration
+
+In [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
+
+* Configure your time zone by editing `TZ_INFO`
+* Disable sensor/interface features which you do not want to use
+* Adjust battery voltage levels
+* Configure the timing parameters if required
+* If enabled, configure your ATC MiThermometer's / Theengs Decoder's BLE MAC Address by by editing `KNOWN_BLE_ADDRESSES`
+* Configure the ADC's input pins, dividers and oversampling settings as needed
+* Disable sensor decoders wich are not needed
+
+### Enabling Debug Output
+
+[Debug Output Configuration in Arduino IDE](Debug_Output.md)
+
+### Test Run
+
+Watch your board's debug output in the serial console and the LoRaWAN communication in your network provider's web console.
+
+## LoRaWAN Payload Formatters
+
+Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding raw data to / from JSON format.
+
+See [The Things Network MQTT Integration and Payload Formatters](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#the-things-network-mqtt-integration-payload-formatters) and [TS013-1.0.0 Payload Codec API](https://resources.lora-alliance.org/technical-specifications/ts013-1-0-0-payload-codec-api) for more details.
+
+### The Things Network Payload Formatters Setup
+
+#### Uplink Formatter
+
+Decode uplink payload (a sequence of bytes) into JSON format, i.e. data structures which are readable/suitable for further processing.
+
+In The Things Network Console:
+1. Go to "Payload formatters" -> "Uplink"
+2. Select "Formatter type": "Custom Javascript formatter"
+3. "Formatter code": Paste [scripts/uplink_formatter.js](scripts/uplink_formatter.js)
+4. Apply "Save changes"
+
+![TTN Uplink Formatter](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/38b66478-688a-4028-974a-c517cddae662)
+
+> [!NOTE]
+> The actual payload depends on the options selected in the Arduino sketch (see) [BresserWeatherSensorsLW.cfg](BresserWeatherSensorsLW.cfg)) &mdash; the decoder must be edited accordingly (add or remove data types and JSON identifiers). The configuration dependent part of the decoder can be created with a C++ preprocessor and the Python script [generate_decoder.py](scripts/generate_decoder.py).
+
+#### Downlink Formatter
+
+Encode downlink payload from JSON to a sequence of bytes.
+
+In The Things Network Console:
+1. Go to "Payload formatters" -> "Downlink"
+2. Select "Formatter type": "Custom Javascript formatter"
+3. "Formatter code": Paste [scripts/downlink_formatter.js](scripts/downlink_formatter.js)
+4. Apply "Save changes"
+
+## MQTT Integration
+
+### The Things Network MQTT Integration
+
+TTN provides an MQTT broker.
+How to receive and decode the payload with an MQTT client -
+see https://www.thethingsnetwork.org/forum/t/some-clarity-on-mqtt-topics/44226/2
+
+V3 topic:
+
+`v3/<ttn app id><at symbol>ttn/devices/<ttn device id>/up`
+
+  
+v3 message key field jsonpaths:
+  
+```
+<ttn device id> = .end_device_ids.device_id
+<ttn app id> = .end_device_ids.application_ids.application_id  // (not including the <at symbol>ttn in the topic)
+<payload> = .uplink_message.frm_payload
+```  
+
+
+JSON-Path with Uplink-Decoder (see [scripts/uplink_formatter.js](scripts/uplink_formatter.js))
+
+`.uplink_message.decoded_payload.bytes.<variable>`
+
+## Datacake Integration
+
+### Datacake / The Things Network Setup
+
+YouTube Video: [Get started for free with LoRaWaN on The Things Network and Datacake IoT Platform](https://youtu.be/WGVFgYp3k3s)
+
+### Desktop Dashboard
+
+![Datacake_Dashboard_Desktop](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/2a876ba1-06b9-4ea3-876c-2fad3d559b01)
+
+### Mobile Dashboard
+![Datacake_Dashboard_Mobile](https://github.com/matthias-bs/BresserWeatherSensorTTN/assets/83612361/fbc0948c-bfd8-4d7d-9780-c113d576d3cf)
 
 ## Remote Configuration Commands / Status Requests via LoRaWAN
+
+Many software parameters can be defined at compile time, i.e. in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h). A few [parameters](#parameters) can also be changed and queried at run time via LoRaWAN, either [using raw data](#using-raw-data) or [using Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters).
 
 ### Parameters
 
@@ -115,6 +268,8 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | <rtc_source>          | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
 | <sensors_incX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
 | <sensors_excX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
+| <ble_active>          | BLE active scan; 1 (active scan) / 0 (passive scan)                         |
+| <ble_scantime>        | BLE scan time in seconds; 0...255                                           |
 | <ble_addrX>           | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
 
 > [!WARNING]
@@ -126,10 +281,10 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 
 > [!NOTE]
 > **Default values**<br>
-> Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
-> BLE addresses: see `BresserWeatherSensorLWCfg.h`<br>
-> Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
-> Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
+> * Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
+> * BLE addresses and scan parameters: see `BresserWeatherSensorLWCfg.h`<br>
+> * Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
+> * Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
 
 ### Using Raw Data
 
@@ -149,6 +304,26 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
 | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+| CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
+| CMD_SET_BLE_CONFIG            | 0xCB (203) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
+
+#### The Things Network Examples
+
+##### Example 1: Set SLEEP_INTERVAL to 360 seconds
+1. Set port for CMD_SET_SLEEP_INTERVAL to 168
+2. Convert interval to hex: 300 = 0x012C
+3. Set payload to 0x01 0x2C
+4. Send downlink via The Things Network Console
+
+![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/4b616cd9-4f50-4407-8032-44d240abc09b)
+
+
+##### Example 2: Set Date/Time
+
+1. Set port for CMD_SET_DATETIME to 136
+2. Get epoch (e.g. from https://www.epochconverter.com/hex) (Example: 0x63B2BC32); add an offset (estimated) for time until received (Example: + 64 / 0x40 seconds => 0x63B2BC**7**2) 
+3. Set payload to 0x63 0xB2 0xBC 0x72
+4. Send downlink via The Things Network Console
 
 ### Using the Javascript Uplink/Downlink Formatters
 
@@ -156,7 +331,7 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | ----------------------------- | ------------------------------------------------------------------------- | ---------------------------- |
 | CMD_GET_DATETIME              | {"cmd": "CMD_GET_DATETIME"}                                               | {"epoch": \<epoch\>}         |
 | CMD_SET_DATETIME              | {"epoch": \<epoch\>}                                                      | n.a.                         |
-| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>"                                      | n.a.                         |
+| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>"}                                     | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
 | CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
@@ -168,4 +343,42 @@ Meanwhile, refer to [BresserWeatherSensorTTN - README.md](https://github.com/mat
 | CMD_SET_SENSORS_EXC           | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}                    | n.a.                         |
 | CMD_GET_BLE_ADDR              | {"cmd": "CMD_GET_BLE_ADDR"}                                               | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]} |
 | CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
+| CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
+| CMD_SET_BLE_CONFIG            | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}              | n.a.                         |
 
+#### The Things Network Examples 
+
+##### Example 1: Set SLEEP_INTERVAL to 360 seconds
+1. Build payload as JSON string: `{"sleep_interval": 360}` &mdash;
+   the correct port is selected automatically
+2. Send downlink via The Things Network Console
+
+![TTN Downlink as JSON](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/2133676f-5d08-4d71-b580-e628c15b1229)
+
+
+##### Example 2: Set Date/Time
+1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
+2. Build payload as JSON string: {"epoch": 1692729897} 
+3. Send downlink via The Things Network Console
+
+## Doxygen Generated Source Code Documentation
+
+[https://matthias-bs.github.io/BresserWeatherSensorTTN/index.html](https://matthias-bs.github.io/BresserWeatherSensorLW/)
+
+## References
+
+Based on
+* [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) by Matthias Prinke
+* [RadioLib](https://github.com/jgromes/RadioLib) by Jan Gromeš
+* [Lora-Serialization](https://github.com/thesolarnomad/lora-serialization) by Joscha Feth
+* [ESP32Time](https://github.com/fbiego/ESP32Time) by Felix Biego
+* [OneWireNg](https://github.com/pstolarz/OneWireNg) by Piotr Stolarz
+* [DallasTemperature / Arduino-Temperature-Control-Library](https://github.com/milesburton/Arduino-Temperature-Control-Library) by Miles Burton
+* [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) by h2zero
+* [Theengs Decoder](https://github.com/theengs/decoder) by [Theengs Project](https://github.com/theengs)
+* [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
+* [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
+
+## Legal
+
+> This project is in no way affiliated with, authorized, maintained, sponsored or endorsed by Bresser GmbH or any of its affiliates or subsidiaries.
