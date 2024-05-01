@@ -84,11 +84,13 @@ uint16_t getBatteryVoltage(void)
     return 0;
     #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
     // Enable ADC input switch, measure voltage and disable ADC input switch
+    uint16_t voltage;
     pinMode(ADC_CTRL, OUTPUT);
     digitalWrite(ADC_CTRL, LOW);
     delay(100);
-    getVoltage();
+    voltage = getVoltage();
     pinMode(ADC_CTRL, INPUT);
+    return voltage;
     #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
     uint16_t voltage = M5.Power.getBatteryVoltage();
     log_d("Voltage = %dmV", voltage);
