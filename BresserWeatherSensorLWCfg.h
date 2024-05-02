@@ -40,7 +40,9 @@
 // 20240410 Removed obsolete defines
 // 20240413 Refactored ADC handling
 // 20240423 Added define ARDUINO_heltec_wifi_lora_32_V3
-// 20240427 Added BLE configuration/status via LoRaWAN
+// 20240427 Added voltage divider and ADC input control pin
+//          for ARDUINO_heltec_wifi_lora_32_V3
+//          Added BLE configuration/status via LoRaWAN
 // 20240430 Modified battery voltage measurement
 //
 // Note:
@@ -500,6 +502,10 @@ const uint8_t ADC3_SAMPLES = 10;
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 #if defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 const float UBATT_DIV = 0.6812;
+#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#define ADC_CTRL 37
+// R17=100k, R14=390k => 100k / (100k + 390 k)
+const float UBATT_DIV = 0.2041;
 #else
 const float UBATT_DIV = 0.5;
 #endif
