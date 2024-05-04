@@ -80,6 +80,7 @@
 // 20240423 Removed rtcSyncReq & runtimeExpired, added rtcTimeSource
 // 20240424 Added appLayer.begin()
 // 20240525 PowerFeather: added BATTERY_CAPACITY_MAH to init()
+//          Added BresserWeatherSensorLWCmd.h
 //
 // ToDo:
 // -
@@ -152,6 +153,7 @@ using namespace PowerFeather;
 #include <RadioLib.h>
 #include <ESP32Time.h>
 #include "BresserWeatherSensorLWCfg.h"
+#include "BresserWeatherSensorLWCmd.h"
 #include "src/AppLayer.h"
 #include "src/adc/adc.h"
 

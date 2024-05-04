@@ -37,6 +37,7 @@
 // 20240419 Modified downlink decoding
 // 20240424 Fixed BLE address initialization from Preferences, added begin()
 // 20240426 Moved bleAddrInit() out of begin()
+// 20240504 Added BresserWeatherSensorLWCmd.h
 //
 // ToDo:
 // -
@@ -51,6 +52,7 @@
 #include <ESP32Time.h>
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
+#include "../BresserWeatherSensorLWCmd.h"
 #include "adc/adc.h"
 #include <LoraMessage.h>
 
