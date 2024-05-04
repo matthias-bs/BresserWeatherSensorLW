@@ -44,6 +44,8 @@
 //          for ARDUINO_heltec_wifi_lora_32_V3
 //          Added BLE configuration/status via LoRaWAN
 // 20240430 Modified battery voltage measurement
+// 20240504 PowerFeather: added BATTERY_CAPACITY_MAH
+//          Moved LoRaWAN command interface to BresserWeatherSensorLWCmd.h
 //
 // Note:
 // Depending on board package file date, either
@@ -58,248 +60,6 @@
 
 #if !defined(_LWCFG_H)
 #define _LWCFG_H
-
-//#include <vector>
-//#include <string>
-
-// ===========================
-// LoRaWAN command interface
-// ===========================
-
-// ---------------------------
-// -- LoRaWAN network layer --
-// ---------------------------
-
-// CMD_GET_DATETIME
-// -----------------
-#define CMD_GET_DATETIME 0x86
-
-// Downlink (command):
-// byte0:   0x00
-
-// Uplink (response):
-// byte0: unixtime[31:24]
-// byte1: unixtime[23:16]
-// byte2: unixtime[15: 8]
-// byte3: unixtime[ 7: 0]
-// byte4: rtc_source[ 7: 0]
-
-
-// CMD_SET_DATETIME
-// -----------------
-// Port: CMD_SET_DATETIME
-#define CMD_SET_DATETIME 0x88
-
-// Downlink (command):
-// byte0: unixtime[31:24]
-// byte1: unixtime[23:16]
-// byte2: unixtime[15: 8]
-// byte3: unixtime[ 7: 0]
-
-// Uplink: n.a.
-
-// CMD_SET_SLEEP_INTERVAL
-// -----------------------
-// Note: Set normal sleep interval in seconds
-// Port: CMD_SET_SLEEP_INTERVAL
-#define CMD_SET_SLEEP_INTERVAL 0xA8
-
-// Downlink (command):
-// byte0: sleep_interval[15:8]
-// byte1: sleep_interval[ 7:0]
-
-// Response: n.a.
-
-// CMD_SET_SLEEP_INTERVAL_LONG
-// ----------------------------
-// Note: Set long sleep interval in seconds (energy saving mode)
-// Port: CMD_SET_SLEEP_INTERVAL_LONG
-#define CMD_SET_SLEEP_INTERVAL_LONG 0xA9
-
-// Downlink (command):
-// byte0: sleep_interval_long[15:8]
-// byte1: sleep_interval_long[ 7:0]
-
-// Uplink: n.a.
-
-// CMD_GET_LW_CONFIG
-// ------------------
-// Port: CMD_GET_LW_CONFIG
-#define CMD_GET_LW_CONFIG 0xB1
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: sleep_interval[15: 8]
-// byte1: sleep_interval[ 7:0]
-// byte2: sleep_interval_long[15:8]
-// byte3: sleep_interval_long[ 7:0]
-
-// -----------------------
-// -- Application layer --
-// -----------------------
-
-// CMD_GET_WS_TIMEOUT
-// -------------------
-// Note: Get weather sensor RX timeout in seconds
-// Port: CMD_GET_WS_TIMEOUT
-#define CMD_GET_WS_TIMEOUT              0xC0
-
-// Downlink (command)
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: ws_timeout[ 7: 0]
-
-// CMD_SET_WS_TIMEOUT
-// -------------------
-// Note: Set weather sensor RX timeout in seconds
-// Port: CMD_SET_WS_TIMEOUT
-#define CMD_SET_WS_TIMEOUT 0xC1
-
-// Downlink (command):
-// byte0: ws_timeout[ 7: 0]
-
-// Uplink: n.a.
-
-// CMD_RESET_RAINGAUGE
-// --------------------
-// Port: CMD_RESET_RAINGAUGE
-#define CMD_RESET_RAINGAUGE 0xC3
-
-// Downlink (command):
-// byte0: flags[7:0] (optional)
-
-// Uplink: n.a.
-
-// Reset Lightning???
-// -------------------
-
-
-// CMD_GET_SENSORS_INC
-// --------------------
-// Note: Get sensors include list (0...12 IDs)
-// Port: CMD_GET_SENSORS_INC
-#define CMD_GET_SENSORS_INC 0xC4
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response): 
-// byte0: sensors_inc0[31:24]
-// byte1: sensors_inc0[23:16]
-// byte2: sensors_inc0[15: 8]
-// byte3: sensors_inc0[ 7: 0]
-// ...
-
-// CMD_SET_SENSORS_INC
-// --------------------
-// Note: Set sensors include list (0...12 IDs)
-// Port: CMD_SET_SENSORS_INC
-#define CMD_SET_SENSORS_INC 0xC5
-
-// Downlink (command):
-// byte0: sensors_inc0[31:24]
-// byte1: sensors_inc0[23:16]
-// byte2: sensors_inc0[15: 8]
-// byte3: sensors_inc0[ 7: 0]
-// ...
-
-// Uplink: n.a.
-
-// CMD_GET_SENSORS_EXC
-// --------------------
-// Note: Get sensors exclude list (0...12 * 4 bytes)
-// Port: CMD_GET_SENSORS_EXC
-#define CMD_GET_SENSORS_EXC 0xC6
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response): 
-// byte0: sensors_exc0[31:24]
-// byte1: sensors_exc0[23:16]
-// byte2: sensors_exc0[15: 8]
-// byte3: sensors_exc0[ 7: 0]
-// ...
-
-// CMD_SET_SENSORS_EXC
-// --------------------
-// Note: Set sensors exclude list (0...12 * 4 bytes)
-// Port: CMD_SET_SENSORS_EXC
-#define CMD_SET_SENSORS_EXC 0xC7
-
-// Downlink (command):
-// byte0: sensors_exc0[31:24]
-// byte1: sensors_exc0[23:16]
-// byte2: sensors_exc0[15: 8]
-// byte3: sensors_exc0[ 7: 0]
-// ...
-
-// Uplink: n.a.
-
-// CMD_GET_BLE_ADDR
-// -----------------
-// Note: Get BLE sensors MAC addresses (0..8 * 6 bytes)
-// Port: CMD_GET_BLE_ADDR
-#define CMD_GET_BLE_ADDR 0xC8
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: ble_addr0[47:24]
-// byte1: ble_addr0[23:32]
-// byte2: ble_addr0[31:24]
-// byte3: ble_addr0[23:16]
-// byte4: ble_addr0[15: 8]
-// byte5: ble_addr0[ 7: 0]
-// ...
-
-// CMD_SET_BLE_ADDR
-// -----------------
-// Note: Set BLE sensors MAC addresses (0..8 * 6 bytes)
-// Port: CMD_SET_BLE_ADDR
-#define CMD_SET_BLE_ADDR 0xC9
-
-// Downlink (command):
-// byte0: ble_addr0[47:24]
-// byte1: ble_addr0[23:32]
-// byte2: ble_addr0[31:24]
-// byte3: ble_addr0[23:16]
-// byte4: ble_addr0[15: 8]
-// byte5: ble_addr0[ 7: 0]
-// ...
-
-// Response: n.a.
-
-// CMD_GET_BLE_CONFIG
-// -------------------
-// Note: Scan time in seconds
-// Port: CMD_GET_BLE_CONFIG
-#define CMD_GET_BLE_CONFIG 0xCA
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: 0x01 (active scan) / 0x00 (passive scan)
-// byte1: scan_time[7:0]
-
-// CMD_SET_BLE_CONFIG
-// -------------------
-// Note: Scan time in seconds
-// Port: CMD_SET_BLE_CONFIG
-#define CMD_SET_BLE_CONFIG 0xCB
-
-// Uplink (command):
-// byte0: active_scan - 0x01 (active scan) / 0x00 (passive scan)
-// byte1: scan_time[7:0]
-
-// Response: n.a.
-
-// ===========================
 
 
 // Enable debug mode (debug messages via serial port)
@@ -424,7 +184,12 @@
 #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
 // On-board VB
 #define PIN_ADC_IN A0
-#elif defined(ESP32S3_POWERFEATHER)
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+// Set battery capacity in mAh
+#define BATTERY_CAPACITY_MAH 0
+#if BATTERY_CAPACITY_MAH == 0
+#pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
+#endif
 // unused
 #define PIN_ADC_IN -1
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)

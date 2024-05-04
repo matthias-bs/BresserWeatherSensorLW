@@ -1,6 +1,6 @@
 {
   "name": "BresserWeatherSensorLW",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Bresser 868 MHz Weather Sensor Radio Receiver; provides data via LoRaWAN",
   "main": "BresserWeatherSensorLW.ino",
   "frameworks": "arduino",
