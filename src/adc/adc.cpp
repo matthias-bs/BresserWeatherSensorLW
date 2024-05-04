@@ -38,6 +38,7 @@
 // 20240427 Added ADC input control and battery voltage measurement
 //          for ARDUINO_heltec_wifi_lora_32_V3
 // 20240430 Modified getBatteryVoltage()
+// 20240504 Heltec WiFi 32 LoRa V3: Changed ADC input attenuation to get higher accuracy
 //
 // ToDo:
 // -
@@ -88,6 +89,7 @@ uint16_t getBatteryVoltage(void)
     uint16_t voltage;
     pinMode(ADC_CTRL, OUTPUT);
     digitalWrite(ADC_CTRL, LOW);
+    analogSetPinAttenuation(PIN_ADC_IN, ADC_0db);
     delay(100);
     voltage = getVoltage();
     pinMode(ADC_CTRL, INPUT);
