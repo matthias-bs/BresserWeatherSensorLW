@@ -79,6 +79,7 @@
 // 20240416 Added enabling of 3.3V power supply for FeatherWing on ESP32-S3 PowerFeather
 // 20240423 Removed rtcSyncReq & runtimeExpired, added rtcTimeSource
 // 20240424 Added appLayer.begin()
+// 20240525 PowerFeather: added BATTERY_CAPACITY_MAH to init()
 //
 // ToDo:
 // -
@@ -463,7 +464,7 @@ void setup()
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
-  Board.init();           // Note: Battery capacity / type has to be set for voltage measurement
+  Board.init(BATTERY_CAPACITY_MAH);           // Note: Battery capacity / type has to be set for voltage measurement
   Board.enable3V3(true);  // Power supply for FeatherWing
   Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
 #endif
