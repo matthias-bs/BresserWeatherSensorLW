@@ -79,14 +79,19 @@
 // 20240416 Added enabling of 3.3V power supply for FeatherWing on ESP32-S3 PowerFeather
 // 20240423 Removed rtcSyncReq & runtimeExpired, added rtcTimeSource
 // 20240424 Added appLayer.begin()
-// 20240525 PowerFeather: added BATTERY_CAPACITY_MAH to init()
+// 20240504 PowerFeather: added BATTERY_CAPACITY_MAH to init()
 //          Added BresserWeatherSensorLWCmd.h
+// 20240505 Implemented loading of LoRaWAN secrets from file on LittleFS (if available)
 //
 // ToDo:
 // -
 //
 // Notes:
+// - Set "Core Debug Level: Debug" for initial testing
 // - The lines with "#pragma message()" in the compiler output are not errors, but useful hints!
+// - The default LoRaWAN credentials are read at compile time from secrets.h (included in config.h),
+//   they can be overriden by the JSON file secrets.json placed in LittleFS
+//   (Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading.)
 // - Pin mapping of radio transceiver module is done in two places:
 //   - BresserWeatherSensorLW:       config.h
 //   - BresserWeatherSensorReceiver: WeatherSensorCfg.h
@@ -152,6 +157,8 @@ using namespace PowerFeather;
 
 #include <RadioLib.h>
 #include <ESP32Time.h>
+#include <LittleFS.h>
+#include <ArduinoJson.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
 #include "src/AppLayer.h"
@@ -176,11 +183,11 @@ const uint8_t PAYLOAD_SIZE = 51;
 // bits 4..7 esp32 sntp time status (not used)
 enum class E_TIME_SOURCE : uint8_t
 {
-    E_GPS       = 0x00,
-    E_RTC       = 0x01,
-    E_LORA      = 0x02,
-    E_UNSYNCHED = 0x04,
-    E_SET       = 0x08
+  E_GPS = 0x00,
+  E_RTC = 0x01,
+  E_LORA = 0x02,
+  E_UNSYNCHED = 0x04,
+  E_SET = 0x08
 };
 
 // Variables which must retain their values after deep sleep
@@ -206,7 +213,7 @@ time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network ti
 uint16_t bootCount;
 uint16_t bootCountSinceUnsuccessfulJoin;
 
-// RP2040 RAM is preserved during sleep; we just have to ensure that it is not initialized at startup (after reset)
+/// RP2040 RAM is preserved during sleep; we just have to ensure that it is not initialized at startup (after reset)
 uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".uninitialized_data")));
 
 /// RTC time source
@@ -220,9 +227,14 @@ ESP32Time rtc;
 AppLayer appLayer(&rtc, &rtcLastClockSync);
 
 #if defined(ESP32)
-// abbreviated version from the Arduino-ESP32 package, see
-// https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
-// for the complete set of options
+
+/*!
+ * \brief Print wakeup reason (ESP32 only)
+ *
+ * Abbreviated version from the Arduino-ESP32 package, see
+ * https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
+ * for the complete set of options.
+ */
 void print_wakeup_reason()
 {
   esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
@@ -237,6 +249,184 @@ void print_wakeup_reason()
 }
 #endif
 
+/*!
+ * \brief Load LoRaWAN secrets from file 'secrets.json' on LittleFS, if available
+ *
+ * Returns all values by reference/pointer
+ * 
+ * Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading
+ * the file to Flash.
+ *
+ * \param joinEUI
+ * \param devEUI
+ * \param nwkKey
+ * \param appKey
+ */
+void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey)
+{
+  if (!LittleFS.begin())
+  {
+    log_d("Could not initialize LittleFS.");
+  }
+  else
+  {
+    File file = LittleFS.open("/secrets.json", "r");
+
+    if (!file)
+    {
+      log_i("File 'secrets.h' not found.");
+    }
+    else
+    {
+      log_d("Reading 'secrets.json'");
+      JsonDocument doc;
+
+      // Deserialize the JSON document
+      DeserializationError error = deserializeJson(doc, file);
+      if (error)
+      {
+        log_d("Failed to read JSON file, using defaults.");
+      }
+      else
+      {
+        const char *joinEUIStr = doc["joinEUI"];
+        if (joinEUIStr == nullptr)
+        {
+          log_e("Missing joinEUI.");
+          file.close();
+          return;
+        }
+        uint64_t _joinEUI = 0;
+        for (int i = 2; i < 18; i += 2)
+        {
+          char tmpStr[3] = "";
+          unsigned int tmpByte;
+          strncpy(tmpStr, &joinEUIStr[i], 2);
+          sscanf(tmpStr, "%x", &tmpByte);
+          _joinEUI = (_joinEUI << 8) | tmpByte;
+        }
+        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
+        log_d("joinEUI: 0x%08X%08X", static_cast<uint32_t>(_joinEUI >> 32), static_cast<uint32_t>(_joinEUI & 0xFFFFFFFF));
+
+        const char *devEUIStr = doc["devEUI"];
+        if (devEUIStr == nullptr)
+        {
+          log_e("Missing devEUI.");
+          file.close();
+          return;
+        }
+        uint64_t _devEUI = 0;
+        for (int i = 2; i < 18; i += 2)
+        {
+          char tmpStr[3] = "";
+          unsigned int tmpByte;
+          strncpy(tmpStr, &devEUIStr[i], 2);
+          sscanf(tmpStr, "%x", &tmpByte);
+          _devEUI = (_devEUI << 8) | tmpByte;
+        }
+        if (_devEUI == 0)
+        {
+          log_e("devEUI is zero.");
+          file.close();
+          return;
+        }
+        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
+        log_d("devEUI: 0x%08X%08X", static_cast<uint32_t>(_devEUI >> 32), static_cast<uint32_t>(_devEUI & 0xFFFFFFFF));
+
+        uint8_t check = 0;
+        bool fail = false;
+
+        log_d("nwkKey:");
+        uint8_t _nwkKey[16];
+        for (size_t i = 0; i < 16; i++)
+        {
+          const char *buf = doc["nwkKey"][i];
+          if (buf == nullptr)
+          {
+            fail = true;
+            break;
+          }
+          unsigned int tmp;
+          sscanf(buf, "%x", &tmp);
+          _nwkKey[i] = static_cast<uint8_t>(tmp);
+          check |= _nwkKey[i];
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+          printf("0x%02X", _nwkKey[i]);
+          if (i < 15)
+          {
+            printf(", ");
+          }
+#endif
+        } // for all nwk_key bytes
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+        printf("\n");
+#endif
+        if (fail || (check == 0))
+        {
+          log_e("nwkKey parse error");
+          file.close();
+          return;
+        }
+
+        check = 0;
+        log_i("appKey:");
+        uint8_t _appKey[16];
+        for (size_t i = 0; i < 16; i++)
+        {
+          const char *buf = doc["appKey"][i];
+          if (buf == nullptr)
+          {
+            fail = true;
+            break;
+          }
+          unsigned int tmp;
+          sscanf(buf, "%x", &tmp);
+          _appKey[i] = static_cast<uint8_t>(tmp);
+          check |= _appKey[i];
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+          printf("0x%02X", _appKey[i]);
+          if (i < 15)
+          {
+            printf(", ");
+          }
+#endif
+        } // for all app_key bytes
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+        printf("\n");
+#endif
+        if (fail || (check == 0))
+        {
+          log_e("appKey parse error");
+          file.close();
+          return;
+        }
+
+        // Every check passed, copy intermediate values as result
+        joinEUI = _joinEUI;
+        devEUI = _devEUI;
+        memcpy(nwkKey, _nwkKey, 16);
+        memcpy(appKey, _appKey, 16);
+      } // deserializeJson o.k.
+    }   // file read o.k.
+    file.close();
+  } // LittleFS o.k.
+}
+
+/*!
+ * \brief Compute sleep duration
+ *
+ * Minimum duration: SLEEP_INTERVAL_MIN
+ * If battery voltage is available and <= BATTERY_WEAK:
+ *   sleep_interval_long
+ * else
+ *   sleep_interval
+ *
+ * Additionally, the sleep interval is reduced from the
+ * default value to achieve a wake-up time alinged to
+ * an integer multiple of the interval after a full hour.
+ *
+ * \returns sleep duration in seconds
+ */
 uint32_t sleepDuration(void)
 {
   uint32_t sleep_interval = prefs.sleep_interval;
@@ -267,7 +457,13 @@ uint32_t sleepDuration(void)
 
 #if defined(ESP32)
 
-// put device in to lowest power deep-sleep mode
+/*!
+ * \brief Enter sleep mode (ESP32 variant)
+ *
+ *  ESP32 deep sleep mode
+ *
+ * \param seconds sleep duration in seconds
+ */
 void gotoSleep(uint32_t seconds)
 {
   esp_sleep_enable_timer_wakeup(seconds * 1000UL * 1000UL); // function uses uS
@@ -284,7 +480,11 @@ void gotoSleep(uint32_t seconds)
 }
 
 #else
-// put device in to lowest power deep-sleep mode
+/*!
+ * \brief Enter sleep mode (RP2040 variant)
+ *
+ * \param seconds sleep duration in seconds
+ */
 void gotoSleep(uint32_t seconds)
 {
   log_i("Sleeping for %lu s", seconds);
@@ -329,6 +529,15 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
+/*!
+ * \brief Decode downlink
+ *
+ * \param port      downlink message port
+ * \param payload   downlink message payload
+ * \param size      downlink message size in bytes
+ *
+ * \returns command ID, if downlink message requests a response, otherwise 0
+ */
 uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   log_v("Port: %d", port);
@@ -390,11 +599,16 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     log_d("Get config");
     return CMD_GET_LW_CONFIG;
   }
-  
+
   log_d("appLayer.decodeDownlink(port=%d, payload[0]=0x%02X, size=%d)", port, payload[0], size);
   return appLayer.decodeDownlink(port, payload, size);
 }
 
+/*!
+ * \brief Send configuration uplink
+ *
+ * \param uplinkRequest command ID of uplink request
+ */
 void sendCfgUplink(uint8_t uplinkReq)
 {
   log_d("--- Uplink Configuration/Status ---");
@@ -466,9 +680,9 @@ void setup()
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
-  Board.init(BATTERY_CAPACITY_MAH);           // Note: Battery capacity / type has to be set for voltage measurement
-  Board.enable3V3(true);  // Power supply for FeatherWing
-  Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
+  Board.init(BATTERY_CAPACITY_MAH); // Note: Battery capacity / type has to be set for voltage measurement
+  Board.enable3V3(true);            // Power supply for FeatherWing
+  Board.enableVSQT(true);           // Power supply for battery management chip (voltage measurement)
 #endif
 
   Serial.begin(115200);
@@ -503,13 +717,17 @@ void setup()
 #endif
   log_i("Boot count: %u", bootCount++);
 
-  if (bootCount == 1) {
+  if (bootCount == 1)
+  {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
   }
 
   // Set time zone
   setenv("TZ", TZ_INFO, 1);
   printDateTime();
+
+  // Try to load LoRaWAN secrets from LittleFS file, if available
+  loadSecrets(joinEUI, devEUI, nwkKey, appKey);
 
   // Initialize Application Layer
   appLayer.begin();
@@ -701,7 +919,8 @@ void setup()
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
 
-      if (downlinkDetails.port > 0) {
+      if (downlinkDetails.port > 0)
+      {
         uplinkReq = decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
       }
     }
