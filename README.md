@@ -36,6 +36,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 * [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
 * [Remote Configuration via LoRaWAN Downlink](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#remote-configuration-via-lorawan-downlink)
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
+* Loading of LoRaWAN secrets from JSON file on LittleFS (optional)
 
 ## Project Status
 
@@ -87,6 +88,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Parameters](#parameters)
   * [Using Raw Data](#using-raw-data)
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
+* [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
 * [Legal](#legal)
@@ -469,6 +471,17 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
 2. Build payload as JSON string: {"epoch": 1692729897} 
 3. Send downlink via The Things Network Console
+
+## Loading LoRaWAN Network Service Credentials from File
+
+To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a JSON file. This allows to use the same source code and binary file for a fleet of devices.
+
+If a valid file `secrets.json` exists on LittleFS, the settings defined at compile time (in `secrets.h`) are overridden.
+
+Modify the example [data/secrets.json](data/secrets.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
+
+> [!WARNING]
+> Only very basic validation of the file `secrets.json` is implemented.
 
 ## Doxygen Generated Source Code Documentation
 
