@@ -474,8 +474,9 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 ## Loading LoRaWAN Network Service Credentials from File
 
-To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a file `secrets.json`.
-If the file exists on LittleFS and is valid, the settings defined at compile time (from `secrets.h`) are overridden.
+To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a JSON file. This allows to use the same source code and binary file for a fleet of devices.
+
+If a valid file `secrets.json` exists on LittleFS, the settings defined at compile time (in `secrets.h`) are overridden.
 
 Modify the example [data/secrets.json](data/secrets.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
 
