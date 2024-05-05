@@ -1,0 +1,6 @@
+<map id="AppLayer::getPayloadStage1" name="AppLayer::getPayloadStage1">
+<area shape="rect" id="node1" title="Prepare / get payload at startup." alt="" coords="5,56,213,83"/>
+<area shape="rect" id="node2" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="261,5,475,32"/>
+<area shape="rect" id="node3" href="$class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="291,56,445,83"/>
+<area shape="rect" id="node4" href="$class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="285,107,451,133"/>
+</map>
