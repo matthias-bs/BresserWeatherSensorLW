@@ -88,6 +88,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Parameters](#parameters)
   * [Using Raw Data](#using-raw-data)
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
+* [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
 * [Legal](#legal)
@@ -470,6 +471,16 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
 2. Build payload as JSON string: {"epoch": 1692729897} 
 3. Send downlink via The Things Network Console
+
+## Loading LoRaWAN Network Service Credentials from File
+
+To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a file `secrets.json`.
+If the file exists on LittleFS and is valid, the settings defined at compile time (from `secrets.h`) are overridden.
+
+Modify the example [data/secrets.json](data/secrets.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
+
+> [!WARNING]
+> Only very basic validation of the file `secrets.json` is implemented.
 
 ## Doxygen Generated Source Code Documentation
 
