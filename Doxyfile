@@ -843,6 +843,7 @@ FILE_PATTERNS          = *.c \
                          *.ipp \
                          *.i++ \
                          *.inl \
+                         *.ino \
                          *.idl \
                          *.ddl \
                          *.odl \
