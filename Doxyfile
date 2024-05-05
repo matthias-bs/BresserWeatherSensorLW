@@ -189,7 +189,7 @@ STRIP_FROM_INC_PATH    =
 SHORT_NAMES            = NO
 
 # If the JAVADOC_AUTOBRIEF tag is set to YES then doxygen will interpret the
-# first line (until the first dot) of a Javadoc-style comment as the brief
+# first line (until the first ) of a Javadoc-style comment as the brief
 # description. If set to NO, the Javadoc-style will behave just like regular Qt-
 # style comments (thus requiring an explicit @brief command for a brief
 # description.)
@@ -198,7 +198,7 @@ SHORT_NAMES            = NO
 JAVADOC_AUTOBRIEF      = NO
 
 # If the QT_AUTOBRIEF tag is set to YES then doxygen will interpret the first
-# line (until the first dot) of a Qt-style comment as the brief description. If
+# line (until the first ) of a Qt-style comment as the brief description. If
 # set to NO, the Qt-style will behave just like regular Qt-style comments (thus
 # requiring an explicit \brief command for a brief description.)
 # The default value is: NO.
@@ -1968,7 +1968,7 @@ MAN_OUTPUT             = man
 
 # The MAN_EXTENSION tag determines the extension that is added to the generated
 # man pages. In case the manual section does not start with a number, the number
-# 3 is prepended. The dot (.) at the beginning of the MAN_EXTENSION tag is
+# 3 is prepended. The  (.) at the beginning of the MAN_EXTENSION tag is
 # optional.
 # The default value is: .3.
 # This tag requires that the tag GENERATE_MAN is set to YES.
@@ -2227,13 +2227,13 @@ EXTERNAL_GROUPS        = YES
 EXTERNAL_PAGES         = YES
 
 #---------------------------------------------------------------------------
-# Configuration options related to the dot tool
+# Configuration options related to the  tool
 #---------------------------------------------------------------------------
 
 # If the CLASS_DIAGRAMS tag is set to YES, doxygen will generate a class diagram
 # (in HTML and LaTeX) for classes with base or super classes. Setting the tag to
-# NO turns the diagrams off. Note that this option also works with HAVE_DOT
-# disabled, but it is recommended to install and use dot, since it yields more
+# NO turns the diagrams off. Note that this option also works with HAVE_
+# disabled, but it is recommended to install and use , since it yields more
 # powerful graphs.
 # The default value is: YES.
 
@@ -2376,7 +2376,7 @@ INCLUDED_BY_GRAPH      = YES
 # The default value is: NO.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-CALL_GRAPH             = NO
+CALL_GRAPH             = YES
 
 # If the CALLER_GRAPH tag is set to YES then doxygen will generate a caller
 # dependency graph for every global function or class method.
