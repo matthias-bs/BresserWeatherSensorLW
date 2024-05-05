@@ -274,7 +274,7 @@ void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *
 
     if (!file)
     {
-      log_i("File 'secrets.h' not found.");
+      log_i("File 'secrets.json' not found.");
     }
     else
     {
