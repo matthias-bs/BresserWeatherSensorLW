@@ -472,7 +472,7 @@ function decodeDownlink(input) {
                     max_sensors: uint8(input.bytes[0]),
                     rx_flags: uint8(input.bytes[1])
                 }
-            }
+            };
         case CMD_SET_BLE_ADDR:
             return {
                 data: {
