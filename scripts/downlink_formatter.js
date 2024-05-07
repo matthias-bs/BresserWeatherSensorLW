@@ -479,14 +479,14 @@ function decodeDownlink(input) {
                     ble_addr: mac48(input.bytes)
                 }
             };
-        case CMD_GET_LW_CONFIG:
+        case CMD_SET_LW_CONFIG:
             return {
                 data: {
                     sleep_interval: uint16BE(input.bytes.slice(1, 2)),
                     sleep_interval_long: uint16BE(input.bytes.slice(3, 4))
                 }
             };
-        case CMD_GET_BLE_CONFIG:
+        case CMD_SET_BLE_CONFIG:
             return {
                 data: {
                     ble_active: uint8(input.bytes[0]),
