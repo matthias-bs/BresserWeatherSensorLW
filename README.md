@@ -379,6 +379,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <rtc_source>          | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
 | <sensors_incX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
 | <sensors_excX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
+| <max_sensors>         | Max. number of Bresser sensors per receive cycle; 1...8                     |
+| <rx_flags>            | Flags for getData(); see [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) |
 | <ble_active>          | BLE active scan; 1 (active scan) / 0 (passive scan)                         |
 | <ble_scantime>        | BLE scan time in seconds; 0...255                                           |
 | <ble_addrX>           | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
@@ -413,6 +415,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
 | CMD_GET_SENSORS_EXC           | 0xC6 (198) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
 | CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
+| CMD_GET_SENSORS_CFG           | 0xCC (204) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0] |
+| CMD_SET_SENSORS_CFG           | 0xCD (205) | max_sensors[7:0]<br>rx_flags[7:0] | n.a. |
 | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
 | CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
