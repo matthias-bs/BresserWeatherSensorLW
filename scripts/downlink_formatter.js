@@ -96,6 +96,7 @@
 // 20240420 Updated for BresserWeatherSensorLW, 
 //          renamed from downlink_formatter.js
 // 20240427 Added BLE configuration
+// 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 //
 // ToDo:
 // -  
@@ -115,6 +116,8 @@ const CMD_GET_SENSORS_INC = 0xC4;
 const CMD_SET_SENSORS_INC = 0xC5;
 const CMD_GET_SENSORS_EXC = 0xC6;
 const CMD_SET_SENSORS_EXC = 0xC7;
+const CMD_GET_SENSORS_CFG = 0xCC;
+const CMD_SET_SENSORS_CFG = 0xCD;
 const CMD_GET_BLE_ADDR = 0xC8;
 const CMD_SET_BLE_ADDR = 0xC9;
 const CMD_GET_BLE_CONFIG = 0xCA;
@@ -239,6 +242,14 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
+        else if (input.data.cmd == "CMD_GET_SENSORS_CFG") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_SENSORS_CFG,
+                warnings: [],
+                errors: []
+            };
+        }
         else if (input.data.cmd == "CMD_GET_BLE_ADDR") {
             return {
                 bytes: [0],
@@ -356,6 +367,13 @@ function encodeDownlink(input) {
             warnings: [],
             errors: []
         };
+    } else if (input.data.hasOwnProperty('max_sensors') && input.data.hasOwnProperty('rx_flags')) {
+        return {
+            bytes: [input.data.max_sensors, input.data.rx_flags],
+            fPort: CMD_SET_SENSORS_CFG,
+            warnings: [],
+            errors: []
+        };
     } else if (input.data.hasOwnProperty('ble_addr')) {
         output = [];
         k = 0;
@@ -398,6 +416,7 @@ function decodeDownlink(input) {
         case CMD_GET_WS_TIMEOUT:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
+        case CMD_GET_SENSORS_CFG:
         case CMD_GET_BLE_ADDR:
         case CMD_GET_BLE_CONFIG:
             return {
@@ -447,6 +466,13 @@ function decodeDownlink(input) {
                     sensors_exc: id32(input.bytes)
                 }
             };
+        case CMD_SET_SENSORS_CFG:
+            return {
+                data: {
+                    max_sensors: uint8(input.bytes[0]),
+                    rx_flags: uint8(input.bytes[1])
+                }
+            }
         case CMD_SET_BLE_ADDR:
             return {
                 data: {
