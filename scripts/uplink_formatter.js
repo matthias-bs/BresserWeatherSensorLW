@@ -97,6 +97,7 @@
 // 20240420 Updated for BresserWeatherSensorLW, 
 //          renamed from ttn_uplink_formatter.js
 // 20240427 Added BLE configuration
+// 20240507 Added CMD_GET_SENSORS_CFG
 //
 // ToDo:
 // -  
@@ -111,6 +112,7 @@ function decoder(bytes, port) {
     const CMD_GET_WS_TIMEOUT = 0xC0;
     const CMD_GET_SENSORS_INC = 0xC4;
     const CMD_GET_SENSORS_EXC = 0xC6;
+    const CMD_GET_SENSORS_CFG = 0xCC;
     const CMD_GET_BLE_ADDR = 0xC8;
     const CMD_GET_BLE_CONFIG = 0xCA;
 
@@ -453,6 +455,14 @@ function decoder(bytes, port) {
             [id32
             ],
             ['sensors_exc'
+            ]
+        );
+    } else if (port === CMD_GET_SENSORS_CFG) {
+        return decode(
+            bytes,
+            [uint8, uint8
+            ],
+            ['max_sensors', 'rx_flags'
             ]
         );
     } else if (port === CMD_GET_BLE_ADDR) {
