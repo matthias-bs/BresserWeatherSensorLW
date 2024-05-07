@@ -654,10 +654,10 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
     else if (cmd == CMD_GET_SENSORS_CFG)
     {
         uint8_t maxSensors;
-        uint8_t rxStrategy;
-        weatherSensor.getSensorsCfg(maxSensors, rxStrategy);
+        uint8_t rxFlags;
+        weatherSensor.getSensorsCfg(maxSensors, rxFlags);
         encoder.writeUint8(maxSensors);
-        encoder.writeUint8(rxStrategy);
+        encoder.writeUint8(rxFlags);
         port = CMD_GET_SENSORS_CFG;
     }
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
