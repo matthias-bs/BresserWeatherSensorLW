@@ -380,7 +380,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <sensors_incX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
 | <sensors_excX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
 | <max_sensors>         | Max. number of Bresser sensors per receive cycle; 1...8                     |
-| <rx_flags>            | Flags for getData(); see [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) |
+| <rx_flags>            | Flags for getData(); see [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/627d0c68ee9304acb9ecfb5f226e4d7be99467cb/src/WeatherSensor.h#L130) |
+| <en_decoders>         | Enabled sensor data decoders; see [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/627d0c68ee9304acb9ecfb5f226e4d7be99467cb/src/WeatherSensor.h#L135)
 | <ble_active>          | BLE active scan; 1 (active scan) / 0 (passive scan)                         |
 | <ble_scantime>        | BLE scan time in seconds; 0...255                                           |
 | <ble_addrX>           | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
@@ -415,8 +416,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
 | CMD_GET_SENSORS_EXC           | 0xC6 (198) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
 | CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
-| CMD_GET_SENSORS_CFG           | 0xCC (204) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0] |
-| CMD_SET_SENSORS_CFG           | 0xCD (205) | max_sensors[7:0]<br>rx_flags[7:0] | n.a. |
+| CMD_GET_SENSORS_CFG           | 0xCC (204) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0> |
+| CMD_SET_SENSORS_CFG           | 0xCD (205) | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0>                     | n.a.             |
 | CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
 | CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
@@ -456,8 +457,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SENSORS_INC           | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}                    | n.a.                         |
 | CMD_GET_SENSORS_EXC           | {"cmd": "CMD_GET_SENSORS_EXC"}                                            | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]} |
 | CMD_SET_SENSORS_EXC           | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}                    | n.a.                         |
-| CMD_GET_SENSORS_CFG           | {"cmd": "CMD_GET_SENSORS_CFG"}                                            | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "enabled_decoders": <enabled_decoders>} |
-| CMD_SET_SENSORS_CFG           | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "enabled_decoders": <en_decoders>} | n.a.                         |
+| CMD_GET_SENSORS_CFG           | {"cmd": "CMD_GET_SENSORS_CFG"}                                            | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>} |
+| CMD_SET_SENSORS_CFG           | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>} | n.a.                         |
 | CMD_GET_BLE_ADDR              | {"cmd": "CMD_GET_BLE_ADDR"}                                               | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]} |
 | CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
 | CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
