@@ -44,6 +44,8 @@
 //
 // CMD_GET_SENSORS_EXC {"sensors_exc"}: [<sensors_exc0>, ...]}
 //
+// CMD_GET_SENSORS_CFG {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>}
+//
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
 // CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
@@ -56,6 +58,9 @@
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
+// <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
+// <rx_flags>           : Flags for getData(); see BresserWeatherSensorReceiver
+// <en_decoders>        : Enabled decoders; see BresserWeatherSensorReceiver
 // <ble_active>         : BLE scan mode - 0: passive / 1: active
 // <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
@@ -98,6 +103,7 @@
 // 20240427 Added BLE configuration
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240508 Fixed decoding of raw data
+//          Added en_decoders to CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 //
 // ToDo:
 // -  
@@ -368,9 +374,11 @@ function encodeDownlink(input) {
             warnings: [],
             errors: []
         };
-    } else if (input.data.hasOwnProperty('max_sensors') && input.data.hasOwnProperty('rx_flags')) {
+    } else if (input.data.hasOwnProperty('max_sensors') && 
+               input.data.hasOwnProperty('rx_flags') &&
+               input.data.hasOwnProperty('en_decoders')) {
         return {
-            bytes: [input.data.max_sensors, input.data.rx_flags],
+            bytes: [input.data.max_sensors, input.data.rx_flags, input.data.en_decoders],
             fPort: CMD_SET_SENSORS_CFG,
             warnings: [],
             errors: []
@@ -471,7 +479,8 @@ function decodeDownlink(input) {
             return {
                 data: {
                     max_sensors: uint8(input.bytes.slice(0, 1)),
-                    rx_flags: uint8(input.bytes.slice(1, 2))
+                    rx_flags: uint8(input.bytes.slice(1, 2)),
+                    en_decoders: uint8(input.bytes.slice(2, 3))
                 }
             };
         case CMD_SET_BLE_ADDR:

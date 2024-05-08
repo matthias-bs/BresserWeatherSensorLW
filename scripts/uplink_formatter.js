@@ -46,6 +46,8 @@
 //
 // CMD_GET_SENSORS_EXC {"sensors_exc"}: [<sensors_exc0>, ...]}
 //
+// CMD_GET_SENSORS_CFG {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>}
+//
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
 // CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
@@ -58,6 +60,9 @@
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
+// <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
+// <rx_flags>           : Flags for getData(); see BresserWeatherSensorReceiver
+// <en_decoders>        : Enabled decoders; see BresserWeatherSensorReceiver
 // <ble_active>         : BLE scan mode - 0: passive / 1: active
 // <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
@@ -98,6 +103,7 @@
 //          renamed from ttn_uplink_formatter.js
 // 20240427 Added BLE configuration
 // 20240507 Added CMD_GET_SENSORS_CFG
+// 20240608 Added en_decoders to CMD_GET_SENSORS_CFG
 //
 // ToDo:
 // -  
@@ -460,9 +466,9 @@ function decoder(bytes, port) {
     } else if (port === CMD_GET_SENSORS_CFG) {
         return decode(
             bytes,
-            [uint8, uint8
+            [uint8, uint8, uint8
             ],
-            ['max_sensors', 'rx_flags'
+            ['max_sensors', 'rx_flags', 'en_decoders'
             ]
         );
     } else if (port === CMD_GET_BLE_ADDR) {
