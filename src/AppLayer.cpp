@@ -48,6 +48,7 @@
 //          Implemented resetting of knownBLEAddresses to defaults
 // 20240426 Added BLE address initialization after updating via downlink
 // 20240427 Added BLE configuration/status via LoRaWAN
+// 20240507 Added configuration of max_sensors/rx_flags via LoRaWAN
 //
 //
 // ToDo:
@@ -126,6 +127,20 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
                       payload[i + 3]);
         }
         weatherSensor.setSensorsExc(payload, size);
+        return 0;
+    }
+
+    if ((port == CMD_GET_SENSORS_CFG) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors configuration");
+        return CMD_GET_SENSORS_CFG;
+    }
+
+    if ((port == CMD_SET_SENSORS_CFG) && (size == 2))
+    {
+        log_d("Set sensors configuration - max_sensors: %u, rx_flags: %u",
+              payload[0], payload[1]);
+        weatherSensor.setSensorsCfg(payload[0], payload[1]);
         return 0;
     }
 
@@ -635,6 +650,15 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
             encoder.writeUint8(payload[i]);
         }
         port = CMD_GET_SENSORS_EXC;
+    }
+    else if (cmd == CMD_GET_SENSORS_CFG)
+    {
+        uint8_t maxSensors;
+        uint8_t rxFlags;
+        weatherSensor.getSensorsCfg(maxSensors, rxFlags);
+        encoder.writeUint8(maxSensors);
+        encoder.writeUint8(rxFlags);
+        port = CMD_GET_SENSORS_CFG;
     }
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)
