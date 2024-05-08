@@ -36,6 +36,7 @@
 //
 // 20240504 Extracted from BresserWeatherSensorLWCfg.h
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
+// 20240508 Updated description of CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 //
 // ToDo:
 // -
@@ -232,7 +233,8 @@
 
 // Uplink (response): 
 // byte0: max_sensors
-// byte1: rx_strategy
+// byte1: rx_flags
+// byte2: en_decoders
 
 // CMD_SET_SENSORS_CFG
 // --------------------
@@ -241,7 +243,8 @@
 
 // Downlink (command):
 // byte0: max_sensors
-// byte1: rx_strategy
+// byte1: rx_flags
+// byte2: en_decoders
 
 // Uplink: n.a.
 
