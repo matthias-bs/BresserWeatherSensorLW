@@ -97,6 +97,7 @@
 //          renamed from downlink_formatter.js
 // 20240427 Added BLE configuration
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
+// 20240508 Fixed decoding of raw data
 //
 // ToDo:
 // -  
@@ -469,8 +470,8 @@ function decodeDownlink(input) {
         case CMD_SET_SENSORS_CFG:
             return {
                 data: {
-                    max_sensors: uint8(input.bytes[0]),
-                    rx_flags: uint8(input.bytes[1])
+                    max_sensors: uint8(input.bytes.slice(0, 1)),
+                    rx_flags: uint8(input.bytes.slice(1, 2))
                 }
             };
         case CMD_SET_BLE_ADDR:
@@ -482,15 +483,15 @@ function decodeDownlink(input) {
         case CMD_SET_LW_CONFIG:
             return {
                 data: {
-                    sleep_interval: uint16BE(input.bytes.slice(1, 2)),
-                    sleep_interval_long: uint16BE(input.bytes.slice(3, 4))
+                    sleep_interval: uint16BE(input.bytes.slice(0, 2)),
+                    sleep_interval_long: uint16BE(input.bytes.slice(2, 4))
                 }
             };
         case CMD_SET_BLE_CONFIG:
             return {
                 data: {
-                    ble_active: uint8(input.bytes[0]),
-                    ble_timeout: uint8(input.bytes[1])
+                    ble_active: uint8(input.bytes.slice(0, 1)),
+                    ble_timeout: uint8(input.bytes.slice(1, 2))
                 }
             };
         default:
