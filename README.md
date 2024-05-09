@@ -24,7 +24,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 
 * Single 868 MHz Radio Transceiver for both Sensor Data Reception and LoRaWAN Connection
 * Compatible to LoRaWAN Specification 1.1.0 / RP001 Regional Parameters 1.1 revision A
-* Tested with [The Things Network](https://www.thethingsnetwork.org/)
+* Tested with [The Things Network](https://www.thethingsnetwork.org/) and [ChirpStack](https://www.chirpstack.io/)
 * Supports multiple 868 MHz Sensors (e.g. Weather Sensor and Soil Moisture Sensor or Indoor Thermometer/Hygrometer)
 * See [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) for supported sensors
 * Low Power Design (using ESP32 Deep Sleep Mode / RP2040 Sleep State)
