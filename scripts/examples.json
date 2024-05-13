@@ -3,17 +3,53 @@
         "type": "uplink",
         "description": "an example of an uplink frame",
         "input": {
-            "bytes": [1, 35, 69, 103, 137, 171, 205, 239],
-            "fPort": 15,
-            "recvTime": "2020-08-02T20:00:00.000+05:00"
+            "bytes": [0, 126, 7, 238, 42, 7, 0, 7, 0, 168, 7, 103, 102, 103, 68, 73, 16, 9, 185, 45, 6, 94, 33, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 0],
+            "fPort": 1,
+            "recvTime": "2024-05-13T22:13:00.000+02:00"
         },
         "output": {
             "data": {
                 // decoded form of the uplink payload
-                "temperature": 15,
-                "humidity": 70
+                "air_temp_c": "20.3",
+                "humidity": 42,
+                "indoor_humidity": 45,
+                "indoor_temp_c": "24.9",
+                "lightning_distance_km": 0,
+                "lightning_events": 0,
+                "lightning_time": 0,
+                "rain_day": "-1.0",
+                "rain_hr": "0.0",
+                "rain_mm": "925.6",
+                "rain_mon": "-1.0",
+                "rain_week": "-1.0",
+                "soil_moisture": 33,
+                "soil_temp_c": "16.3",
+                "status": {
+                    "ble_ok": true,
+                    "ls_batt_ok": true,
+                    "ls_dec_ok": true,
+                    "res0": false,
+                    "s1_batt_ok": true,
+                    "s1_dec_ok": true,
+                    "ws_batt_ok": false,
+                    "ws_dec_ok": true
+                },
+                "status_node": {
+                    "res0": false,
+                    "res1": false,
+                    "res2": false,
+                    "res3": false,
+                    "res4": false,
+                    "res5": false,
+                    "res6": false,
+                    "res7": false
+                },
+                "supply_v": 4169,
+                "wind_avg_meter_sec": "0.7",
+                "wind_direction_deg": "196.0",
+                "wind_gust_meter_sec": "0.7"
             },
-            "warnings": ["warning while converting temperature"]
+            "warnings": []
         }
     },
     {
@@ -48,28 +84,12 @@
         }
     },
     {
-        "type": "uplink",
-        "description": "an example of an uplink frame failed",
-        "input": {
-            "bytes": [1, 35, 69, 103, 137, 171, 205, 239],
-            "fPort": 15,
-            "recvTime": "2020-08-02T20:00:00.000+05:00"
-        },
-        "output": {
-            "errors": [
-                "error thrown while decoding temperature",
-                "error thrown while decoding humidity"
-            ],
-            "warnings": ["warning while converting temperature"]
-        }
-    },
-    {
         "type": "downlink-encode",
         "description": "an example of a downlink frame failed to encode",
         "input": {
             "data": {
                 // decoded form of the downlink payload
-                "cmd": "CMD_UNDEFINED",
+                "cmd": "CMD_UNDEFINED"
             }
         },
         "output": {
