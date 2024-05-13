@@ -410,7 +410,7 @@ function encodeDownlink(input) {
     else {
         return {
             bytes: [],
-            errors: ["unknown command"],
+            errors: ["Unknown command"],
             fPort: 1,
             warnings: []
         };
