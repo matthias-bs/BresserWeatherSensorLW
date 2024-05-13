@@ -22,7 +22,7 @@
         "input": {
             "data": {
                 // decoded form of the downlink payload
-                "sleep_interval": 360}
+                "sleep_interval": 360
             }
         },
         "output": {
