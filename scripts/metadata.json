@@ -17,5 +17,6 @@
     "type": "git",
     "url": "https://github.com/matthias-bs/BresserWeatherSensorLW"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "specVersion": "1.0.0"
 }
