@@ -7,6 +7,12 @@
     "email": "83612361+matthias-bs@users.noreply.github.co",
     "url": "https://github.com/matthias-bs"
   },
+  "codec": {
+    "encodeDownlink": true,
+    "decodeDownlink": true,
+    "examples": true,
+    "jsonSchemas": false
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/matthias-bs/BresserWeatherSensorLW"
