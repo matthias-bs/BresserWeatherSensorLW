@@ -22,31 +22,29 @@
         "input": {
             "data": {
                 // decoded form of the downlink payload
-                "setCounter": true,
-                "range": 7
+                "sleep_interval": 360}
             }
         },
         "output": {
-            "bytes": [254, 220, 186, 152, 118, 84, 50],
-            "fPort": 8,
-            "warnings": ["warning while converting temperature"]
+            "bytes": [1, 104],
+            "fPort": 168,
+            "warnings": []
         }
     },
     {
         "type": "downlink-decode",
         "description": "an example of a downlink frame to decode",
         "input": {
-            "bytes": [254, 220, 186, 152, 118, 84, 50],
-            "fPort": 8,
-            "recvTime": "2020-09-06T15:00:00.000+03:00"
+            "bytes": [1, 104],
+            "fPort": 168,
+            "recvTime": "2024-05-13T08:17:00.000+02:00"
         },
         "output": {
             "data": {
                 // decoded form of the downlink payload
-                "setCounter": true,
-                "range": 7
+                "sleep_interval": 360
             },
-            "warnings": ["warning while converting temperature"]
+            "warnings": []
         }
     },
     {
@@ -71,26 +69,25 @@
         "input": {
             "data": {
                 // decoded form of the downlink payload
-                "setCounter": true,
-                "range": 7
+                "cmd": "CMD_UNDEFINED",
             }
         },
         "output": {
-            "errors": ["error thrown while encoding configuration"],
-            "warnings": ["warning while converting temperature"]
+            "errors": ["Unknown command"],
+            "warnings": []
         }
     },
     {
         "type": "downlink-decode",
         "description": "an example of a downlink frame to decode",
         "input": {
-            "bytes": [254, 220, 186, 152, 118, 84, 50],
-            "fPort": 8,
-            "recvTime": "2020-09-06T15:00:00.000+03:00"
+            "bytes": [0],
+            "fPort": 32,
+            "recvTime": "2024-05-13T08:22:00.000+02:00"
         },
         "output": {
-            "errors": ["error thrown while decoding configuration"],
-            "warnings": ["warning while converting configuration"]
+            "errors": ["Unknown FPort"],
+            "warnings": []
         }
     }
 ]
