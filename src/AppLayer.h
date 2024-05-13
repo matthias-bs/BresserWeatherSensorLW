@@ -81,7 +81,7 @@
 /*!
  * \brief LoRaWAN node application layer
  *
- * Contails all device specific methods and attributes
+ * Contains all device specific methods and attributes
  */
 class AppLayer
 {
@@ -239,7 +239,7 @@ public:
     void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
 
     /*!
-     * \brief Get payload befor uplink
+     * \brief Get payload before uplink
      *
      * Use this if
      * - The radio transceiver is NOT used for sensor communication
