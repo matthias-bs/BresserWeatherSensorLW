@@ -13,6 +13,7 @@
     "examples": true,
     "jsonSchemas": false
   },
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/matthias-bs/BresserWeatherSensorLW"
