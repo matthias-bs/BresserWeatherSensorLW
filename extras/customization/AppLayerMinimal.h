@@ -76,6 +76,15 @@ public:
     };
 
     /*!
+     * \brief AppLayer initialization
+     *
+     * Use this if needed
+     */
+    void begin(void)
+    {
+    };
+
+    /*!
      * \brief Decode app layer specific downlink messages
      *
      * \param port downlink message port
