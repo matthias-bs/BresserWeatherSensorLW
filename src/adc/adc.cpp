@@ -84,6 +84,7 @@ uint16_t getBatteryVoltage(void)
     defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
   // Here come the good guys...
   return getVoltage();
+
 #elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
      // Enable ADC input switch, measure voltage and disable ADC input switch
     uint16_t voltage;
@@ -94,15 +95,13 @@ uint16_t getBatteryVoltage(void)
     voltage = getVoltage();
     pinMode(ADC_CTRL, INPUT);
     return voltage;
+
 #elif defined(ARDUINO_ARCH_RP2040)
   // Not implemented - no default VBAT input circuit (connect external divider to A0)
   return 0;
 
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
   // Not implemented - no default VBAT input circuit (connect external divider to A0)
-  return 0;
-
-#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
   return 0;
 
 #elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
