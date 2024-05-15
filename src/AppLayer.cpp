@@ -50,6 +50,7 @@
 // 20240427 Added BLE configuration/status via LoRaWAN
 // 20240507 Added configuration of max_sensors/rx_flags via LoRaWAN
 // 20240508 Added configuration of en_decoders via LoRaWAN
+// 20240515 Added getOneWireTemperature()
 //
 //
 // ToDo:
@@ -395,6 +396,8 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 #endif
 
 #ifdef ONEWIRE_EN
+    float water_temp_c = getOneWireTemperature();
+    
     // Debug output for auxiliary sensors/voltages
     if (water_temp_c != DEVICE_DISCONNECTED_C)
     {
