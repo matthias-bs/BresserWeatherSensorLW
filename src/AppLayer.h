@@ -38,6 +38,7 @@
 // 20240424 Fixed BLE address initialization from Preferences, added begin()
 // 20240426 Moved bleAddrInit() out of begin()
 // 20240504 Added BresserWeatherSensorLWCmd.h
+// 20240515 Added getOneWireTemperature()
 //
 // ToDo:
 // -
@@ -121,14 +122,6 @@ private:
     Lightning lightningProc;
 #endif
 
-#ifdef ONEWIRE_EN
-    // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-    OneWire oneWire(PIN_ONEWIRE_BUS); //!< OneWire bus
-
-    // Pass our oneWire reference to Dallas Temperature.
-    DallasTemperature temp_sensors(&oneWire); //!< Dallas temperature sensors connected to OneWire bus
-#endif
-
 #ifdef DISTANCESENSOR_EN
 #if defined(ESP32)
     /// Ultrasonic distance sensor
@@ -176,7 +169,7 @@ public:
      *
      * If available, addresses from Preferences are used, otherwise defaults from
      * BresserWeatherSensorLWCfg.h.
-     * 
+     *
      * BleSensors() requires Preferences, which uses the Flash FS,
      * which is not available before the sketches' begin() is called -
      * thus the following cannot be handled by the constructor!
@@ -191,11 +184,13 @@ public:
             // No addresses stored in Preferences, use default
             knownBLEAddresses = knownBLEAddressesDef;
             log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
-        } else {
+        }
+        else
+        {
             log_d("Using BLE addresses from Preferences:");
         }
         bleSensors = BleSensors(knownBLEAddresses);
-        
+
         for (const std::string &s : knownBLEAddresses)
         {
             (void)s;
@@ -204,6 +199,17 @@ public:
 #endif
     };
 
+#ifdef ONEWIRE_EN
+    /*!
+     * \brief Get temperature from Maxim OneWire Sensor
+     *
+     * \param index sensor index
+     *
+     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
+     */
+    float
+    getOneWireTemperature(uint8_t index = 0);
+#endif
 
     /*!
      * \brief Decode app layer specific downlink messages
