@@ -38,6 +38,7 @@
 // 20240424 Fixed BLE address initialization from Preferences, added begin()
 // 20240426 Moved bleAddrInit() out of begin()
 // 20240504 Added BresserWeatherSensorLWCmd.h
+// 20240515 Added getOneWireTemperature()
 //
 // ToDo:
 // -
@@ -204,6 +205,37 @@ public:
 #endif
     };
 
+#ifdef ONEWIRE_EN
+    /*!
+     * \brief Get temperature from Maxim OneWire Sensor
+     *
+     * \param index sensor index
+     *
+     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
+     */
+    float
+    getOneWireTemperature(uint8_t index = 0)
+    {
+        // Call sensors.requestTemperatures() to issue a global temperature
+        // request to all devices on the bus
+        temp_sensors.requestTemperatures();
+
+        // Get temperature by index
+        float tempC = temp_sensors.getTempCByIndex(index);
+
+        // Check if reading was successful
+        if (tempC != DEVICE_DISCONNECTED_C)
+        {
+            log_d("Temperature = %.2f°C", tempC);
+        }
+        else
+        {
+            log_d("Error: Could not read temperature data");
+        }
+
+        return tempC;
+    };
+#endif
 
     /*!
      * \brief Decode app layer specific downlink messages
