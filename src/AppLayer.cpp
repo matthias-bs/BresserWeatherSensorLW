@@ -50,6 +50,7 @@
 // 20240427 Added BLE configuration/status via LoRaWAN
 // 20240507 Added configuration of max_sensors/rx_flags via LoRaWAN
 // 20240508 Added configuration of en_decoders via LoRaWAN
+// 20240515 Added getOneWireTemperature()
 //
 //
 // ToDo:
@@ -58,6 +59,46 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "AppLayer.h"
+
+#ifdef ONEWIRE_EN
+    // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
+    static OneWire oneWire(PIN_ONEWIRE_BUS); //!< OneWire bus
+
+    // Pass our oneWire reference to Dallas Temperature.
+    static DallasTemperature owTempSensors(&oneWire); //!< Dallas temperature sensors connected to OneWire bus
+#endif
+
+#ifdef ONEWIRE_EN
+    /*!
+     * \brief Get temperature from Maxim OneWire Sensor
+     *
+     * \param index sensor index
+     *
+     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
+     */
+    float
+    AppLayer::getOneWireTemperature(uint8_t index)
+    {
+        // Call sensors.requestTemperatures() to issue a global temperature
+        // request to all devices on the bus
+        owTempSensors.requestTemperatures();
+
+        // Get temperature by index
+        float tempC = owTempSensors.getTempCByIndex(index);
+
+        // Check if reading was successful
+        if (tempC != DEVICE_DISCONNECTED_C)
+        {
+            log_d("Temperature = %.2f°C", tempC);
+        }
+        else
+        {
+            log_d("Error: Could not read temperature data");
+        }
+
+        return tempC;
+    };
+#endif
 
 uint8_t
 AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
@@ -395,6 +436,8 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 #endif
 
 #ifdef ONEWIRE_EN
+    float water_temp_c = getOneWireTemperature();
+    
     // Debug output for auxiliary sensors/voltages
     if (water_temp_c != DEVICE_DISCONNECTED_C)
     {
