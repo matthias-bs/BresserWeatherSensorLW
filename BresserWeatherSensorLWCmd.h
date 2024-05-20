@@ -308,5 +308,73 @@
 
 // Response: n.a.
 
+// CMD_GET_APP_PAYLOAD_CFG
+// -----------------------
+// Port: CMD_GET_APP_PAYLOAD_CFG
+#define CMD_GET_APP_PAYLOAD_CFG 0xCE
+
+// Downlink (command):
+// byte0: 0x00
+
+// Response: n.a.
+// Uplink (command):
+// byte00: type00[7:0]
+// byte01: type01[7:0]
+// byte02: type02[7:0]
+// byte03: type03[7:0]
+// byte04: type04[7:0]
+// byte05: type05[7:0]
+// byte06: type06[7:0]
+// byte07: type07[7:0]
+// byte08: type08[7:0]
+// byte09: type09[7:0]
+// byte10: type10[7:0]
+// byte11: type11[7:0]
+// byte12: type12[7:0]
+// byte13: type13[7:0]
+// byte14: type14[7:0]
+// byte15: type15[7:0]
+// byte16: onewire[15:8]
+// byte17: onewire[7:0]
+// byte18: analog[15:8]
+// byte19: analog[7:0]
+// byte20: digital[31:24]
+// byte21: digital[23:16]
+// byte22: digital[15:8]
+// byte23: digital[7:0]
+
+// CMD_SET_APP_PAYLOAD_CFG
+// Port: CMD_SET_APP_PAYLOAD_CFG
+#define CMD_SET_APP_PAYLOAD_CFG 0xCF
+
+// Uplink (command):
+// byte00: type00[7:0]
+// byte01: type01[7:0]
+// byte02: type02[7:0]
+// byte03: type03[7:0]
+// byte04: type04[7:0]
+// byte05: type05[7:0]
+// byte06: type06[7:0]
+// byte07: type07[7:0]
+// byte08: type08[7:0]
+// byte09: type09[7:0]
+// byte10: type10[7:0]
+// byte11: type11[7:0]
+// byte12: type12[7:0]
+// byte13: type13[7:0]
+// byte14: type14[7:0]
+// byte15: type15[7:0]
+// byte16: onewire[15:8]
+// byte17: onewire[7:0]
+// byte18: analog[15:8]
+// byte19: analog[7:0]
+// byte20: digital[31:24]
+// byte21: digital[23:16]
+// byte22: digital[15:8]
+// byte23: digital[7:0]
+
+// Response: n.a.
+
+
 // ===========================
 #endif
