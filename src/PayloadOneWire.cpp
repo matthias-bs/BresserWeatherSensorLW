@@ -75,9 +75,9 @@ float PayloadOneWire::getOneWireTemperature(uint8_t index)
 void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
 {
 
+    unsigned index = (APP_PAYLOAD_BYTES_ONEWIRE * 8) - 1;
     for (int i = APP_PAYLOAD_BYTES_ONEWIRE - 1; i >= 0; i--)
     {
-        unsigned index = (APP_PAYLOAD_BYTES_ONEWIRE * 2) - 1;
         for (int bit = 7; bit >= 0; bit--)
         {
             // Check if sensor with given index is enabled
@@ -95,9 +95,10 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 {
                     log_d("Error: Could not read temperature[%d] data", index);
                 }
-                index--;
+                
                 encoder.writeTemperature(tempC);
             }
+            index--;
         }
     }
 }
