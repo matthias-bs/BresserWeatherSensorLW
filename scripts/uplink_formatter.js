@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////
 // uplink_formatter.js
 // 
@@ -30,7 +29,7 @@
 // port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
 // port = CMD_GET_BLE_CONFIG, {"cmd": "CMD_GET_BLE_CONFIG"} / payload = 0x00
 // port = CMD_SET_BLE_CONFIG, {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
-
+// port = CMD_GET_APP_PAYLOAD_CFG, {"cmd": "CMD_GET_APP_PAYLOAD_CFG"} / payload = 0x00
 //
 // Responses:
 // -----------
@@ -52,6 +51,8 @@
 //
 // CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
 //
+// CMD_GET_APP_PAYLOAD_CFG {"bresser": [<type0>, <type1>, ..., <type15>], "onewire": <onewire>, "analog": <analog>, "digital": <digital>}
+//
 // <ws_timeout>         : 0...255
 // <sleep_interval>     : 0...65535
 // <sleep_interval>     : 0...65535
@@ -66,6 +67,11 @@
 // <ble_active>         : BLE scan mode - 0: passive / 1: active
 // <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
+// <typeN>              : Bitmap for enabling Bresser sensors of type N; each bit position corresponds to a channel, e.g. bit 0 controls ch0; 
+//                        unused bits can be used to select features
+// <onewire>            : Bitmap for enabling 1-Wire sensors; each bit position corresponds to an index
+// <analog>             : Bitmap for enabling analog input channels; each bit positions corresponds to a channel
+// <digital>            : Bitmap for enabling digital input channels in a broad sense &mdash; GPIO, SPI, I2C, UART, ...
 
 // Based on:
 // ---------
@@ -103,7 +109,8 @@
 //          renamed from ttn_uplink_formatter.js
 // 20240427 Added BLE configuration
 // 20240507 Added CMD_GET_SENSORS_CFG
-// 20240608 Added en_decoders to CMD_GET_SENSORS_CFG
+// 20240508 Added en_decoders to CMD_GET_SENSORS_CFG
+// 20240517 Added CMD_GET_APP_PAYLOAD_CFG
 //
 // ToDo:
 // -  
@@ -121,6 +128,7 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_CFG = 0xCC;
     const CMD_GET_BLE_ADDR = 0xC8;
     const CMD_GET_BLE_CONFIG = 0xCA;
+    const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
 
     const ONEWIRE_EN = 0;
 
@@ -229,6 +237,30 @@ function decoder(bytes, port) {
         return res;
     }
     mac48.BYTES = bytes.length;
+
+    var bresser_bitmaps = function (bytes) {
+        var res = [];
+        res[0] = "0x" + byte2hex(bytes[0]);
+        for (var i = 1; i < 16; i++) {
+            res[i] = "0x" + byte2hex(bytes[i]);
+        }
+        return res;
+    }
+    bresser_bitmaps.BYTES = 16;
+
+    var hex16 = function (bytes) {
+        var res;
+        res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
+        return res;
+    }
+    hex16.BYTES = 2;
+
+    var hex32 = function (bytes) {
+        var res;
+        res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
+        return res;
+    }
+    hex32.BYTES = 4;
 
     var id32 = function (bytes) {
         var res = [];
@@ -485,6 +517,17 @@ function decoder(bytes, port) {
             [uint8, uint8
             ],
             ['ble_active', 'ble_scantime']
+        );
+    }  else if (port === CMD_GET_APP_PAYLOAD_CFG) {
+        return decode(
+            bytes,
+            [bresser_bitmaps, hex16, hex16, hex32 
+            ],
+            ['bresser', 'onewire', 'analog', 'digital']
+            //[uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint16, uint16, uint32
+            //],
+            //['type0', 'type1', 'type2', 'type3', 'type4', 'type5', 'type6', 'type7', 'type8', 'type9', 'type10', 'type11', 'type12', 'type13', 'type14',
+            // 'type15', 'onewire', 'analog', 'digital']
         );
     }
 
