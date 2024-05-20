@@ -386,6 +386,10 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <ble_active>          | BLE active scan; 1 (active scan) / 0 (passive scan)                         |
 | <ble_scantime>        | BLE scan time in seconds; 0...255                                           |
 | <ble_addrX>           | BLE sensor MAC addresses; e.g. "DE:AD:BE:EF:12:23"                          |
+| \<typeN\>             | Bitmap for enabling Bresser sensors of type \<N\>; each bit position corresponds to a channel,<br>e.g. bit 0 controls channel 0; unused bits can be used to select features |
+| \<onewire\>           | Bitmap for enabling 1-Wire sensors; each bit position corresponds to an index |
+| \<analog\>            | Bitmap for enabling analog input channels; each bit position corresponds to a channel |
+| \<digital\>           | Bitmap for enabling digital input channels in a broader sense &mdash; GPIO, SPI, I2C, UART, ... |
 
 > [!WARNING]
 > Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
@@ -423,6 +427,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
 | CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
 | CMD_SET_BLE_CONFIG            | 0xCB (203) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
+| CMD_GET_APP_PAYLOAD_CFG       | 0xCE (206) | 0x00                                                                      | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] |
+| CMD_SET_APP_PAYLOAD_CFG       | 0xCF (207) | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] | n.a. |
 
 #### The Things Network Examples
 
@@ -448,7 +454,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | ----------------------------- | ------------------------------------------------------------------------- | ---------------------------- |
 | CMD_GET_DATETIME              | {"cmd": "CMD_GET_DATETIME"}                                               | {"epoch": \<epoch\>}         |
 | CMD_SET_DATETIME              | {"epoch": \<epoch\>}                                                      | n.a.                         |
-| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>"}                                     | n.a.                         |
+| CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>}                                      | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
 | CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
@@ -464,6 +470,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
 | CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
 | CMD_SET_BLE_CONFIG            | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}              | n.a.                         |
+| CMD_GET_APP_PAYLOAD_CFG       | {"cmd": "CMD_GET_APP_PAYLOAD_CFG"}                                        | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} |
+| CMD_SET_APP_PAYLOAD_CFG       | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} | n.a. |
 
 #### The Things Network Examples 
 
