@@ -46,6 +46,7 @@
 // 20240430 Modified battery voltage measurement
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH
 //          Moved LoRaWAN command interface to BresserWeatherSensorLWCmd.h
+// 20240520 Added definitions for AppLayer payload configuration
 //
 // Note:
 // Depending on board package file date, either
@@ -61,6 +62,7 @@
 #if !defined(_LWCFG_H)
 #define _LWCFG_H
 
+#include <stdint.h>
 
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"
@@ -129,7 +131,7 @@
 #define ADC_EN
 
 // Enable OneWire temperature measurement
-// #define ONEWIRE_EN
+#define ONEWIRE_EN
 
 // Enable BLE temperature/humidity measurement
 // Notes:
@@ -152,6 +154,7 @@
 // Enable Ultrasonic Distance Sensor
 #if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 // #define DISTANCESENSOR_EN
+// #define DISTANCESENSOR_CH 8
 #endif
 
 
@@ -289,5 +292,105 @@ const uint8_t UBATT_SAMPLES = 10;
         "a4:c1:38:b8:1f:7f" \
     }
 #endif
+
+/// AppLayer payload configuration size in bytes
+#define APP_PAYLOAD_CFG_SIZE 24
+
+// Default AppLayer payload configuration
+// For each sensor/interface type, there is a set of flags.
+// If a flag is set, the "channel" is enabled (according to the flags bit position).
+
+// -- 868 MHz Sensor Types --
+// 0 - Weather Station; 1 Ch
+#define APP_PAYLOAD_CFG_TYPE00 0x00
+
+// 1 - Weather Station; 1 Ch
+//   - Professional Wind Gauge (with T and H); 1 Ch
+// Flags:
+// 0x10 -> Rain Gauge
+// 0x20 -> Light Intensity
+// 0x40 -> UV Index
+// 0x80 -> Rain Statistics
+#define APP_PAYLOAD_CFG_TYPE01 0x01
+
+// 2 - Thermo-/Hygro-Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE02 0x02
+
+// 3 - Pool / Spa Thermometer; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE03 0x02
+
+// 4 - Soil Moisture Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE04 0x02
+
+// 5 - Water Leakage Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE05 0x02
+
+// 6 - reserved
+#define APP_PAYLOAD_CFG_TYPE06 0x00
+
+// 7 - reserved
+#define APP_PAYLOAD_CFG_TYPE07 0x00
+
+// 8 - Air Quality Sensor PM2.5/PM10; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE08 0x00
+
+// 9 - Lightning Sensor; 1 Ch
+//   - Professional Rain Gauge (with T); 1 Ch
+// Ch: 0
+// Flags:
+// 0x10 -> Ligning Sensor Raw Data
+// 0x20 -> Ligning Preprocessed Data
+// 0x80 -> Rain Gauge
+#define APP_PAYLOAD_CFG_TYPE09 0x31
+
+// 10 - CO2 Sensor; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE10 0x00
+
+// 11 - HCHO/VCO Sensor; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE11 0x00
+
+// 12 - reserved
+#define APP_PAYLOAD_CFG_TYPE12 0x00
+
+// 13 - reserved
+#define APP_PAYLOAD_CFG_TYPE13 0x00
+
+// 14 - reserved
+#define APP_PAYLOAD_CFG_TYPE14 0x00
+
+// 15 - reserved
+#define APP_PAYLOAD_CFG_TYPE15 0x00
+
+// -- 1-Wire Sensors --
+// Index: 0
+#define APP_PAYLOAD_CFG_ONEWIRE1 0x00 // onewire[15:8]
+#define APP_PAYLOAD_CFG_ONEWIRE0 0x01 // onewire[7:0]
+
+// -- Analog Inputs --
+// 0x01: Battery Voltage
+// 0x02: Supply Voltage
+#define APP_PAYLOAD_CFG_ANALOG1 0x01 // analog[15:8]
+#define APP_PAYLOAD_CFG_ANALOG0 0x00 // analog[7:0]
+
+// -- Digital Inputs --
+// Assign to any type of "channel",
+// e.g. GPIO, SPI, I2C, UART, ...
+#define APP_PAYLOAD_CFG_DIGITAL3 0x00 // digital[31:24]
+#define APP_PAYLOAD_CFG_DIGITAL2 0x00 // digital[23:16]
+#define APP_PAYLOAD_CFG_DIGITAL1 0x00 // digital[15:8]
+#define APP_PAYLOAD_CFG_DIGITAL0 0x00 // digital[7:0]
+
+#define APP_PAYLOAD_OFFS_ONEWIRE 16
+#define APP_PAYLOAD_BYTES_ONEWIRE 2
+
+#define APP_PAYLOAD_OFFS_ANALOG 18
+#define APP_PAYLOAD_BYTES_ANALOG 2
+
+#define APP_PAYLOAD_OFFS_DIGITAL 20
+#define APP_PAYLOAD_BYTES_DIGITAL 4
 
 #endif // _LWCFG_H
