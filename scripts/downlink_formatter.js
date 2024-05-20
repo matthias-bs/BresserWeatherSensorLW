@@ -25,6 +25,8 @@
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
 // port = CMD_GET_SENSORS_EXC, {"cmd": "CMD_GET_SENSORS_EXC"} / payload = 0x00
 // port = CMD_SET_SENSORS_EXC, {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}
+// port = CMD_GET_APP_PAYLOAD_CFG, {"cmd": "CMD_GET_APP_PAYLOAD_CFG"} / payload = 0x00
+// port = CMD_SET_APP_PAYLOAD_CFG, ["bresser": [<type0>, ... <type15>], "onewire": <onewire>, "analog": <analog>, "digital": <digital>]
 // port = CMD_GET_BLE_ADDR, {"cmd": "CMD_GET_BLE_ADDR"} / payload = 0x00
 // port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
 // port = CMD_GET_BLE_CONFIG, {"cmd": "CMD_GET_BLE_CONFIG"} / payload = 0x00
@@ -46,6 +48,8 @@
 //
 // CMD_GET_SENSORS_CFG {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>}
 //
+// CMD_GET_APP_PAYLOAD_CFG {"bresser": [<type0>, <type1>, ..., <type15>], "onewire": <onewire>, "analog": <analog>, "digital": <digital>}
+//
 // CMD_GET_BLE_ADDR {"ble_addr": [<ble_addr0>, ...]}
 //
 // CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
@@ -64,6 +68,11 @@
 // <ble_active>         : BLE scan mode - 0: passive / 1: active
 // <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
+// <typeN>              : Bitmap for enabling Bresser sensors of type N; each bit position corresponds to a channel, e.g. bit 0 controls ch0; 
+//                        unused bits can be used to select features
+// <onewire>            : Bitmap for enabling 1-Wire sensors; each bit position corresponds to an index
+// <analog>             : Bitmap for enabling analog input channels; each bit positions corresponds to a channel
+// <digital>            : Bitmap for enabling digital input channels in a broad sense &mdash; GPIO, SPI, I2C, UART, ...
 //
 //
 // Based on:
@@ -104,6 +113,7 @@
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240508 Fixed decoding of raw data
 //          Added en_decoders to CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
+// 20240519 Added CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 //
 // ToDo:
 // -  
@@ -125,6 +135,8 @@ const CMD_GET_SENSORS_EXC = 0xC6;
 const CMD_SET_SENSORS_EXC = 0xC7;
 const CMD_GET_SENSORS_CFG = 0xCC;
 const CMD_SET_SENSORS_CFG = 0xCD;
+const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
+const CMD_SET_APP_PAYLOAD_CFG = 0xCF;
 const CMD_GET_BLE_ADDR = 0xC8;
 const CMD_SET_BLE_ADDR = 0xC9;
 const CMD_GET_BLE_CONFIG = 0xCA;
@@ -257,6 +269,14 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
+        else if (input.data.cmd == "CMD_GET_APP_PAYLOAD_CFG") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_APP_PAYLOAD_CFG,
+                warnings: [],
+                errors: []
+            };
+        }
         else if (input.data.cmd == "CMD_GET_BLE_ADDR") {
             return {
                 bytes: [0],
@@ -380,6 +400,67 @@ function encodeDownlink(input) {
         return {
             bytes: [input.data.max_sensors, input.data.rx_flags, input.data.en_decoders],
             fPort: CMD_SET_SENSORS_CFG,
+            warnings: [],
+            errors: []
+        };
+    } else if (input.data.hasOwnProperty('bresser') &&
+               input.data.hasOwnProperty('onewire') &&
+               input.data.hasOwnProperty('analog') &&
+               input.data.hasOwnProperty('digital')) {
+        if (input.data.bresser.length != 16) {
+            return {
+                bytes: [],
+                warnings: [],
+                errors: ["<bresser>: expected 16 bytes, got " + input.data.bresser.length]
+            };
+        }
+        for (i = 0; i < input.data.bresser.length; i++) {
+            if (input.data.bresser[i].substr(0, 2) == "0x") {
+                value = parseInt(input.data.bresser[i].substr(2), 16);
+                output[i] = value;
+            } else {
+                return {
+                    bytes: [],
+                    warnings: [],
+                    errors: ["'bresser': Invalid hex value"]
+                };
+            }
+        }
+        if (input.data.onewire.substr(0, 2) == "0x") {
+            output[16] = parseInt(input.data.onewire.substr(2, 2), 16);
+            output[17] = parseInt(input.data.onewire.substr(4, 2), 16);
+        } else {
+            return {
+                bytes: [],
+                warnings: [],
+                errors: ["'onewire': Invalid hex value"]
+            };
+        }
+        if (input.data.analog.substr(0, 2) == "0x") {
+            output[18] = parseInt(input.data.analog.substr(2, 2), 16);
+            output[19] = parseInt(input.data.analog.substr(4, 2), 16);
+        } else {
+            return {
+                bytes: [],
+                warnings: [],
+                errors: ["'analog': Invalid hex value"]
+            };
+        }
+        if (input.data.digital.substr(0, 2) == "0x") {
+            output[20] = parseInt(input.data.digital.substr(2, 2), 16);
+            output[21] = parseInt(input.data.digital.substr(4, 2), 16);
+            output[22] = parseInt(input.data.digital.substr(6, 2), 16);
+            output[23] = parseInt(input.data.digital.substr(8, 2), 16);
+        } else {
+            return {
+                bytes: [],
+                warnings: [],
+                errors: ["'digital': Invalid hex value"]
+            };
+        }
+        return {
+            bytes: output,
+            fPort: CMD_SET_APP_PAYLOAD_CFG,
             warnings: [],
             errors: []
         };
