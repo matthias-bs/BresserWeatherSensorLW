@@ -56,6 +56,9 @@
 class PayloadOneWire
 {
 public:
+    /*!
+     * \brief Constructor
+     */
     PayloadOneWire(){};
 
     /*!
@@ -67,11 +70,12 @@ public:
      */
     float getOneWireTemperature(uint8_t index);
 
-    /!*
-      * \brief Encode 1-Wire temperature sensor values for LoRaWAN transmission
-      * 
-      * \param appPayloadCfg LoRaWAN payload configuration bitmaps
-      * \param encoder LoRaWAN payload encoder object
+    /*!
+     * \brief Encode 1-Wire temperature sensor values for LoRaWAN transmission
+     * 
+     * \param appPayloadCfg LoRaWAN payload configuration bitmaps
+     * \param encoder LoRaWAN payload encoder object
+     */
     void encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder);
 };
 #endif // ONEWIRE_EN
