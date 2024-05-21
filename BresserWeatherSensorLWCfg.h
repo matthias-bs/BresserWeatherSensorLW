@@ -47,6 +47,7 @@
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH
 //          Moved LoRaWAN command interface to BresserWeatherSensorLWCmd.h
 // 20240520 Added definitions for AppLayer payload configuration
+// 20240521 Added UBATT_CH/USUPPLY_CH
 //
 // Note:
 // Depending on board package file date, either
@@ -218,6 +219,9 @@
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 const float SUPPLY_DIV = 0.5;
 const uint8_t SUPPLY_SAMPLES = 10;
+
+// "Channel" in appPayloadCfg
+#define USUPPLY_CH 1 
 #endif
 
 #ifdef PIN_ADC1_IN
@@ -278,6 +282,9 @@ const float UBATT_DIV = 0.2041;
 const float UBATT_DIV = 0.5;
 #endif
 const uint8_t UBATT_SAMPLES = 10;
+
+// "Channel" appPayloadCfg
+#define UBATT_CH 1
 #endif
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
