@@ -64,9 +64,10 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     {
         for (int bit = 7; bit >= 0; bit--)
         {
-            if ((appPayloadCfg[APP_PAYLOAD_OFFS_ONEWIRE + i] >> bit) & 0x1)
+            if ((appPayloadCfg[APP_PAYLOAD_OFFS_DIGITAL + i] >> bit) & 0x1)
+            {
 #ifdef DISTANCESENSOR_EN
-                // Check if sensor with given index is enabled
+                // Check if channel is enabled
                 if (ch == DISTANCESENSOR_CH)
                 {
                     uint16_t distance_mm = readDistanceSensor();
@@ -81,6 +82,7 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                     encoder.writeUint16(distance_mm);
                 }
 #endif
+            }
             ch--;
         }
     }
