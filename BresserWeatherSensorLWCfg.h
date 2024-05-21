@@ -219,10 +219,10 @@
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 const float SUPPLY_DIV = 0.5;
 const uint8_t SUPPLY_SAMPLES = 10;
+#endif
 
 // "Channel" in appPayloadCfg
 #define USUPPLY_CH 1 
-#endif
 
 #ifdef PIN_ADC1_IN
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
