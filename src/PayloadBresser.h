@@ -32,6 +32,8 @@
 // History:
 //
 // 20240521 Created
+// 20240523 Added encodeWeatherSensor(),
+//          added defines for signalling invalid data
 //
 // ToDo:
 // -
@@ -53,6 +55,13 @@
 #endif
 
 #include <LoraMessage.h>
+
+// Encoding of invalid values
+#define INV_FLOAT 0xFFFFFFFF
+#define INV_UINT32 0xFFFFFFFF
+#define INV_UINT16 0xFFFF
+#define INV_UINT8 0xFF
+#define INV_TEMP 0x7FFF
 
 class PayloadBresser
 {
@@ -90,6 +99,7 @@ public:
     void encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder);
 
 private:
+    void encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder);
     void encodeThermoHygroSensor(int idx, LoraEncoder &encoder);
     void encodePoolThermometer(int idx, LoraEncoder &encoder);
     void encodeSoilSensor(int idx, LoraEncoder &encoder);

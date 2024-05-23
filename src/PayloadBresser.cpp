@@ -32,9 +32,13 @@
 // History:
 //
 // 20240521 Created
+// 20240523 Added encodeWeatherSensor(),
+//          added defines for signalling invalid data
 //
 // ToDo:
-// -
+// - Add handling of Weather Sensor flags
+// - Add handling of Professional Rain Gauge
+// - Add rain gauge statistics
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -46,31 +50,48 @@ void PayloadBresser::begin(void)
 
 void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
 {
-    for (int type = 0; type < 16; type++)
+    // Handle weather sensors first
+    // SENSOR_TYPE_WEATHER0 and WEATHER_TYPE_WEATHER1 are treated as one.
+    // Those sensors only have one channel (0).
+
+    uint8_t flags = appPayloadCfg[0] | appPayloadCfg[1];
+    if (flags & 1)
+    {
+        // Try to find SENSOR_TYPE_WEATHER1
+        int idx = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
+        if (idx < 0)
+        {
+            // Try to find SENSOR_TYPE_WEATHER0
+            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
+        }
+        encodeWeatherSensor(idx, flags, encoder);
+    }
+
+    for (int type = 2; type < 16; type++)
     {
         // Skip if bitmap is zero
         if (appPayloadCfg[type] == 0)
             continue;
 
 #ifdef LIGHTNINGSENSOR_EN
+        // Lightning sensor has fixed channel (0)
         if (type == SENSOR_TYPE_LIGHTNING)
         {
-            int idx = -1;
-            idx = weatherSensor.findType(type, 0);
+            int idx = weatherSensor.findType(type, 0);
 
             encodeLightningSensor(idx, appPayloadCfg[type], encoder);
             continue;
         }
 #endif
 
+        // Handle sensors with channel selection
         for (int bit = 7; bit >= 0; bit--)
         {
             // Check if channel is enabled
             if (!((appPayloadCfg[type] >> bit) & 0x1))
                 continue;
 
-            int idx = -1;
-            idx = weatherSensor.findType(type, bit);
+            int idx = weatherSensor.findType(type, bit);
 
             if (type == SENSOR_TYPE_THERMO_HYGRO)
             {
@@ -111,14 +132,114 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     }
 }
 
+void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder)
+{
+    //                    Weather Stations     Professional  3-in-1 Professional
+    //                 5-in-1  6-in-1  7-in-1   Rain Gauge       Wind Gauge
+    //
+    // Temperature       X       X       X         X                 X
+    // Humidity          X       X       X                           X
+    // Wind              X       X       X                           X
+    // Rain              X       X       X         X
+    // UV                        X       X
+    // Light Intensity                   X
+
+    if (idx == -1)
+    {
+        log_i("-- Weather Sensor Failure");
+        // Invalidate
+        encoder.writeUint16(INV_TEMP); // Temperature
+        encoder.writeUint8(INV_UINT8); // Humidity
+#ifdef ENCODE_AS_FLOAT
+        encoder.writeRawFloat(INV_FLOAT); // Wind gust
+        encoder.writeRawFloat(INV_FLOAT); // Wind avg
+        encoder.writeRawFloat(INV_FLOAT); // Wind dir
+#else
+        encoder.writeUint16(INV_UINT16); // Wind gust
+        encoder.writeUint16(INV_UINT16); // Wind avg
+        encoder.writeUint16(INV_UINT16); // Wind dir
+#endif
+        encoder.writeRawFloat(INV_FLOAT);  // Rain
+        encoder.writeRawFloat(INV_UINT32); // Light
+        encoder.writeUint8(INV_UINT8);     // UV
+    }
+    else
+    {
+        if (weatherSensor.sensor[idx].w.temp_ok)
+        {
+            log_i("Air Temperature:    %3.1f °C", weatherSensor.sensor[idx].w.temp_c);
+            encoder.writeTemperature(weatherSensor.sensor[idx].w.temp_c);
+        }
+        else
+        {
+            log_i("Air Temperature:     --.- °C");
+            encoder.writeUint16(INV_UINT16);
+        }
+        if (weatherSensor.sensor[idx].w.humidity_ok)
+        {
+            log_i("Humidity:            %2d   %%", weatherSensor.sensor[idx].w.humidity);
+        }
+        else
+        {
+            log_i("Humidity:            --   %%");
+            encoder.writeUint8(INV_UINT8);
+        }
+        if (weatherSensor.sensor[idx].w.rain_ok)
+        {
+            log_i("Rain Gauge:       %7.1f mm", weatherSensor.sensor[idx].w.rain_mm);
+            encoder.writeRawFloat(weatherSensor.sensor[idx].w.rain_mm);
+        }
+        else
+        {
+            log_i("Rain Gauge:       ---.- mm");
+            encoder.writeRawFloat(INV_FLOAT);
+        }
+        if (weatherSensor.sensor[idx].w.wind_ok)
+        {
+            log_i("Wind Speed (avg.):    %3.1f m/s", weatherSensor.sensor[idx].w.wind_avg_meter_sec_fp1 / 10.0);
+            log_i("Wind Speed (max.):    %3.1f m/s", weatherSensor.sensor[idx].w.wind_gust_meter_sec_fp1 / 10.0);
+            log_i("Wind Direction:     %4.1f °", weatherSensor.sensor[idx].w.wind_direction_deg_fp1 / 10.0);
+            encoder.writeUint16(weatherSensor.sensor[idx].w.wind_avg_meter_sec_fp1);
+            encoder.writeUint16(weatherSensor.sensor[idx].w.wind_gust_meter_sec_fp1);
+            encoder.writeUint16(weatherSensor.sensor[idx].w.wind_direction_deg_fp1);
+        }
+        else
+        {
+            log_i("Wind Speed (avg.):     --.- m/s");
+            log_i("Wind Speed (max.):     --.- m/s");
+            log_i("Wind Direction:     ---.- °");
+            encoder.writeUint16(INV_UINT16);
+            encoder.writeUint16(INV_UINT16);
+            encoder.writeUint16(INV_UINT16);
+        }
+        if (weatherSensor.sensor[idx].w.uv_ok)
+        {
+            log_i("UV Index:            %3.1f", weatherSensor.sensor[idx].w.uv);
+            encoder.writeUint8(static_cast<uint8_t>(weatherSensor.sensor[idx].w.uv * 10));
+        }
+        else {
+            log_i("UV Index:            --.-");
+            encoder.writeUint8(INV_UINT8);
+        }
+        if (weatherSensor.sensor[idx].w.light_ok) {
+            log_i("Light intensity:  %06f lx", weatherSensor.sensor[idx].w.light_lux);
+            encoder.writeUint32(static_cast<uint32_t>(weatherSensor.sensor[idx].w.light_lux));
+        }
+        else {
+            log_i("Light intensity:   ------ lx");
+            encoder.writeUint32(INV_UINT32);
+        }
+    }
+}
+
 void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
         log_i("-- Thermo/Hygro Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0x7FFF);
-        encoder.writeUint8(0xFF);
+        // Invalidate
+        encoder.writeUint16(INV_TEMP);
+        encoder.writeUint8(INV_UINT8);
     }
     else
     {
@@ -134,8 +255,8 @@ void PayloadBresser::encodePoolThermometer(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- Pool Thermometer Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0x7FFF);
+        // Invalidate
+        encoder.writeUint16(INV_TEMP);
     }
     else
     {
@@ -149,9 +270,9 @@ void PayloadBresser::encodeSoilSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- Soil Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0x7FFF);
-        encoder.writeUint8(0xFF);
+        // Invalidate
+        encoder.writeUint16(INV_TEMP);
+        encoder.writeUint8(INV_UINT8);
     }
     else
     {
@@ -167,8 +288,8 @@ void PayloadBresser::encodeLeakageSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- Leakage Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint8(0xFF);
+        // Invalidate
+        encoder.writeUint8(INV_UINT8);
     }
     else
     {
@@ -182,10 +303,10 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- Air Quality (PM) Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0xFFFF);
-        encoder.writeUint16(0xFFFF);
-        encoder.writeUint16(0xFFFF);
+        // Invalidate
+        encoder.writeUint16(INV_UINT16);
+        encoder.writeUint16(INV_UINT16);
+        encoder.writeUint16(INV_UINT16);
     }
     else
     {
@@ -193,7 +314,7 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
         if (weatherSensor.sensor[idx].pm.pm_1_0_init)
         {
             log_i("PM1.0: init");
-            encoder.writeUint16(0xFFFF);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -203,7 +324,7 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
         if (weatherSensor.sensor[idx].pm.pm_2_5_init)
         {
             log_i("PM2.5: init");
-            encoder.writeUint16(0xFFFF);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -213,7 +334,7 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
         if (weatherSensor.sensor[idx].pm.pm_10_init)
         {
             log_i("PM10: init");
-            encoder.writeUint16(0xFFFF);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -232,9 +353,9 @@ void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &
         if (idx == -1)
         {
             log_i("-- Lightning Sensor Failure");
-            // fill with suspicious dummy values
-            encoder.writeUint8(0xFF);
-            encoder.writeUint16(0xFFFF);
+            // Invalidate
+            encoder.writeUint8(INV_UINT8);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -265,9 +386,9 @@ void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &
         else
         {
             log_i("-- No Lightning Event Data Available");
-            encoder.writeUint32(0xFFFFFFFF);
-            encoder.writeUint16(0xFFFF);
-            encoder.writeUint8(0xFF);
+            encoder.writeUint32(INV_UINT32);
+            encoder.writeUint16(INV_UINT16);
+            encoder.writeUint8(INV_UINT8);
         }
     }
 }
@@ -278,8 +399,8 @@ void PayloadBresser::encodeCo2Sensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- CO2 Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0xFFFF);
+        // Invalidate
+        encoder.writeUint16(INV_UINT16);
     }
     else
     {
@@ -287,7 +408,7 @@ void PayloadBresser::encodeCo2Sensor(int idx, LoraEncoder &encoder)
         if (weatherSensor.sensor[idx].co2.co2_init)
         {
             log_i("CO2: init");
-            encoder.writeUint16(0xFFFF);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -302,16 +423,16 @@ void PayloadBresser::encodeHchoVocSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         log_i("-- Air Quality (HCHO/VOC) Sensor Failure");
-        // fill with suspicious dummy values
-        encoder.writeUint16(0xFFFF);
-        encoder.writeUint8(0xFF);
+        // Invalidate
+        encoder.writeUint16(INV_UINT16);
+        encoder.writeUint8(INV_UINT8);
     }
     else
     {
         if (weatherSensor.sensor[idx].voc.hcho_init)
         {
             log_i("HCHO: init");
-            encoder.writeUint16(0xFFFF);
+            encoder.writeUint16(INV_UINT16);
         }
         else
         {
@@ -322,7 +443,7 @@ void PayloadBresser::encodeHchoVocSensor(int idx, LoraEncoder &encoder)
         if (weatherSensor.sensor[idx].voc.voc_init)
         {
             log_i("VOC: init");
-            encoder.writeUint8(0xFF);
+            encoder.writeUint8(INV_UINT8);
         }
         else
         {
