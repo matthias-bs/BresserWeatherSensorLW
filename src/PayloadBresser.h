@@ -34,6 +34,8 @@
 // 20240521 Created
 // 20240523 Added encodeWeatherSensor(),
 //          added defines for signalling invalid data
+// 20240524 Moved rainGauge, appPrefs and time members from AppLayer
+//          into the class
 //
 // ToDo:
 // -
@@ -46,6 +48,8 @@
 #include "../BresserWeatherSensorLWCfg.h"
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
+#include <ESP32Time.h>
+#include <Preferences.h>
 
 #ifdef RAINDATA_EN
 #include "RainGauge.h"
@@ -69,7 +73,18 @@ public:
     /// Bresser Weather Sensor Receiver
     WeatherSensor weatherSensor;
 
+#ifdef RAINDATA_EN
+    /// Rain data statistics
+    RainGauge rainGauge;
+#endif
+
 private:
+    ESP32Time *_rtc;
+    time_t *_rtcLastClockSync;
+
+    /// Preferences (stored in flash memory)
+    Preferences appPrefs;
+
 #ifdef LIGHTNINGSENSOR_EN
     time_t lightn_ts;
     int lightn_events;
@@ -83,7 +98,11 @@ public:
     /*!
      * \brief Constructor
      */
-    PayloadBresser(){};
+    PayloadBresser(ESP32Time *rtc, time_t *clocksync)
+    {
+        _rtc = rtc;
+        _rtcLastClockSync = clocksync;
+    };
 
     /*!
      * \brief Bresser sensors startup code
