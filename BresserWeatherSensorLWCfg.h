@@ -49,6 +49,7 @@
 // 20240520 Added definitions for AppLayer payload configuration
 // 20240521 Added UBATT_CH/USUPPLY_CH
 // 20240524 Added sensor feature flags
+//          Moved PAYLOAD_SIZE from BresserWeatherSensorLW.ino
 //
 // Note:
 // Depending on board package file date, either
@@ -93,6 +94,10 @@
 // See https://github.com/matthias-bs/BresserWeatherSensorTTN/issues/55
 //#define ARDUINO_THINGPULSE_EPULSE_FEATHER
 #endif
+
+// Uplink message payload size
+// The maximum allowed for all data rates is 51 bytes.
+const uint8_t PAYLOAD_SIZE = 51;
 
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
