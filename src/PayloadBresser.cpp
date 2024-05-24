@@ -138,13 +138,20 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
 #endif
 
         // Handle sensors with channel selection
-        for (int bit = 7; bit >= 0; bit--)
+        for (uint8_t ch = 1; ch <= 7; ch++)
         {
             // Check if channel is enabled
-            if (!((appPayloadCfg[type] >> bit) & 0x1))
+            if (!((appPayloadCfg[type] >> ch) & 0x1))
                 continue;
 
-            int idx = weatherSensor.findType(type, bit);
+            if (!isSpaceLeft(encoder, type))
+                break;
+
+            log_i("%s Sensor Ch %u", sensorTypes[type], ch);
+            int idx = weatherSensor.findType(type, ch);
+            if (idx == -1) {
+                log_i("-- Failure");
+            }
 
             if (type == SENSOR_TYPE_THERMO_HYGRO)
             {
@@ -185,6 +192,7 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     }
 }
 
+// Payload size: 2...17 bytes (ENCODE_AS_FLOAT == false) / 2...23 bytes (ENCODE_AS_FLOAT == true)
 void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder)
 {
     //                    Weather Stations     Professional  3-in-1 Professional
@@ -346,7 +354,6 @@ void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Thermo/Hygro Sensor Failure");
         // Invalidate
         encoder.writeUint16(INV_TEMP);
         encoder.writeUint8(INV_UINT8);
@@ -364,7 +371,6 @@ void PayloadBresser::encodePoolThermometer(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Pool Thermometer Failure");
         // Invalidate
         encoder.writeUint16(INV_TEMP);
     }
@@ -379,7 +385,6 @@ void PayloadBresser::encodeSoilSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Soil Sensor Failure");
         // Invalidate
         encoder.writeUint16(INV_TEMP);
         encoder.writeUint8(INV_UINT8);
@@ -397,7 +402,6 @@ void PayloadBresser::encodeLeakageSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Leakage Sensor Failure");
         // Invalidate
         encoder.writeUint8(INV_UINT8);
     }
@@ -412,7 +416,6 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Air Quality (PM) Sensor Failure");
         // Invalidate
         encoder.writeUint16(INV_UINT16);
         encoder.writeUint16(INV_UINT16);
@@ -420,7 +423,6 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
     }
     else
     {
-        // Air Quality (Particular Matter) Sensor
         if (weatherSensor.sensor[idx].pm.pm_1_0_init)
         {
             log_i("PM1.0: init");
@@ -455,6 +457,7 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
 }
 
 #ifdef LIGHTNINGSENSOR_EN
+// Payload size: 3 bytes (raw) / 7 bytes (pre-processed) / 10 bytes (both)
 void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &encoder)
 {
     if (flags & (PAYLOAD_LIGHTNING_RAW | 1))
@@ -462,7 +465,6 @@ void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &
         // Raw sensor values
         if (idx == -1)
         {
-            log_i("-- Lightning Sensor Failure");
             // Invalidate
             encoder.writeUint8(INV_UINT8);
             encoder.writeUint16(INV_UINT16);
@@ -508,13 +510,11 @@ void PayloadBresser::encodeCo2Sensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- CO2 Sensor Failure");
         // Invalidate
         encoder.writeUint16(INV_UINT16);
     }
     else
     {
-        // CO2 Sensor
         if (weatherSensor.sensor[idx].co2.co2_init)
         {
             log_i("CO2: init");
@@ -532,7 +532,6 @@ void PayloadBresser::encodeHchoVocSensor(int idx, LoraEncoder &encoder)
 {
     if (idx == -1)
     {
-        log_i("-- Air Quality (HCHO/VOC) Sensor Failure");
         // Invalidate
         encoder.writeUint16(INV_UINT16);
         encoder.writeUint8(INV_UINT8);
