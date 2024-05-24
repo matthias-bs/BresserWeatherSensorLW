@@ -36,6 +36,7 @@
 //          added defines for signalling invalid data
 // 20240524 Moved rainGauge, appPrefs and time members from AppLayer
 //          into the class
+//          Added isSpaceLeft(), payloadSize[] & sensorTypes[]
 //
 // ToDo:
 // -
@@ -73,6 +74,43 @@ class PayloadBresser
 public:
     /// Bresser Weather Sensor Receiver
     WeatherSensor weatherSensor;
+
+    // Payload size in bytes
+    const uint8_t payloadSize[16] = {
+        0,
+        23, // SENSOR_TYPE_WEATHER1 (max.)
+        3, // SENSOR_TYPE_THERMO_HYGRO
+        2, // SENSOR_TYPE_POOL_THERMO
+        3, // SENSOR_TYPE_SOIL
+        1, // SENSOR_TYPE_LEAKAGE
+        0, // reserved
+        0, // reserved
+        6, // SENSOR_TYPE_AIR_PM
+        3, // SENSOR_TYPE_LIGHTNING (min.)
+        2, // SENSOR_TYPE_CO2
+        3, // SENSOR_TYPE_HCHO_VOC
+        0, // reserved
+        0, // reserved
+        0, // reserved
+        0 // reserved
+    };
+
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+    const char * sensorTypes[16] = {
+        "Weather",
+        "Weather",
+        "Thermo/Hygro",
+        "Pool Temperature",
+        "Soil",
+        "Leakage",
+        "",
+        "",
+        "Air Quality (PM)",
+        "Lightning",
+        "CO2",
+        "Air Quality (HCHO/VOC)"
+    };
+#endif
 
 #ifdef RAINDATA_EN
     /// Rain data statistics
@@ -130,5 +168,10 @@ private:
 #endif
     void encodeCo2Sensor(int idx, LoraEncoder &encoder);
     void encodeHchoVocSensor(int idx, LoraEncoder &encoder);
+
+    bool isSpaceLeft(LoraEncoder &encoder, uint8_t type)
+    {
+        return (encoder.getLength() + payloadSize[type] <= PAYLOAD_SIZE); 
+    };
 };
 #endif //_PAYLOAD_BRESSER
