@@ -34,11 +34,12 @@
 // 20240521 Created
 // 20240523 Added encodeWeatherSensor(),
 //          added defines for signalling invalid data
+// 20240524 Moved Weather Sensor and rain gauge/lightning post processing 
+//          from AppLayer into this class
 //
 // ToDo:
 // - Add handling of Weather Sensor flags
 // - Add handling of Professional Rain Gauge
-// - Add rain gauge statistics
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -46,6 +47,17 @@
 
 void PayloadBresser::begin(void)
 {
+    weatherSensor.begin();
+    weatherSensor.clearSlots();
+    appPrefs.begin("BWS-LW-APP", false);
+    uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
+    log_d("Preferences: weathersensor_timeout: %u s", ws_timeout);
+    appPrefs.end();
+
+    log_i("Waiting for Weather Sensor Data; timeout %u s", ws_timeout);
+    bool decode_ok = weatherSensor.getData(ws_timeout * 1000, DATA_ALL_SLOTS);
+    (void)decode_ok;
+    log_i("Receiving Weather Sensor Data %s", decode_ok ? "o.k." : "failed");
 }
 
 void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
@@ -59,11 +71,32 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     {
         // Try to find SENSOR_TYPE_WEATHER1
         int idx = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
-        if (idx < 0)
+        if (idx > 0) {
+            rainGauge.set_max(100000);
+        }
+        else
         {
             // Try to find SENSOR_TYPE_WEATHER0
             idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
+            rainGauge.set_max(1000);
         }
+
+#ifdef RAINDATA_EN
+        // Check if time is valid
+        if (*_rtcLastClockSync > 0)
+        {
+            // Get local date and time
+            struct tm timeinfo;
+            time_t tnow = _rtc->getLocalEpoch();
+            localtime_r(&tnow, &timeinfo);
+
+            // If weather sensor has be found and rain data is valid, update statistics
+            if ((idx > -1) && weatherSensor.sensor[idx].valid && weatherSensor.sensor[idx].w.rain_ok)
+            {
+                rainGauge.update(tnow, weatherSensor.sensor[idx].w.rain_mm, weatherSensor.sensor[idx].startup);
+            }
+        }
+#endif
         encodeWeatherSensor(idx, flags, encoder);
     }
 
@@ -78,6 +111,25 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         if (type == SENSOR_TYPE_LIGHTNING)
         {
             int idx = weatherSensor.findType(type, 0);
+#ifdef LIGHTNINGSENSOR_EN
+
+            // Check if time is valid
+            if (*_rtcLastClockSync > 0)
+            {
+                // Get local date and time
+                time_t tnow = _rtc->getLocalEpoch();
+
+                // If lightning sensor has be found and data is valid, run post-processing
+                if ((idx > -1) && weatherSensor.sensor[idx].valid)
+                {
+                    lightningProc.update(
+                        tnow,
+                        weatherSensor.sensor[idx].lgt.strike_count,
+                        weatherSensor.sensor[idx].lgt.distance_km,
+                        weatherSensor.sensor[idx].startup);
+                }
+            }
+#endif
 
             encodeLightningSensor(idx, appPayloadCfg[type], encoder);
             continue;
@@ -217,19 +269,44 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
             log_i("UV Index:            %3.1f", weatherSensor.sensor[idx].w.uv);
             encoder.writeUint8(static_cast<uint8_t>(weatherSensor.sensor[idx].w.uv * 10));
         }
-        else {
+        else
+        {
             log_i("UV Index:            --.-");
             encoder.writeUint8(INV_UINT8);
         }
-        if (weatherSensor.sensor[idx].w.light_ok) {
+        if (weatherSensor.sensor[idx].w.light_ok)
+        {
             log_i("Light intensity:  %06f lx", weatherSensor.sensor[idx].w.light_lux);
             encoder.writeUint32(static_cast<uint32_t>(weatherSensor.sensor[idx].w.light_lux));
         }
-        else {
+        else
+        {
             log_i("Light intensity:   ------ lx");
             encoder.writeUint32(INV_UINT32);
         }
     }
+    // Rain data statistics
+#ifdef RAINDATA_EN
+    if ((idx) && weatherSensor.sensor[idx].valid && weatherSensor.sensor[idx].w.rain_ok)
+    {
+        log_i("Rain past 60min:  %7.1f mm", rainGauge.pastHour());
+        log_i("Rain curr. day:   %7.1f mm", rainGauge.currentDay());
+        log_i("Rain curr. week:  %7.1f mm", rainGauge.currentWeek());
+        log_i("Rain curr. month: %7.1f mm", rainGauge.currentMonth());
+        encoder.writeRawFloat(rainGauge.pastHour());
+        encoder.writeRawFloat(rainGauge.currentDay());
+        encoder.writeRawFloat(rainGauge.currentWeek());
+        encoder.writeRawFloat(rainGauge.currentMonth());
+    }
+    else
+    {
+        log_i("Current rain gauge statistics not valid.");
+        encoder.writeRawFloat(INV_FLOAT);
+        encoder.writeRawFloat(INV_FLOAT);
+        encoder.writeRawFloat(INV_FLOAT);
+        encoder.writeRawFloat(INV_FLOAT);
+    }
+#endif
 }
 
 void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)
