@@ -32,6 +32,7 @@
 // History:
 //
 // 20240521 Created
+// 20240524 Added payload size check, changed bitmap order
 //
 // ToDo:
 // -
@@ -51,19 +52,19 @@ void PayloadAnalog::encodeAnalog(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     unsigned ch = (APP_PAYLOAD_BYTES_ANALOG * 8) - 1;
     for (int i = APP_PAYLOAD_BYTES_ANALOG - 1; i >= 0; i--)
     {
-        for (int bit = 7; bit >= 0; bit--)
+        for (uint8_t bit = 0; bit <= 7; bit++)
         {
             // Check if channel is enabled
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_ANALOG + i] >> bit) & 0x1) {
 
-                if (ch == UBATT_CH)
+                if ((ch == UBATT_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
                 {
                     uint16_t uBatt = getBatteryVoltage();
                     log_i("ch %02u: U_batt:   %04u mv", ch);
                     encoder.writeUint16(uBatt);
                 }
 
-                if (ch == USUPPLY_CH)
+                if ((ch == USUPPLY_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
                 {
                     uint16_t uSupply = getSupplyVoltage();
                     log_i("ch %02u: U_supply: %04u mv", ch);

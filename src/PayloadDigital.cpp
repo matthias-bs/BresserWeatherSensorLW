@@ -32,6 +32,7 @@
 // History:
 //
 // 20240520 Created
+// 20240524 Added payload size check, changed bitmap order
 //
 // ToDo:
 // -
@@ -62,13 +63,13 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     unsigned ch = (APP_PAYLOAD_BYTES_DIGITAL * 8) - 1;
     for (int i = APP_PAYLOAD_BYTES_DIGITAL - 1; i >= 0; i--)
     {
-        for (int bit = 7; bit >= 0; bit--)
+        for (uint8_t bit = 0; bit <= 7; bit++)
         {
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_DIGITAL + i] >> bit) & 0x1)
             {
 #ifdef DISTANCESENSOR_EN
                 // Check if channel is enabled
-                if (ch == DISTANCESENSOR_CH)
+                if ((ch == DISTANCESENSOR_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
                 {
                     uint16_t distance_mm = readDistanceSensor();
                     if (distance_mm > 0)

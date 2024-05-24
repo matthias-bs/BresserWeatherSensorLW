@@ -32,6 +32,7 @@
 // History:
 //
 // 20240520 Created
+// 20240524 Added payload size check, changed bitmap order
 //
 // ToDo:
 // -
@@ -78,10 +79,14 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     unsigned index = (APP_PAYLOAD_BYTES_ONEWIRE * 8) - 1;
     for (int i = APP_PAYLOAD_BYTES_ONEWIRE - 1; i >= 0; i--)
     {
-        for (int bit = 7; bit >= 0; bit--)
+        for (uint8_t ch = 0; ch <= 7; ch++)
         {
+            // Check if enough space is left in payload buffer
+            if (encoder.getLength() > PAYLOAD_SIZE - 2)
+                return;
+            
             // Check if sensor with given index is enabled
-            if ((appPayloadCfg[APP_PAYLOAD_OFFS_ONEWIRE + i] >> bit) & 0x1)
+            if ((appPayloadCfg[APP_PAYLOAD_OFFS_ONEWIRE + i] >> ch) & 0x1)
             {
                 // Get temperature by index
                 float tempC = owTempSensors.getTempCByIndex(index);
