@@ -48,6 +48,7 @@
 //          Moved LoRaWAN command interface to BresserWeatherSensorLWCmd.h
 // 20240520 Added definitions for AppLayer payload configuration
 // 20240521 Added UBATT_CH/USUPPLY_CH
+// 20240524 Added sensor feature flags
 //
 // Note:
 // Depending on board package file date, either
@@ -303,22 +304,45 @@ const uint8_t UBATT_SAMPLES = 10;
 /// AppLayer payload configuration size in bytes
 #define APP_PAYLOAD_CFG_SIZE 24
 
-// Default AppLayer payload configuration
+// --- Default AppLayer payload configuration ---
+
 // For each sensor/interface type, there is a set of flags.
 // If a flag is set, the "channel" is enabled (according to the flags bit position).
+// For sensors which use a fixed channel, the flags are used to select
+// which signals (features) shall be included in the payload.
+
+// -- Sensor feature flags --
+
+// Weather Sensor
+#define PAYLOAD_WS_HUMIDITY     0b00000010
+#define PAYLOAD_WS_WIND         0b00000100
+#define PAYLOAD_WS_RAINGAUGE    0b00001000
+#define PAYLOAD_WS_LIGHT        0b00010000
+#define PAYLOAD_WS_UV           0b00100000
+#define PAYLOAD_WS_RAIN_H       0b01000000 // Rain post-processing; hourly rainfall
+#define PAYLOAD_WS_RAIN_DWM     0b10000000 // Rain post-processing; daily, weekly, monthly
+
+// Lightning sensor
+#define PAYLOAD_LIGHTNING_RAW   0b00010000 // Sensor raw data
+#define PAYLOAD_LIGHTNING_PROC  0b00100000 // Post-processed lightning data
 
 // -- 868 MHz Sensor Types --
 // 0 - Weather Station; 1 Ch
+// Note: Included in APP_PAYLOAD_CFG_TYPE01
 #define APP_PAYLOAD_CFG_TYPE00 0x00
 
 // 1 - Weather Station; 1 Ch
 //   - Professional Wind Gauge (with T and H); 1 Ch
-// Flags:
-// 0x10 -> Rain Gauge
-// 0x20 -> Light Intensity
-// 0x40 -> UV Index
-// 0x80 -> Rain Statistics
-#define APP_PAYLOAD_CFG_TYPE01 0x01
+#define APP_PAYLOAD_CFG_TYPE01 ( \
+    1 /* enable sensor */ | \
+    PAYLOAD_WS_HUMIDITY | \
+    PAYLOAD_WS_WIND | \
+    PAYLOAD_WS_RAINGAUGE | \
+    PAYLOAD_WS_LIGHT | \
+    PAYLOAD_WS_UV | \
+    PAYLOAD_WS_RAIN_H | \
+    PAYLOAD_WS_RAIN_DWM \
+)
 
 // 2 - Thermo-/Hygro-Sensor; 7 Ch
 // Ch: 1
@@ -348,11 +372,11 @@ const uint8_t UBATT_SAMPLES = 10;
 // 9 - Lightning Sensor; 1 Ch
 //   - Professional Rain Gauge (with T); 1 Ch
 // Ch: 0
-// Flags:
-// 0x10 -> Ligning Sensor Raw Data
-// 0x20 -> Ligning Preprocessed Data
-// 0x80 -> Rain Gauge
-#define APP_PAYLOAD_CFG_TYPE09 0x31
+#define APP_PAYLOAD_CFG_TYPE09 ( \
+    1 /* enable sensor */ | \
+    PAYLOAD_LIGHTNING_PROC | \
+    PAYLOAD_LIGHTNING_RAW \
+)
 
 // 10 - CO2 Sensor; 4 Ch
 #define APP_PAYLOAD_CFG_TYPE10 0x00
