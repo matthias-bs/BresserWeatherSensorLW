@@ -51,54 +51,17 @@
 // 20240507 Added configuration of max_sensors/rx_flags via LoRaWAN
 // 20240508 Added configuration of en_decoders via LoRaWAN
 // 20240515 Added getOneWireTemperature()
-//
+// 20240520 Moved 1-Wire sensor code to PayloadOneWire.h/.cpp
+// 20240524 Added appPayloadCfgDef, setAppPayloadCfg() & getAppPayloadCfg()
+//          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
 //
 // ToDo:
-// -
+// - Move BLE code to separate class
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "AppLayer.h"
 
-#ifdef ONEWIRE_EN
-    // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-    static OneWire oneWire(PIN_ONEWIRE_BUS); //!< OneWire bus
-
-    // Pass our oneWire reference to Dallas Temperature.
-    static DallasTemperature owTempSensors(&oneWire); //!< Dallas temperature sensors connected to OneWire bus
-#endif
-
-#ifdef ONEWIRE_EN
-    /*!
-     * \brief Get temperature from Maxim OneWire Sensor
-     *
-     * \param index sensor index
-     *
-     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
-     */
-    float
-    AppLayer::getOneWireTemperature(uint8_t index)
-    {
-        // Call sensors.requestTemperatures() to issue a global temperature
-        // request to all devices on the bus
-        owTempSensors.requestTemperatures();
-
-        // Get temperature by index
-        float tempC = owTempSensors.getTempCByIndex(index);
-
-        // Check if reading was successful
-        if (tempC != DEVICE_DISCONNECTED_C)
-        {
-            log_d("Temperature = %.2f°C", tempC);
-        }
-        else
-        {
-            log_d("Error: Could not read temperature data");
-        }
-
-        return tempC;
-    };
-#endif
 
 uint8_t
 AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
@@ -226,6 +189,27 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
         return 0;
     }
+    
+    if ((port == CMD_GET_APP_PAYLOAD_CFG) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get AppLayer payload configuration");
+        return CMD_GET_APP_PAYLOAD_CFG;
+    }
+
+    if ((port == CMD_SET_SENSORS_CFG) && (size == 16))
+    {
+        log_d("Set AppLayer payload configuration");
+        for (size_t i=0; i < 16; i++) {
+            log_d("Type%02d: 0x%X", i, payload[i]);
+        }
+        log_d("1-Wire:  0x%04X", payload[9] << 8 | payload[8]);
+        log_d("Analog:  0x%04X", (payload[11] << 8) | payload[10]);
+        log_d("Digital: 0x%08X", (payload[15] << 24) | (payload[14] << 16) | (payload[13] << 8) | payload[12]);
+
+        setAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
+        return 0;
+    }
+
 #endif
     return 0;
 }
@@ -243,10 +227,6 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
     (void)port; // suppress warning regarding unused parameter
 
-#ifdef PIN_SUPPLY_IN
-    uint16_t supply_voltage = getVoltage(PIN_SUPPLY_IN, SUPPLY_SAMPLES, SUPPLY_DIV);
-#endif
-    uint16_t battery_voltage = getBatteryVoltage();
     bool mithermometer_valid = false;
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     float indoor_temp_c;
@@ -264,208 +244,36 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     // Get sensor data - run BLE scan for <bleScanTime>
     bleSensors.getData(ble_scantime, ble_active);
 #endif
-#ifdef LIGHTNINGSENSOR_EN
-    time_t lightn_ts;
-    int lightn_events;
-    uint8_t lightn_distance;
-#endif
 
-    weatherSensor.begin();
-    weatherSensor.clearSlots();
-    appPrefs.begin("BWS-LW-APP", false);
-    uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
-    log_d("Preferences: weathersensor_timeout: %u s", ws_timeout);
-    appPrefs.end();
-
-    log_i("Waiting for Weather Sensor Data; timeout %u s", ws_timeout);
-    bool decode_ok = weatherSensor.getData(ws_timeout * 1000, DATA_ALL_SLOTS);
-    (void)decode_ok;
-    log_i("Receiving Weather Sensor Data %s", decode_ok ? "o.k." : "failed");
 
     log_v("Port: %d", port);
 
-#ifdef RAINDATA_EN
-    // Check if time is valid
-    if (*_rtcLastClockSync > 0)
-    {
-        // Get local date and time
-        struct tm timeinfo;
-        time_t tnow = _rtc->getLocalEpoch();
-        localtime_r(&tnow, &timeinfo);
-
-        // Find weather sensor and determine rain gauge overflow limit
-        // Try to find SENSOR_TYPE_WEATHER0
-        int ws = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
-        if (ws > -1)
-        {
-            rainGauge.set_max(1000);
-        }
-        else
-        {
-            // Try to find SENSOR_TYPE_WEATHER1
-            ws = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
-            rainGauge.set_max(100000);
-        }
-
-        // If weather sensor has be found and rain data is valid, update statistics
-        if ((ws > -1) && weatherSensor.sensor[ws].valid && weatherSensor.sensor[ws].w.rain_ok)
-        {
-            rainGauge.update(tnow, weatherSensor.sensor[ws].w.rain_mm, weatherSensor.sensor[ws].startup);
-        }
-    }
-#endif
-
-#ifdef LIGHTNINGSENSOR_EN
-    // Check if time is valid
-    if (*_rtcLastClockSync > 0)
-    {
-        // Get local date and time
-        time_t tnow = _rtc->getLocalEpoch();
-
-        // Find lightning sensor
-        int ls = weatherSensor.findType(SENSOR_TYPE_LIGHTNING);
-
-        // If lightning sensor has be found and data is valid, run post-processing
-        if ((ls > -1) && weatherSensor.sensor[ls].valid)
-        {
-            lightningProc.update(tnow, weatherSensor.sensor[ls].lgt.strike_count, weatherSensor.sensor[ls].lgt.distance_km, weatherSensor.sensor[ls].startup);
-        }
-    }
-#endif
-    //
-    // Find Bresser sensor data in array
-    //
-
-    // Try to find SENSOR_TYPE_WEATHER0
-    int ws = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
-    if (ws < 0)
-    {
-        // Try to find SENSOR_TYPE_WEATHER1
-        ws = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
-    }
-
-    int s1 = -1;
-#ifdef SOILSENSOR_EN
-    // Try to find SENSOR_TYPE_SOIL
-    s1 = weatherSensor.findType(SENSOR_TYPE_SOIL, 1);
-#endif
-
-    int ls = -1;
-#ifdef LIGHTNINGSENSOR_EN
-    // Try to find SENSOR_TYPE_LIGHTNING
-    ls = weatherSensor.findType(SENSOR_TYPE_LIGHTNING);
-#endif
-
     log_i("--- Uplink Data ---");
 
-    // Debug output for weather sensor data
-    if (ws > -1)
-    {
-        if (weatherSensor.sensor[ws].w.temp_ok)
-        {
-            log_i("Air Temperature:    %3.1f °C", weatherSensor.sensor[ws].w.temp_c);
-        }
-        else
-        {
-            log_i("Air Temperature:     --.- °C");
-        }
-        if (weatherSensor.sensor[ws].w.humidity_ok)
-        {
-            log_i("Humidity:            %2d   %%", weatherSensor.sensor[ws].w.humidity);
-        }
-        else
-        {
-            log_i("Humidity:            --   %%");
-        }
-        if (weatherSensor.sensor[ws].w.rain_ok)
-        {
-            log_i("Rain Gauge:       %7.1f mm", weatherSensor.sensor[ws].w.rain_mm);
-        }
-        else
-        {
-            log_i("Rain Gauge:       ---.- mm");
-        }
-        log_i("Wind Speed (avg.):    %3.1f m/s", weatherSensor.sensor[ws].w.wind_avg_meter_sec_fp1 / 10.0);
-        log_i("Wind Speed (max.):    %3.1f m/s", weatherSensor.sensor[ws].w.wind_gust_meter_sec_fp1 / 10.0);
-        log_i("Wind Direction:     %4.1f °", weatherSensor.sensor[ws].w.wind_direction_deg_fp1 / 10.0);
-    }
-    else
-    {
-        log_i("-- Weather Sensor Failure");
-    }
+    // TODO: Handle battery status flags in PayloadBresser
+    // // Sensor status flags
+    // encoder.writeBitmap(0,
+    //                     mithermometer_valid,
+    //                     (ls > -1) ? weatherSensor.sensor[ls].valid : false,
+    //                     (ls > -1) ? weatherSensor.sensor[ls].battery_ok : false,
+    //                     (s1 > -1) ? weatherSensor.sensor[s1].valid : false,
+    //                     (s1 > -1) ? weatherSensor.sensor[s1].battery_ok : false,
+    //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
+    //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
 
-// Debug output for soil sensor data
-#ifdef SOILSENSOR_EN
-    if (s1 > -1)
-    {
-        log_i("Soil Temperature 1: %3.1f °C", weatherSensor.sensor[s1].soil.temp_c);
-        log_i("Soil Moisture 1:     %2d   %%", weatherSensor.sensor[s1].soil.moisture);
-    }
-    else
-    {
-        log_i("-- Soil Sensor 1 Failure");
-    }
-#endif
-
-// Debug output for lightning sensor data
-#ifdef LIGHTNINGSENSOR_EN
-    if (ls > -1)
-    {
-        log_i("Lightning counter: %4d", weatherSensor.sensor[ls].lgt.strike_count);
-        log_i("Lightning distance:  %2d   km", weatherSensor.sensor[ls].lgt.distance_km);
-    }
-    else
-    {
-        log_i("-- Lightning Sensor Failure");
-    }
-    if (lightningProc.lastEvent(lightn_ts, lightn_events, lightn_distance))
-    {
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        struct tm timeinfo;
-        char tbuf[25];
-
-        localtime_r(&lightn_ts, &timeinfo);
-        strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-#endif
-        log_i("Last lightning event @%s: %d events, %d km", tbuf, lightn_events, lightn_distance);
-    }
-    else
-    {
-        log_i("-- No Lightning Event Data Available");
-    }
-#endif
+encodeBresser(appPayloadCfg, encoder);
 
 #ifdef ONEWIRE_EN
-    float water_temp_c = getOneWireTemperature();
-    
-    // Debug output for auxiliary sensors/voltages
-    if (water_temp_c != DEVICE_DISCONNECTED_C)
-    {
-        log_i("Water Temperature:  % 2.1f °C", water_temp_c);
-    }
-    else
-    {
-        log_i("Water Temperature:   --.- °C");
-        water_temp_c = -30.0;
-    }
-#endif
-#ifdef DISTANCESENSOR_EN
-    if (distance_mm > 0)
-    {
-        log_i("Distance:          %4d mm", distance_mm);
-    }
-    else
-    {
-        log_i("Distance:         ---- mm");
-    }
-#endif
-#ifdef PIN_SUPPLY_IN
-    log_i("Supply  Voltage:   %4d   mV", supply_voltage);
-#endif
-#if defined(ADC_EN) && defined(PIN_ADC_IN)
-    log_i("Battery Voltage:   %4d   mV", battery_voltage);
+    encodeOneWire(appPayloadCfg, encoder);
 #endif
 
+// Voltages / auxiliary analog sensor data
+encodeAnalog(appPayloadCfg, encoder);
+
+// Digital Sensors (GPIO, UART, I2C, SPI, ...)
+encodeDigital(appPayloadCfg, encoder);
+
+// BLE Temperature/Humidity Sensors
 #if defined(MITHERMOMETER_EN)
     float div = 100.0;
 #elif defined(THEENGSDECODER_EN)
@@ -479,171 +287,18 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
         indoor_humidity = bleSensors.data[0].humidity / div;
         log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
         log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
+        encoder.writeTemperature(indoor_temp_c);
+        encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
     }
     else
     {
         log_i("Indoor Air Temp.:    --.- °C");
         log_i("Indoor Humidity:     --   %%");
-        indoor_temp_c = -30;
-        indoor_humidity = 0;
+        encoder.writeUint16(INV_UINT16);
+        encoder.writeUint8(INV_UINT8);
     }
-#endif
-    log_v("-");
-
-#ifdef SENSORID_EN
-    if (ws > -1)
-    {
-        encoder.writeUint32(weatherSensor.sensor[ws].sensor_id);
-    }
-    else
-    {
-        encoder.writeUint32(0);
-    }
-#endif
-
-    // Sensor status flags
-    encoder.writeBitmap(0,
-                        mithermometer_valid,
-                        (ls > -1) ? weatherSensor.sensor[ls].valid : false,
-                        (ls > -1) ? weatherSensor.sensor[ls].battery_ok : false,
-                        (s1 > -1) ? weatherSensor.sensor[s1].valid : false,
-                        (s1 > -1) ? weatherSensor.sensor[s1].battery_ok : false,
-                        (ws > -1) ? weatherSensor.sensor[ws].valid : false,
-                        (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
-
-    // Weather sensor data
-    if (ws > -1)
-    {
-        // weather sensor data available
-        if (weatherSensor.sensor[ws].w.temp_ok)
-        {
-            encoder.writeTemperature(weatherSensor.sensor[ws].w.temp_c);
-        }
-        else
-        {
-            encoder.writeTemperature(-30);
-        }
-        if (weatherSensor.sensor[ws].w.humidity_ok)
-        {
-            encoder.writeUint8(weatherSensor.sensor[ws].w.humidity);
-        }
-        else
-        {
-            encoder.writeUint8(0);
-        }
-#ifdef ENCODE_AS_FLOAT
-        encoder.writeRawFloat(weatherSensor.sensor[ws].w.wind_gust_meter_sec);
-        encoder.writeRawFloat(weatherSensor.sensor[ws].w.wind_avg_meter_sec);
-        encoder.writeRawFloat(weatherSensor.sensor[ws].w.wind_direction_deg);
-#else
-        encoder.writeUint16(weatherSensor.sensor[ws].w.wind_gust_meter_sec_fp1);
-        encoder.writeUint16(weatherSensor.sensor[ws].w.wind_avg_meter_sec_fp1);
-        encoder.writeUint16(weatherSensor.sensor[ws].w.wind_direction_deg_fp1);
-#endif
-        if (weatherSensor.sensor[ws].w.rain_ok)
-        {
-            encoder.writeRawFloat(weatherSensor.sensor[ws].w.rain_mm);
-        }
-        else
-        {
-            encoder.writeRawFloat(0);
-        }
-    }
-    else
-    {
-        // fill with suspicious dummy values
-        encoder.writeTemperature(-30);
-        encoder.writeUint8(0);
-#ifdef ENCODE_AS_FLOAT
-        encoder.writeRawFloat(0);
-        encoder.writeRawFloat(0);
-        encoder.writeRawFloat(0);
-#else
-        encoder.writeUint16(0);
-        encoder.writeUint16(0);
-        encoder.writeUint16(0);
-#endif
-        encoder.writeRawFloat(0);
-    }
-
-// Voltages / auxiliary sensor data
-#ifdef PIN_SUPPLY_IN
-    encoder.writeUint16(supply_voltage);
-#endif
-#if defined(PIN_ADC_IN)
-    encoder.writeUint16(battery_voltage);
-#endif
-#ifdef ONEWIRE_EN
-    encoder.writeTemperature(water_temp_c);
-#endif
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    encoder.writeTemperature(indoor_temp_c);
-    encoder.writeUint8((uint8_t)(indoor_humidity + 0.5));
-
-    // BLE Tempoerature/Humidity Sensor: delete results fromBLEScan buffer to release memory
+    // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
     bleSensors.clearScanResults();
-#endif
-
-// Soil sensor data
-#ifdef SOILSENSOR_EN
-    if (s1 > -1)
-    {
-        // soil sensor data available
-        encoder.writeTemperature(weatherSensor.sensor[s1].soil.temp_c);
-        encoder.writeUint8(weatherSensor.sensor[s1].soil.moisture);
-    }
-    else
-    {
-        // fill with suspicious dummy values
-        encoder.writeTemperature(-30);
-        encoder.writeUint8(0);
-    }
-#endif
-
-// Rain data statistics
-#ifdef RAINDATA_EN
-    if ((ws > -1) && weatherSensor.sensor[ws].valid && weatherSensor.sensor[ws].w.rain_ok)
-    {
-        log_i("Rain past 60min:  %7.1f mm", rainGauge.pastHour());
-        log_i("Rain curr. day:   %7.1f mm", rainGauge.currentDay());
-        log_i("Rain curr. week:  %7.1f mm", rainGauge.currentWeek());
-        log_i("Rain curr. month: %7.1f mm", rainGauge.currentMonth());
-        encoder.writeRawFloat(rainGauge.pastHour());
-        encoder.writeRawFloat(rainGauge.currentDay());
-        encoder.writeRawFloat(rainGauge.currentWeek());
-        encoder.writeRawFloat(rainGauge.currentMonth());
-    }
-    else
-    {
-        log_i("Current rain gauge statistics not valid.");
-        encoder.writeRawFloat(-1);
-        encoder.writeRawFloat(-1);
-        encoder.writeRawFloat(-1);
-        encoder.writeRawFloat(-1);
-    }
-#endif
-
-// Distance sensor data
-#ifdef DISTANCESENSOR_EN
-    encoder.writeUint16(distance_mm);
-#endif
-
-// Lightning sensor data
-#ifdef LIGHTNINGSENSOR_EN
-    if (ls > -1)
-    {
-        // Lightning sensor data available
-        encoder.writeUnixtime(lightn_ts);
-        encoder.writeUint16(lightn_events);
-        encoder.writeUint8(lightn_distance);
-    }
-    else
-    {
-        // Fill with suspicious dummy values
-        encoder.writeUnixtime(0);
-        encoder.writeUint16(0);
-        encoder.writeUint8(0);
-    }
 #endif
 }
 
@@ -718,6 +373,16 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         port = CMD_GET_BLE_ADDR;
     }
 #endif
+    else if (cmd == CMD_GET_APP_PAYLOAD_CFG)
+    {
+        uint8_t payload[APP_PAYLOAD_CFG_SIZE];
+        getAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
+        for (size_t i = 0; i < APP_PAYLOAD_CFG_SIZE; i++)
+        {
+            encoder.writeUint8(payload[i]);
+        }
+        port = CMD_GET_APP_PAYLOAD_CFG;
+    }
 }
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
@@ -776,3 +441,23 @@ std::vector<std::string> AppLayer::getBleAddr(void)
     return bleAddr;
 }
 #endif
+
+bool AppLayer::getAppPayloadCfg(uint8_t *bytes, uint8_t size)
+{
+    bool res = false;
+    appPrefs.begin("BWS-LW-APP", false);
+    if (appPrefs.isKey("payloadcfg")) {
+        appPrefs.getBytes("payloadcfg", bytes, size);
+        res = true;
+    }
+    appPrefs.end();
+    return res;
+}
+
+void AppLayer::setAppPayloadCfg(uint8_t *bytes, uint8_t size)
+{
+    appPrefs.begin("BWS-LW-APP", false);
+    appPrefs.putBytes("payloadcfg", bytes, size);
+    appPrefs.end();
+    memcpy(appPayloadCfg, bytes, size);
+}
