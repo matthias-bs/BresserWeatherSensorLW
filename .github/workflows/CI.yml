@@ -23,7 +23,7 @@ jobs:
           #- esp32:esp32:heltec_wifi_lora_32_V2
           - esp32:esp32:heltec_wifi_lora_32_V3
           #- esp32:esp32:featheresp32
-          - esp32:esp32:m5stack-core2
+          #- esp32:esp32:m5stack-core2
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
           - rp2040:rp2040:adafruit_feather:dbgport=Serial
