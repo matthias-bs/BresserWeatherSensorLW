@@ -227,7 +227,6 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 {
     (void)port; // suppress warning regarding unused parameter
 
-    bool mithermometer_valid = false;
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     float indoor_temp_c;
     float indoor_humidity;
@@ -282,7 +281,6 @@ encodeDigital(appPayloadCfg, encoder);
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     if (bleSensors.data[0].valid)
     {
-        mithermometer_valid = true;
         indoor_temp_c = bleSensors.data[0].temperature / div;
         indoor_humidity = bleSensors.data[0].humidity / div;
         log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
