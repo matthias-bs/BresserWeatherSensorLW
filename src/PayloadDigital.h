@@ -44,6 +44,7 @@
 #include "../BresserWeatherSensorLWCfg.h"
 
 #include <LoraMessage.h>
+#include "logging.h"
 
 #ifdef DISTANCESENSOR_EN
 // A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor

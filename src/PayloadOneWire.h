@@ -47,11 +47,9 @@
 
 // Dallas/Maxim OneWire Temperature Sensor
 #include <DallasTemperature.h>
+
 #include <LoraMessage.h>
-
-
-// Dallas/Maxim OneWire Temperature Sensor
-#include <DallasTemperature.h>
+#include "logging.h"
 
 class PayloadOneWire
 {

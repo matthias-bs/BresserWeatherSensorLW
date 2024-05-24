@@ -44,6 +44,7 @@
 #include "../BresserWeatherSensorLWCfg.h"
 #include "adc/adc.h"
 #include <LoraMessage.h>
+#include "logging.h"
 
 
 class PayloadAnalog

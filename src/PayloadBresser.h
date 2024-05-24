@@ -59,6 +59,7 @@
 #endif
 
 #include <LoraMessage.h>
+#include "logging.h"
 
 // Encoding of invalid values
 #define INV_FLOAT 0xFFFFFFFF
