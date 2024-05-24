@@ -82,6 +82,8 @@
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH to init()
 //          Added BresserWeatherSensorLWCmd.h
 // 20240505 Implemented loading of LoRaWAN secrets from file on LittleFS (if available)
+// 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve 
+//          to uplinkPayload[], modified actual size in sendReceive()
 //
 // ToDo:
 // -
@@ -166,10 +168,6 @@ using namespace PowerFeather;
 
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
-
-// Uplink message payload size
-// The maximum allowed for all data rates is 51 bytes.
-const uint8_t PAYLOAD_SIZE = 51;
 
 // Time source & status, see below
 //
@@ -746,8 +744,8 @@ void setup()
     gotoSleep(sleepDuration());
   }
 
-  // build payload byte array
-  uint8_t uplinkPayload[PAYLOAD_SIZE];
+  // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
+  uint8_t uplinkPayload[PAYLOAD_SIZE + 8];
 
   LoraEncoder encoder(uplinkPayload);
 
@@ -899,11 +897,29 @@ void setup()
   // perform an uplink & optionally receive downlink
   if (fcntUp % 64 == 0)
   {
-    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, true, &uplinkDetails, &downlinkDetails);
+    state = node.sendReceive(
+      uplinkPayload,
+      min(encoder.getLength(), static_cast<int>(PAYLOAD_SIZE)),
+      port,
+      downlinkPayload,
+      &downlinkSize,
+      true,
+      &uplinkDetails,
+      &downlinkDetails
+    );
   }
   else
   {
-    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, false, nullptr, &downlinkDetails);
+    state = node.sendReceive(
+      uplinkPayload,
+      min(encoder.getLength(), static_cast<int>(PAYLOAD_SIZE)),
+      port,
+      downlinkPayload,
+      &downlinkSize,
+      false,
+      nullptr,
+      &downlinkDetails
+    );
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
