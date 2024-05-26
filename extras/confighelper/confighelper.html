@@ -40,6 +40,11 @@
 <html>
 <head>
     <title>Config Helper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
     <script>
         // Payload size per channel
         const ONEWIRE_SIZE = 2;
@@ -51,19 +56,19 @@
 
         var configArray = [];
         const sensorTypes = [
-                ["Weather", 0],
-                ["Weather", 0],
-                ["Thermo/Hygro", 3],
-                ["Pool Temperature", 2],
-                ["Soil", 3],
-                ["Leakage", 1],
-                ["reserved", 0],
-                ["reserved", 0],
-                ["Air Quality (PM)", 6],
-                ["Lightning", 0],
-                ["CO2", 2],
-                ["Air Quality (HCHO/VOC)", 3]
-            ];
+            ["Weather", 0],
+            ["Weather", 0],
+            ["Thermo/Hygro", 3],
+            ["Pool Temperature", 2],
+            ["Soil", 3],
+            ["Leakage", 1],
+            ["reserved", 0],
+            ["reserved", 0],
+            ["Air Quality (PM)", 6],
+            ["Lightning", 0],
+            ["CO2", 2],
+            ["Air Quality (HCHO/VOC)", 3]
+        ];
 
         window.onload = function () {
             // Add event listener to "Weather Sensors" checkbox
@@ -97,16 +102,25 @@
                 if (i == 9)
                     continue;
 
+                var table = document.createElement('div');
+                table.classList.add('table');
+                //table.style = "width: 100%; display: table;";
+                table.style.width = '100%';
+                table.style.display = 'table';
+
                 var row = document.createElement('div');
                 row.classList.add('row');
+                //row.style = "display: table-row;";
+                row.style.display = 'rable-row';
 
                 var labelColumn = document.createElement('div');
                 labelColumn.classList.add('column');
+                labelColumn.style.width = '250px';
+                labelColumn.style.display = 'table-cell';
 
                 var checkboxColumn = document.createElement('div');
-                checkboxColumn.style.marginLeft = '250px';
                 checkboxColumn.classList.add('column');
-                //checkboxColumn.style.position = 'absolute'; // Set the position to absolute
+                checkboxColumn.style.display = 'table-cell';
 
                 var checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
@@ -126,10 +140,11 @@
                 checkboxColumn.appendChild(checkbox);
                 checkboxColumn.appendChild(input);
 
+                table.appendChild(row);
                 row.appendChild(labelColumn);
                 row.appendChild(checkboxColumn);
 
-                checkboxContainer.appendChild(row);
+                checkboxContainer.appendChild(table);
             }
 
             // Add event listener to "1-Wire Sensors" checkbox
@@ -242,9 +257,9 @@
         function getMultichannelconfig(configArray) {
             var size = 0;
             for (var i = 2; i <= 11; i++) {
-                 if (i == 9)
-                     continue;
-                 var checkbox = document.getElementById('checkbox' + i);
+                if (i == 9)
+                    continue;
+                var checkbox = document.getElementById('checkbox' + i);
                 if (checkbox.checked) {
                     [tmp, bitmap] = getChannels('inputChannel' + i, 8);
                     configArray[i] = bitmap;
@@ -265,7 +280,7 @@
 
             [size, lightningValue] = getLightningconfig();
             totalSize += size;
-            
+
             var size = getMultichannelconfig(configArray);
             totalSize += size;
 
@@ -351,8 +366,17 @@
 </head>
 
 <body>
-    <h1>Welcome to Config Helper</h1>
-
+    <h1>Welcome to Confi</body>g Helper</h1>
+    <div style="border: 1px solid black; padding: 10px; width: fit-content;">
+        <ul>
+            <li>Select desired sensors/interfaces via checkboxes.</li>
+            <li>If weather/lightning sensor is enabled, select options via checkboxes.</li>
+            <li>For other sensors, enter channel numbers separated by commas into text fields.</li>
+            <li>Check if assumptions regarding data field sizes are valid.</li>
+            <li>BLE sensors are enabled separately by specifying their MAC addresses.</li>
+        </ul>
+    </div>
+    <br><br>
     <form onsubmit="handleFormSubmit(event)">
         <label for="weather">Weather Sensor:</label>
         <input type="checkbox" id="weather" name="weather">
@@ -387,24 +411,29 @@
         <input type="checkbox" id="onewire" name="onewire">
         <input type="text" id="onewireInput" name="onewireInput" style="display: none;"><br><br>
 
-        <label for="analog">Analog Sensors:</label>
+        <label for="analog">Analog Interfaces:</label>
         <input type="checkbox" id="analog" name="analog" onchange="toggleInput('analogInput', this.checked)">
         <input type="text" id="analogInput" name="analogInput" style="display: none;"><br><br>
 
-        <label for="digital">Digital Sensors:</label>
+        <label for="digital">Digital Interfaces:</label>
         <input type="checkbox" id="digital" name="digital" onchange="toggleInput('digitalInput', this.checked)">
         <input type="text" id="digitalInput" name="digitalInput" style="display: none;"><br><br>
 
-        <label for="size">Size:</label><br>
+        <label for="size">Size (Bytes):</label><br>
         <input type="text" id="size" name="size" value="0" readonly><br><br>
 
-        <label for="jsonOutput">JSON Output:</label><br>
+        <label for="jsonOutput">JSON Output (Node Configuration Downlink):</label><br>
         <textarea id="jsonOutput" name="jsonOutput" readonly cols="60" rows="23"></textarea><br><br>
 
-        <label for="arrayOutput" style="vertical-align: top;">Array Output:</label><br>
+        <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
         <textarea id="arrayOutput" name="arrayOutput" readonly cols="60" rows="3"></textarea><br><br>
         <input type="submit" value="Submit">
     </form>
+    <br>
+    <br>
+    <p style="font-size: smaller;">
+    Copyright &copy; 2024 Matthias Prinke, MIT License
+    </p>
 </body>
 
 </html>
