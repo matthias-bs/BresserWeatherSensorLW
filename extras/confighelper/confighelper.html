@@ -54,7 +54,10 @@
         // Payload size limit
         const PAYLOAD_SIZE_LIMIT = 51;
 
+        // Config array
         var configArray = [];
+
+        // [Name, Size in bytes]
         const sensorTypes = [
             ["Weather", 0],
             ["Weather", 0],
@@ -70,6 +73,7 @@
             ["Air Quality (HCHO/VOC)", 3]
         ];
 
+        // Toggle input field visibility
         window.onload = function () {
             // Add event listener to "Weather Sensors" checkbox
             document.getElementById('weather').addEventListener('change', function () {
@@ -183,8 +187,9 @@
             document.getElementById('arrayOutput').value = configStr;
         }; // window.onload
 
+        // Get [size, bitmap] from a comma-separated list of channel numbers
         function getChannels(id, length, size_per_channel) {
-            // Get the onewireInput value
+            // Get the text input field's value
             var input = document.getElementById(id).value;
 
             // Split the input into an array of numbers
@@ -208,6 +213,7 @@
             return [size, result];
         }
 
+        // Get [size, bitmap] from the Weather Sensor configuration selected with checkboxes
         function getWeatherconfig() {
             var weatherCheckbox = document.getElementById('weather');
             if (!weatherCheckbox.checked) {
@@ -234,6 +240,7 @@
             return [size, result];
         }
 
+        // Get [size, bitmap] from the Lightning Sensor configuration selected with checkboxes
         function getLightningconfig() {
             var lightningCheckbox = document.getElementById('lightning');
             if (!lightningCheckbox.checked) {
@@ -254,6 +261,8 @@
             return [size, result];
         }
 
+        // Get [size, bitmap] from the Multi-Channel Bresser Sensors' configuration
+        // consisting of checkboxes and text fields with channel numbers
         function getMultichannelconfig(configArray) {
             var size = 0;
             for (var i = 2; i <= 11; i++) {
@@ -271,6 +280,7 @@
             return size;
         }
 
+        // Calculate the size of the payload and update the JSON output
         function handleFormSubmit(event) {
             event.preventDefault(); // Prevent the form from submitting
 
@@ -366,7 +376,7 @@
 </head>
 
 <body>
-    <h1>Welcome to Confi</body>g Helper</h1>
+    <h1>Welcome to Config Helper</h1>
     <div style="border: 1px solid black; padding: 10px; width: fit-content;">
         <ul>
             <li>Select desired sensors/interfaces via checkboxes.</li>
