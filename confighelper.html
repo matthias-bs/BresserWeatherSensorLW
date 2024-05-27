@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<!--
+// confighelper.h
+//
+// BresserWeatherSensorLW LoRaWAN Payload Configuration Tool
+//
+// created: 05/2024
+//
+//
+// MIT License
+//
+// Copyright (c) 2024 Matthias Prinke
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//
+// History:
+//
+// 20240526 Created
+//
+// ToDo:
+// -
+-->
+<html>
+<head>
+    <title>Config Helper</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        // Payload size per channel
+        const ONEWIRE_SIZE = 2;
+        const ANALOG_SIZE = 2;
+        const DIGITAL_SIZE = 1;
+
+        // Payload size limit
+        const PAYLOAD_SIZE_LIMIT = 51;
+
+        // Config array
+        var configArray = [];
+
+        // [Name, Size in bytes]
+        const sensorTypes = [
+            ["Weather", 0],
+            ["Weather", 0],
+            ["Thermo/Hygro", 3],
+            ["Pool Temperature", 2],
+            ["Soil", 3],
+            ["Leakage", 1],
+            ["reserved", 0],
+            ["reserved", 0],
+            ["Air Quality (PM)", 6],
+            ["Lightning", 0],
+            ["CO2", 2],
+            ["Air Quality (HCHO/VOC)", 3]
+        ];
+
+        // Toggle input field visibility
+        window.onload = function () {
+            // Add event listener to "Weather Sensors" checkbox
+            document.getElementById('weather').addEventListener('change', function () {
+                document.getElementById('labelWeatherHumidity').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherHumidity').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherRain').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherRain').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherWind').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherWind').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherUV').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherUV').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherLight').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherLight').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherRainHourly').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherRainHourly').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherRainDWM').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherRainDWM').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Add event listener to "Lightning" checkbox
+            document.getElementById('lightning').addEventListener('change', function () {
+                document.getElementById('lightningRaw').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelLightningRaw').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('lightningProc').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelLightningProc').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            var checkboxContainer = document.getElementById('checkboxContainer');
+            for (var i = 2; i <= 11; i++) {
+                if (i == 9)
+                    continue;
+
+                var table = document.createElement('div');
+                table.classList.add('table');
+                //table.style = "width: 100%; display: table;";
+                table.style.width = '100%';
+                table.style.display = 'table';
+
+                var row = document.createElement('div');
+                row.classList.add('row');
+                //row.style = "display: table-row;";
+                row.style.display = 'rable-row';
+
+                var labelColumn = document.createElement('div');
+                labelColumn.classList.add('column');
+                labelColumn.style.width = '250px';
+                labelColumn.style.display = 'table-cell';
+
+                var checkboxColumn = document.createElement('div');
+                checkboxColumn.classList.add('column');
+                checkboxColumn.style.display = 'table-cell';
+
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'checkbox' + i;
+                checkbox.name = 'checkbox' + i;
+
+                var label = document.createElement('label');
+                label.htmlFor = 'checkbox' + i;
+                label.appendChild(document.createTextNode(sensorTypes[i][0] + ': '));
+
+                var input = document.createElement('input');
+                input.type = "text";
+                input.id = "inputChannel" + i;
+                input.name = "inputChannel" + i;
+
+                labelColumn.appendChild(label);
+                checkboxColumn.appendChild(checkbox);
+                checkboxColumn.appendChild(input);
+
+                table.appendChild(row);
+                row.appendChild(labelColumn);
+                row.appendChild(checkboxColumn);
+
+                checkboxContainer.appendChild(table);
+            }
+
+            // Add event listener to "1-Wire Sensors" checkbox
+            document.getElementById('multiChannel').addEventListener('change', function () {
+                document.getElementById('checkboxContainer').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Add event listener to "1-Wire Sensors" checkbox
+            document.getElementById('onewire').addEventListener('change', function () {
+                document.getElementById('onewireInput').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Add event listener to "Analog Sensors" checkbox
+            document.getElementById('analog').addEventListener('change', function () {
+                document.getElementById('analogInput').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Add event listener to "Digital Sensors" checkbox
+            document.getElementById('digital').addEventListener('change', function () {
+                document.getElementById('digitalInput').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Initialize the size field
+            document.getElementById('size').value = 0;
+
+            // Initialize JSON output field
+            document.getElementById('jsonOutput').value = "{}";
+
+            var configStr = "{\n";
+            const zero = 0;
+            for (var i = 0; i < 24; i++) {
+                configArray[i] = 0;
+                configStr += "0x" + configArray[i].toString(16).padStart(2, '0') + ", ";
+            }
+            configStr += "}";
+            document.getElementById('arrayOutput').value = configStr;
+        }; // window.onload
+
+        // Get [size, bitmap] from a comma-separated list of channel numbers
+        function getChannels(id, length, size_per_channel) {
+            // Get the text input field's value
+            var input = document.getElementById(id).value;
+
+            // Split the input into an array of numbers
+            var numbers = input.split(',').map(Number);
+
+            // Initialize the size and the 16-bit value
+            var size = 0;
+            var result = 0;
+
+            // Iterate over the numbers
+            for (var i = 0; i < numbers.length; i++) {
+                // Check if the number is in the range 0 to 16
+                if (numbers[i] >= 0 && numbers[i] < length) {
+                    // Add 2 to the size for each bit set
+                    size += size_per_channel;
+
+                    // Set the corresponding bit in the 16-bit value
+                    result |= 1 << numbers[i];
+                }
+            }
+            return [size, result];
+        }
+
+        // Get [size, bitmap] from the Weather Sensor configuration selected with checkboxes
+        function getWeatherconfig() {
+            var weatherCheckbox = document.getElementById('weather');
+            if (!weatherCheckbox.checked) {
+                return [0, 0];
+            }
+            var size = 0;
+            var result = 1;
+            var weatherConfig = [
+                ['weatherHumidity', 1],
+                ['weatherRain', 4],
+                ['weatherWind', 6],
+                ['weatherUV', 1],
+                ['weatherLight', 4],
+                ['weatherRainHourly', 4],
+                ['weatherRainDWM', 12]
+            ];
+            for (var i = 0; i < weatherConfig.length; i++) {
+                var checkbox = document.getElementById(weatherConfig[i][0]);
+                if (checkbox.checked) {
+                    result |= (1 << (i + 1));
+                    size += weatherConfig[i][1];
+                }
+            }
+            return [size, result];
+        }
+
+        // Get [size, bitmap] from the Lightning Sensor configuration selected with checkboxes
+        function getLightningconfig() {
+            var lightningCheckbox = document.getElementById('lightning');
+            if (!lightningCheckbox.checked) {
+                return [0, 0];
+            }
+            var size = 0;
+            var result = 1;
+            var checkbox = document.getElementById('lightningRaw');
+            if (checkbox.checked) {
+                result |= 0x10;
+                size += 3;
+            }
+            checkbox = document.getElementById('lightningProc');
+            if (checkbox.checked) {
+                result |= 0x20;
+                size += 7;
+            }
+            return [size, result];
+        }
+
+        // Get [size, bitmap] from the Multi-Channel Bresser Sensors' configuration
+        // consisting of checkboxes and text fields with channel numbers
+        function getMultichannelconfig(configArray) {
+            var size = 0;
+            for (var i = 2; i <= 11; i++) {
+                if (i == 9)
+                    continue;
+                var checkbox = document.getElementById('checkbox' + i);
+                if (checkbox.checked) {
+                    [tmp, bitmap] = getChannels('inputChannel' + i, 8);
+                    configArray[i] = bitmap;
+                    size += sensorTypes[i][1];
+                } else {
+                    configArray[i] = 0;
+                }
+            }
+            return size;
+        }
+
+        // Calculate the size of the payload and update the JSON output
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent the form from submitting
+
+            var totalSize = 0;
+            [size, weatherValue] = getWeatherconfig();
+            totalSize += size;
+
+            [size, lightningValue] = getLightningconfig();
+            totalSize += size;
+
+            var size = getMultichannelconfig(configArray);
+            totalSize += size;
+
+            var onewireCheckbox = document.getElementById('onewire');
+            if (onewireCheckbox.checked) {
+                [size, onewireValue] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
+                totalSize += size;
+            } else {
+                onewireValue = 0;
+            }
+
+            var analogCheckbox = document.getElementById('analog');
+            if (analogCheckbox.checked) {
+                [size, analogValue] = getChannels('analogInput', 16, ANALOG_SIZE);
+                totalSize += size;
+            } else {
+                analogValue = 0;
+            }
+
+            var digitalCheckbox = document.getElementById('digital');
+            if (digitalCheckbox.checked) {
+                [size, digitalValue] = getChannels('digitalInput', 32, DIGITAL_SIZE);
+                totalSize += size;
+            } else {
+                digitalValue = 0;
+            }
+
+            // Check if size exceeds PAYLOAD_SIZE_LIMIT
+            if (totalSize > PAYLOAD_SIZE_LIMIT) {
+                document.getElementById('size').style.border = '3px solid red';
+            } else {
+                document.getElementById('size').style.border = 'none';
+            }
+            // Update the size field
+            document.getElementById('size').value = totalSize;
+
+            configArray[0] = weatherValue;
+            configArray[9] = lightningValue;
+
+            // Get the current JSON output
+            var jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
+
+            jsonOutput.bresser = [];
+            for (var i = 0; i < 16; i++) {
+                jsonOutput.bresser[i] = "0x" + configArray[i].toString(16).padStart(2, '0');
+            }
+
+            // Update the onewire value in the JSON output
+            jsonOutput.onewire = "0x" + onewireValue.toString(16).padStart(4, '0');
+
+            jsonOutput.analog = "0x" + analogValue.toString(16).padStart(4, '0');
+
+            jsonOutput.digital = "0x" + digitalValue.toString(16).padStart(8, '0');
+
+
+            // Update the JSON output field
+            document.getElementById('jsonOutput').value = JSON.stringify(jsonOutput, null, 4);
+
+            // Update the arrayOutput
+            var arrayOutput = document.getElementById('arrayOutput');
+
+            //arrayOutputValue = arrayOutputValue.replace("$SELECTION_PLACEHOLDER$", "    0x" + upper8Bits.toString(16).padStart(2, '0') + ",\n    0x" + lower8Bits.toString(16).padStart(2, '0') + ",");
+            configArray[16] = (onewireValue >> 8) & 0xFF;
+            configArray[17] = onewireValue & 0xFF;
+
+            configArray[18] = (analogValue >> 8) & 0xFF;
+            configArray[19] = analogValue & 0xFF;
+
+            configArray[20] = (digitalValue >> 24) & 0xFF;
+            configArray[21] = (digitalValue >> 16) & 0xFF;
+            configArray[22] = (digitalValue >> 8) & 0xFF;
+            configArray[23] = digitalValue & 0xFF;
+
+            configStr = "{";
+            for (var i = 0; i < 24; i++) {
+                configStr += "0x" + configArray[i].toString(16).padStart(2, '0') + ", ";
+            }
+            configStr += "}";
+            arrayOutput.value = configStr;
+        }
+
+    </script>
+</head>
+
+<body>
+    <h1>Welcome to Config Helper</h1>
+    <div style="border: 1px solid black; padding: 10px; width: fit-content;">
+        <ul>
+            <li>Select desired sensors/interfaces via checkboxes.</li>
+            <li>If weather/lightning sensor is enabled, select options via checkboxes.</li>
+            <li>For other sensors, enter channel numbers separated by commas into text fields.</li>
+            <li>Check if assumptions regarding data field sizes are valid.</li>
+            <li>BLE sensors are enabled separately by specifying their MAC addresses.</li>
+        </ul>
+    </div>
+    <br><br>
+    <form onsubmit="handleFormSubmit(event)">
+        <label for="weather">Weather Sensor:</label>
+        <input type="checkbox" id="weather" name="weather">
+        <label for="weatherHumidity" id="labelWeatherHumidity">Humidity:</label>
+        <input type="checkbox" id="weatherHumidity" name="weatherHumidity">
+        <label for="weatherRain" id="labelWeatherRain">Rain:</label>
+        <input type="checkbox" id="weatherRain" name="weatherRain">
+        <label for="weatherWind" id="labelWeatherWind">Wind:</label>
+        <input type="checkbox" id="weatherWind" name="weatherWind">
+        <label for="weatherUV" id="labelWeatherUV">UV:</label>
+        <input type="checkbox" id="weatherUV" name="weatherUV">
+        <label for="weatherLight" id="labelWeatherLight">Light:</label>
+        <input type="checkbox" id="weatherLight" name="weatherLight">
+        <label for="weatherRainHourly" id="labelWeatherRainHourly">Hourly Rain:</label>
+        <input type="checkbox" id="weatherRainHourly" name="weatherRainHourly">
+        <label for="weatherRainDWM" id="labelWeatherRainDWM">Daily/Weekly/Monthly Rain:</label>
+        <input type="checkbox" id="weatherRainDWM" name="weatherRainDWM">
+        <br><br>
+        <label for="lightning">Lightning Sensor:</label>
+        <input type="checkbox" id="lightning" name="lightning">
+        <label for="lightningRaw" id="labelLightningRaw" style="display: none;">raw:</label>
+        <input type="checkbox" id="lightningRaw" name="lightningRaw" style="display: none;">
+        <label for="lightningProc" id="labelLightningProc" style="display: none;">processed:</label>
+        <input type="checkbox" id="lightningProc" name="lightningProc" style="display: none;">
+        <br><br>
+        <label for="multiChannel">Multi-Channel Bresser Sensors:</label>
+        <input type="checkbox" id="multiChannel" name="multiChannel"
+            onchange="toggleInput('checkboxContainer', this.checked)"><br><br>
+        <div id="checkboxContainer" style="display: none;"></div><br>
+
+        <label for="onewire">1-Wire Sensors:</label>
+        <input type="checkbox" id="onewire" name="onewire">
+        <input type="text" id="onewireInput" name="onewireInput" style="display: none;"><br><br>
+
+        <label for="analog">Analog Interfaces:</label>
+        <input type="checkbox" id="analog" name="analog" onchange="toggleInput('analogInput', this.checked)">
+        <input type="text" id="analogInput" name="analogInput" style="display: none;"><br><br>
+
+        <label for="digital">Digital Interfaces:</label>
+        <input type="checkbox" id="digital" name="digital" onchange="toggleInput('digitalInput', this.checked)">
+        <input type="text" id="digitalInput" name="digitalInput" style="display: none;"><br><br>
+
+        <label for="size">Size (Bytes):</label><br>
+        <input type="text" id="size" name="size" value="0" readonly><br><br>
+
+        <label for="jsonOutput">JSON Output (Node Configuration Downlink):</label><br>
+        <textarea id="jsonOutput" name="jsonOutput" readonly cols="60" rows="23"></textarea><br><br>
+
+        <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
+        <textarea id="arrayOutput" name="arrayOutput" readonly cols="60" rows="3"></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <br>
+    <br>
+    <p style="font-size: smaller;">
+    Copyright &copy; 2024 Matthias Prinke, MIT License
+    </p>
+</body>
+
+</html>

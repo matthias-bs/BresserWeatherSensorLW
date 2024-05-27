@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['resetdata_19',['resetData',['../class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6',1,'BleSensors']]],
-  ['rssi_20',['rssi',['../struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44',1,'BleDataS']]]
+  ['m_5fknownbleaddresses_22',['m_knownBLEAddresses',['../class_my_advertised_device_callbacks.html#a517b072519394342162ae760dcb8fbbd',1,'MyAdvertisedDeviceCallbacks']]],
+  ['m_5fsensordata_23',['m_sensorData',['../class_my_advertised_device_callbacks.html#a6c635b0441f41875bee0e31771a25851',1,'MyAdvertisedDeviceCallbacks']]],
+  ['myadvertiseddevicecallbacks_24',['MyAdvertisedDeviceCallbacks',['../class_my_advertised_device_callbacks.html',1,'']]]
 ];

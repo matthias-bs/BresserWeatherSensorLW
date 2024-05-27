@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['m_5fknownbleaddresses_16',['m_knownBLEAddresses',['../class_my_advertised_device_callbacks.html#a517b072519394342162ae760dcb8fbbd',1,'MyAdvertisedDeviceCallbacks']]],
-  ['m_5fsensordata_17',['m_sensorData',['../class_my_advertised_device_callbacks.html#a6c635b0441f41875bee0e31771a25851',1,'MyAdvertisedDeviceCallbacks']]],
-  ['myadvertiseddevicecallbacks_18',['MyAdvertisedDeviceCallbacks',['../class_my_advertised_device_callbacks.html',1,'']]]
+  ['humidity_21',['humidity',['../struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780',1,'BleDataS']]]
 ];
