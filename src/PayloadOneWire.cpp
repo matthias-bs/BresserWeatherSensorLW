@@ -33,6 +33,7 @@
 //
 // 20240520 Created
 // 20240524 Added payload size check, changed bitmap order
+// 20240528 Changed index count direction, fixed signalling of invalid data
 //
 // ToDo:
 // -
@@ -76,7 +77,7 @@ float PayloadOneWire::getOneWireTemperature(uint8_t index)
 void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
 {
 
-    unsigned index = (APP_PAYLOAD_BYTES_ONEWIRE * 8) - 1;
+    unsigned index = 0;
     for (int i = APP_PAYLOAD_BYTES_ONEWIRE - 1; i >= 0; i--)
     {
         for (uint8_t ch = 0; ch <= 7; ch++)
@@ -95,15 +96,17 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 if (tempC != DEVICE_DISCONNECTED_C)
                 {
                     log_d("Temperature[%d] = %.2f°C", index, tempC);
+                    encoder.writeTemperature(tempC);
                 }
                 else
                 {
                     log_d("Error: Could not read temperature[%d] data", index);
+                    encoder.writeTemperature(INV_TEMP);
                 }
                 
-                encoder.writeTemperature(tempC);
+                
             }
-            index--;
+            index++;
         }
     }
 }
