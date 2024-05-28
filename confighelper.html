@@ -35,6 +35,7 @@
 // 20240526 Created
 // 20240527 Added generation of uplink decoder parameters
 //          Fixed bug in arrayOutput generation
+// 20240528 Fixed getMultichannelconfig()
 //
 // ToDo:
 // -
@@ -291,6 +292,21 @@
             return [size, result];
         }
 
+        // Insert the selected channels into the signals array
+        // and enclose them in single quotes.
+        function formatSignals(signals, numbers) {
+            var _signals = [];
+            for (var j = 0; j < numbers.length; j++) {
+                if (signals.constructor === Array) {
+                    _signals[j] = signals.map((signal) => "'" + signal.replace('*', numbers[j]) + "'");
+                } else {
+                    _signals = signals.replace('*', numbers[j]);
+                    _signals = "'" + _signals + "'";
+                }
+            }
+            return _signals;
+        }
+
         // Get [size, bitmap] from the Multi-Channel Bresser Sensors' configuration
         // consisting of checkboxes and text fields with channel numbers
         function getMultichannelconfig(configArray, configDecoder) {
@@ -303,8 +319,8 @@
                     [tmp, bitmap, numbers] = getChannels('inputChannel' + i, 8);
                     configArray[i] = bitmap;
                     size += sensorTypes[i][1];
+                    configDecoder.signals.push(formatSignals(sensorTypes[i][2], numbers));
                     for (var j = 0; j < numbers.length; j++) {
-                        configDecoder.signals.push(sensorTypes[i][2].map(signal => ("'" + signal.replace('*', numbers[j]) + "'")));
                         configDecoder.types.push(sensorTypes[i][3]);
                     }
                 } else {
@@ -338,8 +354,8 @@
                 [size, onewireValue, numbers] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
                 totalSize += size;
                 for (var j = 0; j < numbers.length; j++) {
-                        configDecoder.signals.push("'ow" + numbers[j] + "_temp_c'");
-                        configDecoder.types.push('temperature');
+                    configDecoder.signals.push("'ow" + numbers[j] + "_temp_c'");
+                    configDecoder.types.push('temperature');
                 }
             } else {
                 onewireValue = 0;
@@ -350,8 +366,8 @@
                 [size, analogValue, numbers] = getChannels('analogInput', 16, ANALOG_SIZE);
                 totalSize += size;
                 for (var j = 0; j < numbers.length; j++) {
-                        configDecoder.signals.push("'a" + numbers[j] + "_voltage_mv'");
-                        configDecoder.types.push('uint16');
+                    configDecoder.signals.push("'a" + numbers[j] + "_voltage_mv'");
+                    configDecoder.types.push('uint16');
                 }
             } else {
                 analogValue = 0;
@@ -362,8 +378,8 @@
                 [size, digitalValue, numbers] = getChannels('digitalInput', 32, DIGITAL_SIZE);
                 totalSize += size;
                 for (var j = 0; j < numbers.length; j++) {
-                        configDecoder.signals.push("'d" + numbers[j] + "_value'");
-                        configDecoder.types.push(DIGITAL_TYPE);
+                    configDecoder.signals.push("'d" + numbers[j] + "_value'");
+                    configDecoder.types.push(DIGITAL_TYPE);
                 }
             } else {
                 digitalValue = 0;
@@ -492,7 +508,8 @@
         <label for="jsonOutput">Node Configuration Downlink:</label><br>
         <textarea id="jsonOutput" name="jsonOutput" readonly cols="100" rows="23"></textarea><br><br>
 
-        <label for="jsonOutput2">Uplink Formatter (<code>uplink_formatter.js</code>, parameters for <code>decode()</code>):</label><br>
+        <label for="jsonOutput2">Uplink Formatter (<code>uplink_formatter.js</code>, parameters for
+            <code>decode()</code>):</label><br>
         <textarea id="jsonOutput2" name="jsonOutput2" readonly cols="100" rows="23"></textarea><br><br>
 
         <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
