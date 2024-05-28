@@ -50,6 +50,7 @@
 // 20240521 Added UBATT_CH/USUPPLY_CH
 // 20240524 Added sensor feature flags
 //          Moved PAYLOAD_SIZE from BresserWeatherSensorLW.ino
+// 20240528 Added encoding of invalid values, modified default payload, fixes
 //
 // Note:
 // Depending on board package file date, either
@@ -290,7 +291,7 @@ const float UBATT_DIV = 0.5;
 const uint8_t UBATT_SAMPLES = 10;
 
 // "Channel" appPayloadCfg
-#define UBATT_CH 1
+#define UBATT_CH 0
 #endif
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
@@ -338,12 +339,15 @@ const uint8_t UBATT_SAMPLES = 10;
 
 // 1 - Weather Station; 1 Ch
 //   - Professional Wind Gauge (with T and H); 1 Ch
+//   - Professional Rain Gauge (with T); 1 Ch
+//     Note: Type encoded as 0x9/0xA/0xB in radio message,
+//           but changed to 1 in BresserWeatherSensorReceiver!
 #define APP_PAYLOAD_CFG_TYPE01 ( \
     1 /* enable sensor */ | \
     PAYLOAD_WS_HUMIDITY | \
     PAYLOAD_WS_WIND | \
     PAYLOAD_WS_RAINGAUGE | \
-    PAYLOAD_WS_LIGHT | \
+    /* PAYLOAD_WS_LIGHT | */ \
     PAYLOAD_WS_UV | \
     PAYLOAD_WS_RAIN_H | \
     PAYLOAD_WS_RAIN_DWM \
@@ -363,7 +367,7 @@ const uint8_t UBATT_SAMPLES = 10;
 
 // 5 - Water Leakage Sensor; 7 Ch
 // Ch: 1
-#define APP_PAYLOAD_CFG_TYPE05 0x02
+#define APP_PAYLOAD_CFG_TYPE05 0x00
 
 // 6 - reserved
 #define APP_PAYLOAD_CFG_TYPE06 0x00
@@ -375,12 +379,11 @@ const uint8_t UBATT_SAMPLES = 10;
 #define APP_PAYLOAD_CFG_TYPE08 0x00
 
 // 9 - Lightning Sensor; 1 Ch
-//   - Professional Rain Gauge (with T); 1 Ch
 // Ch: 0
 #define APP_PAYLOAD_CFG_TYPE09 ( \
     1 /* enable sensor */ | \
-    PAYLOAD_LIGHTNING_PROC | \
-    PAYLOAD_LIGHTNING_RAW \
+    /* PAYLOAD_LIGHTNING_RAW | */ \
+    PAYLOAD_LIGHTNING_PROC \
 )
 
 // 10 - CO2 Sensor; 4 Ch
@@ -409,8 +412,8 @@ const uint8_t UBATT_SAMPLES = 10;
 // -- Analog Inputs --
 // 0x01: Battery Voltage
 // 0x02: Supply Voltage
-#define APP_PAYLOAD_CFG_ANALOG1 0x01 // analog[15:8]
-#define APP_PAYLOAD_CFG_ANALOG0 0x00 // analog[7:0]
+#define APP_PAYLOAD_CFG_ANALOG1 0x00 // analog[15:8]
+#define APP_PAYLOAD_CFG_ANALOG0 0x01 // analog[7:0]
 
 // -- Digital Inputs --
 // Assign to any type of "channel",
@@ -428,5 +431,12 @@ const uint8_t UBATT_SAMPLES = 10;
 
 #define APP_PAYLOAD_OFFS_DIGITAL 20
 #define APP_PAYLOAD_BYTES_DIGITAL 4
+
+// Encoding of invalid values
+#define INV_FLOAT 0xFFFFFFFF
+#define INV_UINT32 0xFFFFFFFF
+#define INV_UINT16 0xFFFF
+#define INV_UINT8 0xFF
+#define INV_TEMP 0x7FFF
 
 #endif // _LWCFG_H
