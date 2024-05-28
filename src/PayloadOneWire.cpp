@@ -101,7 +101,7 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 else
                 {
                     log_d("Error: Could not read temperature[%d] data", index);
-                    encoder.writeTemperature(INV_TEMP);
+                    encoder.writeUint16(INV_TEMP);
                 }
                 
                 
