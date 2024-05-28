@@ -37,6 +37,7 @@
 // 20240524 Moved Weather Sensor and rain gauge/lightning post processing
 //          from AppLayer into this class
 //          Added handling of sensor feature flags
+// 20240528 Fixes
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -71,7 +72,7 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
     {
         // Try to find SENSOR_TYPE_WEATHER1
         int idx = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
-        if (idx > 0)
+        if (idx > -1)
         {
             rainGauge.set_max(100000);
         }
@@ -173,13 +174,6 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             {
                 encodeAirPmSensor(idx, encoder);
             }
-            else if (type == SENSOR_TYPE_WEATHER0)
-            {
-                // Note:
-                // SENSOR_TYPE_RAIN is changed to SENSOR_TYPE_WEATHER0 by the decoder
-                // to avoid mix-up with SENSOR_TYPE_LIGHTNING (same type code!).
-                // FIXME
-            }
             else if (type == SENSOR_TYPE_CO2)
             {
                 encodeCo2Sensor(idx, encoder);
@@ -212,6 +206,8 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
         encoder.writeUint16(INV_TEMP); // Temperature
         if (flags & PAYLOAD_WS_HUMIDITY)
             encoder.writeUint8(INV_UINT8); // Humidity
+        if (flags & PAYLOAD_WS_RAINGAUGE)
+            encoder.writeRawFloat(INV_FLOAT); // Rain
         if (flags & PAYLOAD_WS_WIND)
         {
 #ifdef ENCODE_AS_FLOAT
@@ -224,8 +220,6 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
             encoder.writeUint16(INV_UINT16); // Wind dir
 #endif
         }
-        if (flags & PAYLOAD_WS_RAINGAUGE)
-            encoder.writeRawFloat(INV_FLOAT); // Rain
         if (flags & PAYLOAD_WS_UV)
             encoder.writeUint8(INV_UINT8); // UV
         if (flags & PAYLOAD_WS_LIGHT)
@@ -248,6 +242,7 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
             if (weatherSensor.sensor[idx].w.humidity_ok)
             {
                 log_i("Humidity:            %2d   %%", weatherSensor.sensor[idx].w.humidity);
+                encoder.writeUint8(weatherSensor.sensor[idx].w.humidity);
             }
             else
             {
@@ -316,6 +311,7 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
             }
         }
     }
+
     // Rain data statistics
 #ifdef RAINDATA_EN
     if ((idx) && weatherSensor.sensor[idx].valid && weatherSensor.sensor[idx].w.rain_ok)
@@ -460,7 +456,7 @@ void PayloadBresser::encodeAirPmSensor(int idx, LoraEncoder &encoder)
 // Payload size: 3 bytes (raw) / 7 bytes (pre-processed) / 10 bytes (both)
 void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &encoder)
 {
-    if (flags & (PAYLOAD_LIGHTNING_RAW | 1))
+    if (flags & PAYLOAD_LIGHTNING_RAW)
     {
         // Raw sensor values
         if (idx == -1)
@@ -478,7 +474,7 @@ void PayloadBresser::encodeLightningSensor(int idx, uint8_t flags, LoraEncoder &
         }
     }
 
-    if (flags & (PAYLOAD_LIGHTNING_PROC | 1))
+    if (flags & PAYLOAD_LIGHTNING_PROC)
     {
         // Post-processed sensor values
         if (lightningProc.lastEvent(lightn_ts, lightn_events, lightn_distance))
