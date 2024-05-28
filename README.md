@@ -89,6 +89,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Using Raw Data](#using-raw-data)
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
 * [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
+* [Payload Configuration](#payload-configuration)
 * [Customizing the Application Layer](#customizing-the-application-layer)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
@@ -498,6 +499,10 @@ Modify the example [data/secrets.json](data/secrets.json) as required and instal
 
 > [!WARNING]
 > Only very basic validation of the file `secrets.json` is implemented.
+
+## Payload Configuration
+
+[Config Helper](https://matthias-bs.github.io/BresserWeatherSensorLW/confighelper.html)
 
 ## Customizing the Application Layer
 
