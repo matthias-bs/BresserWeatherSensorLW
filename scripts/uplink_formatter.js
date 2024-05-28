@@ -111,6 +111,7 @@
 // 20240507 Added CMD_GET_SENSORS_CFG
 // 20240508 Added en_decoders to CMD_GET_SENSORS_CFG
 // 20240517 Added CMD_GET_APP_PAYLOAD_CFG
+// 20240528 Modified sensor data payload decoder
 //
 // ToDo:
 // -  
@@ -129,8 +130,6 @@ function decoder(bytes, port) {
     const CMD_GET_BLE_ADDR = 0xC8;
     const CMD_GET_BLE_CONFIG = 0xCA;
     const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
-
-    const ONEWIRE_EN = 0;
 
     var rtc_source_code = {
         0x00: "GPS",
@@ -417,43 +416,43 @@ function decoder(bytes, port) {
 
 
     if (port === 1) {
-        if (ONEWIRE_EN) {
-            return decode(
-                bytes,
-                [bitmap_node, bitmap_sensors, temperature, uint8,
-                    uint16fp1, uint16fp1, uint16fp1,
-                    rawfloat, uint16, temperature,
-                    temperature, uint8, temperature, uint8,
-                    rawfloat, rawfloat, rawfloat, rawfloat,
-                    unixtime, uint16, uint8
-                ],
-                ['status_node', 'status', 'air_temp_c', 'humidity',
-                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'rain_mm', 'supply_v', 'water_temp_c',
-                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
-                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
-                    'lightning_time', 'lightning_events', 'lightning_distance_km'
-                ]
-            );
-        } else {
-            return decode(
-                bytes,
-                [bitmap_node, bitmap_sensors, temperature, uint8,
-                    uint16fp1, uint16fp1, uint16fp1,
-                    rawfloat, uint16,
-                    temperature, uint8, temperature, uint8,
-                    rawfloat, rawfloat, rawfloat, rawfloat,
-                    unixtime, uint16, uint8
-                ],
-                ['status_node', 'status', 'air_temp_c', 'humidity',
-                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'rain_mm', 'supply_v',
-                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
-                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
-                    'lightning_time', 'lightning_events', 'lightning_distance_km'
-                ]
-            );
-        }
+        return decode(
+            bytes,
+[
+    temperature,
+    uint8,
+    rawfloat,
+    uint16fp1,uint16fp1,uint16fp1,
+    uint8,
+    rawfloat,
+    rawfloat,rawfloat,rawfloat,
+    unixtime,
+    uint16,
+    uint8,
+    temperature,uint8,
+    temperature,
+    temperature,uint8,
+    temperature,
+    uint16
+],
+[
+    'ws_temp_c',
+    'ws_humidity',
+    'ws_rain_mm',
+    'ws_wind_gust_ms','ws_wind_avg_ms','ws_wind_dir_deg',
+    'ws_uv',
+    'ws_rain_hourly_mm',
+    'ws_rain_daily_mm','ws_rain_weekly_mm','ws_rain_monthly_mm',
+    'lgt_time',
+    'lgt_events',
+    'lgt_distance_km',
+    'th1_temp_c','th1_humidity',
+    'pt1_temp_c',
+    'soil1_temp_c','soil1_moisture',
+    'ow0_temp_c',
+    'a0_voltage_mv'
+]
+);
 
     } else if (port === CMD_GET_DATETIME) {
         return decode(
