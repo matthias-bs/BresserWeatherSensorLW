@@ -35,7 +35,7 @@
 // 20240526 Created
 // 20240527 Added generation of uplink decoder parameters
 //          Fixed bug in arrayOutput generation
-// 20240528 Fixed getMultichannelconfig()
+// 20240528 Fixed getMultichannelconfig() and getWeatherconfig()
 //
 // ToDo:
 // -
@@ -254,7 +254,14 @@
                 if (checkbox.checked) {
                     result |= (1 << i);
                     size += weatherConfig[i][1];
-                    configDecoder.signals.push("'" + weatherConfig[i][2] + "'");
+                    signals = weatherConfig[i][2];
+                    var _signals = [];
+                    if (signals.constructor === Array) {
+                        _signals = signals.map((signal) => "'" + signal + "'");
+                    } else {
+                        _signals = "'" + signals + "'";
+                    }
+                    configDecoder.signals.push(_signals);
                     configDecoder.types.push(weatherConfig[i][3]);
                 }
             }
