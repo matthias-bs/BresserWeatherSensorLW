@@ -433,7 +433,7 @@ const uint8_t UBATT_SAMPLES = 10;
 #define APP_PAYLOAD_BYTES_DIGITAL 4
 
 // Encoding of invalid values
-#define INV_FLOAT 0xFFFFFFFF
+#define INV_FLOAT NAN
 #define INV_UINT32 0xFFFFFFFF
 #define INV_UINT16 0xFFFF
 #define INV_UINT8 0xFF
