@@ -84,6 +84,7 @@
 // 20240505 Implemented loading of LoRaWAN secrets from file on LittleFS (if available)
 // 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve 
 //          to uplinkPayload[], modified actual size in sendReceive()
+// 20240528 Disabled uplink transmission of LoRaWAN node status flags
 //
 // ToDo:
 // -
@@ -749,15 +750,17 @@ void setup()
 
   LoraEncoder encoder(uplinkPayload);
 
-  // LoRaWAN node status flags
-  encoder.writeBitmap(0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      longSleep,
-                      0,
-                      0);
+  // Note:
+  // This should be enabled by a LoRaWAN downlink command if required.
+  // // LoRaWAN node status flags
+  // encoder.writeBitmap(0,
+  //                     0,
+  //                     0,
+  //                     0,
+  //                     0,
+  //                     longSleep,
+  //                     0,
+  //                     0);
 
   appLayer.getPayloadStage1(1, encoder);
 
