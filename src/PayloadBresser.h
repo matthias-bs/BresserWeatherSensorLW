@@ -37,6 +37,7 @@
 // 20240524 Moved rainGauge, appPrefs and time members from AppLayer
 //          into the class
 //          Added isSpaceLeft(), payloadSize[] & sensorTypes[]
+// 20240528 Moved encoding of invalid values to BresserWeatherSensorLWCmd.h
 //
 // ToDo:
 // -
@@ -61,13 +62,6 @@
 
 #include <LoraMessage.h>
 #include "logging.h"
-
-// Encoding of invalid values
-#define INV_FLOAT 0xFFFFFFFF
-#define INV_UINT32 0xFFFFFFFF
-#define INV_UINT16 0xFFFF
-#define INV_UINT8 0xFF
-#define INV_TEMP 0x7FFF
 
 class PayloadBresser
 {
