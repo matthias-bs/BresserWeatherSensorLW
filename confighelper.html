@@ -33,11 +33,14 @@
 // History:
 //
 // 20240526 Created
+// 20240527 Added generation of uplink decoder parameters
+//          Fixed bug in arrayOutput generation
 //
 // ToDo:
 // -
 -->
 <html>
+
 <head>
     <title>Config Helper</title>
     <style>
@@ -51,26 +54,35 @@
         const ANALOG_SIZE = 2;
         const DIGITAL_SIZE = 1;
 
+        // Uplink decoder datatype
+        DIGITAL_TYPE = 'uint8';
+
         // Payload size limit
         const PAYLOAD_SIZE_LIMIT = 51;
 
         // Config array
         var configArray = [];
 
+        // Decoder array
+        var configDecoder = {
+            signals: [],
+            types: []
+        };
+
         // [Name, Size in bytes]
         const sensorTypes = [
             ["Weather", 0],
             ["Weather", 0],
-            ["Thermo/Hygro", 3],
-            ["Pool Temperature", 2],
-            ["Soil", 3],
-            ["Leakage", 1],
-            ["reserved", 0],
-            ["reserved", 0],
-            ["Air Quality (PM)", 6],
+            ["Thermo/Hygro", 3, ['th*_temp_c', 'th*_humidity'], ['temperature', 'uint8']],
+            ["Pool Temperature", 2, 'pt*_temp_c', 'temperature'],
+            ["Soil", 3, ['soil*_temp_c', 'soil*_moisture'], ['temperature', 'uint8']],
+            ["Leakage", 1, 'leak*_alarm', 'uint8'],
+            ["reserved", 0, '', ''],
+            ["reserved", 0, '', ''],
+            ["Air Quality (PM)", 6, ['pm*_pm1_0_ug_m3', 'pm*_pm2_5_ug_m3', 'pm*_pm10_ug_m3'], ['uint16', 'uint16', 'uint16']],
             ["Lightning", 0],
-            ["CO2", 2],
-            ["Air Quality (HCHO/VOC)", 3]
+            ["CO2", 2, 'c_co2_ppm', ['uint16']],
+            ["Air Quality (HCHO/VOC)", 3, ['aq*_hcho_ppb', 'aq*_voc'], ['uint16', 'uint16']],
         ];
 
         // Toggle input field visibility
@@ -174,8 +186,11 @@
             // Initialize the size field
             document.getElementById('size').value = 0;
 
-            // Initialize JSON output field
+            // Initialize Configuration Downlink output field
             document.getElementById('jsonOutput').value = "{}";
+
+            // Initialize Uplink Formatter output field
+            document.getElementById('jsonOutput2').value = "{}";
 
             var configStr = "{\n";
             const zero = 0;
@@ -210,11 +225,11 @@
                     result |= 1 << numbers[i];
                 }
             }
-            return [size, result];
+            return [size, result, numbers];
         }
 
         // Get [size, bitmap] from the Weather Sensor configuration selected with checkboxes
-        function getWeatherconfig() {
+        function getWeatherconfig(configDecoder) {
             var weatherCheckbox = document.getElementById('weather');
             if (!weatherCheckbox.checked) {
                 return [0, 0];
@@ -222,19 +237,24 @@
             var size = 0;
             var result = 1;
             var weatherConfig = [
-                ['weatherHumidity', 1],
-                ['weatherRain', 4],
-                ['weatherWind', 6],
-                ['weatherUV', 1],
-                ['weatherLight', 4],
-                ['weatherRainHourly', 4],
-                ['weatherRainDWM', 12]
+                ['weatherTemperature', 2, 'ws_temp_c', 'temperature'],
+                ['weatherHumidity', 1, 'ws_humidity', 'uint8'],
+                ['weatherRain', 4, 'ws_rain_mm', 'rawfloat'],
+                ['weatherWind', 6, ['ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg'], ['uint16fp1', 'uint16fp1', 'uint16fp1']],
+                ['weatherUV', 1, 'ws_uv', 'uint8'],
+                ['weatherLight', 4, 'ws_light_lux', 'uint32'],
+                ['weatherRainHourly', 4, 'ws_rain_hourly_mm', 'rawfloat'],
+                ['weatherRainDWM', 12, ['ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm'], ['rawfloat', 'rawfloat', 'rawfloat']]
             ];
-            for (var i = 0; i < weatherConfig.length; i++) {
+            configDecoder.signals.push("'" + weatherConfig[0][2] + "'");
+            configDecoder.types.push(weatherConfig[0][3]);
+            for (var i = 1; i < weatherConfig.length; i++) {
                 var checkbox = document.getElementById(weatherConfig[i][0]);
                 if (checkbox.checked) {
-                    result |= (1 << (i + 1));
+                    result |= (1 << i);
                     size += weatherConfig[i][1];
+                    configDecoder.signals.push("'" + weatherConfig[i][2] + "'");
+                    configDecoder.types.push(weatherConfig[i][3]);
                 }
             }
             return [size, result];
@@ -252,27 +272,41 @@
             if (checkbox.checked) {
                 result |= 0x10;
                 size += 3;
+                configDecoder.signals.push("'lgt_distance_km'");
+                configDecoder.signals.push("'lgt_strike_count'");
+                configDecoder.types.push('uint8');
+                configDecoder.types.push('uint16');
             }
             checkbox = document.getElementById('lightningProc');
             if (checkbox.checked) {
                 result |= 0x20;
                 size += 7;
+                configDecoder.signals.push("'lgt_time'");
+                configDecoder.signals.push("'lgt_events'");
+                configDecoder.signals.push("'lgt_distance_km'");
+                configDecoder.types.push('unixtime');
+                configDecoder.types.push('uint16');
+                configDecoder.types.push('uint8');
             }
             return [size, result];
         }
 
         // Get [size, bitmap] from the Multi-Channel Bresser Sensors' configuration
         // consisting of checkboxes and text fields with channel numbers
-        function getMultichannelconfig(configArray) {
+        function getMultichannelconfig(configArray, configDecoder) {
             var size = 0;
             for (var i = 2; i <= 11; i++) {
                 if (i == 9)
                     continue;
                 var checkbox = document.getElementById('checkbox' + i);
                 if (checkbox.checked) {
-                    [tmp, bitmap] = getChannels('inputChannel' + i, 8);
+                    [tmp, bitmap, numbers] = getChannels('inputChannel' + i, 8);
                     configArray[i] = bitmap;
                     size += sensorTypes[i][1];
+                    for (var j = 0; j < numbers.length; j++) {
+                        configDecoder.signals.push(sensorTypes[i][2].map(signal => ("'" + signal.replace('*', numbers[j]) + "'")));
+                        configDecoder.types.push(sensorTypes[i][3]);
+                    }
                 } else {
                     configArray[i] = 0;
                 }
@@ -285,35 +319,52 @@
             event.preventDefault(); // Prevent the form from submitting
 
             var totalSize = 0;
-            [size, weatherValue] = getWeatherconfig();
+            configDecoder = {
+                signals: [],
+                types: []
+            };
+
+            [size, weatherValue] = getWeatherconfig(configDecoder);
             totalSize += size;
 
             [size, lightningValue] = getLightningconfig();
             totalSize += size;
 
-            var size = getMultichannelconfig(configArray);
+            var size = getMultichannelconfig(configArray, configDecoder);
             totalSize += size;
 
             var onewireCheckbox = document.getElementById('onewire');
             if (onewireCheckbox.checked) {
-                [size, onewireValue] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
+                [size, onewireValue, numbers] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
                 totalSize += size;
+                for (var j = 0; j < numbers.length; j++) {
+                        configDecoder.signals.push("'ow" + numbers[j] + "_temp_c'");
+                        configDecoder.types.push('temperature');
+                }
             } else {
                 onewireValue = 0;
             }
 
             var analogCheckbox = document.getElementById('analog');
             if (analogCheckbox.checked) {
-                [size, analogValue] = getChannels('analogInput', 16, ANALOG_SIZE);
+                [size, analogValue, numbers] = getChannels('analogInput', 16, ANALOG_SIZE);
                 totalSize += size;
+                for (var j = 0; j < numbers.length; j++) {
+                        configDecoder.signals.push("'a" + numbers[j] + "_voltage_mv'");
+                        configDecoder.types.push('uint16');
+                }
             } else {
                 analogValue = 0;
             }
 
             var digitalCheckbox = document.getElementById('digital');
             if (digitalCheckbox.checked) {
-                [size, digitalValue] = getChannels('digitalInput', 32, DIGITAL_SIZE);
+                [size, digitalValue, numbers] = getChannels('digitalInput', 32, DIGITAL_SIZE);
                 totalSize += size;
+                for (var j = 0; j < numbers.length; j++) {
+                        configDecoder.signals.push("'d" + numbers[j] + "_value'");
+                        configDecoder.types.push(DIGITAL_TYPE);
+                }
             } else {
                 digitalValue = 0;
             }
@@ -348,6 +399,12 @@
 
             // Update the JSON output field
             document.getElementById('jsonOutput').value = JSON.stringify(jsonOutput, null, 4);
+
+            document.getElementById('jsonOutput2').value = '[\n'
+                + configDecoder.types.map(type => "    " + type).join(",\n")
+                + "\n],\n[\n"
+                + configDecoder.signals.map(signal => "    " + signal).join(",\n")
+                + "\n]";
 
             // Update the arrayOutput
             var arrayOutput = document.getElementById('arrayOutput');
@@ -432,17 +489,21 @@
         <label for="size">Size (Bytes):</label><br>
         <input type="text" id="size" name="size" value="0" readonly><br><br>
 
-        <label for="jsonOutput">JSON Output (Node Configuration Downlink):</label><br>
-        <textarea id="jsonOutput" name="jsonOutput" readonly cols="60" rows="23"></textarea><br><br>
+        <label for="jsonOutput">Node Configuration Downlink:</label><br>
+        <textarea id="jsonOutput" name="jsonOutput" readonly cols="100" rows="23"></textarea><br><br>
+
+        <label for="jsonOutput2">Uplink Formatter (<code>uplink_formatter.js</code>, parameters for <code>decode()</code>):</label><br>
+        <textarea id="jsonOutput2" name="jsonOutput2" readonly cols="100" rows="23"></textarea><br><br>
 
         <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
-        <textarea id="arrayOutput" name="arrayOutput" readonly cols="60" rows="3"></textarea><br><br>
+        <textarea id="arrayOutput" name="arrayOutput" readonly cols="100" rows="3"></textarea><br><br>
+
         <input type="submit" value="Submit">
     </form>
     <br>
     <br>
     <p style="font-size: smaller;">
-    Copyright &copy; 2024 Matthias Prinke, MIT License
+        Copyright &copy; 2024 Matthias Prinke, MIT License
     </p>
 </body>
 
