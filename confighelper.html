@@ -36,6 +36,9 @@
 // 20240527 Added generation of uplink decoder parameters
 //          Fixed bug in arrayOutput generation
 // 20240528 Fixed getMultichannelconfig() and getWeatherconfig()
+// 20240529 Changed type of ws_uv to uint8fp1
+//          Changed position of lightning data
+//          Fixed missing multiChannel checkbox evaluation
 //
 // ToDo:
 // -
@@ -121,13 +124,11 @@
 
                 var table = document.createElement('div');
                 table.classList.add('table');
-                //table.style = "width: 100%; display: table;";
                 table.style.width = '100%';
                 table.style.display = 'table';
 
                 var row = document.createElement('div');
                 row.classList.add('row');
-                //row.style = "display: table-row;";
                 row.style.display = 'rable-row';
 
                 var labelColumn = document.createElement('div');
@@ -242,7 +243,7 @@
                 ['weatherHumidity', 1, 'ws_humidity', 'uint8'],
                 ['weatherRain', 4, 'ws_rain_mm', 'rawfloat'],
                 ['weatherWind', 6, ['ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg'], ['uint16fp1', 'uint16fp1', 'uint16fp1']],
-                ['weatherUV', 1, 'ws_uv', 'uint8'],
+                ['weatherUV', 1, 'ws_uv', 'uint8fp1'],
                 ['weatherLight', 4, 'ws_light_lux', 'uint32'],
                 ['weatherRainHourly', 4, 'ws_rain_hourly_mm', 'rawfloat'],
                 ['weatherRainDWM', 12, ['ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm'], ['rawfloat', 'rawfloat', 'rawfloat']]
@@ -319,10 +320,14 @@
         function getMultichannelconfig(configArray, configDecoder) {
             var size = 0;
             for (var i = 2; i <= 11; i++) {
-                if (i == 9)
+                if (i == 9) {
+                    [lgtSize, configArray[9]] = getLightningconfig();
+                    size += lgtSize;
                     continue;
+                }
+                var checkboxMultichannel = document.getElementById('multiChannel');
                 var checkbox = document.getElementById('checkbox' + i);
-                if (checkbox.checked) {
+                if (checkboxMultichannel.checked && checkbox.checked) {
                     [tmp, bitmap, numbers] = getChannels('inputChannel' + i, 8);
                     configArray[i] = bitmap;
                     size += sensorTypes[i][1];
@@ -348,9 +353,6 @@
             };
 
             [size, weatherValue] = getWeatherconfig(configDecoder);
-            totalSize += size;
-
-            [size, lightningValue] = getLightningconfig();
             totalSize += size;
 
             var size = getMultichannelconfig(configArray, configDecoder);
@@ -402,7 +404,6 @@
             document.getElementById('size').value = totalSize;
 
             configArray[0] = weatherValue;
-            configArray[9] = lightningValue;
 
             // Get the current JSON output
             var jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
