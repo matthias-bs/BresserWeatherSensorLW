@@ -54,6 +54,7 @@
 // 20240520 Moved 1-Wire sensor code to PayloadOneWire.h/.cpp
 // 20240524 Added appPayloadCfgDef, setAppPayloadCfg() & getAppPayloadCfg()
 //          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
+// 20240529 Changed encoding of INV_TEMP for BLE sensors
 //
 // ToDo:
 // - Move BLE code to separate class
@@ -292,7 +293,7 @@ encodeDigital(appPayloadCfg, encoder);
     {
         log_i("Indoor Air Temp.:    --.- °C");
         log_i("Indoor Humidity:     --   %%");
-        encoder.writeUint16(INV_UINT16);
+        encoder.writeTemperature(INV_TEMP);
         encoder.writeUint8(INV_UINT8);
     }
     // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
