@@ -113,6 +113,8 @@
 // 20240517 Added CMD_GET_APP_PAYLOAD_CFG
 // 20240528 Modified sensor data payload decoder
 // 20240529 Added uint8fp1 for UV index
+//          Added NaN results to decoding functions
+//          Added supression of NaN results in decoder
 //
 // ToDo:
 // -  
@@ -177,7 +179,11 @@ function decoder(bytes, port) {
         if (bytes.length !== uint8.BYTES) {
             throw new Error('int must have exactly 1 byte');
         }
-        return bytesToInt(bytes);
+        var res = bytesToInt(bytes);
+        if (res === 0xFF) {
+            return NaN;
+        }
+        return res;
     };
     uint8.BYTES = 1;
 
@@ -185,16 +191,24 @@ function decoder(bytes, port) {
         if (bytes.length !== uint8fp1.BYTES) {
             throw new Error('int must have exactly 1 byte');
         }
-        var res = bytesToInt(bytes) * 0.1;
+        var res = bytesToInt(bytes);
+        if (res === 0xFF) {
+            return NaN;
+        }
+        res *= 0.1;
         return res.toFixed(1);
     };
-    uint8fp1.BYTES = 2;
+    uint8fp1.BYTES = 1;
 
     var uint16 = function (bytes) {
         if (bytes.length !== uint16.BYTES) {
             throw new Error('int must have exactly 2 bytes');
         }
-        return bytesToInt(bytes);
+        var res = bytesToInt(bytes);
+        if (res === 0xFFFF) {
+            return NaN;
+        }
+        return res;
     };
     uint16.BYTES = 2;
 
@@ -202,7 +216,11 @@ function decoder(bytes, port) {
         if (bytes.length !== uint16fp1.BYTES) {
             throw new Error('int must have exactly 2 bytes');
         }
-        var res = bytesToInt(bytes) * 0.1;
+        var res = bytesToInt(bytes);
+        if (res === 0xFFFF) {
+            return NaN;
+        }
+        res *= 0.1;
         return res.toFixed(1);
     };
     uint16fp1.BYTES = 2;
@@ -316,6 +334,9 @@ function decoder(bytes, port) {
             t = -t;
         }
         t = t / 1e2;
+        if (t === 327.67) {
+            return NaN;
+        }
         return t.toFixed(1);
     };
     temperature.BYTES = 2;
@@ -326,6 +347,9 @@ function decoder(bytes, port) {
         }
 
         var h = bytesToInt(bytes);
+        if (h === 0xFFFF) {
+            return NaN;
+        }
         return h / 1e2;
     };
     humidity.BYTES = 2;
@@ -343,6 +367,9 @@ function decoder(bytes, port) {
         var e = bits >>> 23 & 0xff;
         var m = (e === 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
         var f = sign * m * Math.pow(2, e - 150);
+        if (e === 0x7F && m !== 0) {
+            return NaN;
+        }
         return f.toFixed(1);
     }
     rawfloat.BYTES = 4;
@@ -352,7 +379,7 @@ function decoder(bytes, port) {
             throw new Error('Bitmap must have exactly 1 byte');
         }
         var i = bytesToInt(byte);
-        var bm = ('00000000' + Number(i).toString(2)).substr(-8).split('').map(Number).map(Boolean);
+        var bm = ('00000000' + Number(i).toString(2)).slice(-8).split('').map(Number).map(Boolean);
 
         return ['res7', 'res6', 'res5', 'res4', 'res3', 'res2', 'res1', 'res0']
             .reduce(function (obj, pos, index) {
@@ -367,7 +394,7 @@ function decoder(bytes, port) {
             throw new Error('Bitmap must have exactly 1 byte');
         }
         var i = bytesToInt(byte);
-        var bm = ('00000000' + Number(i).toString(2)).substr(-8).split('').map(Number).map(Boolean);
+        var bm = ('00000000' + Number(i).toString(2)).slice(-8).split('').map(Number).map(Boolean);
         // Only Weather Sensor
         //return ['res5', 'res4', 'res3', 'res2', 'res1', 'res0', 'dec_ok', 'batt_ok']
         // Weather Sensor + MiThermo (BLE) Sensor
@@ -381,8 +408,18 @@ function decoder(bytes, port) {
     };
     bitmap_sensors.BYTES = 1;
 
+    /**
+     * Decodes the given bytes using the provided mask and names.
+     *
+     * @param {Array} bytes - The bytes to decode.
+     * @param {Array} mask - The mask used for decoding.
+     * @param {Array} [names] - The names of the decoded values.
+     * @returns {Object} - The decoded values as an object.
+     * @throws {Error} - If the length of the bytes is less than the mask length.
+     */
     var decode = function (bytes, mask, names) {
 
+        // Sum of all mask bytes
         var maskLength = mask.reduce(function (prev, cur) {
             return prev + cur.BYTES;
         }, 0);
@@ -393,14 +430,20 @@ function decoder(bytes, port) {
         names = names || [];
         var offset = 0;
         return mask
-            .map(function (decodeFn) {
-                var current = bytes.slice(offset, offset += decodeFn.BYTES);
-                return decodeFn(current);
-            })
-            .reduce(function (prev, cur, idx) {
+        .map(function (decodeFn) {
+            var current = bytes.slice(offset, offset += decodeFn.BYTES);
+            var decodedValue = decodeFn(current);
+            if (isNaN(decodedValue)) {
+                return null;
+            }
+            return decodedValue;
+        })
+        .reduce(function (prev, cur, idx) {
+            if (cur !== null) {
                 prev[names[idx] || idx] = cur;
-                return prev;
-            }, {});
+            }
+            return prev;
+        }, {});
     };
 
     if (typeof module === 'object' && typeof module.exports !== 'undefined') {
@@ -436,12 +479,12 @@ function decoder(bytes, port) {
     uint8fp1,
     rawfloat,
     rawfloat,rawfloat,rawfloat,
-    unixtime,
-    uint16,
-    uint8,
     temperature,uint8,
     temperature,
     temperature,uint8,
+    unixtime,
+    uint16,
+    uint8,
     temperature,
     uint16
 ],
@@ -453,12 +496,12 @@ function decoder(bytes, port) {
     'ws_uv',
     'ws_rain_hourly_mm',
     'ws_rain_daily_mm','ws_rain_weekly_mm','ws_rain_monthly_mm',
-    'lgt_time',
-    'lgt_events',
-    'lgt_distance_km',
     'th1_temp_c','th1_humidity',
     'pt1_temp_c',
     'soil1_temp_c','soil1_moisture',
+    'lgt_time',
+    'lgt_events',
+    'lgt_distance_km',
     'ow0_temp_c',
     'a0_voltage_mv'
 ]
