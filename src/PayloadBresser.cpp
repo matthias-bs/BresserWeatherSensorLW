@@ -38,6 +38,7 @@
 //          from AppLayer into this class
 //          Added handling of sensor feature flags
 // 20240528 Fixes
+// 20240529 Changed encoding of INV_TEMP
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -203,7 +204,7 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
     {
         log_i("-- Weather Sensor Failure");
         // Invalidate
-        encoder.writeUint16(INV_TEMP); // Temperature
+        encoder.writeTemperature(INV_TEMP); // Temperature
         if (flags & PAYLOAD_WS_HUMIDITY)
             encoder.writeUint8(INV_UINT8); // Humidity
         if (flags & PAYLOAD_WS_RAINGAUGE)
@@ -351,7 +352,7 @@ void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         // Invalidate
-        encoder.writeUint16(INV_TEMP);
+        encoder.writeTemperature(INV_TEMP);
         encoder.writeUint8(INV_UINT8);
     }
     else
@@ -368,7 +369,7 @@ void PayloadBresser::encodePoolThermometer(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         // Invalidate
-        encoder.writeUint16(INV_TEMP);
+        encoder.writeTemperature(INV_TEMP);
     }
     else
     {
@@ -382,7 +383,7 @@ void PayloadBresser::encodeSoilSensor(int idx, LoraEncoder &encoder)
     if (idx == -1)
     {
         // Invalidate
-        encoder.writeUint16(INV_TEMP);
+        encoder.writeTemperature(INV_TEMP);
         encoder.writeUint8(INV_UINT8);
     }
     else
