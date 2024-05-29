@@ -359,7 +359,7 @@ const uint8_t UBATT_SAMPLES = 10;
 
 // 3 - Pool / Spa Thermometer; 7 Ch
 // Ch: 1
-#define APP_PAYLOAD_CFG_TYPE03 0x02
+#define APP_PAYLOAD_CFG_TYPE03 0x00
 
 // 4 - Soil Moisture Sensor; 7 Ch
 // Ch: 1
@@ -437,6 +437,6 @@ const uint8_t UBATT_SAMPLES = 10;
 #define INV_UINT32 0xFFFFFFFF
 #define INV_UINT16 0xFFFF
 #define INV_UINT8 0xFF
-#define INV_TEMP 0x7FFF
+#define INV_TEMP 327.67
 
 #endif // _LWCFG_H
