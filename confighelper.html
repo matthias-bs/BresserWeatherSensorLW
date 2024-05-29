@@ -39,6 +39,7 @@
 // 20240529 Changed type of ws_uv to uint8fp1
 //          Changed position of lightning data
 //          Fixed missing multiChannel checkbox evaluation
+//          Fixed Weather Sensor size calculation
 //
 // ToDo:
 // -
@@ -194,7 +195,7 @@
             // Initialize Uplink Formatter output field
             document.getElementById('jsonOutput2').value = "{}";
 
-            var configStr = "{\n";
+            let configStr = "{\n";
             const zero = 0;
             for (var i = 0; i < 24; i++) {
                 configArray[i] = 0;
@@ -207,14 +208,14 @@
         // Get [size, bitmap] from a comma-separated list of channel numbers
         function getChannels(id, length, size_per_channel) {
             // Get the text input field's value
-            var input = document.getElementById(id).value;
+            let input = document.getElementById(id).value;
 
             // Split the input into an array of numbers
-            var numbers = input.split(',').map(Number);
+            let numbers = input.split(',').map(Number);
 
             // Initialize the size and the 16-bit value
-            var size = 0;
-            var result = 0;
+            let size = 0;
+            let result = 0;
 
             // Iterate over the numbers
             for (var i = 0; i < numbers.length; i++) {
@@ -236,9 +237,9 @@
             if (!weatherCheckbox.checked) {
                 return [0, 0];
             }
-            var size = 0;
-            var result = 1;
-            var weatherConfig = [
+            let size = 0;
+            let result = 1;
+            const weatherConfig = [
                 ['weatherTemperature', 2, 'ws_temp_c', 'temperature'],
                 ['weatherHumidity', 1, 'ws_humidity', 'uint8'],
                 ['weatherRain', 4, 'ws_rain_mm', 'rawfloat'],
@@ -248,6 +249,7 @@
                 ['weatherRainHourly', 4, 'ws_rain_hourly_mm', 'rawfloat'],
                 ['weatherRainDWM', 12, ['ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm'], ['rawfloat', 'rawfloat', 'rawfloat']]
             ];
+            size += weatherConfig[0][1];
             configDecoder.signals.push("'" + weatherConfig[0][2] + "'");
             configDecoder.types.push(weatherConfig[0][3]);
             for (var i = 1; i < weatherConfig.length; i++) {
@@ -271,13 +273,13 @@
 
         // Get [size, bitmap] from the Lightning Sensor configuration selected with checkboxes
         function getLightningconfig() {
-            var lightningCheckbox = document.getElementById('lightning');
+            let lightningCheckbox = document.getElementById('lightning');
             if (!lightningCheckbox.checked) {
                 return [0, 0];
             }
-            var size = 0;
-            var result = 1;
-            var checkbox = document.getElementById('lightningRaw');
+            let size = 0;
+            let result = 1;
+            let checkbox = document.getElementById('lightningRaw');
             if (checkbox.checked) {
                 result |= 0x10;
                 size += 3;
@@ -303,7 +305,7 @@
         // Insert the selected channels into the signals array
         // and enclose them in single quotes.
         function formatSignals(signals, numbers) {
-            var _signals = [];
+            let _signals = [];
             for (var j = 0; j < numbers.length; j++) {
                 if (signals.constructor === Array) {
                     _signals[j] = signals.map((signal) => "'" + signal.replace('*', numbers[j]) + "'");
@@ -318,19 +320,19 @@
         // Get [size, bitmap] from the Multi-Channel Bresser Sensors' configuration
         // consisting of checkboxes and text fields with channel numbers
         function getMultichannelconfig(configArray, configDecoder) {
-            var size = 0;
+            let size = 0;
             for (var i = 2; i <= 11; i++) {
                 if (i == 9) {
                     [lgtSize, configArray[9]] = getLightningconfig();
                     size += lgtSize;
                     continue;
                 }
-                var checkboxMultichannel = document.getElementById('multiChannel');
-                var checkbox = document.getElementById('checkbox' + i);
+                let checkboxMultichannel = document.getElementById('multiChannel');
+                let checkbox = document.getElementById('checkbox' + i);
                 if (checkboxMultichannel.checked && checkbox.checked) {
                     [tmp, bitmap, numbers] = getChannels('inputChannel' + i, 8);
                     configArray[i] = bitmap;
-                    size += sensorTypes[i][1];
+                    size += sensorTypes[i][1] * numbers.length;
                     configDecoder.signals.push(formatSignals(sensorTypes[i][2], numbers));
                     for (var j = 0; j < numbers.length; j++) {
                         configDecoder.types.push(sensorTypes[i][3]);
@@ -346,8 +348,8 @@
         function handleFormSubmit(event) {
             event.preventDefault(); // Prevent the form from submitting
 
-            var totalSize = 0;
-            configDecoder = {
+            let totalSize = 0;
+            let configDecoder = {
                 signals: [],
                 types: []
             };
@@ -358,7 +360,7 @@
             var size = getMultichannelconfig(configArray, configDecoder);
             totalSize += size;
 
-            var onewireCheckbox = document.getElementById('onewire');
+            let onewireCheckbox = document.getElementById('onewire');
             if (onewireCheckbox.checked) {
                 [size, onewireValue, numbers] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
                 totalSize += size;
@@ -370,7 +372,7 @@
                 onewireValue = 0;
             }
 
-            var analogCheckbox = document.getElementById('analog');
+            let analogCheckbox = document.getElementById('analog');
             if (analogCheckbox.checked) {
                 [size, analogValue, numbers] = getChannels('analogInput', 16, ANALOG_SIZE);
                 totalSize += size;
@@ -382,7 +384,7 @@
                 analogValue = 0;
             }
 
-            var digitalCheckbox = document.getElementById('digital');
+            let digitalCheckbox = document.getElementById('digital');
             if (digitalCheckbox.checked) {
                 [size, digitalValue, numbers] = getChannels('digitalInput', 32, DIGITAL_SIZE);
                 totalSize += size;
@@ -406,7 +408,7 @@
             configArray[0] = weatherValue;
 
             // Get the current JSON output
-            var jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
+            let jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
 
             jsonOutput.bresser = [];
             for (var i = 0; i < 16; i++) {
@@ -431,7 +433,7 @@
                 + "\n]";
 
             // Update the arrayOutput
-            var arrayOutput = document.getElementById('arrayOutput');
+            let arrayOutput = document.getElementById('arrayOutput');
 
             //arrayOutputValue = arrayOutputValue.replace("$SELECTION_PLACEHOLDER$", "    0x" + upper8Bits.toString(16).padStart(2, '0') + ",\n    0x" + lower8Bits.toString(16).padStart(2, '0') + ",");
             configArray[16] = (onewireValue >> 8) & 0xFF;
