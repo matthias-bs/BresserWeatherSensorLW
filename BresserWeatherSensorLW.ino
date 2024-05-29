@@ -85,6 +85,7 @@
 // 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve 
 //          to uplinkPayload[], modified actual size in sendReceive()
 // 20240528 Disabled uplink transmission of LoRaWAN node status flags
+// 20242529 Fixed payload size calculation
 //
 // ToDo:
 // -
@@ -897,12 +898,19 @@ void setup()
   LoRaWANEvent_t uplinkDetails;
   LoRaWANEvent_t downlinkDetails;
 
+  uint8_t payloadSize = encoder.getLength();
+  if (payloadSize > PAYLOAD_SIZE)
+  {
+    log_w("Payload size exceeds maximum of %u bytes - truncating", PAYLOAD_SIZE);
+    payloadSize = PAYLOAD_SIZE;
+  }
+
   // perform an uplink & optionally receive downlink
   if (fcntUp % 64 == 0)
   {
     state = node.sendReceive(
       uplinkPayload,
-      min(encoder.getLength(), static_cast<int>(PAYLOAD_SIZE)),
+      payloadSize,
       port,
       downlinkPayload,
       &downlinkSize,
@@ -915,7 +923,7 @@ void setup()
   {
     state = node.sendReceive(
       uplinkPayload,
-      min(encoder.getLength(), static_cast<int>(PAYLOAD_SIZE)),
+      payloadSize,
       port,
       downlinkPayload,
       &downlinkSize,
