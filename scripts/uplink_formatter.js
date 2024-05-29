@@ -112,6 +112,7 @@
 // 20240508 Added en_decoders to CMD_GET_SENSORS_CFG
 // 20240517 Added CMD_GET_APP_PAYLOAD_CFG
 // 20240528 Modified sensor data payload decoder
+// 20240529 Added uint8fp1 for UV index
 //
 // ToDo:
 // -  
@@ -180,6 +181,15 @@ function decoder(bytes, port) {
     };
     uint8.BYTES = 1;
 
+    var uint8fp1 = function (bytes) {
+        if (bytes.length !== uint8fp1.BYTES) {
+            throw new Error('int must have exactly 1 byte');
+        }
+        var res = bytesToInt(bytes) * 0.1;
+        return res.toFixed(1);
+    };
+    uint8fp1.BYTES = 2;
+
     var uint16 = function (bytes) {
         if (bytes.length !== uint16.BYTES) {
             throw new Error('int must have exactly 2 bytes');
@@ -189,7 +199,7 @@ function decoder(bytes, port) {
     uint16.BYTES = 2;
 
     var uint16fp1 = function (bytes) {
-        if (bytes.length !== uint16.BYTES) {
+        if (bytes.length !== uint16fp1.BYTES) {
             throw new Error('int must have exactly 2 bytes');
         }
         var res = bytesToInt(bytes) * 0.1;
@@ -423,7 +433,7 @@ function decoder(bytes, port) {
     uint8,
     rawfloat,
     uint16fp1,uint16fp1,uint16fp1,
-    uint8,
+    uint8fp1,
     rawfloat,
     rawfloat,rawfloat,rawfloat,
     unixtime,
