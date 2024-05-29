@@ -124,133 +124,127 @@ $(document).ready(function(){initNavTree('_payload_bresser_8h_source.html',''); 
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">// 20240524 Moved rainGauge, appPrefs and time members from AppLayer</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">//          into the class</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//          Added isSpaceLeft(), payloadSize[] &amp; sensorTypes[]</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">// ToDo:</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// -</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#if !defined(_PAYLOAD_BRESSER)</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#define _PAYLOAD_BRESSER</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include &quot;WeatherSensorCfg.h&quot;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include &lt;WeatherSensor.h&gt;</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include &lt;ESP32Time.h&gt;</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#ifdef RAINDATA_EN</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &quot;RainGauge.h&quot;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;Lightning.h&quot;</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">// Encoding of invalid values</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#define INV_FLOAT 0xFFFFFFFF</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#define INV_UINT32 0xFFFFFFFF</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#define INV_UINT16 0xFFFF</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#define INV_UINT8 0xFF</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#define INV_TEMP 0x7FFF</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// 20240528 Moved encoding of invalid values to BresserWeatherSensorLWCmd.h</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// ToDo:</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">// -</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#if !defined(_PAYLOAD_BRESSER)</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#define _PAYLOAD_BRESSER</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#include &quot;WeatherSensorCfg.h&quot;</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#include &lt;WeatherSensor.h&gt;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#include &lt;ESP32Time.h&gt;</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#ifdef RAINDATA_EN</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &quot;RainGauge.h&quot;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;Lightning.h&quot;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &quot;logging.h&quot;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="class_payload_bresser.html">   66</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_payload_bresser.html">PayloadBresser</a></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">   70</a></span>&#160;    WeatherSensor <a class="code" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">weatherSensor</a>;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="class_payload_bresser.html">   72</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_payload_bresser.html">PayloadBresser</a></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;{</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">   76</a></span>&#160;    WeatherSensor <a class="code" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">weatherSensor</a>;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="comment">// Payload size in bytes</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">const</span> uint8_t payloadSize[16] = {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        0,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        23, <span class="comment">// SENSOR_TYPE_WEATHER1 (max.)</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        3, <span class="comment">// SENSOR_TYPE_THERMO_HYGRO</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        2, <span class="comment">// SENSOR_TYPE_POOL_THERMO</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        3, <span class="comment">// SENSOR_TYPE_SOIL</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        1, <span class="comment">// SENSOR_TYPE_LEAKAGE</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="comment">// Payload size in bytes</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keyword">const</span> uint8_t payloadSize[16] = {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        0,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        23, <span class="comment">// SENSOR_TYPE_WEATHER1 (max.)</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        3, <span class="comment">// SENSOR_TYPE_THERMO_HYGRO</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        2, <span class="comment">// SENSOR_TYPE_POOL_THERMO</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        3, <span class="comment">// SENSOR_TYPE_SOIL</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        1, <span class="comment">// SENSOR_TYPE_LEAKAGE</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        0, <span class="comment">// reserved</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        0, <span class="comment">// reserved</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        6, <span class="comment">// SENSOR_TYPE_AIR_PM</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        3, <span class="comment">// SENSOR_TYPE_LIGHTNING (min.)</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        2, <span class="comment">// SENSOR_TYPE_CO2</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        3, <span class="comment">// SENSOR_TYPE_HCHO_VOC</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        0, <span class="comment">// reserved</span></div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        0, <span class="comment">// reserved</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        6, <span class="comment">// SENSOR_TYPE_AIR_PM</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        3, <span class="comment">// SENSOR_TYPE_LIGHTNING (min.)</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        2, <span class="comment">// SENSOR_TYPE_CO2</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        3, <span class="comment">// SENSOR_TYPE_HCHO_VOC</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        0, <span class="comment">// reserved</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        0, <span class="comment">// reserved</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        0, <span class="comment">// reserved</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        0 <span class="comment">// reserved</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    };</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">#if CORE_DEBUG_LEVEL &gt;= ARDUHAL_LOG_LEVEL_INFO</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> * sensorTypes[16] = {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="stringliteral">&quot;Weather&quot;</span>,</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="stringliteral">&quot;Weather&quot;</span>,</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="stringliteral">&quot;Thermo/Hygro&quot;</span>,</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="stringliteral">&quot;Pool Temperature&quot;</span>,</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="stringliteral">&quot;Soil&quot;</span>,</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="stringliteral">&quot;Leakage&quot;</span>,</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="stringliteral">&quot;&quot;</span>,</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="stringliteral">&quot;&quot;</span>,</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="stringliteral">&quot;Air Quality (PM)&quot;</span>,</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="stringliteral">&quot;Lightning&quot;</span>,</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="stringliteral">&quot;CO2&quot;</span>,</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="stringliteral">&quot;Air Quality (HCHO/VOC)&quot;</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    };</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">#ifdef RAINDATA_EN</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">  117</a></span>&#160;    RainGauge <a class="code" href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">rainGauge</a>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    ESP32Time *_rtc;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    time_t *_rtcLastClockSync;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    Preferences appPrefs;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    time_t lightn_ts;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">int</span> lightn_events;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    uint8_t lightn_distance;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    Lightning lightningProc;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00140"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">  140</a></span>&#160;    <a class="code" href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">PayloadBresser</a>(ESP32Time *rtc, time_t *clocksync)</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    {</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        _rtc = rtc;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        _rtcLastClockSync = clocksync;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    };</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">begin</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_payload_bresser.html#abe69edbc8676f2f3954c4654f7d59161">encodeBresser</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordtype">void</span> encodeWeatherSensor(<span class="keywordtype">int</span> idx, uint8_t flags, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordtype">void</span> encodeThermoHygroSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordtype">void</span> encodePoolThermometer(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">void</span> encodeSoilSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordtype">void</span> encodeLeakageSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordtype">void</span> encodeAirPmSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordtype">void</span> encodeLightningSensor(<span class="keywordtype">int</span> idx, uint8_t flags, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">void</span> encodeCo2Sensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordtype">void</span> encodeHchoVocSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160; </div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keywordtype">bool</span> isSpaceLeft(LoraEncoder &amp;encoder, uint8_t type)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    {</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">return</span> (encoder.getLength() + payloadSize[type] &lt;= PAYLOAD_SIZE); </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    };</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;};</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_BRESSER</span></div>
-<div class="ttc" id="aclass_payload_bresser_html"><div class="ttname"><a href="class_payload_bresser.html">PayloadBresser</a></div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:73</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_a2fddb11ea632f2bf2a003c8a72a59bb3"><div class="ttname"><a href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">PayloadBresser::PayloadBresser</a></div><div class="ttdeci">PayloadBresser(ESP32Time *rtc, time_t *clocksync)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:140</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_a7262003f3dc4341ed826fdb64ba0ac5a"><div class="ttname"><a href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">PayloadBresser::weatherSensor</a></div><div class="ttdeci">WeatherSensor weatherSensor</div><div class="ttdoc">Bresser Weather Sensor Receiver.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:76</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_a817a2cfaa3942071014a6fccab423899"><div class="ttname"><a href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">PayloadBresser::rainGauge</a></div><div class="ttdeci">RainGauge rainGauge</div><div class="ttdoc">Rain data statistics.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:117</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_abe69edbc8676f2f3954c4654f7d59161"><div class="ttname"><a href="class_payload_bresser.html#abe69edbc8676f2f3954c4654f7d59161">PayloadBresser::encodeBresser</a></div><div class="ttdeci">void encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode Bresser sensor data for LoRaWAN transmission.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:63</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_adb2aeefccdd9c9f759f7235a2a5c7dc1"><div class="ttname"><a href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Bresser sensors startup code.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:48</div></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        0, <span class="comment">// reserved</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        0 <span class="comment">// reserved</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    };</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">#if CORE_DEBUG_LEVEL &gt;= ARDUHAL_LOG_LEVEL_INFO</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> * sensorTypes[16] = {</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="stringliteral">&quot;Weather&quot;</span>,</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        <span class="stringliteral">&quot;Weather&quot;</span>,</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="stringliteral">&quot;Thermo/Hygro&quot;</span>,</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="stringliteral">&quot;Pool Temperature&quot;</span>,</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="stringliteral">&quot;Soil&quot;</span>,</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="stringliteral">&quot;Leakage&quot;</span>,</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="stringliteral">&quot;&quot;</span>,</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="stringliteral">&quot;&quot;</span>,</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="stringliteral">&quot;Air Quality (PM)&quot;</span>,</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="stringliteral">&quot;Lightning&quot;</span>,</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="stringliteral">&quot;CO2&quot;</span>,</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        <span class="stringliteral">&quot;Air Quality (HCHO/VOC)&quot;</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    };</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">#ifdef RAINDATA_EN</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">  111</a></span>&#160;    RainGauge <a class="code" href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">rainGauge</a>;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    ESP32Time *_rtc;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    time_t *_rtcLastClockSync;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    Preferences appPrefs;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    time_t lightn_ts;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">int</span> lightn_events;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    uint8_t lightn_distance;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    Lightning lightningProc;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00134"></a><span class="lineno"><a class="line" href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">  134</a></span>&#160;    <a class="code" href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">PayloadBresser</a>(ESP32Time *rtc, time_t *clocksync)</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    {</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        _rtc = rtc;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        _rtcLastClockSync = clocksync;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    };</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">begin</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_payload_bresser.html#abe69edbc8676f2f3954c4654f7d59161">encodeBresser</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordtype">void</span> encodeWeatherSensor(<span class="keywordtype">int</span> idx, uint8_t flags, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordtype">void</span> encodeThermoHygroSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordtype">void</span> encodePoolThermometer(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">void</span> encodeSoilSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordtype">void</span> encodeLeakageSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordtype">void</span> encodeAirPmSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="preprocessor">#ifdef LIGHTNINGSENSOR_EN</span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordtype">void</span> encodeLightningSensor(<span class="keywordtype">int</span> idx, uint8_t flags, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">void</span> encodeCo2Sensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordtype">void</span> encodeHchoVocSensor(<span class="keywordtype">int</span> idx, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordtype">bool</span> isSpaceLeft(LoraEncoder &amp;encoder, uint8_t type)</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keywordflow">return</span> (encoder.getLength() + payloadSize[type] &lt;= PAYLOAD_SIZE); </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    };</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;};</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_BRESSER</span></div>
+<div class="ttc" id="aclass_payload_bresser_html"><div class="ttname"><a href="class_payload_bresser.html">PayloadBresser</a></div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:67</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_a2fddb11ea632f2bf2a003c8a72a59bb3"><div class="ttname"><a href="class_payload_bresser.html#a2fddb11ea632f2bf2a003c8a72a59bb3">PayloadBresser::PayloadBresser</a></div><div class="ttdeci">PayloadBresser(ESP32Time *rtc, time_t *clocksync)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:134</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_a7262003f3dc4341ed826fdb64ba0ac5a"><div class="ttname"><a href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">PayloadBresser::weatherSensor</a></div><div class="ttdeci">WeatherSensor weatherSensor</div><div class="ttdoc">Bresser Weather Sensor Receiver.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:70</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_a817a2cfaa3942071014a6fccab423899"><div class="ttname"><a href="class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899">PayloadBresser::rainGauge</a></div><div class="ttdeci">RainGauge rainGauge</div><div class="ttdoc">Rain data statistics.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:111</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_abe69edbc8676f2f3954c4654f7d59161"><div class="ttname"><a href="class_payload_bresser.html#abe69edbc8676f2f3954c4654f7d59161">PayloadBresser::encodeBresser</a></div><div class="ttdeci">void encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode Bresser sensor data for LoRaWAN transmission.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:64</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_adb2aeefccdd9c9f759f7235a2a5c7dc1"><div class="ttname"><a href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Bresser sensors startup code.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:49</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
