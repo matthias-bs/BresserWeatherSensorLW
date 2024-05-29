@@ -433,7 +433,9 @@ const uint8_t UBATT_SAMPLES = 10;
 #define APP_PAYLOAD_BYTES_DIGITAL 4
 
 // Encoding of invalid values
-#define INV_FLOAT NAN
+// for floating point, see
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN
+#define INV_FLOAT 0x3FFFFFFF 
 #define INV_UINT32 0xFFFFFFFF
 #define INV_UINT16 0xFFFF
 #define INV_UINT8 0xFF
