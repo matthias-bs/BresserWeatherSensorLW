@@ -114,6 +114,7 @@
 // 20240508 Fixed decoding of raw data
 //          Added en_decoders to CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240519 Added CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
+// 20240530 Added decoding of CMD_SET_APP_PAYLOAD_CFG
 //
 // ToDo:
 // -  
@@ -190,6 +191,16 @@ function uint32BE(bytes) {
     return bytesToIntBE(bytes);
 }
 
+function hex16(bytes) {
+    let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
+    return res;
+}
+
+function hex32(bytes) {
+    let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
+    return res;
+}
+
 function byte2hex(byte) {
     return ('0' + byte.toString(16)).slice(-2);
 }
@@ -209,6 +220,15 @@ function id32(bytes) {
     var j = 0;
     for (var i = 0; i < bytes.length; i += 4) {
         res[j++] = "0x" + byte2hex(bytes[i]) + byte2hex(bytes[i + 1]) + byte2hex(bytes[i + 2]) + byte2hex(bytes[i + 3]);
+    }
+    return res;
+}
+
+function bresser_bitmaps(bytes) {
+    let res = [];
+    res[0] = "0x" + byte2hex(bytes[0]);
+    for (var i = 1; i < 16; i++) {
+        res[i] = "0x" + byte2hex(bytes[i]);
     }
     return res;
 }
@@ -394,9 +414,9 @@ function encodeDownlink(input) {
             warnings: [],
             errors: []
         };
-    } else if (input.data.hasOwnProperty('max_sensors') && 
-               input.data.hasOwnProperty('rx_flags') &&
-               input.data.hasOwnProperty('en_decoders')) {
+    } else if (input.data.hasOwnProperty('max_sensors') &&
+        input.data.hasOwnProperty('rx_flags') &&
+        input.data.hasOwnProperty('en_decoders')) {
         return {
             bytes: [input.data.max_sensors, input.data.rx_flags, input.data.en_decoders],
             fPort: CMD_SET_SENSORS_CFG,
@@ -404,9 +424,9 @@ function encodeDownlink(input) {
             errors: []
         };
     } else if (input.data.hasOwnProperty('bresser') &&
-               input.data.hasOwnProperty('onewire') &&
-               input.data.hasOwnProperty('analog') &&
-               input.data.hasOwnProperty('digital')) {
+        input.data.hasOwnProperty('onewire') &&
+        input.data.hasOwnProperty('analog') &&
+        input.data.hasOwnProperty('digital')) {
         if (input.data.bresser.length != 16) {
             return {
                 bytes: [],
@@ -562,6 +582,15 @@ function decodeDownlink(input) {
                     max_sensors: uint8(input.bytes.slice(0, 1)),
                     rx_flags: uint8(input.bytes.slice(1, 2)),
                     en_decoders: uint8(input.bytes.slice(2, 3))
+                }
+            };
+        case CMD_SET_APP_PAYLOAD_CFG:
+            return {
+                data: {
+                    bresser: bresser_bitmaps(input.bytes.slice(0, 16)),
+                    onewire: hex16(input.bytes.slice(16, 18)),
+                    analog: hex16(input.bytes.slice(18, 20)),
+                    digital: hex32(input.bytes.slice(20, 24))
                 }
             };
         case CMD_SET_BLE_ADDR:
