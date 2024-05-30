@@ -114,7 +114,7 @@
 // 20240508 Fixed decoding of raw data
 //          Added en_decoders to CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240519 Added CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
-// 20240530 Added decoding of CMD_SET_APP_PAYLOAD_CFG
+// 20240530 Added decoding of CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 //
 // ToDo:
 // -  
@@ -527,6 +527,7 @@ function decodeDownlink(input) {
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
         case CMD_GET_SENSORS_CFG:
+        case CMD_GET_APP_PAYLOAD_CFG:
         case CMD_GET_BLE_ADDR:
         case CMD_GET_BLE_CONFIG:
             return {
