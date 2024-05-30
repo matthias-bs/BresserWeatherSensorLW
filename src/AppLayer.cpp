@@ -55,6 +55,7 @@
 // 20240524 Added appPayloadCfgDef, setAppPayloadCfg() & getAppPayloadCfg()
 //          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
 // 20240529 Changed encoding of INV_TEMP for BLE sensors
+// 20240530 Fixed CMD_SET_APP_PAYLOAD_CFG handling
 //
 // ToDo:
 // - Move BLE code to separate class
@@ -62,7 +63,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "AppLayer.h"
-
 
 uint8_t
 AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
@@ -151,7 +151,8 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     }
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    if ((port == CMD_GET_BLE_CONFIG) && (payload[0] == 0x00) && (size == 1)) {
+    if ((port == CMD_GET_BLE_CONFIG) && (payload[0] == 0x00) && (size == 1))
+    {
         log_d("Get BLE config");
         return CMD_GET_BLE_CONFIG;
     }
@@ -190,22 +191,23 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
         return 0;
     }
-    
+
     if ((port == CMD_GET_APP_PAYLOAD_CFG) && (payload[0] == 0x00) && (size == 1))
     {
         log_d("Get AppLayer payload configuration");
         return CMD_GET_APP_PAYLOAD_CFG;
     }
 
-    if ((port == CMD_SET_SENSORS_CFG) && (size == 16))
+    if ((port == CMD_SET_APP_PAYLOAD_CFG) && (size == 24))
     {
         log_d("Set AppLayer payload configuration");
-        for (size_t i=0; i < 16; i++) {
+        for (size_t i = 0; i < 16; i++)
+        {
             log_d("Type%02d: 0x%X", i, payload[i]);
         }
-        log_d("1-Wire:  0x%04X", payload[9] << 8 | payload[8]);
-        log_d("Analog:  0x%04X", (payload[11] << 8) | payload[10]);
-        log_d("Digital: 0x%08X", (payload[15] << 24) | (payload[14] << 16) | (payload[13] << 8) | payload[12]);
+        log_d("1-Wire:  0x%04X", payload[16] << 8 | payload[17]);
+        log_d("Analog:  0x%04X", (payload[18] << 8) | payload[19]);
+        log_d("Digital: 0x%08X", (payload[20] << 24) | (payload[21] << 16) | (payload[22] << 8) | payload[23]);
 
         setAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
         return 0;
@@ -245,7 +247,6 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     bleSensors.getData(ble_scantime, ble_active);
 #endif
 
-
     log_v("Port: %d", port);
 
     log_i("--- Uplink Data ---");
@@ -261,17 +262,17 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
     //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
 
-encodeBresser(appPayloadCfg, encoder);
+    encodeBresser(appPayloadCfg, encoder);
 
 #ifdef ONEWIRE_EN
     encodeOneWire(appPayloadCfg, encoder);
 #endif
 
-// Voltages / auxiliary analog sensor data
-encodeAnalog(appPayloadCfg, encoder);
+    // Voltages / auxiliary analog sensor data
+    encodeAnalog(appPayloadCfg, encoder);
 
-// Digital Sensors (GPIO, UART, I2C, SPI, ...)
-encodeDigital(appPayloadCfg, encoder);
+    // Digital Sensors (GPIO, UART, I2C, SPI, ...)
+    encodeDigital(appPayloadCfg, encoder);
 
 // BLE Temperature/Humidity Sensors
 #if defined(MITHERMOMETER_EN)
@@ -280,24 +281,27 @@ encodeDigital(appPayloadCfg, encoder);
     float div = 1.0;
 #endif
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    if (bleSensors.data[0].valid)
+    if (encoder.getLength() <= PAYLOAD_SIZE - 3)
     {
-        indoor_temp_c = bleSensors.data[0].temperature / div;
-        indoor_humidity = bleSensors.data[0].humidity / div;
-        log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
-        log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
-        encoder.writeTemperature(indoor_temp_c);
-        encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
+        if (bleSensors.data[0].valid)
+        {
+            indoor_temp_c = bleSensors.data[0].temperature / div;
+            indoor_humidity = bleSensors.data[0].humidity / div;
+            log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
+            log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
+            encoder.writeTemperature(indoor_temp_c);
+            encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
+        }
+        else
+        {
+            log_i("Indoor Air Temp.:    --.- °C");
+            log_i("Indoor Humidity:     --   %%");
+            encoder.writeTemperature(INV_TEMP);
+            encoder.writeUint8(INV_UINT8);
+        }
+        // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
+        bleSensors.clearScanResults();
     }
-    else
-    {
-        log_i("Indoor Air Temp.:    --.- °C");
-        log_i("Indoor Humidity:     --   %%");
-        encoder.writeTemperature(INV_TEMP);
-        encoder.writeUint8(INV_UINT8);
-    }
-    // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
-    bleSensors.clearScanResults();
 #endif
 }
 
@@ -445,7 +449,8 @@ bool AppLayer::getAppPayloadCfg(uint8_t *bytes, uint8_t size)
 {
     bool res = false;
     appPrefs.begin("BWS-LW-APP", false);
-    if (appPrefs.isKey("payloadcfg")) {
+    if (appPrefs.isKey("payloadcfg"))
+    {
         appPrefs.getBytes("payloadcfg", bytes, size);
         res = true;
     }
