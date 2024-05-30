@@ -41,6 +41,7 @@
 //          Fixed missing multiChannel checkbox evaluation
 //          Fixed Weather Sensor size calculation
 // 20240530 Added BLE sensor configuration
+//          Removed unused onchange="toggleInput(id, this.checked)" properties
 //
 // ToDo:
 // -
@@ -172,7 +173,7 @@
                 checkboxContainer.appendChild(table);
             }
 
-            // Add event listener to "1-Wire Sensors" checkbox
+            // Add event listener to "Multichannel Sensors" checkbox
             document.getElementById('multiChannel').addEventListener('change', function () {
                 document.getElementById('checkboxContainer').style.display = this.checked ? 'inline' : 'none';
             });
@@ -459,7 +460,6 @@
             // Update the arrayOutput
             let arrayOutput = document.getElementById('arrayOutput');
 
-            //arrayOutputValue = arrayOutputValue.replace("$SELECTION_PLACEHOLDER$", "    0x" + upper8Bits.toString(16).padStart(2, '0') + ",\n    0x" + lower8Bits.toString(16).padStart(2, '0') + ",");
             configArray[16] = (onewireValue >> 8) & 0xFF;
             configArray[17] = onewireValue & 0xFF;
 
@@ -520,8 +520,7 @@
         <input type="checkbox" id="lightningProc" name="lightningProc" style="display: none;">
         <br><br>
         <label for="multiChannel">Multi-Channel Bresser Sensors:</label>
-        <input type="checkbox" id="multiChannel" name="multiChannel"
-            onchange="toggleInput('checkboxContainer', this.checked)"><br><br>
+        <input type="checkbox" id="multiChannel" name="multiChannel"><br><br>
         <div id="checkboxContainer" style="display: none;"></div><br>
 
         <label for="onewire">1-Wire Sensors:</label>
@@ -529,16 +528,15 @@
         <input type="text" id="onewireInput" name="onewireInput" style="display: none;"><br><br>
 
         <label for="analog">Analog Interfaces:</label>
-        <input type="checkbox" id="analog" name="analog" onchange="toggleInput('analogInput', this.checked)">
+        <input type="checkbox" id="analog" name="analog">
         <input type="text" id="analogInput" name="analogInput" style="display: none;"><br><br>
 
         <label for="digital">Digital Interfaces:</label>
-        <input type="checkbox" id="digital" name="digital" onchange="toggleInput('digitalInput', this.checked)">
+        <input type="checkbox" id="digital" name="digital">
         <input type="text" id="digitalInput" name="digitalInput" style="display: none;"><br><br>
 
         <label for="ble">BLE Sensors:</label>
-        <input type="checkbox" id="ble" name="ble" onchange="toggleInput('digitalInput', this.checked)">
-        <!--<label for="bleInput" style="display: none;">Integer Input:</label>-->
+        <input type="checkbox" id="ble" name="ble">
         <input type="number" id="bleInput" name="bleInput" style="display: none; width: 40px;"><br><br>
 
         <label for="size">Size (Bytes):</label><br>
