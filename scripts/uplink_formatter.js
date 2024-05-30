@@ -115,6 +115,8 @@
 // 20240529 Added uint8fp1 for UV index
 //          Added NaN results to decoding functions
 //          Added supression of NaN results in decoder
+// 20240530 Added SKIP_INVALID_SIGNALS
+//          Added BLE signals to decoder
 //
 // ToDo:
 // -  
@@ -123,6 +125,9 @@
 
 function decoder(bytes, port) {
     // bytes is of type Buffer
+
+    // Skip signals encoded as invalid
+    const SKIP_INVALID_SIGNALS = true;
 
     const CMD_GET_DATETIME = 0x86;
     const CMD_GET_LW_CONFIG = 0xB1;
@@ -180,7 +185,7 @@ function decoder(bytes, port) {
             throw new Error('int must have exactly 1 byte');
         }
         var res = bytesToInt(bytes);
-        if (res === 0xFF) {
+        if (SKIP_INVALID_SIGNALS && res === 0xFF) {
             return NaN;
         }
         return res;
@@ -192,7 +197,7 @@ function decoder(bytes, port) {
             throw new Error('int must have exactly 1 byte');
         }
         var res = bytesToInt(bytes);
-        if (res === 0xFF) {
+        if (SKIP_INVALID_SIGNALS && res === 0xFF) {
             return NaN;
         }
         res *= 0.1;
@@ -205,7 +210,7 @@ function decoder(bytes, port) {
             throw new Error('int must have exactly 2 bytes');
         }
         var res = bytesToInt(bytes);
-        if (res === 0xFFFF) {
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
             return NaN;
         }
         return res;
@@ -217,7 +222,7 @@ function decoder(bytes, port) {
             throw new Error('int must have exactly 2 bytes');
         }
         var res = bytesToInt(bytes);
-        if (res === 0xFFFF) {
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
             return NaN;
         }
         res *= 0.1;
@@ -334,7 +339,7 @@ function decoder(bytes, port) {
             t = -t;
         }
         t = t / 1e2;
-        if (t === 327.67) {
+        if (SKIP_INVALID_SIGNALS && t == 327.67) {
             return NaN;
         }
         return t.toFixed(1);
@@ -347,7 +352,7 @@ function decoder(bytes, port) {
         }
 
         var h = bytesToInt(bytes);
-        if (h === 0xFFFF) {
+        if (SKIP_INVALID_SIGNALS && h === 0xFFFF) {
             return NaN;
         }
         return h / 1e2;
@@ -480,13 +485,14 @@ function decoder(bytes, port) {
     rawfloat,
     rawfloat,rawfloat,rawfloat,
     temperature,uint8,
-    temperature,
     temperature,uint8,
     unixtime,
     uint16,
     uint8,
     temperature,
-    uint16
+    uint16,
+    temperature,
+    uint8
 ],
 [
     'ws_temp_c',
@@ -497,13 +503,14 @@ function decoder(bytes, port) {
     'ws_rain_hourly_mm',
     'ws_rain_daily_mm','ws_rain_weekly_mm','ws_rain_monthly_mm',
     'th1_temp_c','th1_humidity',
-    'pt1_temp_c',
     'soil1_temp_c','soil1_moisture',
     'lgt_time',
     'lgt_events',
     'lgt_distance_km',
     'ow0_temp_c',
-    'a0_voltage_mv'
+    'a0_voltage_mv',
+    'ble0_temp_c',
+    'ble0_humidity',
 ]
 );
 
