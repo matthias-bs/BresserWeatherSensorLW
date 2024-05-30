@@ -105,6 +105,10 @@ const uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {
  * Contains all device specific methods and attributes
  */
 class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    ,
+                 BleSensors
+#endif
 #ifdef ONEWIRE_EN
     ,
                  PayloadOneWire
