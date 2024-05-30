@@ -38,6 +38,7 @@
 //          into the class
 //          Added isSpaceLeft(), payloadSize[] & sensorTypes[]
 // 20240528 Moved encoding of invalid values to BresserWeatherSensorLWCmd.h
+// 20240530 Added missing entries in sensorTypes[]
 //
 // ToDo:
 // -
@@ -97,12 +98,16 @@ public:
         "Pool Temperature",
         "Soil",
         "Leakage",
-        "",
-        "",
+        "reserved",
+        "reserved",
         "Air Quality (PM)",
         "Lightning",
         "CO2",
-        "Air Quality (HCHO/VOC)"
+        "Air Quality (HCHO/VOC)",
+        "reserved",
+        "reserved",
+        "reserved",
+        "reserved"
     };
 #endif
 
