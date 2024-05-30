@@ -366,12 +366,15 @@
                 types: []
             };
 
+            // Add Bresser weather sensor
             [size, weatherValue] = getWeatherconfig(configDecoder);
             totalSize += size;
 
+            // Add multi-channel Bresser sensors
             var size = getMultichannelconfig(configArray, configDecoder);
             totalSize += size;
 
+            // Add 1-Wire sensors
             let onewireCheckbox = document.getElementById('onewire');
             if (onewireCheckbox.checked) {
                 [size, onewireValue, numbers] = getChannels('onewireInput', 16, ONEWIRE_SIZE);
@@ -384,6 +387,7 @@
                 onewireValue = 0;
             }
 
+            // Add analog interfaces
             let analogCheckbox = document.getElementById('analog');
             if (analogCheckbox.checked) {
                 [size, analogValue, numbers] = getChannels('analogInput', 16, ANALOG_SIZE);
@@ -396,6 +400,7 @@
                 analogValue = 0;
             }
 
+            // Add digital interfaces
             let digitalCheckbox = document.getElementById('digital');
             if (digitalCheckbox.checked) {
                 [size, digitalValue, numbers] = getChannels('digitalInput', 32, DIGITAL_SIZE);
@@ -408,6 +413,7 @@
                 digitalValue = 0;
             }
 
+            // Add BLE sensors
             let bleCheckbox = document.getElementById('ble');
             if (bleCheckbox.checked) {
                 let number = document.getElementById('bleInput').value;
