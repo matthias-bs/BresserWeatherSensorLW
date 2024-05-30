@@ -435,20 +435,20 @@ function decoder(bytes, port) {
         names = names || [];
         var offset = 0;
         return mask
-        .map(function (decodeFn) {
-            var current = bytes.slice(offset, offset += decodeFn.BYTES);
-            var decodedValue = decodeFn(current);
-            if (isNaN(decodedValue)) {
-                return null;
-            }
-            return decodedValue;
-        })
-        .reduce(function (prev, cur, idx) {
-            if (cur !== null) {
-                prev[names[idx] || idx] = cur;
-            }
-            return prev;
-        }, {});
+            .map(function (decodeFn) {
+                var current = bytes.slice(offset, offset += decodeFn.BYTES);
+                var decodedValue = decodeFn(current);
+                if (isNaN(decodedValue)) {
+                    return null;
+                }
+                return decodedValue;
+            })
+            .reduce(function (prev, cur, idx) {
+                if (cur !== null) {
+                    prev[names[idx] || idx] = cur;
+                }
+                return prev;
+            }, {});
     };
 
     if (typeof module === 'object' && typeof module.exports !== 'undefined') {
@@ -476,43 +476,43 @@ function decoder(bytes, port) {
     if (port === 1) {
         return decode(
             bytes,
-[
-    temperature,
-    uint8,
-    rawfloat,
-    uint16fp1,uint16fp1,uint16fp1,
-    uint8fp1,
-    rawfloat,
-    rawfloat,rawfloat,rawfloat,
-    temperature,uint8,
-    temperature,uint8,
-    unixtime,
-    uint16,
-    uint8,
-    temperature,
-    uint16,
-    temperature,
-    uint8
-],
-[
-    'ws_temp_c',
-    'ws_humidity',
-    'ws_rain_mm',
-    'ws_wind_gust_ms','ws_wind_avg_ms','ws_wind_dir_deg',
-    'ws_uv',
-    'ws_rain_hourly_mm',
-    'ws_rain_daily_mm','ws_rain_weekly_mm','ws_rain_monthly_mm',
-    'th1_temp_c','th1_humidity',
-    'soil1_temp_c','soil1_moisture',
-    'lgt_time',
-    'lgt_events',
-    'lgt_distance_km',
-    'ow0_temp_c',
-    'a0_voltage_mv',
-    'ble0_temp_c',
-    'ble0_humidity',
-]
-);
+            [
+                temperature,
+                uint8,
+                rawfloat,
+                uint16fp1, uint16fp1, uint16fp1,
+                uint8fp1,
+                rawfloat,
+                rawfloat, rawfloat, rawfloat,
+                temperature, uint8,
+                temperature, uint8,
+                unixtime,
+                uint16,
+                uint8,
+                temperature,
+                uint16,
+                temperature,
+                uint8
+            ],
+            [
+                'ws_temp_c',
+                'ws_humidity',
+                'ws_rain_mm',
+                'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
+                'ws_uv',
+                'ws_rain_hourly_mm',
+                'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
+                'th1_temp_c', 'th1_humidity',
+                'soil1_temp_c', 'soil1_moisture',
+                'lgt_time',
+                'lgt_events',
+                'lgt_distance_km',
+                'ow0_temp_c',
+                'a0_voltage_mv',
+                'ble0_temp_c',
+                'ble0_humidity',
+            ]
+        );
 
     } else if (port === CMD_GET_DATETIME) {
         return decode(
@@ -577,16 +577,12 @@ function decoder(bytes, port) {
             ],
             ['ble_active', 'ble_scantime']
         );
-    }  else if (port === CMD_GET_APP_PAYLOAD_CFG) {
+    } else if (port === CMD_GET_APP_PAYLOAD_CFG) {
         return decode(
             bytes,
-            [bresser_bitmaps, hex16, hex16, hex32 
+            [bresser_bitmaps, hex16, hex16, hex32
             ],
             ['bresser', 'onewire', 'analog', 'digital']
-            //[uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint8, uint16, uint16, uint32
-            //],
-            //['type0', 'type1', 'type2', 'type3', 'type4', 'type5', 'type6', 'type7', 'type8', 'type9', 'type10', 'type11', 'type12', 'type13', 'type14',
-            // 'type15', 'onewire', 'analog', 'digital']
         );
     }
 
