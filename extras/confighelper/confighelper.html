@@ -40,6 +40,7 @@
 //          Changed position of lightning data
 //          Fixed missing multiChannel checkbox evaluation
 //          Fixed Weather Sensor size calculation
+// 20240530 Added BLE sensor configuration
 //
 // ToDo:
 // -
@@ -74,7 +75,7 @@
             types: []
         };
 
-        // [Name, Size in bytes]
+        // [Name, Size in bytes, Signals, Types]
         const sensorTypes = [
             ["Weather", 0],
             ["Weather", 0],
@@ -89,6 +90,11 @@
             ["CO2", 2, 'c_co2_ppm', ['uint16']],
             ["Air Quality (HCHO/VOC)", 3, ['aq*_hcho_ppb', 'aq*_voc'], ['uint16', 'uint16']],
         ];
+
+        const bleSensors = [
+            [2, 'ble*_temp_c', 'temperature'],
+            [1, 'ble*_humidity', 'uint8']
+        ]
 
         // Toggle input field visibility
         window.onload = function () {
@@ -184,6 +190,11 @@
             // Add event listener to "Digital Sensors" checkbox
             document.getElementById('digital').addEventListener('change', function () {
                 document.getElementById('digitalInput').style.display = this.checked ? 'inline' : 'none';
+            });
+
+            // Add event listener to "BLE Sensors" checkbox
+            document.getElementById('ble').addEventListener('change', function () {
+                document.getElementById('bleInput').style.display = this.checked ? 'inline' : 'none';
             });
 
             // Initialize the size field
@@ -396,6 +407,19 @@
                 digitalValue = 0;
             }
 
+            let bleCheckbox = document.getElementById('ble');
+            if (bleCheckbox.checked) {
+                let number = document.getElementById('bleInput').value;
+                for (var i = 0; i < number; i++) {
+                    for (var j = 0; j < bleSensors.length; j++) {
+                        totalSize += bleSensors[j][0];
+                        let signal = bleSensors[j][1].replace('*', i);
+                        configDecoder.signals.push(`'${signal}'`);
+                        configDecoder.types.push(bleSensors[j][2]);
+                    }
+                }
+            }
+
             // Check if size exceeds PAYLOAD_SIZE_LIMIT
             if (totalSize > PAYLOAD_SIZE_LIMIT) {
                 document.getElementById('size').style.border = '3px solid red';
@@ -511,6 +535,11 @@
         <label for="digital">Digital Interfaces:</label>
         <input type="checkbox" id="digital" name="digital" onchange="toggleInput('digitalInput', this.checked)">
         <input type="text" id="digitalInput" name="digitalInput" style="display: none;"><br><br>
+
+        <label for="ble">BLE Sensors:</label>
+        <input type="checkbox" id="ble" name="ble" onchange="toggleInput('digitalInput', this.checked)">
+        <!--<label for="bleInput" style="display: none;">Integer Input:</label>-->
+        <input type="number" id="bleInput" name="bleInput" style="display: none; width: 40px;"><br><br>
 
         <label for="size">Size (Bytes):</label><br>
         <input type="text" id="size" name="size" value="0" readonly><br><br>
