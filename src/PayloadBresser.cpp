@@ -39,6 +39,7 @@
 //          Added handling of sensor feature flags
 // 20240528 Fixes
 // 20240529 Changed encoding of INV_TEMP
+// 20240530 Weather sensor: Fixed encoding of invalid temperature
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -236,7 +237,7 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
         else
         {
             log_i("Air Temperature:     --.- °C");
-            encoder.writeUint16(INV_UINT16);
+            encoder.writeTemperature(INV_TEMP);
         }
         if (flags & PAYLOAD_WS_HUMIDITY)
         {
