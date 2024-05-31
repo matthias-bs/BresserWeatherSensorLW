@@ -129,181 +129,178 @@ $(document).ready(function(){initNavTree('_app_layer_8h_source.html',''); initRe
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// 20240520 Moved 1-Wire sensor code to PayloadOneWire.h/.cpp</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">// 20240524 Added appPayloadCfgDef, setAppPayloadCfg() &amp; getAppPayloadCfg()</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//          Moved code to PayloadBresser, PayloadAnalog &amp; PayloadDigital</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">// ToDo:</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// - Move BLE code to separate class</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#if !defined(_APPLAYER_H)</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#define _APPLAYER_H</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#include &quot;WeatherSensorCfg.h&quot;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &lt;WeatherSensor.h&gt;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;ESP32Time.h&gt;</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCmd.h&quot;</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;PayloadBresser.h&quot;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &quot;PayloadOneWire.h&quot;</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &quot;PayloadAnalog.h&quot;</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &quot;PayloadDigital.h&quot;</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN)</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">// BLE Temperature/Humidity Sensor</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#include &lt;ATC_MiThermometer.h&gt;</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#if defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#include &quot;BleSensors/BleSensors.h&quot;</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">const</span> uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    APP_PAYLOAD_CFG_TYPE00,</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    APP_PAYLOAD_CFG_TYPE01,</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    APP_PAYLOAD_CFG_TYPE02,</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    APP_PAYLOAD_CFG_TYPE03,</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    APP_PAYLOAD_CFG_TYPE04,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    APP_PAYLOAD_CFG_TYPE05,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    APP_PAYLOAD_CFG_TYPE06,</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    APP_PAYLOAD_CFG_TYPE07,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    APP_PAYLOAD_CFG_TYPE08,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    APP_PAYLOAD_CFG_TYPE09,</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    APP_PAYLOAD_CFG_TYPE10,</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    APP_PAYLOAD_CFG_TYPE11,</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    APP_PAYLOAD_CFG_TYPE12,</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    APP_PAYLOAD_CFG_TYPE13,</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    APP_PAYLOAD_CFG_TYPE14,</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    APP_PAYLOAD_CFG_TYPE15,</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    APP_PAYLOAD_CFG_ONEWIRE1, <span class="comment">// onewire[15:8]</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    APP_PAYLOAD_CFG_ONEWIRE0, <span class="comment">// onewire[7:0]</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    APP_PAYLOAD_CFG_ANALOG1,  <span class="comment">// analog[15:0]</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    APP_PAYLOAD_CFG_ANALOG0,  <span class="comment">// analog[7:0]</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    APP_PAYLOAD_CFG_DIGITAL3, <span class="comment">// digital[31:24]</span></div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    APP_PAYLOAD_CFG_DIGITAL2, <span class="comment">// digital[23:16]</span></div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    APP_PAYLOAD_CFG_DIGITAL1, <span class="comment">// digital[15:8]</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    APP_PAYLOAD_CFG_DIGITAL0  <span class="comment">// digital[7:0]</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;};</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="class_app_layer.html">  107</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_app_layer.html">AppLayer</a> : <span class="keyword">public</span> <a class="code" href="class_payload_bresser.html">PayloadBresser</a>, <a class="code" href="class_payload_analog.html">PayloadAnalog</a>, <a class="code" href="class_payload_digital.html">PayloadDigital</a></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">#ifdef ONEWIRE_EN</span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    ,</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                 <a class="code" href="class_payload_one_wire.html">PayloadOneWire</a></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;{</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    ESP32Time *_rtc;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    time_t *_rtcLastClockSync;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    Preferences appPrefs;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    uint8_t appPayloadCfg[APP_PAYLOAD_CFG_SIZE];</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    std::vector&lt;std::string&gt; knownBLEAddressesDef;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    std::vector&lt;std::string&gt; knownBLEAddresses;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">#ifdef MITHERMOMETER_EN</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    ATC_MiThermometer bleSensors; </div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">#ifdef THEENGSDECODER_EN</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <a class="code" href="class_ble_sensors.html">BleSensors</a> bleSensors;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">  146</a></span>&#160;    <a class="code" href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">AppLayer</a>(ESP32Time *rtc, time_t *clocksync) : <a class="code" href="class_payload_bresser.html">PayloadBresser</a>(rtc, clocksync), <a class="code" href="class_payload_analog.html">PayloadAnalog</a>(), <a class="code" href="class_payload_digital.html">PayloadDigital</a>()</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                                                  ,</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                                                  bleSensors()</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;#endif</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;#ifdef ONEWIRE_EN</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;                                                  ,</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;                                                  <a class="code" href="class_payload_one_wire.html">PayloadOneWire</a>()</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;#endif</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    {</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        _rtc = rtc;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        _rtcLastClockSync = clocksync;</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    };</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; </div>
-<div class="line"><a name="l00164"></a><span class="lineno"><a class="line" href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">  164</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">begin</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    {</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <a class="code" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">bleAddrInit</a>();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <a class="code" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a>();</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <a class="code" href="class_payload_analog.html#af359fb1d3381a74b71fa845f3675301a">PayloadAnalog::begin</a>();</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <a class="code" href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">PayloadDigital::begin</a>();</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">getAppPayloadCfg</a>(appPayloadCfg, APP_PAYLOAD_CFG_SIZE))</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        {</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            memcpy(appPayloadCfg, appPayloadCfgDef, APP_PAYLOAD_CFG_SIZE);</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    };</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
-<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">  187</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">bleAddrInit</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        knownBLEAddresses = <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>();</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="keywordflow">if</span> (knownBLEAddresses.size() == 0)</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        {</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;            <span class="comment">// No addresses stored in Preferences, use default</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;            knownBLEAddresses = knownBLEAddressesDef;</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            log_d(<span class="stringliteral">&quot;Using BLE addresses from BresserWeatherSensorLWCfg.h:&quot;</span>);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        }</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            log_d(<span class="stringliteral">&quot;Using BLE addresses from Preferences:&quot;</span>);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        bleSensors = <a class="code" href="class_ble_sensors.html">BleSensors</a>(knownBLEAddresses);</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string &amp;s : knownBLEAddresses)</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        {</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            (void)s;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            log_d(<span class="stringliteral">&quot;%s&quot;</span>, s.c_str());</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;        }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    };</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    uint8_t <a class="code" href="class_app_layer.html#a3a16ef6e33cfd0ff29ee3248780cb3e8">decodeDownlink</a>(uint8_t port, uint8_t *payload, <span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">genPayload</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">getPayloadStage1</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">getPayloadStage2</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160; </div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">getConfigPayload</a>(uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a7673f6a864910942e622c7b78081ab26">setBleAddr</a>(uint8_t *bytes, uint8_t size);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160; </div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    uint8_t <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>(uint8_t *bytes);</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    std::vector&lt;std::string&gt; <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160; </div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a5abe368561e741d7ddefdec635052343">setAppPayloadCfg</a>(uint8_t *bytes, uint8_t size);</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160; </div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">getAppPayloadCfg</a>(uint8_t *bytes, uint8_t size);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;};</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _APPLAYER_H</span></div>
-<div class="ttc" id="aclass_app_layer_html"><div class="ttname"><a href="class_app_layer.html">AppLayer</a></div><div class="ttdoc">LoRaWAN node application layer.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:112</div></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">// 20240530 Removed BleSensors as base class &amp; from initializers</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// ToDo:</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">// - Move BLE code to separate class</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#if !defined(_APPLAYER_H)</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#define _APPLAYER_H</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">#include &quot;WeatherSensorCfg.h&quot;</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#include &lt;WeatherSensor.h&gt;</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#include &lt;ESP32Time.h&gt;</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">#include &quot;../BresserWeatherSensorLWCmd.h&quot;</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#include &quot;PayloadBresser.h&quot;</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#include &quot;PayloadOneWire.h&quot;</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#include &quot;PayloadAnalog.h&quot;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#include &quot;PayloadDigital.h&quot;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN)</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">// BLE Temperature/Humidity Sensor</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">#include &lt;ATC_MiThermometer.h&gt;</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#if defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#include &quot;BleSensors/BleSensors.h&quot;</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">const</span> uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    APP_PAYLOAD_CFG_TYPE00,</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    APP_PAYLOAD_CFG_TYPE01,</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    APP_PAYLOAD_CFG_TYPE02,</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    APP_PAYLOAD_CFG_TYPE03,</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    APP_PAYLOAD_CFG_TYPE04,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    APP_PAYLOAD_CFG_TYPE05,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    APP_PAYLOAD_CFG_TYPE06,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    APP_PAYLOAD_CFG_TYPE07,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    APP_PAYLOAD_CFG_TYPE08,</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    APP_PAYLOAD_CFG_TYPE09,</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    APP_PAYLOAD_CFG_TYPE10,</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    APP_PAYLOAD_CFG_TYPE11,</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    APP_PAYLOAD_CFG_TYPE12,</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    APP_PAYLOAD_CFG_TYPE13,</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    APP_PAYLOAD_CFG_TYPE14,</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    APP_PAYLOAD_CFG_TYPE15,</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    APP_PAYLOAD_CFG_ONEWIRE1, <span class="comment">// onewire[15:8]</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    APP_PAYLOAD_CFG_ONEWIRE0, <span class="comment">// onewire[7:0]</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    APP_PAYLOAD_CFG_ANALOG1,  <span class="comment">// analog[15:0]</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    APP_PAYLOAD_CFG_ANALOG0,  <span class="comment">// analog[7:0]</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    APP_PAYLOAD_CFG_DIGITAL3, <span class="comment">// digital[31:24]</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    APP_PAYLOAD_CFG_DIGITAL2, <span class="comment">// digital[23:16]</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    APP_PAYLOAD_CFG_DIGITAL1, <span class="comment">// digital[15:8]</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    APP_PAYLOAD_CFG_DIGITAL0  <span class="comment">// digital[7:0]</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;};</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="class_app_layer.html">  108</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_app_layer.html">AppLayer</a> : <span class="keyword">public</span> <a class="code" href="class_payload_bresser.html">PayloadBresser</a>, <a class="code" href="class_payload_analog.html">PayloadAnalog</a>, <a class="code" href="class_payload_digital.html">PayloadDigital</a></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">#ifdef ONEWIRE_EN</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    ,</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                 <a class="code" href="class_payload_one_wire.html">PayloadOneWire</a></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;{</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    ESP32Time *_rtc;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    time_t *_rtcLastClockSync;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    Preferences appPrefs;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    uint8_t appPayloadCfg[APP_PAYLOAD_CFG_SIZE];</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    std::vector&lt;std::string&gt; knownBLEAddressesDef;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    std::vector&lt;std::string&gt; knownBLEAddresses;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#ifdef MITHERMOMETER_EN</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    ATC_MiThermometer bleSensors; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">#ifdef THEENGSDECODER_EN</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <a class="code" href="class_ble_sensors.html">BleSensors</a> bleSensors;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00147"></a><span class="lineno"><a class="line" href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">  147</a></span>&#160;    <a class="code" href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">AppLayer</a>(ESP32Time *rtc, time_t *clocksync) : <a class="code" href="class_payload_bresser.html">PayloadBresser</a>(rtc, clocksync), <a class="code" href="class_payload_analog.html">PayloadAnalog</a>(), <a class="code" href="class_payload_digital.html">PayloadDigital</a>()</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;#ifdef ONEWIRE_EN</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                                                  ,</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                                                  <a class="code" href="class_payload_one_wire.html">PayloadOneWire</a>()</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;#endif</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    {</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        _rtc = rtc;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        _rtcLastClockSync = clocksync;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    };</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160; </div>
+<div class="line"><a name="l00161"></a><span class="lineno"><a class="line" href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">  161</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">begin</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    {</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        <a class="code" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">bleAddrInit</a>();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <a class="code" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a>();</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <a class="code" href="class_payload_analog.html#af359fb1d3381a74b71fa845f3675301a">PayloadAnalog::begin</a>();</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <a class="code" href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">PayloadDigital::begin</a>();</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160; </div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keywordflow">if</span> (!<a class="code" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">getAppPayloadCfg</a>(appPayloadCfg, APP_PAYLOAD_CFG_SIZE))</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            memcpy(appPayloadCfg, appPayloadCfgDef, APP_PAYLOAD_CFG_SIZE);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        }</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    };</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00184"></a><span class="lineno"><a class="line" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">  184</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">bleAddrInit</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    {</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        knownBLEAddresses = <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>();</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keywordflow">if</span> (knownBLEAddresses.size() == 0)</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        {</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            <span class="comment">// No addresses stored in Preferences, use default</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;            knownBLEAddresses = knownBLEAddressesDef;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;            log_d(<span class="stringliteral">&quot;Using BLE addresses from BresserWeatherSensorLWCfg.h:&quot;</span>);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        }</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        {</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;            log_d(<span class="stringliteral">&quot;Using BLE addresses from Preferences:&quot;</span>);</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        bleSensors = <a class="code" href="class_ble_sensors.html">BleSensors</a>(knownBLEAddresses);</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <span class="keywordflow">for</span> (<span class="keyword">const</span> std::string &amp;s : knownBLEAddresses)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            (void)s;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            log_d(<span class="stringliteral">&quot;%s&quot;</span>, s.c_str());</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    };</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160; </div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    uint8_t <a class="code" href="class_app_layer.html#a3a16ef6e33cfd0ff29ee3248780cb3e8">decodeDownlink</a>(uint8_t port, uint8_t *payload, <span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">genPayload</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">getPayloadStage1</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160; </div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">getPayloadStage2</a>(uint8_t port, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">getConfigPayload</a>(uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160; </div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a7673f6a864910942e622c7b78081ab26">setBleAddr</a>(uint8_t *bytes, uint8_t size);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    uint8_t <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>(uint8_t *bytes);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160; </div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    std::vector&lt;std::string&gt; <a class="code" href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">getBleAddr</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_app_layer.html#a5abe368561e741d7ddefdec635052343">setAppPayloadCfg</a>(uint8_t *bytes, uint8_t size);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160; </div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">getAppPayloadCfg</a>(uint8_t *bytes, uint8_t size);</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;};</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _APPLAYER_H</span></div>
+<div class="ttc" id="aclass_app_layer_html"><div class="ttname"><a href="class_app_layer.html">AppLayer</a></div><div class="ttdoc">LoRaWAN node application layer.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:113</div></div>
 <div class="ttc" id="aclass_app_layer_html_a3a16ef6e33cfd0ff29ee3248780cb3e8"><div class="ttname"><a href="class_app_layer.html#a3a16ef6e33cfd0ff29ee3248780cb3e8">AppLayer::decodeDownlink</a></div><div class="ttdeci">uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)</div><div class="ttdoc">Decode app layer specific downlink messages.</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:68</div></div>
-<div class="ttc" id="aclass_app_layer_html_a50c5619afaca9f1a2d29904ae9bb4b29"><div class="ttname"><a href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">AppLayer::getBleAddr</a></div><div class="ttdeci">std::vector&lt; std::string &gt; getBleAddr(void)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:405</div></div>
-<div class="ttc" id="aclass_app_layer_html_a566d1495e400b1735e3a8976801b5793"><div class="ttname"><a href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">AppLayer::getPayloadStage1</a></div><div class="ttdeci">void getPayloadStage1(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Prepare / get payload at startup.</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:227</div></div>
-<div class="ttc" id="aclass_app_layer_html_a5abe368561e741d7ddefdec635052343"><div class="ttname"><a href="class_app_layer.html#a5abe368561e741d7ddefdec635052343">AppLayer::setAppPayloadCfg</a></div><div class="ttdeci">void setAppPayloadCfg(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:456</div></div>
-<div class="ttc" id="aclass_app_layer_html_a7673f6a864910942e622c7b78081ab26"><div class="ttname"><a href="class_app_layer.html#a7673f6a864910942e622c7b78081ab26">AppLayer::setBleAddr</a></div><div class="ttdeci">void setBleAddr(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:388</div></div>
-<div class="ttc" id="aclass_app_layer_html_a8902127a1eb11b9741f829794c2306dd"><div class="ttname"><a href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">AppLayer::AppLayer</a></div><div class="ttdeci">AppLayer(ESP32Time *rtc, time_t *clocksync)</div><div class="ttdoc">Constructor with BLE sensors.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:146</div></div>
-<div class="ttc" id="aclass_app_layer_html_a8ee82c577f2eb1100a91fa8259536f5a"><div class="ttname"><a href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">AppLayer::genPayload</a></div><div class="ttdeci">void genPayload(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Generate payload (by emulation)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:218</div></div>
-<div class="ttc" id="aclass_app_layer_html_abd31aca92ab7c9e9b4ac117f48c9fc5b"><div class="ttname"><a href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">AppLayer::bleAddrInit</a></div><div class="ttdeci">void bleAddrInit(void)</div><div class="ttdoc">Initialize list of known BLE addresses from defaults or Preferences.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:187</div></div>
-<div class="ttc" id="aclass_app_layer_html_ac01081f86f6c9350e288c09a5f4b6d76"><div class="ttname"><a href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">AppLayer::getPayloadStage2</a></div><div class="ttdeci">void getPayloadStage2(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Get payload before uplink.</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:304</div></div>
-<div class="ttc" id="aclass_app_layer_html_ac8292cd2853576c6178c018f25020820"><div class="ttname"><a href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">AppLayer::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">AppLayer initialization.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:164</div></div>
-<div class="ttc" id="aclass_app_layer_html_ad8cf493864669eda0382ab27e763e09f"><div class="ttname"><a href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">AppLayer::getConfigPayload</a></div><div class="ttdeci">void getConfigPayload(uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:310</div></div>
-<div class="ttc" id="aclass_app_layer_html_af225da5389cb83b2db5bc5eb4e45f1e9"><div class="ttname"><a href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">AppLayer::getAppPayloadCfg</a></div><div class="ttdeci">bool getAppPayloadCfg(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:444</div></div>
+<div class="ttc" id="aclass_app_layer_html_a50c5619afaca9f1a2d29904ae9bb4b29"><div class="ttname"><a href="class_app_layer.html#a50c5619afaca9f1a2d29904ae9bb4b29">AppLayer::getBleAddr</a></div><div class="ttdeci">std::vector&lt; std::string &gt; getBleAddr(void)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:409</div></div>
+<div class="ttc" id="aclass_app_layer_html_a566d1495e400b1735e3a8976801b5793"><div class="ttname"><a href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">AppLayer::getPayloadStage1</a></div><div class="ttdeci">void getPayloadStage1(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Prepare / get payload at startup.</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:229</div></div>
+<div class="ttc" id="aclass_app_layer_html_a5abe368561e741d7ddefdec635052343"><div class="ttname"><a href="class_app_layer.html#a5abe368561e741d7ddefdec635052343">AppLayer::setAppPayloadCfg</a></div><div class="ttdeci">void setAppPayloadCfg(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:461</div></div>
+<div class="ttc" id="aclass_app_layer_html_a7673f6a864910942e622c7b78081ab26"><div class="ttname"><a href="class_app_layer.html#a7673f6a864910942e622c7b78081ab26">AppLayer::setBleAddr</a></div><div class="ttdeci">void setBleAddr(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:392</div></div>
+<div class="ttc" id="aclass_app_layer_html_a8902127a1eb11b9741f829794c2306dd"><div class="ttname"><a href="class_app_layer.html#a8902127a1eb11b9741f829794c2306dd">AppLayer::AppLayer</a></div><div class="ttdeci">AppLayer(ESP32Time *rtc, time_t *clocksync)</div><div class="ttdoc">Constructor with BLE sensors.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:147</div></div>
+<div class="ttc" id="aclass_app_layer_html_a8ee82c577f2eb1100a91fa8259536f5a"><div class="ttname"><a href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">AppLayer::genPayload</a></div><div class="ttdeci">void genPayload(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Generate payload (by emulation)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:220</div></div>
+<div class="ttc" id="aclass_app_layer_html_abd31aca92ab7c9e9b4ac117f48c9fc5b"><div class="ttname"><a href="class_app_layer.html#abd31aca92ab7c9e9b4ac117f48c9fc5b">AppLayer::bleAddrInit</a></div><div class="ttdeci">void bleAddrInit(void)</div><div class="ttdoc">Initialize list of known BLE addresses from defaults or Preferences.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:184</div></div>
+<div class="ttc" id="aclass_app_layer_html_ac01081f86f6c9350e288c09a5f4b6d76"><div class="ttname"><a href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">AppLayer::getPayloadStage2</a></div><div class="ttdeci">void getPayloadStage2(uint8_t port, LoraEncoder &amp;encoder)</div><div class="ttdoc">Get payload before uplink.</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:308</div></div>
+<div class="ttc" id="aclass_app_layer_html_ac8292cd2853576c6178c018f25020820"><div class="ttname"><a href="class_app_layer.html#ac8292cd2853576c6178c018f25020820">AppLayer::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">AppLayer initialization.</div><div class="ttdef"><b>Definition:</b> AppLayer.h:161</div></div>
+<div class="ttc" id="aclass_app_layer_html_ad8cf493864669eda0382ab27e763e09f"><div class="ttname"><a href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">AppLayer::getConfigPayload</a></div><div class="ttdeci">void getConfigPayload(uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:314</div></div>
+<div class="ttc" id="aclass_app_layer_html_af225da5389cb83b2db5bc5eb4e45f1e9"><div class="ttname"><a href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">AppLayer::getAppPayloadCfg</a></div><div class="ttdeci">bool getAppPayloadCfg(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition:</b> AppLayer.cpp:448</div></div>
 <div class="ttc" id="aclass_ble_sensors_html"><div class="ttname"><a href="class_ble_sensors.html">BleSensors</a></div><div class="ttdoc">BLE Sensor (e.g. thermometer/hygrometer) client.</div><div class="ttdef"><b>Definition:</b> BleSensors.h:71</div></div>
 <div class="ttc" id="aclass_payload_analog_html"><div class="ttname"><a href="class_payload_analog.html">PayloadAnalog</a></div><div class="ttdef"><b>Definition:</b> PayloadAnalog.h:51</div></div>
 <div class="ttc" id="aclass_payload_analog_html_af359fb1d3381a74b71fa845f3675301a"><div class="ttname"><a href="class_payload_analog.html#af359fb1d3381a74b71fa845f3675301a">PayloadAnalog::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Analog channel startup code.</div><div class="ttdef"><b>Definition:</b> PayloadAnalog.cpp:46</div></div>
-<div class="ttc" id="aclass_payload_bresser_html"><div class="ttname"><a href="class_payload_bresser.html">PayloadBresser</a></div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:67</div></div>
-<div class="ttc" id="aclass_payload_bresser_html_adb2aeefccdd9c9f759f7235a2a5c7dc1"><div class="ttname"><a href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Bresser sensors startup code.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:50</div></div>
+<div class="ttc" id="aclass_payload_bresser_html"><div class="ttname"><a href="class_payload_bresser.html">PayloadBresser</a></div><div class="ttdef"><b>Definition:</b> PayloadBresser.h:68</div></div>
+<div class="ttc" id="aclass_payload_bresser_html_adb2aeefccdd9c9f759f7235a2a5c7dc1"><div class="ttname"><a href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">PayloadBresser::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Bresser sensors startup code.</div><div class="ttdef"><b>Definition:</b> PayloadBresser.cpp:51</div></div>
 <div class="ttc" id="aclass_payload_digital_html"><div class="ttname"><a href="class_payload_digital.html">PayloadDigital</a></div><div class="ttdef"><b>Definition:</b> PayloadDigital.h:55</div></div>
 <div class="ttc" id="aclass_payload_digital_html_a5e5f5fc4ee9833f2f2900870e7556b86"><div class="ttname"><a href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">PayloadDigital::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Digital channel startup code.</div><div class="ttdef"><b>Definition:</b> PayloadDigital.cpp:54</div></div>
 <div class="ttc" id="aclass_payload_one_wire_html"><div class="ttname"><a href="class_payload_one_wire.html">PayloadOneWire</a></div><div class="ttdef"><b>Definition:</b> PayloadOneWire.h:55</div></div>
