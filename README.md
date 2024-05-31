@@ -547,7 +547,7 @@ The default payload configuration is as follows:
 
 The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters](#lorawan-payload-formatters). `uint16fp1` and `uint8fp1` are extensions in the payload formatter for fixed-point numbers with 1 decimal.
 
-The default sensor data uplink confoguration is defined in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/BresserWeatherSensorLWCfg.h#L313 as a set of byte values, which are used in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/src/AppLayer.h#L71 to define the array `appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE]. This array is used as a large bitmap, where each byte represents a specific sensor or interface and each bit corresponds to a channel or feature.
+The default sensor data uplink configuration is defined in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/BresserWeatherSensorLWCfg.h#L313 as a set of byte values, which are used in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/src/AppLayer.h#L71 to define the array `appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE]. This array is used as a large bitmap, where each byte represents a specific sensor or interface and each bit corresponds to a channel or feature.
 
 ### Config Helper
 
