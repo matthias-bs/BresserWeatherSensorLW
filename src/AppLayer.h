@@ -66,13 +66,6 @@
 #include "PayloadBLE.h"
 #include <LoraMessage.h>
 
-// #if defined(MITHERMOMETER_EN)
-// // BLE Temperature/Humidity Sensor
-// #include <ATC_MiThermometer.h>
-// #endif
-// #if defined(THEENGSDECODER_EN)
-// #include "BleSensors/BleSensors.h"
-// #endif
 
 /// Default AppLayer payload configuration
 const uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {
@@ -127,22 +120,6 @@ private:
     /// AppLayer payload configuration
     uint8_t appPayloadCfg[APP_PAYLOAD_CFG_SIZE];
 
-    // #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    //     /// Default BLE MAC addresses
-    //     std::vector<std::string> knownBLEAddressesDef;
-    //     /// Actual BLE MAC addresses; either from Preferences or from defaults
-    //     std::vector<std::string> knownBLEAddresses;
-    // #endif
-
-    // #ifdef MITHERMOMETER_EN
-    //     /// BLE Temperature/Humidity Sensors
-    //     ATC_MiThermometer bleSensors; //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
-    // #endif
-    // #ifdef THEENGSDECODER_EN
-    //     /// Bluetooth Low Energy sensors
-    //     BleSensors bleSensors;
-    // #endif
-
 public:
     /*!
      * \brief Constructor with BLE sensors
@@ -174,48 +151,15 @@ public:
         PayloadBresser::begin();
         PayloadAnalog::begin();
         PayloadDigital::begin();
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
         PayloadBLE::begin();
+#endif
 
         if (!getAppPayloadCfg(appPayloadCfg, APP_PAYLOAD_CFG_SIZE))
         {
             memcpy(appPayloadCfg, appPayloadCfgDef, APP_PAYLOAD_CFG_SIZE);
         }
     };
-
-    //     /*!
-    //      * \brief Initialize list of known BLE addresses from defaults or Preferences
-    //      *
-    //      * If available, addresses from Preferences are used, otherwise defaults from
-    //      * BresserWeatherSensorLWCfg.h.
-    //      *
-    //      * BleSensors() requires Preferences, which uses the Flash FS,
-    //      * which is not available before the sketches' begin() is called -
-    //      * thus the following cannot be handled by the constructor!
-    //      */
-    //     void bleAddrInit(void)
-    //     {
-    // #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    //         knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
-    //         knownBLEAddresses = getBleAddr();
-    //         if (knownBLEAddresses.size() == 0)
-    //         {
-    //             // No addresses stored in Preferences, use default
-    //             knownBLEAddresses = knownBLEAddressesDef;
-    //             log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
-    //         }
-    //         else
-    //         {
-    //             log_d("Using BLE addresses from Preferences:");
-    //         }
-    //         bleSensors = BleSensors(knownBLEAddresses);
-
-    //         for (const std::string &s : knownBLEAddresses)
-    //         {
-    //             (void)s;
-    //             log_d("%s", s.c_str());
-    //         }
-    // #endif
-    //     };
 
     /*!
      * \brief Decode app layer specific downlink messages
@@ -274,32 +218,6 @@ public:
      * \param encoder uplink data encoder object
      */
     void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
-
-// #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-//     /*!
-//      * Set BLE addresses in Preferences and bleSensors object
-//      *
-//      * \param bytes MAC addresses (6 bytes per address)
-//      * \param size size in bytes
-//      */
-//     void setBleAddr(uint8_t *bytes, uint8_t size);
-
-//     /*!
-//      * Get BLE addresses from Preferences
-//      *
-//      * \param bytes buffer for addresses
-//      *
-//      * \returns number of bytes copied into buffer
-//      */
-//     uint8_t getBleAddr(uint8_t *bytes);
-
-//     /*!
-//      * Get BLE addresses from Preferences
-//      *
-//      * \returns BLE addresses
-//      */
-//     std::vector<std::string> getBleAddr(void);
-// #endif
 
     /*!
      * Set AppLayer payload config in Preferences
