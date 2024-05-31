@@ -558,9 +558,12 @@ Changing the configuration by setting bitmaps is not really comfortable. Therefo
 [Config Helper](https://matthias-bs.github.io/BresserWeatherSensorLW/confighelper.html)
 
 In the Config Helper, you select the desired sensors/interfaces and the used channels/features and generate
-* A bitmap to change the default payload configuration in the C++ source code
-* A JSON string to configure the node via LoRaWAN downlink with the command [CMD_SET_APP_PAYLOAD_CFG](#using-the-javascript-uplinkdownlink-formatters)
-* A JSON string to configure the [Uplink Payload Formatter](#lorawan-payload-formatters)
+1. A bitmap to change the default payload configuration in the C++ source code
+2. A JSON string to configure the node via LoRaWAN downlink with the command [CMD_SET_APP_PAYLOAD_CFG](#using-the-javascript-uplinkdownlink-formatters)
+3. A JSON string to configure the [Uplink Payload Formatter](#lorawan-payload-formatters)
+
+> [!NOTE]
+> You do not have to modify the source code if you use the configuration via LoRaWAN downlink!
 
 ## Customizing the Application Layer
 
