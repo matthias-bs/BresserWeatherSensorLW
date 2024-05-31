@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// PayloadOneWire.h
+// PayloadOneWire.cpp
 //
 // Get 1-Wire temperature sensor values and encode as LoRaWAN payload
 //
