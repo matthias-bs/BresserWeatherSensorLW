@@ -42,6 +42,7 @@
 // 20240520 Moved 1-Wire sensor code to PayloadOneWire.h/.cpp
 // 20240524 Added appPayloadCfgDef, setAppPayloadCfg() & getAppPayloadCfg()
 //          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
+// 20240530 Removed BleSensors as base class & from initializers
 //
 // ToDo:
 // - Move BLE code to separate class
@@ -105,10 +106,6 @@ const uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {
  * Contains all device specific methods and attributes
  */
 class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    ,
-                 BleSensors
-#endif
 #ifdef ONEWIRE_EN
     ,
                  PayloadOneWire
@@ -148,10 +145,6 @@ public:
      * \param clocksync Timestamp of last clock synchronization
      */
     AppLayer(ESP32Time *rtc, time_t *clocksync) : PayloadBresser(rtc, clocksync), PayloadAnalog(), PayloadDigital()
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-                                                  ,
-                                                  BleSensors()
-#endif
 #ifdef ONEWIRE_EN
                                                   ,
                                                   PayloadOneWire()
