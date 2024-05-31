@@ -512,7 +512,7 @@ Modify the example [data/secrets.json](data/secrets.json) as required and instal
 
 ### Default Configuration
 
-The default payload configuration consists of
+The default payload configuration is as follows:
 
 | Sensor                    | Signal                          | Unit  | Type        | Bytes |
 | ------------------------- | ------------------------------- | ----- | ----------- | ----- |
@@ -552,6 +552,8 @@ The default sensor data uplink confoguration is defined in https://github.com/ma
 ### Config Helper
 
 Changing the configuration by setting bitmaps is not really comfortable. Therefore the Config Helper has been created.
+
+![Config_Helper-20240531](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/36fe486b-3ffe-474d-9b1f-762415ff47db)
 
 [Config Helper](https://matthias-bs.github.io/BresserWeatherSensorLW/confighelper.html)
 
