@@ -1,7 +1,8 @@
 <map id="AppLayer" name="AppLayer">
-<area shape="rect" id="node1" title="LoRaWAN node application layer." alt="" coords="241,80,324,107"/>
+<area shape="rect" id="node1" title="LoRaWAN node application layer." alt="" coords="312,80,395,107"/>
 <area shape="rect" id="node2" href="$class_payload_bresser.html" title=" " alt="" coords="5,5,128,32"/>
 <area shape="rect" id="node3" href="$class_payload_analog.html" title=" " alt="" coords="153,5,271,32"/>
 <area shape="rect" id="node4" href="$class_payload_digital.html" title=" " alt="" coords="295,5,411,32"/>
 <area shape="rect" id="node5" href="$class_payload_one_wire.html" title=" " alt="" coords="435,5,565,32"/>
+<area shape="rect" id="node6" href="$class_payload_b_l_e.html" title=" " alt="" coords="589,5,686,32"/>
 </map>

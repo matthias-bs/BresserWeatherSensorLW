@@ -8,6 +8,9 @@ var hierarchy =
     [ "PayloadAnalog", "class_payload_analog.html", [
       [ "AppLayer", "class_app_layer.html", null ]
     ] ],
+    [ "PayloadBLE", "class_payload_b_l_e.html", [
+      [ "AppLayer", "class_app_layer.html", null ]
+    ] ],
     [ "PayloadBresser", "class_payload_bresser.html", [
       [ "AppLayer", "class_app_layer.html", null ]
     ] ],
