@@ -90,6 +90,8 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
 * [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
 * [Payload Configuration](#payload-configuration)
+  * [Default Configuration](#default-configuration)
+  * [Config Helper](#config-helper)
 * [Customizing the Application Layer](#customizing-the-application-layer)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
@@ -392,6 +394,9 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | \<analog\>            | Bitmap for enabling analog input channels; each bit position corresponds to a channel |
 | \<digital\>           | Bitmap for enabling digital input channels in a broader sense &mdash; GPIO, SPI, I2C, UART, ... |
 
+> [!HINT]
+> See [Payload Configuration](#payload-configuration) for more details!
+
 > [!WARNING]
 > Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
 
@@ -404,7 +409,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 > * Sleep interval (long): see `BresserWeatherSensorLWCfg.h`<br>
 > * BLE addresses and scan parameters: see `BresserWeatherSensorLWCfg.h`<br>
 > * Weather sensor receive timeout: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
-> * Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h` 
+> * Sensor IDs include/exclude list: see `BresserWeatherSensorReceiver/src/WeatherSensorCfg.h`<br>
+> * Sensor data uplink payload configuration: see [Payload Configuration](#payload-configuration)
 
 ### Using Raw Data
 
@@ -502,7 +508,55 @@ Modify the example [data/secrets.json](data/secrets.json) as required and instal
 
 ## Payload Configuration
 
+### Default Configuration
+
+The default payload configuration consists of
+
+| Sensor                    | Signal                          | Unit  | Type        | Bytes |
+| ------------------------- | ------------------------------- | ----- | ----------- | ----- |
+| Bresser Sensors                                                                           |
+| Weather                   | Temperature                     | °C    | temperature |     2 |
+| Weather                   | Humidity                        | %     | uint8       |     1 |
+| Weather                   | Rain Gauge                      | mm    | rawfloat    |     4 |
+| Weather                   | Wind Speed (Gusts)              | m/s   | uint16fp1   |     2 |
+| Weather                   | Wind Speed (Avg)                | m/s   | uint16fp1   |     2 |
+| Weather                   | Wind Direction                  | °     | uint16fp1   |     2 |
+| Weather                   | UV Index                        | -     | uint8fp1    |     1 |
+| Weather                   | Post-processed: Hourly Rain     | mm    | rawfloat    |     4 |
+| Weather                   | Post-processed: Daily Rain      | mm    | rawfloat    |     4 |
+| Weather                   | Post-processed: Weekly Rain     | mm    | rawfloat    |     4 |
+| Weather                   | Post-processed: Monthly Rain    | mm    | rawfloat    |     4 |
+| Temperature/Humidity      | Temperature                     | °C    | temperature |     2 |
+| Temperature/Humidity      | Humidity                        | %     | uint8       |     1 |
+| Soil Moisture/Temperature | Temperature                     | °C    | temperature |     2 |
+| Soil Moisture/Temperature | Moisture                        | %     | uint8       |     1 |
+| Lightning                 | Post-processed: Event timestamp | epoch | unixtime    |     4 |
+| Lightning                 | Post-processed: No. of events   | -     | uint16      |     2 |
+| Lightning                 | Post-processed: Storm distance  | km    | uint8       |     1 |
+| 1-Wire Sensors                                                                            |
+| Temperature               | Temperature                     | °C    | temperature |     2 |
+| Analog Interface                                                                          |
+| Ch 00                     | Battery voltage                 | mV    | uint16      |     2 |
+| Digital Interface                                                                         |
+| -- none --                                                                                |
+| BLE Sensors                                                                               |
+| Temperature/Humidity      | Temperature                     | °C    | temperature |     2 |
+| Temperature/Humidity      | Humidity                        | %     | uint8       |     1 |
+
+The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters](#lorawan-payload-formatters). `uint16fp1` and `uint8fp1` are extensions in the payload formatter for fixed-point numbers with 1 decimal.
+
+The default sensor data uplink confoguration is defined in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/BresserWeatherSensorLWCfg.h#L313 as a set of byte values, which are used in https://github.com/matthias-bs/BresserWeatherSensorLW/blob/cb918c6f17e2ef4f6e3f01d1cbb4b6a2c4e21089/src/AppLayer.h#L71 to define the array `appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE]. This array is used as a large bitmap, where each byte represents a specific sensor or interface and each bit corresponds to a channel or feature.
+
+### Config Helper
+
+Changing the configuration by setting bitmaps is not really comfortable. Therefore the Config Helper has been created.
+
 [Config Helper](https://matthias-bs.github.io/BresserWeatherSensorLW/confighelper.html)
+
+In the Config Helper, you select the desired sensors/interfaces and the used channels/features and generate
+* A bitmap to change the default payload configuration in the C++ source code
+* A JSON string to configure the node via LoRaWAN downlink with the command [CMD_SET_APP_PAYLOAD_CFG](#using-the-javascript-uplinkdownlink-formatters)
+* A JSON string to configure the [Uplink Payload Formatter](#lorawan-payload-formatters)
 
 ## Customizing the Application Layer
 
