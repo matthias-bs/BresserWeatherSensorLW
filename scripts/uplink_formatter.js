@@ -166,7 +166,7 @@ function decoder(bytes, port) {
 
     // Big Endian
     var bytesToIntBE = function (bytes) {
-        var i = 0;
+        let i = 0;
         for (var x = 0; x < bytes.length; x++) {
             i |= +(bytes[x] << ((bytes.length - 1 - x) * 8));
         }
@@ -272,8 +272,7 @@ function decoder(bytes, port) {
 
     var bresser_bitmaps = function (bytes) {
         let res = [];
-        res[0] = "0x" + byte2hex(bytes[0]);
-        for (var i = 1; i < 16; i++) {
+        for (var i = 0; i < 16; i++) {
             res[i] = "0x" + byte2hex(bytes[i]);
         }
         return res;
@@ -281,15 +280,13 @@ function decoder(bytes, port) {
     bresser_bitmaps.BYTES = 16;
 
     var hex16 = function (bytes) {
-        let res;
-        res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
+        let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
         return res;
     };
     hex16.BYTES = 2;
 
     var hex32 = function (bytes) {
-        let res;
-        res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
+        let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
         return res;
     };
     hex32.BYTES = 4;
@@ -466,6 +463,7 @@ function decoder(bytes, port) {
             bitmap_node: bitmap_node,
             bitmap_sensors: bitmap_sensors,
             rawfloat: rawfloat,
+            uint8fp1: uint8fp1,
             uint16fp1: uint16fp1,
             rtc_source: rtc_source,
             decode: decode
