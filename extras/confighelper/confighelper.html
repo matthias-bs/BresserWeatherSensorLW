@@ -42,6 +42,7 @@
 //          Fixed Weather Sensor size calculation
 // 20240530 Added BLE sensor configuration
 //          Removed unused onchange="toggleInput(id, this.checked)" properties
+// 20240531 Fixed getLightningconfig()
 //
 // ToDo:
 // -
@@ -284,7 +285,7 @@
         }
 
         // Get [size, bitmap] from the Lightning Sensor configuration selected with checkboxes
-        function getLightningconfig() {
+        function getLightningconfig(configDecoder) {
             let lightningCheckbox = document.getElementById('lightning');
             if (!lightningCheckbox.checked) {
                 return [0, 0];
@@ -335,7 +336,7 @@
             let size = 0;
             for (var i = 2; i <= 11; i++) {
                 if (i == 9) {
-                    [lgtSize, configArray[9]] = getLightningconfig();
+                    [lgtSize, configArray[9]] = getLightningconfig(configDecoder);
                     size += lgtSize;
                     continue;
                 }
