@@ -25,15 +25,15 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             6.5.0
+// RadioLib                             6.6.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.27.0
+// BresserWeatherSensorReceiver         0.28.2
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
-// ATC MiThermometer                    0.3.1 (optional)
-// Theengs Decoder                      1.7.2 (optional)
+// ATC MiThermometer                    0.4.2 (optional)
+// Theengs Decoder                      1.7.8 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -82,9 +82,16 @@
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH to init()
 //          Added BresserWeatherSensorLWCmd.h
 // 20240505 Implemented loading of LoRaWAN secrets from file on LittleFS (if available)
+// 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve 
+//          to uplinkPayload[], modified actual size in sendReceive()
+// 20240528 Disabled uplink transmission of LoRaWAN node status flags
+// 20242529 Fixed payload size calculation
+// 20240530 Updated to RadioLib v6.6.0
 //
 // ToDo:
-// -
+// - Fix restoring nonces/session buffers after examples in 
+//   https://github.com/radiolib-org/radiolib-persistence
+//   have been updated
 //
 // Notes:
 // - Set "Core Debug Level: Debug" for initial testing
@@ -166,10 +173,6 @@ using namespace PowerFeather;
 
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
-
-// Uplink message payload size
-// The maximum allowed for all data rates is 51 bytes.
-const uint8_t PAYLOAD_SIZE = 51;
 
 // Time source & status, see below
 //
@@ -746,20 +749,22 @@ void setup()
     gotoSleep(sleepDuration());
   }
 
-  // build payload byte array
-  uint8_t uplinkPayload[PAYLOAD_SIZE];
+  // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
+  uint8_t uplinkPayload[PAYLOAD_SIZE + 8];
 
   LoraEncoder encoder(uplinkPayload);
 
-  // LoRaWAN node status flags
-  encoder.writeBitmap(0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      longSleep,
-                      0,
-                      0);
+  // Note:
+  // This should be enabled by a LoRaWAN downlink command if required.
+  // // LoRaWAN node status flags
+  // encoder.writeBitmap(0,
+  //                     0,
+  //                     0,
+  //                     0,
+  //                     0,
+  //                     longSleep,
+  //                     0,
+  //                     0);
 
   appLayer.getPayloadStage1(1, encoder);
 
@@ -785,25 +790,22 @@ void setup()
 
   // recall session from RTC deep-sleep preserved variable
   state = node.setBufferSession(LWsession); // send them to LoRaWAN stack
+
   // if we have booted at least once we should have a session to restore, so report any failure
   // otherwise no point saying there's been a failure when it was bound to fail with an empty
   // LWsession var. At this point, bootCount has already been incremented, hence the > 2
   debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restoring session buffer failed", state, false);
 
-  // process the restored session or failing that, create a new one &
-  // return flag to indicate a fresh join is required
-  log_d("Setup LoRaWAN session");
-  state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey, false);
-  // see comment above, no need to report a failure that is bound to occur on first boot
-  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restore session failed", state, false);
+  // Setup the OTAA session information
+  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
 
   // loop until successful join
-  while (state != RADIOLIB_ERR_NONE)
+  while ((state != RADIOLIB_LORAWAN_NEW_SESSION) && (state != RADIOLIB_LORAWAN_SESSION_RESTORED))
   {
     log_d("Join ('login') to the LoRaWAN Network");
-    state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey, true);
+    state = node.activateOTAA();
 
-    if (state < RADIOLIB_ERR_NONE)
+    if ((state != RADIOLIB_LORAWAN_NEW_SESSION) && (state != RADIOLIB_LORAWAN_SESSION_RESTORED))
     {
       log_d("Join failed: %d", state);
 
@@ -874,11 +876,11 @@ void setup()
   }
 
   // Retrieve the last uplink frame counter
-  uint32_t fcntUp = node.getFcntUp();
+  uint32_t fCntUp = node.getFCntUp();
 
   // Send a confirmed uplink every 64th frame
   // and also request the LinkCheck command
-  if (fcntUp % 64 == 0)
+  if (fCntUp % 64 == 0)
   {
     log_i("[LoRaWAN] Requesting LinkCheck");
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
@@ -896,14 +898,39 @@ void setup()
   LoRaWANEvent_t uplinkDetails;
   LoRaWANEvent_t downlinkDetails;
 
-  // perform an uplink & optionally receive downlink
-  if (fcntUp % 64 == 0)
+  uint8_t payloadSize = encoder.getLength();
+  if (payloadSize > PAYLOAD_SIZE)
   {
-    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, true, &uplinkDetails, &downlinkDetails);
+    log_w("Payload size exceeds maximum of %u bytes - truncating", PAYLOAD_SIZE);
+    payloadSize = PAYLOAD_SIZE;
+  }
+
+  // perform an uplink & optionally receive downlink
+  if (fCntUp % 64 == 0)
+  {
+    state = node.sendReceive(
+      uplinkPayload,
+      payloadSize,
+      port,
+      downlinkPayload,
+      &downlinkSize,
+      true,
+      &uplinkDetails,
+      &downlinkDetails
+    );
   }
   else
   {
-    state = node.sendReceive(uplinkPayload, encoder.getLength(), port, downlinkPayload, &downlinkSize, false, nullptr, &downlinkDetails);
+    state = node.sendReceive(
+      uplinkPayload,
+      payloadSize,
+      port,
+      downlinkPayload,
+      &downlinkSize,
+      false,
+      nullptr,
+      &downlinkDetails
+    );
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
@@ -919,9 +946,9 @@ void setup()
       log_i("Downlink data: ");
       arrayDump(downlinkPayload, downlinkSize);
 
-      if (downlinkDetails.port > 0)
+      if (downlinkDetails.fPort > 0)
       {
-        uplinkReq = decodeDownlink(downlinkDetails.port, downlinkPayload, downlinkSize);
+        uplinkReq = decodeDownlink(downlinkDetails.fPort, downlinkPayload, downlinkSize);
       }
     }
     else
@@ -945,8 +972,8 @@ void setup()
     log_d("[LoRaWAN] Datarate:\t%d", downlinkDetails.datarate);
     log_d("[LoRaWAN] Frequency:\t%7.3f MHz", downlinkDetails.freq);
     log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
-    log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fcnt);
-    log_d("[LoRaWAN] Port:\t\t%u", downlinkDetails.port);
+    log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fCnt);
+    log_d("[LoRaWAN] fPort:\t\t%u", downlinkDetails.fPort);
   }
 
   uint32_t networkTime = 0;
@@ -979,7 +1006,7 @@ void setup()
     sendCfgUplink(uplinkReq);
   }
 
-  log_d("FcntUp: %u", node.getFcntUp());
+  log_d("FcntUp: %u", node.getFCntUp());
 
   // now save session to RTC memory
   uint8_t *persist = node.getBufferSession();

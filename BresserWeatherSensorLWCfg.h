@@ -46,6 +46,11 @@
 // 20240430 Modified battery voltage measurement
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH
 //          Moved LoRaWAN command interface to BresserWeatherSensorLWCmd.h
+// 20240520 Added definitions for AppLayer payload configuration
+// 20240521 Added UBATT_CH/USUPPLY_CH
+// 20240524 Added sensor feature flags
+//          Moved PAYLOAD_SIZE from BresserWeatherSensorLW.ino
+// 20240528 Added encoding of invalid values, modified default payload, fixes
 //
 // Note:
 // Depending on board package file date, either
@@ -61,6 +66,7 @@
 #if !defined(_LWCFG_H)
 #define _LWCFG_H
 
+#include <stdint.h>
 
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"
@@ -89,6 +95,10 @@
 // See https://github.com/matthias-bs/BresserWeatherSensorTTN/issues/55
 //#define ARDUINO_THINGPULSE_EPULSE_FEATHER
 #endif
+
+// Uplink message payload size
+// The maximum allowed for all data rates is 51 bytes.
+const uint8_t PAYLOAD_SIZE = 51;
 
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
@@ -129,7 +139,7 @@
 #define ADC_EN
 
 // Enable OneWire temperature measurement
-// #define ONEWIRE_EN
+#define ONEWIRE_EN
 
 // Enable BLE temperature/humidity measurement
 // Notes:
@@ -152,6 +162,7 @@
 // Enable Ultrasonic Distance Sensor
 #if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 // #define DISTANCESENSOR_EN
+// #define DISTANCESENSOR_CH 8
 #endif
 
 
@@ -217,6 +228,9 @@ const float SUPPLY_DIV = 0.5;
 const uint8_t SUPPLY_SAMPLES = 10;
 #endif
 
+// "Channel" in appPayloadCfg
+#define USUPPLY_CH 1 
+
 #ifdef PIN_ADC1_IN
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 const float ADC1_DIV = 0.5;
@@ -275,6 +289,9 @@ const float UBATT_DIV = 0.2041;
 const float UBATT_DIV = 0.5;
 #endif
 const uint8_t UBATT_SAMPLES = 10;
+
+// "Channel" appPayloadCfg
+#define UBATT_CH 0
 #endif
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
@@ -289,5 +306,139 @@ const uint8_t UBATT_SAMPLES = 10;
         "a4:c1:38:b8:1f:7f" \
     }
 #endif
+
+/// AppLayer payload configuration size in bytes
+#define APP_PAYLOAD_CFG_SIZE 24
+
+// --- Default AppLayer payload configuration ---
+
+// For each sensor/interface type, there is a set of flags.
+// If a flag is set, the "channel" is enabled (according to the flags bit position).
+// For sensors which use a fixed channel, the flags are used to select
+// which signals (features) shall be included in the payload.
+
+// -- Sensor feature flags --
+
+// Weather Sensor
+#define PAYLOAD_WS_HUMIDITY     0b00000010
+#define PAYLOAD_WS_WIND         0b00000100
+#define PAYLOAD_WS_RAINGAUGE    0b00001000
+#define PAYLOAD_WS_LIGHT        0b00010000
+#define PAYLOAD_WS_UV           0b00100000
+#define PAYLOAD_WS_RAIN_H       0b01000000 // Rain post-processing; hourly rainfall
+#define PAYLOAD_WS_RAIN_DWM     0b10000000 // Rain post-processing; daily, weekly, monthly
+
+// Lightning sensor
+#define PAYLOAD_LIGHTNING_RAW   0b00010000 // Sensor raw data
+#define PAYLOAD_LIGHTNING_PROC  0b00100000 // Post-processed lightning data
+
+// -- 868 MHz Sensor Types --
+// 0 - Weather Station; 1 Ch
+// Note: Included in APP_PAYLOAD_CFG_TYPE01
+#define APP_PAYLOAD_CFG_TYPE00 0x00
+
+// 1 - Weather Station; 1 Ch
+//   - Professional Wind Gauge (with T and H); 1 Ch
+//   - Professional Rain Gauge (with T); 1 Ch
+//     Note: Type encoded as 0x9/0xA/0xB in radio message,
+//           but changed to 1 in BresserWeatherSensorReceiver!
+#define APP_PAYLOAD_CFG_TYPE01 ( \
+    1 /* enable sensor */ | \
+    PAYLOAD_WS_HUMIDITY | \
+    PAYLOAD_WS_WIND | \
+    PAYLOAD_WS_RAINGAUGE | \
+    /* PAYLOAD_WS_LIGHT | */ \
+    PAYLOAD_WS_UV | \
+    PAYLOAD_WS_RAIN_H | \
+    PAYLOAD_WS_RAIN_DWM \
+)
+
+// 2 - Thermo-/Hygro-Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE02 0x02
+
+// 3 - Pool / Spa Thermometer; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE03 0x00
+
+// 4 - Soil Moisture Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE04 0x02
+
+// 5 - Water Leakage Sensor; 7 Ch
+// Ch: 1
+#define APP_PAYLOAD_CFG_TYPE05 0x00
+
+// 6 - reserved
+#define APP_PAYLOAD_CFG_TYPE06 0x00
+
+// 7 - reserved
+#define APP_PAYLOAD_CFG_TYPE07 0x00
+
+// 8 - Air Quality Sensor PM2.5/PM10; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE08 0x00
+
+// 9 - Lightning Sensor; 1 Ch
+// Ch: 0
+#define APP_PAYLOAD_CFG_TYPE09 ( \
+    1 /* enable sensor */ | \
+    /* PAYLOAD_LIGHTNING_RAW | */ \
+    PAYLOAD_LIGHTNING_PROC \
+)
+
+// 10 - CO2 Sensor; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE10 0x00
+
+// 11 - HCHO/VCO Sensor; 4 Ch
+#define APP_PAYLOAD_CFG_TYPE11 0x00
+
+// 12 - reserved
+#define APP_PAYLOAD_CFG_TYPE12 0x00
+
+// 13 - reserved
+#define APP_PAYLOAD_CFG_TYPE13 0x00
+
+// 14 - reserved
+#define APP_PAYLOAD_CFG_TYPE14 0x00
+
+// 15 - reserved
+#define APP_PAYLOAD_CFG_TYPE15 0x00
+
+// -- 1-Wire Sensors --
+// Index: 0
+#define APP_PAYLOAD_CFG_ONEWIRE1 0x00 // onewire[15:8]
+#define APP_PAYLOAD_CFG_ONEWIRE0 0x01 // onewire[7:0]
+
+// -- Analog Inputs --
+// 0x01: Battery Voltage
+// 0x02: Supply Voltage
+#define APP_PAYLOAD_CFG_ANALOG1 0x00 // analog[15:8]
+#define APP_PAYLOAD_CFG_ANALOG0 0x01 // analog[7:0]
+
+// -- Digital Inputs --
+// Assign to any type of "channel",
+// e.g. GPIO, SPI, I2C, UART, ...
+#define APP_PAYLOAD_CFG_DIGITAL3 0x00 // digital[31:24]
+#define APP_PAYLOAD_CFG_DIGITAL2 0x00 // digital[23:16]
+#define APP_PAYLOAD_CFG_DIGITAL1 0x00 // digital[15:8]
+#define APP_PAYLOAD_CFG_DIGITAL0 0x00 // digital[7:0]
+
+#define APP_PAYLOAD_OFFS_ONEWIRE 16
+#define APP_PAYLOAD_BYTES_ONEWIRE 2
+
+#define APP_PAYLOAD_OFFS_ANALOG 18
+#define APP_PAYLOAD_BYTES_ANALOG 2
+
+#define APP_PAYLOAD_OFFS_DIGITAL 20
+#define APP_PAYLOAD_BYTES_DIGITAL 4
+
+// Encoding of invalid values
+// for floating point, see
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NaN
+#define INV_FLOAT 0x3FFFFFFF 
+#define INV_UINT32 0xFFFFFFFF
+#define INV_UINT16 0xFFFF
+#define INV_UINT8 0xFF
+#define INV_TEMP 327.67
 
 #endif // _LWCFG_H

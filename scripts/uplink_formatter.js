@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////
 // uplink_formatter.js
 // 
@@ -30,7 +29,7 @@
 // port = CMD_SET_BLE_ADDR, {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}
 // port = CMD_GET_BLE_CONFIG, {"cmd": "CMD_GET_BLE_CONFIG"} / payload = 0x00
 // port = CMD_SET_BLE_CONFIG, {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
-
+// port = CMD_GET_APP_PAYLOAD_CFG, {"cmd": "CMD_GET_APP_PAYLOAD_CFG"} / payload = 0x00
 //
 // Responses:
 // -----------
@@ -52,6 +51,8 @@
 //
 // CMD_GET_BLE_CONFIG {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}
 //
+// CMD_GET_APP_PAYLOAD_CFG {"bresser": [<type0>, <type1>, ..., <type15>], "onewire": <onewire>, "analog": <analog>, "digital": <digital>}
+//
 // <ws_timeout>         : 0...255
 // <sleep_interval>     : 0...65535
 // <sleep_interval>     : 0...65535
@@ -66,6 +67,11 @@
 // <ble_active>         : BLE scan mode - 0: passive / 1: active
 // <ble_scantime>       : BLE scan time in seconds (0...255)
 // <ble_addrN>          : e.g. "DE:AD:BE:EF:12:23"
+// <typeN>              : Bitmap for enabling Bresser sensors of type N; each bit position corresponds to a channel, e.g. bit 0 controls ch0; 
+//                        unused bits can be used to select features
+// <onewire>            : Bitmap for enabling 1-Wire sensors; each bit position corresponds to an index
+// <analog>             : Bitmap for enabling analog input channels; each bit positions corresponds to a channel
+// <digital>            : Bitmap for enabling digital input channels in a broad sense &mdash; GPIO, SPI, I2C, UART, ...
 
 // Based on:
 // ---------
@@ -103,7 +109,15 @@
 //          renamed from ttn_uplink_formatter.js
 // 20240427 Added BLE configuration
 // 20240507 Added CMD_GET_SENSORS_CFG
-// 20240608 Added en_decoders to CMD_GET_SENSORS_CFG
+// 20240508 Added en_decoders to CMD_GET_SENSORS_CFG
+// 20240517 Added CMD_GET_APP_PAYLOAD_CFG
+// 20240528 Modified sensor data payload decoder
+// 20240529 Added uint8fp1 for UV index
+//          Added NaN results to decoding functions
+//          Added supression of NaN results in decoder
+// 20240530 Added SKIP_INVALID_SIGNALS
+//          Added BLE signals to decoder
+// 20240531 Fixed handling of arrays in decoder()
 //
 // ToDo:
 // -  
@@ -113,6 +127,9 @@
 function decoder(bytes, port) {
     // bytes is of type Buffer
 
+    // Skip signals encoded as invalid
+    const SKIP_INVALID_SIGNALS = true;
+
     const CMD_GET_DATETIME = 0x86;
     const CMD_GET_LW_CONFIG = 0xB1;
     const CMD_GET_WS_TIMEOUT = 0xC0;
@@ -121,10 +138,9 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_CFG = 0xCC;
     const CMD_GET_BLE_ADDR = 0xC8;
     const CMD_GET_BLE_CONFIG = 0xCA;
+    const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
 
-    const ONEWIRE_EN = 0;
-
-    var rtc_source_code = {
+    const rtc_source_code = {
         0x00: "GPS",
         0x01: "RTC",
         0x02: "LORA",
@@ -141,7 +157,7 @@ function decoder(bytes, port) {
     rtc_source.BYTES = 1;
 
     var bytesToInt = function (bytes) {
-        var i = 0;
+        let i = 0;
         for (var x = 0; x < bytes.length; x++) {
             i |= +(bytes[x] << (x * 8));
         }
@@ -150,7 +166,7 @@ function decoder(bytes, port) {
 
     // Big Endian
     var bytesToIntBE = function (bytes) {
-        var i = 0;
+        let i = 0;
         for (var x = 0; x < bytes.length; x++) {
             i |= +(bytes[x] << ((bytes.length - 1 - x) * 8));
         }
@@ -169,23 +185,48 @@ function decoder(bytes, port) {
         if (bytes.length !== uint8.BYTES) {
             throw new Error('int must have exactly 1 byte');
         }
-        return bytesToInt(bytes);
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFF) {
+            return NaN;
+        }
+        return res;
     };
     uint8.BYTES = 1;
+
+    var uint8fp1 = function (bytes) {
+        if (bytes.length !== uint8fp1.BYTES) {
+            throw new Error('int must have exactly 1 byte');
+        }
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFF) {
+            return NaN;
+        }
+        res *= 0.1;
+        return res.toFixed(1);
+    };
+    uint8fp1.BYTES = 1;
 
     var uint16 = function (bytes) {
         if (bytes.length !== uint16.BYTES) {
             throw new Error('int must have exactly 2 bytes');
         }
-        return bytesToInt(bytes);
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
+            return NaN;
+        }
+        return res;
     };
     uint16.BYTES = 2;
 
     var uint16fp1 = function (bytes) {
-        if (bytes.length !== uint16.BYTES) {
+        if (bytes.length !== uint16fp1.BYTES) {
             throw new Error('int must have exactly 2 bytes');
         }
-        var res = bytesToInt(bytes) * 0.1;
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
+            return NaN;
+        }
+        res *= 0.1;
         return res.toFixed(1);
     };
     uint16fp1.BYTES = 2;
@@ -219,26 +260,45 @@ function decoder(bytes, port) {
     }
 
     var mac48 = function (bytes) {
-        var res = [];
-        var size = bytes.length;
-        var j = 0;
+        let res = [];
+        let j = 0;
         for (var i = 0; i < bytes.length; i += 6) {
             res[j++] = byte2hex(bytes[i]) + ":" + byte2hex(bytes[i + 1]) + ":" + byte2hex(bytes[i + 2]) + ":" +
                 byte2hex(bytes[i + 3]) + ":" + byte2hex(bytes[i + 4]) + ":" + byte2hex(bytes[i + 5]);
         }
         return res;
-    }
+    };
     mac48.BYTES = bytes.length;
 
+    var bresser_bitmaps = function (bytes) {
+        let res = [];
+        for (var i = 0; i < 16; i++) {
+            res[i] = "0x" + byte2hex(bytes[i]);
+        }
+        return res;
+    };
+    bresser_bitmaps.BYTES = 16;
+
+    var hex16 = function (bytes) {
+        let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
+        return res;
+    };
+    hex16.BYTES = 2;
+
+    var hex32 = function (bytes) {
+        let res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
+        return res;
+    };
+    hex32.BYTES = 4;
+
     var id32 = function (bytes) {
-        var res = [];
-        var size = bytes.length;
-        var j = 0;
+        let res = [];
+        let j = 0;
         for (var i = 0; i < bytes.length; i += 4) {
             res[j++] = "0x" + byte2hex(bytes[i]) + byte2hex(bytes[i + 1]) + byte2hex(bytes[i + 2]) + byte2hex(bytes[i + 3]);
         }
         return res;
-    }
+    };
     id32.BYTES = bytes.length;
 
     var latLng = function (bytes) {
@@ -246,8 +306,8 @@ function decoder(bytes, port) {
             throw new Error('Lat/Long must have exactly 8 bytes');
         }
 
-        var lat = bytesToInt(bytes.slice(0, latLng.BYTES / 2));
-        var lng = bytesToInt(bytes.slice(latLng.BYTES / 2, latLng.BYTES));
+        let lat = bytesToInt(bytes.slice(0, latLng.BYTES / 2));
+        let lng = bytesToInt(bytes.slice(latLng.BYTES / 2, latLng.BYTES));
 
         return [lat / 1e6, lng / 1e6];
     };
@@ -257,11 +317,11 @@ function decoder(bytes, port) {
         if (bytes.length !== temperature.BYTES) {
             throw new Error('Temperature must have exactly 2 bytes');
         }
-        var isNegative = bytes[0] & 0x80;
-        var b = ('00000000' + Number(bytes[0]).toString(2)).slice(-8)
+        let isNegative = bytes[0] & 0x80;
+        let b = ('00000000' + Number(bytes[0]).toString(2)).slice(-8)
             + ('00000000' + Number(bytes[1]).toString(2)).slice(-8);
         if (isNegative) {
-            var arr = b.split('').map(function (x) { return !Number(x); });
+            let arr = b.split('').map(function (x) { return !Number(x); });
             for (var i = arr.length - 1; i > 0; i--) {
                 arr[i] = !arr[i];
                 if (arr[i]) {
@@ -270,11 +330,14 @@ function decoder(bytes, port) {
             }
             b = arr.map(Number).join('');
         }
-        var t = parseInt(b, 2);
+        let t = parseInt(b, 2);
         if (isNegative) {
             t = -t;
         }
         t = t / 1e2;
+        if (SKIP_INVALID_SIGNALS && t == 327.67) {
+            return NaN;
+        }
         return t.toFixed(1);
     };
     temperature.BYTES = 2;
@@ -284,7 +347,10 @@ function decoder(bytes, port) {
             throw new Error('Humidity must have exactly 2 bytes');
         }
 
-        var h = bytesToInt(bytes);
+        let h = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && h === 0xFFFF) {
+            return NaN;
+        }
         return h / 1e2;
     };
     humidity.BYTES = 2;
@@ -302,6 +368,9 @@ function decoder(bytes, port) {
         var e = bits >>> 23 & 0xff;
         var m = (e === 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
         var f = sign * m * Math.pow(2, e - 150);
+        if (e === 0x7F && m !== 0) {
+            return NaN;
+        }
         return f.toFixed(1);
     }
     rawfloat.BYTES = 4;
@@ -310,8 +379,8 @@ function decoder(bytes, port) {
         if (byte.length !== bitmap_node.BYTES) {
             throw new Error('Bitmap must have exactly 1 byte');
         }
-        var i = bytesToInt(byte);
-        var bm = ('00000000' + Number(i).toString(2)).substr(-8).split('').map(Number).map(Boolean);
+        let i = bytesToInt(byte);
+        let bm = ('00000000' + Number(i).toString(2)).slice(-8).split('').map(Number).map(Boolean);
 
         return ['res7', 'res6', 'res5', 'res4', 'res3', 'res2', 'res1', 'res0']
             .reduce(function (obj, pos, index) {
@@ -325,8 +394,8 @@ function decoder(bytes, port) {
         if (byte.length !== bitmap_sensors.BYTES) {
             throw new Error('Bitmap must have exactly 1 byte');
         }
-        var i = bytesToInt(byte);
-        var bm = ('00000000' + Number(i).toString(2)).substr(-8).split('').map(Number).map(Boolean);
+        let i = bytesToInt(byte);
+        let bm = ('00000000' + Number(i).toString(2)).slice(-8).split('').map(Number).map(Boolean);
         // Only Weather Sensor
         //return ['res5', 'res4', 'res3', 'res2', 'res1', 'res0', 'dec_ok', 'batt_ok']
         // Weather Sensor + MiThermo (BLE) Sensor
@@ -340,8 +409,18 @@ function decoder(bytes, port) {
     };
     bitmap_sensors.BYTES = 1;
 
+    /**
+     * Decodes the given bytes using the provided mask and names.
+     *
+     * @param {Array} bytes - The bytes to decode.
+     * @param {Array} mask - The mask used for decoding.
+     * @param {Array} [names] - The names of the decoded values.
+     * @returns {Object} - The decoded values as an object.
+     * @throws {Error} - If the length of the bytes is less than the mask length.
+     */
     var decode = function (bytes, mask, names) {
 
+        // Sum of all mask bytes
         var maskLength = mask.reduce(function (prev, cur) {
             return prev + cur.BYTES;
         }, 0);
@@ -354,10 +433,16 @@ function decoder(bytes, port) {
         return mask
             .map(function (decodeFn) {
                 var current = bytes.slice(offset, offset += decodeFn.BYTES);
-                return decodeFn(current);
+                var decodedValue = decodeFn(current);
+                if (isNaN(decodedValue) && decodedValue.constructor === Number) {
+                    return null;
+                }
+                return decodedValue;
             })
             .reduce(function (prev, cur, idx) {
-                prev[names[idx] || idx] = cur;
+                if (cur !== null) {
+                    prev[names[idx] || idx] = cur;
+                }
                 return prev;
             }, {});
     };
@@ -371,12 +456,14 @@ function decoder(bytes, port) {
             uint16BE: uint16BE,
             uint32BE: uint32BE,
             mac48: mac48,
+            bresser_bitmaps: bresser_bitmaps,
             temperature: temperature,
             humidity: humidity,
             latLng: latLng,
             bitmap_node: bitmap_node,
             bitmap_sensors: bitmap_sensors,
             rawfloat: rawfloat,
+            uint8fp1: uint8fp1,
             uint16fp1: uint16fp1,
             rtc_source: rtc_source,
             decode: decode
@@ -385,43 +472,45 @@ function decoder(bytes, port) {
 
 
     if (port === 1) {
-        if (ONEWIRE_EN) {
-            return decode(
-                bytes,
-                [bitmap_node, bitmap_sensors, temperature, uint8,
-                    uint16fp1, uint16fp1, uint16fp1,
-                    rawfloat, uint16, temperature,
-                    temperature, uint8, temperature, uint8,
-                    rawfloat, rawfloat, rawfloat, rawfloat,
-                    unixtime, uint16, uint8
-                ],
-                ['status_node', 'status', 'air_temp_c', 'humidity',
-                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'rain_mm', 'supply_v', 'water_temp_c',
-                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
-                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
-                    'lightning_time', 'lightning_events', 'lightning_distance_km'
-                ]
-            );
-        } else {
-            return decode(
-                bytes,
-                [bitmap_node, bitmap_sensors, temperature, uint8,
-                    uint16fp1, uint16fp1, uint16fp1,
-                    rawfloat, uint16,
-                    temperature, uint8, temperature, uint8,
-                    rawfloat, rawfloat, rawfloat, rawfloat,
-                    unixtime, uint16, uint8
-                ],
-                ['status_node', 'status', 'air_temp_c', 'humidity',
-                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'rain_mm', 'supply_v',
-                    'indoor_temp_c', 'indoor_humidity', 'soil_temp_c', 'soil_moisture',
-                    'rain_hr', 'rain_day', 'rain_week', 'rain_mon',
-                    'lightning_time', 'lightning_events', 'lightning_distance_km'
-                ]
-            );
-        }
+        return decode(
+            bytes,
+            [
+                temperature,
+                uint8,
+                rawfloat,
+                uint16fp1, uint16fp1, uint16fp1,
+                uint8fp1,
+                rawfloat,
+                rawfloat, rawfloat, rawfloat,
+                temperature, uint8,
+                temperature, uint8,
+                unixtime,
+                uint16,
+                uint8,
+                temperature,
+                uint16,
+                temperature,
+                uint8
+            ],
+            [
+                'ws_temp_c',
+                'ws_humidity',
+                'ws_rain_mm',
+                'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
+                'ws_uv',
+                'ws_rain_hourly_mm',
+                'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
+                'th1_temp_c', 'th1_humidity',
+                'soil1_temp_c', 'soil1_moisture',
+                'lgt_time',
+                'lgt_events',
+                'lgt_distance_km',
+                'ow0_temp_c',
+                'a0_voltage_mv',
+                'ble0_temp_c',
+                'ble0_humidity',
+            ]
+        );
 
     } else if (port === CMD_GET_DATETIME) {
         return decode(
@@ -485,6 +574,13 @@ function decoder(bytes, port) {
             [uint8, uint8
             ],
             ['ble_active', 'ble_scantime']
+        );
+    } else if (port === CMD_GET_APP_PAYLOAD_CFG) {
+        return decode(
+            bytes,
+            [bresser_bitmaps, hex16, hex16, hex32
+            ],
+            ['bresser', 'onewire', 'analog', 'digital']
         );
     }
 

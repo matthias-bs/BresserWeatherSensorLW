@@ -28,6 +28,10 @@ jobs:
           cat keywords.txt
           echo "-----------------------------------------------------------"
 
+      - name: Copy confighelper.html
+        run: |
+          cp extras/confighelper/confighelper.html docs/html/
+        
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@releases/v4
         with:

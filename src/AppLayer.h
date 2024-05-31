@@ -39,6 +39,11 @@
 // 20240426 Moved bleAddrInit() out of begin()
 // 20240504 Added BresserWeatherSensorLWCmd.h
 // 20240515 Added getOneWireTemperature()
+// 20240520 Moved 1-Wire sensor code to PayloadOneWire.h/.cpp
+// 20240524 Added appPayloadCfgDef, setAppPayloadCfg() & getAppPayloadCfg()
+//          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
+// 20240530 Removed BleSensors as base class & from initializers
+// 20240531 Moved BLE specific code to PayloadBLE.h
 //
 // ToDo:
 // -
@@ -54,37 +59,56 @@
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "../BresserWeatherSensorLWCmd.h"
-#include "adc/adc.h"
+#include "PayloadBresser.h"
+#include "PayloadOneWire.h"
+#include "PayloadAnalog.h"
+#include "PayloadDigital.h"
+#include "PayloadBLE.h"
 #include <LoraMessage.h>
 
-#if defined(MITHERMOMETER_EN)
-// BLE Temperature/Humidity Sensor
-#include <ATC_MiThermometer.h>
-#endif
-#if defined(THEENGSDECODER_EN)
-#include "BleSensors/BleSensors.h"
-#endif
-#ifdef RAINDATA_EN
-#include "RainGauge.h"
-#endif
-#ifdef LIGHTNINGSENSOR_EN
-#include "Lightning.h"
-#endif
-#ifdef ONEWIRE_EN
-// Dallas/Maxim OneWire Temperature Sensor
-#include <DallasTemperature.h>
-#endif
-#ifdef DISTANCESENSOR_EN
-// A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor
-#include <DistanceSensor_A02YYUW.h>
-#endif
+
+/// Default AppLayer payload configuration
+const uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {
+    APP_PAYLOAD_CFG_TYPE00,
+    APP_PAYLOAD_CFG_TYPE01,
+    APP_PAYLOAD_CFG_TYPE02,
+    APP_PAYLOAD_CFG_TYPE03,
+    APP_PAYLOAD_CFG_TYPE04,
+    APP_PAYLOAD_CFG_TYPE05,
+    APP_PAYLOAD_CFG_TYPE06,
+    APP_PAYLOAD_CFG_TYPE07,
+    APP_PAYLOAD_CFG_TYPE08,
+    APP_PAYLOAD_CFG_TYPE09,
+    APP_PAYLOAD_CFG_TYPE10,
+    APP_PAYLOAD_CFG_TYPE11,
+    APP_PAYLOAD_CFG_TYPE12,
+    APP_PAYLOAD_CFG_TYPE13,
+    APP_PAYLOAD_CFG_TYPE14,
+    APP_PAYLOAD_CFG_TYPE15,
+    APP_PAYLOAD_CFG_ONEWIRE1, // onewire[15:8]
+    APP_PAYLOAD_CFG_ONEWIRE0, // onewire[7:0]
+    APP_PAYLOAD_CFG_ANALOG1,  // analog[15:0]
+    APP_PAYLOAD_CFG_ANALOG0,  // analog[7:0]
+    APP_PAYLOAD_CFG_DIGITAL3, // digital[31:24]
+    APP_PAYLOAD_CFG_DIGITAL2, // digital[23:16]
+    APP_PAYLOAD_CFG_DIGITAL1, // digital[15:8]
+    APP_PAYLOAD_CFG_DIGITAL0  // digital[7:0]
+};
 
 /*!
  * \brief LoRaWAN node application layer
  *
  * Contains all device specific methods and attributes
  */
-class AppLayer
+class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
+#ifdef ONEWIRE_EN
+    ,
+                 PayloadOneWire
+#endif
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    ,
+                 PayloadBLE
+#endif
 {
 private:
     ESP32Time *_rtc;
@@ -93,62 +117,24 @@ private:
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
 
-    /// Bresser Weather Sensor Receiver
-    WeatherSensor weatherSensor;
-
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    /// Default BLE MAC addresses
-    std::vector<std::string> knownBLEAddressesDef;
-    /// Actual BLE MAC addresses; either from Preferences or from defaults
-    std::vector<std::string> knownBLEAddresses;
-#endif
-
-#ifdef MITHERMOMETER_EN
-    /// BLE Temperature/Humidity Sensors
-    ATC_MiThermometer bleSensors; //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
-#endif
-#ifdef THEENGSDECODER_EN
-    /// Bluetooth Low Energy sensors
-    BleSensors bleSensors;
-#endif
-
-#ifdef RAINDATA_EN
-    /// Rain data statistics
-    RainGauge rainGauge;
-#endif
-
-#ifdef LIGHTNINGSENSOR_EN
-    /// Lightning sensor post-processing
-    Lightning lightningProc;
-#endif
-
-#ifdef DISTANCESENSOR_EN
-#if defined(ESP32)
-    /// Ultrasonic distance sensor
-    DistanceSensor_A02YYUW distanceSensor(&Serial2);
-#else
-    /// Ultrasonic distance sensor
-    DistanceSensor_A02YYUW distanceSensor(&Serial1);
-#endif
-#endif
+    /// AppLayer payload configuration
+    uint8_t appPayloadCfg[APP_PAYLOAD_CFG_SIZE];
 
 public:
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     /*!
      * \brief Constructor with BLE sensors
      *
      * \param rtc Real time clock object
      * \param clocksync Timestamp of last clock synchronization
      */
-    AppLayer(ESP32Time *rtc, time_t *clocksync) : bleSensors()
-#else
-    /*!
-     * \brief Constructor without BLE sensors
-     *
-     * \param rtc Real time clock object
-     * \param clocksync Timestamp of last clock synchronization
-     */
-    AppLayer(ESP32Time *rtc, time_t *clocksync)
+    AppLayer(ESP32Time *rtc, time_t *clocksync) : PayloadBresser(rtc, clocksync), PayloadAnalog(), PayloadDigital()
+#ifdef ONEWIRE_EN
+                                                  ,
+                                                  PayloadOneWire()
+#endif
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+                                                  ,
+                                                  PayloadBLE()
 #endif
     {
         _rtc = rtc;
@@ -161,55 +147,19 @@ public:
      */
     void begin(void)
     {
-        bleAddrInit();
-    };
-
-    /*!
-     * \brief Initialize list of known BLE addresses from defaults or Preferences
-     *
-     * If available, addresses from Preferences are used, otherwise defaults from
-     * BresserWeatherSensorLWCfg.h.
-     *
-     * BleSensors() requires Preferences, which uses the Flash FS,
-     * which is not available before the sketches' begin() is called -
-     * thus the following cannot be handled by the constructor!
-     */
-    void bleAddrInit(void)
-    {
+        // bleAddrInit();
+        PayloadBresser::begin();
+        PayloadAnalog::begin();
+        PayloadDigital::begin();
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-        knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
-        knownBLEAddresses = getBleAddr();
-        if (knownBLEAddresses.size() == 0)
-        {
-            // No addresses stored in Preferences, use default
-            knownBLEAddresses = knownBLEAddressesDef;
-            log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
-        }
-        else
-        {
-            log_d("Using BLE addresses from Preferences:");
-        }
-        bleSensors = BleSensors(knownBLEAddresses);
-
-        for (const std::string &s : knownBLEAddresses)
-        {
-            (void)s;
-            log_d("%s", s.c_str());
-        }
+        PayloadBLE::begin();
 #endif
+
+        if (!getAppPayloadCfg(appPayloadCfg, APP_PAYLOAD_CFG_SIZE))
+        {
+            memcpy(appPayloadCfg, appPayloadCfgDef, APP_PAYLOAD_CFG_SIZE);
+        }
     };
-
-#ifdef ONEWIRE_EN
-    /*!
-     * \brief Get temperature from Maxim OneWire Sensor
-     *
-     * \param index sensor index
-     *
-     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
-     */
-    float
-    getOneWireTemperature(uint8_t index = 0);
-#endif
 
     /*!
      * \brief Decode app layer specific downlink messages
@@ -269,30 +219,22 @@ public:
      */
     void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
 
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     /*!
-     * Set BLE addresses in Preferences and bleSensors object
+     * Set AppLayer payload config in Preferences
      *
-     * \param bytes MAC addresses (6 bytes per address)
-     * \param size size in bytes
+     * \param bytes buffer
+     * \param size buffer size in bytes
      */
-    void setBleAddr(uint8_t *bytes, uint8_t size);
+    void setAppPayloadCfg(uint8_t *bytes, uint8_t size);
 
     /*!
-     * Get BLE addresses from Preferences
+     * Get AppLayer payload config from Preferences
      *
-     * \param bytes buffer for addresses
+     * \param bytes buffer
+     * \param size buffer size in bytes
      *
-     * \returns number of bytes copied into buffer
+     * \returns true if available in Preferences, else false
      */
-    uint8_t getBleAddr(uint8_t *bytes);
-
-    /*!
-     * Get BLE addresses from Preferences
-     *
-     * \returns BLE addresses
-     */
-    std::vector<std::string> getBleAddr(void);
-#endif
+    bool getAppPayloadCfg(uint8_t *bytes, uint8_t size);
 };
 #endif // _APPLAYER_H
