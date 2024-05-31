@@ -56,53 +56,68 @@
 //          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
 // 20240529 Changed encoding of INV_TEMP for BLE sensors
 // 20240530 Fixed CMD_SET_APP_PAYLOAD_CFG handling
+// 20240531 Moved BLE specific code to PayloadBLE.cpp
 //
 // ToDo:
-// - Move BLE code to separate class
+// -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "AppLayer.h"
 
-#ifdef ONEWIRE_EN
-    // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
-    static OneWire oneWire(PIN_ONEWIRE_BUS); //!< OneWire bus
 
-    // Pass our oneWire reference to Dallas Temperature.
-    static DallasTemperature owTempSensors(&oneWire); //!< Dallas temperature sensors connected to OneWire bus
+void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
+{
+    // unused
+    (void)port;
+    (void)encoder;
+    weatherSensor.genMessage(0, 0xfff0, SENSOR_TYPE_WEATHER1);
+    weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
+}
+
+void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
+{
+    (void)port; // eventually suppress warning regarding unused parameter
+
+    log_v("Port: %d", port);
+
+    log_i("--- Uplink Data ---");
+
+    // TODO: Handle battery status flags in PayloadBresser
+    // // Sensor status flags
+    // encoder.writeBitmap(0,
+    //                     mithermometer_valid,
+    //                     (ls > -1) ? weatherSensor.sensor[ls].valid : false,
+    //                     (ls > -1) ? weatherSensor.sensor[ls].battery_ok : false,
+    //                     (s1 > -1) ? weatherSensor.sensor[s1].valid : false,
+    //                     (s1 > -1) ? weatherSensor.sensor[s1].battery_ok : false,
+    //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
+    //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
+
+    encodeBresser(appPayloadCfg, encoder);
+
+#ifdef ONEWIRE_EN
+    encodeOneWire(appPayloadCfg, encoder);
 #endif
 
-#ifdef ONEWIRE_EN
-    /*!
-     * \brief Get temperature from Maxim OneWire Sensor
-     *
-     * \param index sensor index
-     *
-     * \returns temperature in degrees Celsius or DEVICE_DISCONNECTED_C
-     */
-    float
-    AppLayer::getOneWireTemperature(uint8_t index)
-    {
-        // Call sensors.requestTemperatures() to issue a global temperature
-        // request to all devices on the bus
-        owTempSensors.requestTemperatures();
+    // Voltages / auxiliary analog sensor data
+    encodeAnalog(appPayloadCfg, encoder);
 
-        // Get temperature by index
-        float tempC = owTempSensors.getTempCByIndex(index);
+    // Digital Sensors (GPIO, UART, I2C, SPI, ...)
+    encodeDigital(appPayloadCfg, encoder);
 
-        // Check if reading was successful
-        if (tempC != DEVICE_DISCONNECTED_C)
-        {
-            log_d("Temperature = %.2f°C", tempC);
-        }
-        else
-        {
-            log_d("Error: Could not read temperature data");
-        }
-
-        return tempC;
-    };
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    // BLE Temperature/Humidity Sensors
+    encodeBLE(appPayloadCfg, encoder);
 #endif
+
+}
+
+void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
+{
+    (void)port;
+    (void)encoder;
+}
 
 uint8_t
 AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
@@ -257,100 +272,6 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     return 0;
 }
 
-void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
-{
-    // unused
-    (void)port;
-    (void)encoder;
-    weatherSensor.genMessage(0, 0xfff0, SENSOR_TYPE_WEATHER1);
-    weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
-}
-
-void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
-{
-    (void)port; // suppress warning regarding unused parameter
-
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    float indoor_temp_c;
-    float indoor_humidity;
-
-    // Set sensor data invalid
-    bleSensors.resetData();
-
-    appPrefs.begin("BWS-LW-APP", false);
-    uint8_t ble_active = appPrefs.getUChar("ble_active", BLE_SCAN_MODE);
-    uint8_t ble_scantime = appPrefs.getUChar("ble_scantime", BLE_SCAN_TIME);
-    log_d("Preferences: ble_active: %u", ble_active);
-    log_d("Preferences: ble_scantime: %u s", ble_scantime);
-    appPrefs.end();
-    // Get sensor data - run BLE scan for <bleScanTime>
-    bleSensors.getData(ble_scantime, ble_active);
-#endif
-
-    log_v("Port: %d", port);
-
-    log_i("--- Uplink Data ---");
-
-    // TODO: Handle battery status flags in PayloadBresser
-    // // Sensor status flags
-    // encoder.writeBitmap(0,
-    //                     mithermometer_valid,
-    //                     (ls > -1) ? weatherSensor.sensor[ls].valid : false,
-    //                     (ls > -1) ? weatherSensor.sensor[ls].battery_ok : false,
-    //                     (s1 > -1) ? weatherSensor.sensor[s1].valid : false,
-    //                     (s1 > -1) ? weatherSensor.sensor[s1].battery_ok : false,
-    //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
-    //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
-
-    encodeBresser(appPayloadCfg, encoder);
-
-#ifdef ONEWIRE_EN
-    encodeOneWire(appPayloadCfg, encoder);
-#endif
-
-    // Voltages / auxiliary analog sensor data
-    encodeAnalog(appPayloadCfg, encoder);
-
-    // Digital Sensors (GPIO, UART, I2C, SPI, ...)
-    encodeDigital(appPayloadCfg, encoder);
-
-// BLE Temperature/Humidity Sensors
-#if defined(MITHERMOMETER_EN)
-    float div = 100.0;
-#elif defined(THEENGSDECODER_EN)
-    float div = 1.0;
-#endif
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-    if (encoder.getLength() <= PAYLOAD_SIZE - 3)
-    {
-        if (bleSensors.data[0].valid)
-        {
-            indoor_temp_c = bleSensors.data[0].temperature / div;
-            indoor_humidity = bleSensors.data[0].humidity / div;
-            log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
-            log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
-            encoder.writeTemperature(indoor_temp_c);
-            encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
-        }
-        else
-        {
-            log_i("Indoor Air Temp.:    --.- °C");
-            log_i("Indoor Humidity:     --   %%");
-            encoder.writeTemperature(INV_TEMP);
-            encoder.writeUint8(INV_UINT8);
-        }
-        // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
-        bleSensors.clearScanResults();
-    }
-#endif
-}
-
-void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
-{
-    (void)port;
-    (void)encoder;
-}
-
 void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder)
 {
     if (cmd == CMD_GET_WS_TIMEOUT)
@@ -427,63 +348,6 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         port = CMD_GET_APP_PAYLOAD_CFG;
     }
 }
-
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-void AppLayer::setBleAddr(uint8_t *bytes, uint8_t size)
-{
-    appPrefs.begin("BWS-LW-APP", false);
-    appPrefs.putBytes("ble", bytes, size);
-    appPrefs.end();
-}
-
-uint8_t AppLayer::getBleAddr(uint8_t *payload)
-{
-    appPrefs.begin("BWS-LW-APP", false);
-    uint8_t size = appPrefs.getBytesLength("ble");
-    appPrefs.getBytes("ble", payload, size);
-    appPrefs.end();
-
-    return size;
-}
-
-std::vector<std::string> AppLayer::getBleAddr(void)
-{
-    std::vector<std::string> bleAddr;
-
-    appPrefs.begin("BWS-LW-APP", false);
-    uint8_t size = appPrefs.getBytesLength("ble");
-    uint8_t addrBytes[48];
-    appPrefs.getBytes("ble", addrBytes, size);
-    appPrefs.end();
-
-    if (size < 6)
-    {
-        // return empty list
-        return bleAddr;
-    }
-
-    uint8_t check = 0;
-    for (size_t i = 0; i < 6; i++)
-    {
-        check |= addrBytes[i];
-    }
-    if (check == 0)
-    {
-        // First address is 00:00:00:00:00:00, return empty list
-        return bleAddr;
-    }
-
-    for (size_t i = 0; i < size; i += 6)
-    {
-        char addr[18];
-        snprintf(addr, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
-                 addrBytes[i], addrBytes[i + 1], addrBytes[i + 2], addrBytes[i + 3], addrBytes[i + 4], addrBytes[i + 5]);
-        bleAddr.push_back(addr);
-    }
-
-    return bleAddr;
-}
-#endif
 
 bool AppLayer::getAppPayloadCfg(uint8_t *bytes, uint8_t size)
 {
