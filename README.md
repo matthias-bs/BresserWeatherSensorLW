@@ -573,7 +573,7 @@ Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinima
 
 ## Doxygen Generated Source Code Documentation
 
-[https://matthias-bs.github.io/BresserWeatherSensorTTN/index.html](https://matthias-bs.github.io/BresserWeatherSensorLW/)
+[https://matthias-bs.github.io/BresserWeatherSensorWL/index.html](https://matthias-bs.github.io/BresserWeatherSensorLW/)
 
 ## References
 
