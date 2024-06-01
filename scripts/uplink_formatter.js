@@ -119,6 +119,7 @@
 //          Added BLE signals to decoder
 // 20240531 Fixed handling of arrays in decoder()
 // 20240601 Change lightning event to provide timestamp and time
+//          Added compatibility mode: "status" as in BresserweatherSensorTTN
 //
 // ToDo:
 // -  
@@ -130,6 +131,9 @@ function decoder(bytes, port) {
 
     // Skip signals encoded as invalid
     const SKIP_INVALID_SIGNALS = true;
+
+    // Compatibility mode: create "status" as in BresserweatherSensorTTN
+    const COMPATIBILITY_MODE = true;
 
     const CMD_GET_DATETIME = 0x86;
     const CMD_GET_LW_CONFIG = 0xB1;
@@ -413,6 +417,7 @@ function decoder(bytes, port) {
     };
     bitmap_sensors.BYTES = 1;
 
+    //sensorStatus = {"status": {"ws_dec_ok": true}};
     /**
      * Decodes the given bytes using the provided mask and names.
      *
@@ -434,11 +439,32 @@ function decoder(bytes, port) {
 
         names = names || [];
         var offset = 0;
-        return mask
-            .map(function (decodeFn) {
+        if (COMPATIBILITY_MODE) {
+            var ws_dec_ok = true;
+            var ws_batt_ok = true;
+            var s1_dec_ok = true;
+            var s1_batt_ok = true;
+            var ble_ok = true;
+        }
+        var decodedValues = mask
+            .map(function (decodeFn, idx) {
                 var current = bytes.slice(offset, offset += decodeFn.BYTES);
                 var decodedValue = decodeFn(current);
                 if (isNaN(decodedValue) && decodedValue.constructor === Number) {
+                    if (COMPATIBILITY_MODE) {
+                        // Check if the decoded value is NaN
+                        var name = names[idx] || idx;
+                        if (name.startsWith('ws_') &&  (name != "ws_uv")) {
+                        //if (name == "ws_humidity") {
+                            ws_dec_ok = false;
+                        }
+                        if (name.startsWith('soil1_')) {
+                            s1_dec_ok = false;
+                        }
+                        if (name.startsWith('ble0_')) {
+                            ble_ok = false;
+                        }
+                    }
                     return null;
                 }
                 return decodedValue;
@@ -449,6 +475,15 @@ function decoder(bytes, port) {
                 }
                 return prev;
             }, {});
+        if (COMPATIBILITY_MODE) {
+            decodedValues.status = {}; // Create a status object in the decoded values
+            decodedValues.status.ws_dec_ok = ws_dec_ok;
+            decodedValues.status.ws_batt_ok = ws_batt_ok;
+            decodedValues.status.s1_dec_ok = s1_dec_ok;
+            decodedValues.status.s1_batt_ok = s1_batt_ok;
+            decodedValues.status.ble_ok = ble_ok;
+        }
+        return decodedValues;
     };
 
     if (typeof module === 'object' && typeof module.exports !== 'undefined') {
@@ -515,6 +550,7 @@ function decoder(bytes, port) {
                 'ble0_humidity',
             ]
         );
+        //return {...res, ...sensorStatus};
 
     } else if (port === CMD_GET_DATETIME) {
         return decode(
