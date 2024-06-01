@@ -40,6 +40,7 @@
 // 20240528 Fixes
 // 20240529 Changed encoding of INV_TEMP
 // 20240530 Weather sensor: Fixed encoding of invalid temperature
+// 20240601 Added mapping of invalid RainGauge values to INV_FLOAT
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -320,17 +321,36 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
     {
         if (flags & PAYLOAD_WS_RAIN_H)
         {
-            log_i("Rain past 60min:  %7.1f mm", rainGauge.pastHour());
-            encoder.writeRawFloat(rainGauge.pastHour());
+            bool valid = false;
+            float rainPasthour = rainGauge.pastHour(&valid);
+            log_i("Rain past 60min:  %7.1f mm", rainPasthour);
+            if (!valid) {
+                rainPasthour = INV_FLOAT;
+            }
+            encoder.writeRawFloat(rainPasthour);
         }
         if (flags & PAYLOAD_WS_RAIN_DWM)
         {
-            log_i("Rain curr. day:   %7.1f mm", rainGauge.currentDay());
-            log_i("Rain curr. week:  %7.1f mm", rainGauge.currentWeek());
-            log_i("Rain curr. month: %7.1f mm", rainGauge.currentMonth());
-            encoder.writeRawFloat(rainGauge.currentDay());
-            encoder.writeRawFloat(rainGauge.currentWeek());
-            encoder.writeRawFloat(rainGauge.currentMonth());
+            float rain = rainGauge.currentDay();
+            log_i("Rain curr. day:   %7.1f mm", rain);
+            if (rain == -1) {
+                rain = INV_FLOAT;
+            }
+            encoder.writeRawFloat(rain);
+
+            rain = rainGauge.currentWeek();
+            log_i("Rain curr. week:  %7.1f mm", rain);
+            if (rain == -1) {
+                rain = INV_FLOAT;
+            }
+            encoder.writeRawFloat(rain);
+
+            rain = rainGauge.currentMonth();
+            log_i("Rain curr. month: %7.1f mm", rain);
+            if (rain == -1) {
+                rain = INV_FLOAT;
+            }
+            encoder.writeRawFloat(rain);
         }
     }
     else
