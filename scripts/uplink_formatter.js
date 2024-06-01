@@ -118,6 +118,7 @@
 // 20240530 Added SKIP_INVALID_SIGNALS
 //          Added BLE signals to decoder
 // 20240531 Fixed handling of arrays in decoder()
+// 20240601 Change lightning event to provide timestamp and time
 //
 // ToDo:
 // -  
@@ -177,7 +178,10 @@ function decoder(bytes, port) {
         if (bytes.length !== unixtime.BYTES) {
             throw new Error('Unix time must have exactly 4 bytes');
         }
-        return bytesToInt(bytes);
+        dateObj = new Date(bytesToInt(bytes) * 1000);
+        let time = dateObj.toISOString();
+        let timestamp = bytesToInt(bytes);
+        return { time: time, timestamp: timestamp };
     };
     unixtime.BYTES = 4;
 
