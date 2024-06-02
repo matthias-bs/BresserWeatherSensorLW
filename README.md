@@ -79,6 +79,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Enabling Debug Output](#enabling-debug-output)
   * [Test Run](#test-run)
 * [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
+  * [Encoding of Unavailable or Invalid Data](#encoding-of-unavailable-or-invalid-data) 
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [MQTT Integration](#mqtt-integration)
   * [The Things Network MQTT Integration](#the-things-network-mqtt-integration)
@@ -299,9 +300,17 @@ Watch your board's debug output in the serial console and the LoRaWAN communicat
 
 ## LoRaWAN Payload Formatters
 
-Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding raw data to / from JSON format.
+Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding of raw data to / from JSON format.
 
 See [The Things Network MQTT Integration and Payload Formatters](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#the-things-network-mqtt-integration-payload-formatters) and [TS013-1.0.0 Payload Codec API](https://resources.lora-alliance.org/technical-specifications/ts013-1-0-0-payload-codec-api) for more details.
+
+### Encoding of Unavailable or Invalid Data
+
+For various reasons, data can be (temporarily) unavailable or invalid, e.g. due to a sensor radio message reception failure, sensor initialization, or a low sensor battery. The sensor data uplink message has a fixed format (see  [Payload Configuration](#payload-configuration)), therefore it is not possible to simply omit any data. The allowed payload size of a LoRaWAN frame is very small, therefore space should not be wasted by dedicated 'data valid' flags.
+
+As a solution, unavailable/invalid data are encoded as special values &mdash; out of the normal range &mdash; in the data fields. E.g. a humidity value, which is encoded as 8-bit unsigned value with a range of 0 to 100 percent, is encoded as 255 (0xFF) to indicate invalid data. Those special values defined in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h).
+
+The [Uplink Payload Formatter](scripts/uplink_formatter.js) detects and skips this data, i.e. the JSON output string contains only valid data. This can be changed by setting `SKIP_INVALID_SIGNALS = false`.
 
 ### The Things Network Payload Formatters Setup
 
