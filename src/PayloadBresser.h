@@ -39,6 +39,7 @@
 //          Added isSpaceLeft(), payloadSize[] & sensorTypes[]
 // 20240528 Moved encoding of invalid values to BresserWeatherSensorLWCmd.h
 // 20240530 Added missing entries in sensorTypes[]
+// 20240603 encodeBresser(): added appStatus parameter
 //
 // ToDo:
 // -
@@ -153,7 +154,7 @@ public:
      * \param appPayloadCfg LoRaWAN payload configuration bitmaps
      * \param encoder LoRaWAN payload encoder object
      */
-    void encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder);
+    void encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder);
 
 private:
     void encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder);
