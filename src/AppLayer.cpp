@@ -57,6 +57,7 @@
 // 20240529 Changed encoding of INV_TEMP for BLE sensors
 // 20240530 Fixed CMD_SET_APP_PAYLOAD_CFG handling
 // 20240531 Moved BLE specific code to PayloadBLE.cpp
+// 20240603 Added encoding of sensor battery status flags
 //
 // ToDo:
 // -
@@ -94,7 +95,7 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
     //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
 
-    encodeBresser(appPayloadCfg, encoder);
+    encodeBresser(appPayloadCfg, appStatus, encoder);
 
 #ifdef ONEWIRE_EN
     encodeOneWire(appPayloadCfg, encoder);
@@ -108,9 +109,24 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     // BLE Temperature/Humidity Sensors
-    encodeBLE(appPayloadCfg, encoder);
+    encodeBLE(appPayloadCfg, appStatus, encoder);
 #endif
 
+    // FIXME: To be removed later
+    // Battery status flags for compatibility with BresserWeatherSensorTTN
+    if ((appPayloadCfg[0] & 1) && (encoder.getLength() <= PAYLOAD_SIZE - 1)) {
+        log_i("Battery status flags: ws=%u, soil=%u, lgt=%u", appStatus[SENSOR_TYPE_WEATHER1] & 1,
+              (appStatus[SENSOR_TYPE_SOIL] & 2) >> 1, appStatus[SENSOR_TYPE_LIGHTNING] & 1);
+        encoder.writeBitmap(0,
+            0,
+            0,
+            (appStatus[SENSOR_TYPE_LIGHTNING] & 1) ? true : false,
+            0,
+            (appStatus[SENSOR_TYPE_SOIL] & 2) ? true : false,
+            0,
+            (appStatus[SENSOR_TYPE_WEATHER1] & 1) ? true : false
+        );
+    }
 }
 
 void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
