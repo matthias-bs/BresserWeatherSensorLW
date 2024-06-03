@@ -32,6 +32,7 @@
 // History:
 //
 // 20240531 Moved from AppLayer.cpp
+// 20240603 Added BLE sensor battery status
 //
 // ToDo:
 // -
@@ -97,7 +98,6 @@ std::vector<std::string> PayloadBLE::getBleAddr(void)
     return bleAddr;
 }
 
-
 /*
  * Initialize list of known BLE addresses from defaults or Preferences
  */
@@ -127,9 +127,9 @@ void PayloadBLE::bleAddrInit(void)
 /*
  * Encode BLE temperature/humidity sensor values for LoRaWAN transmission
  */
-void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, LoraEncoder &encoder)
+void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &encoder)
 {
-    #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     float indoor_temp_c;
     float indoor_humidity;
 
@@ -163,6 +163,10 @@ void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
             encoder.writeTemperature(indoor_temp_c);
             encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
+            if (bleSensors.data[0].batt_level > BLE_BATT_OK)
+            {
+                appStatus[APP_PAYLOAD_OFFS_BLE + APP_PAYLOAD_BYTES_BLE - 1] |= 1;
+            }
         }
         else
         {
