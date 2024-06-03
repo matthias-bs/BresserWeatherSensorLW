@@ -58,6 +58,7 @@
 // 20240530 Fixed CMD_SET_APP_PAYLOAD_CFG handling
 // 20240531 Moved BLE specific code to PayloadBLE.cpp
 // 20240603 Added encoding of sensor battery status flags
+//          Added CMD_GET_SENSORS_STAT
 //
 // ToDo:
 // -
@@ -163,6 +164,12 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         appPrefs.putUChar("ws_timeout", payload[0]);
         appPrefs.end();
         return 0;
+    }
+
+    if ((port == CMD_GET_SENSORS_STAT) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors' status");
+        return CMD_GET_SENSORS_STAT;
     }
 
     if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
@@ -310,6 +317,15 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         port = CMD_GET_BLE_CONFIG;
     }
 #endif
+    else if (cmd == CMD_GET_SENSORS_STAT)
+    {
+        for (size_t i = 0; i < APP_STATUS_SIZE; i++)
+        {
+            encoder.writeUint8(appStatus[i]);
+        }
+        port = CMD_GET_SENSORS_STAT;
+    }
+
     else if (cmd == CMD_GET_SENSORS_INC)
     {
         uint8_t payload[48];
