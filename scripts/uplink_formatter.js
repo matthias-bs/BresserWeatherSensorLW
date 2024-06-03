@@ -120,6 +120,7 @@
 // 20240531 Fixed handling of arrays in decoder()
 // 20240601 Change lightning event to provide timestamp and time
 //          Added compatibility mode: "status" as in BresserweatherSensorTTN
+// 20240603 Added sensor battery status flags (compatibility mode)
 //
 // ToDo:
 // -  
@@ -441,9 +442,7 @@ function decoder(bytes, port) {
         var offset = 0;
         if (COMPATIBILITY_MODE) {
             var ws_dec_ok = true;
-            var ws_batt_ok = true;
             var s1_dec_ok = true;
-            var s1_batt_ok = true;
             var ble_ok = true;
         }
         var decodedValues = mask
@@ -476,11 +475,9 @@ function decoder(bytes, port) {
                 return prev;
             }, {});
         if (COMPATIBILITY_MODE) {
-            decodedValues.status = {}; // Create a status object in the decoded values
+            //decodedValues.status = {}; // Create a status object in the decoded values
             decodedValues.status.ws_dec_ok = ws_dec_ok;
-            decodedValues.status.ws_batt_ok = ws_batt_ok;
             decodedValues.status.s1_dec_ok = s1_dec_ok;
-            decodedValues.status.s1_batt_ok = s1_batt_ok;
             decodedValues.status.ble_ok = ble_ok;
         }
         return decodedValues;
@@ -529,7 +526,8 @@ function decoder(bytes, port) {
                 temperature,
                 uint16,
                 temperature,
-                uint8
+                uint8,
+                bitmap_sensors
             ],
             [
                 'ws_temp_c',
@@ -548,6 +546,7 @@ function decoder(bytes, port) {
                 'a0_voltage_mv',
                 'ble0_temp_c',
                 'ble0_humidity',
+                'status'
             ]
         );
         //return {...res, ...sensorStatus};

@@ -32,6 +32,7 @@
 // History:
 //
 // 20240531 Moved from AppLayer.h
+// 20240603 encodeBLE(): added appStatus parameter
 //
 // ToDo:
 // -
@@ -134,7 +135,7 @@ public:
      * \param appPayloadCfg LoRaWAN payload configuration bitmaps
      * \param encoder LoRaWAN payload encoder object
      */
-    void encodeBLE(uint8_t *appPayloadCfg, LoraEncoder &encoder);
+    void encodeBLE(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &encoder);
 };
 #endif // defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
 #endif //_PAYLOAD_BLE

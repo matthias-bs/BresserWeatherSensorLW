@@ -44,6 +44,7 @@
 //          Moved code to PayloadBresser, PayloadAnalog & PayloadDigital
 // 20240530 Removed BleSensors as base class & from initializers
 // 20240531 Moved BLE specific code to PayloadBLE.h
+// 20240603 Added appStatus[]
 //
 // ToDo:
 // -
@@ -65,7 +66,6 @@
 #include "PayloadDigital.h"
 #include "PayloadBLE.h"
 #include <LoraMessage.h>
-
 
 /// Default AppLayer payload configuration
 const uint8_t appPayloadCfgDef[APP_PAYLOAD_CFG_SIZE] = {
@@ -120,6 +120,9 @@ private:
     /// AppLayer payload configuration
     uint8_t appPayloadCfg[APP_PAYLOAD_CFG_SIZE];
 
+    /// AppLayer status bits
+    uint8_t appStatus[APP_STATUS_SIZE];
+
 public:
     /*!
      * \brief Constructor with BLE sensors
@@ -139,6 +142,10 @@ public:
     {
         _rtc = rtc;
         _rtcLastClockSync = clocksync;
+        for (int i = 0; i < APP_STATUS_SIZE; i++)
+        {
+            appStatus[i] = 0;
+        }
     };
 
     /*!
