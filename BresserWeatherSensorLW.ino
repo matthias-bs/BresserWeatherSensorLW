@@ -87,6 +87,7 @@
 // 20240528 Disabled uplink transmission of LoRaWAN node status flags
 // 20242529 Fixed payload size calculation
 // 20240530 Updated to RadioLib v6.6.0
+// 20240603 Added AppLayer status uplink
 //
 // ToDo:
 // - Fix restoring nonces/session buffers after examples in 
@@ -204,6 +205,7 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchoniza
 RTC_DATA_ATTR uint16_t bootCount = 1;
 RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
 RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource;
+RTC_DATA_ATTR bool appStatusUplinkPending = false;
 RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
 
 #else
@@ -221,6 +223,9 @@ uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".un
 
 /// RTC time source
 E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
+
+/// AppLayer status uplink pending
+bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
 #endif
 
 /// Real time clock
@@ -723,6 +728,7 @@ void setup()
   if (bootCount == 1)
   {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
+    appStatusUplinkPending = 0;
   }
 
   // Set time zone
@@ -886,6 +892,12 @@ void setup()
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
   }
 
+  // Set appStatusUplink flag if required
+  if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
+  {
+    appStatusUplinkPending = true;
+  }
+
   // ----- and now for the main event -----
   log_i("Sending uplink");
 
@@ -1001,9 +1013,16 @@ void setup()
     log_d("[LoRaWAN] LinkCheck count:\t%u", gwCnt);
   }
 
+  if (appStatusUplinkPending) {
+    log_i("AppLayer status uplink pending");
+  }
+
   if (uplinkReq)
   {
     sendCfgUplink(uplinkReq);
+  } else if (appStatusUplinkPending) {
+    sendCfgUplink(CMD_GET_SENSORS_STAT);
+    appStatusUplinkPending = false;
   }
 
   log_d("FcntUp: %u", node.getFCntUp());

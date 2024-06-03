@@ -21,6 +21,7 @@
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
+// port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
 // port = CMD_GET_SENSORS_EXC, {"cmd": "CMD_GET_SENSORS_EXC"} / payload = 0x00
@@ -41,6 +42,8 @@
 // CMD_GET_DATETIME {"epoch": <unix_epoch_time>, "rtc_source": <rtc_source>}
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
+//
+// CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
 // CMD_GET_SENSORS_INC {"sensors_inc": [<sensors_inc0>, ...]}
 //
@@ -115,6 +118,7 @@
 //          Added en_decoders to CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240519 Added CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 // 20240530 Added decoding of CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
+// 20240603 Added CMD_GET_SENSORS_STAT
 //
 // ToDo:
 // -  
@@ -130,6 +134,7 @@ const CMD_GET_LW_CONFIG = 0xB1;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_RAINGAUGE = 0xC3;
+const CMD_GET_SENSORS_STAT = 0xD0;
 const CMD_GET_SENSORS_INC = 0xC4;
 const CMD_SET_SENSORS_INC = 0xC5;
 const CMD_GET_SENSORS_EXC = 0xC6;
@@ -261,6 +266,14 @@ function encodeDownlink(input) {
             return {
                 bytes: [0],
                 fPort: CMD_GET_WS_TIMEOUT,
+                warnings: [],
+                errors: []
+            };
+        }
+        else if (input.data.cmd == "CMD_GET_SENSORS_STAT") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_SENSORS_STAT,
                 warnings: [],
                 errors: []
             };
@@ -524,6 +537,7 @@ function decodeDownlink(input) {
         case CMD_GET_DATETIME:
         case CMD_GET_LW_CONFIG:
         case CMD_GET_WS_TIMEOUT:
+        case CMD_GET_SENSORS_STAT:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
         case CMD_GET_SENSORS_CFG:

@@ -52,6 +52,7 @@
 //          Moved PAYLOAD_SIZE from BresserWeatherSensorLW.ino
 // 20240528 Added encoding of invalid values, modified default payload, fixes
 // 20240603 Added definitions for sensor status flags
+//          Added appStatusUplinkInterval
 //
 // Note:
 // Depending on board package file date, either
@@ -123,6 +124,9 @@ const uint8_t PAYLOAD_SIZE = 51;
 
 // RTC to network time sync interval (in minutes)
 #define CLOCK_SYNC_INTERVAL 24 * 60
+
+// TODO: Modify to set this value via downlink
+const uint8_t appStatusUplinkInterval = 120;
 
 // Timeout for weather sensor data reception (seconds)
 #define WEATHERSENSOR_TIMEOUT 180

@@ -21,6 +21,7 @@
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
+// port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
 // port = CMD_GET_SENSORS_EXC, {"cmd": "CMD_GET_SENSORS_EXC"} / payload = 0x00
@@ -40,6 +41,8 @@
 // CMD_GET_DATETIME {"epoch": <unix_epoch_time>, "rtc_source": <rtc_source>}
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
+//
+// CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
 // CMD_GET_SENSORS_INC {"sensors_inc": [<sensors_inc0>, ...]}
 //
@@ -121,6 +124,7 @@
 // 20240601 Change lightning event to provide timestamp and time
 //          Added compatibility mode: "status" as in BresserweatherSensorTTN
 // 20240603 Added sensor battery status flags (compatibility mode)
+//          Added command Added CMD_GET_SENSORS_STAT and sensor status decoder
 //
 // ToDo:
 // -  
@@ -145,6 +149,7 @@ function decoder(bytes, port) {
     const CMD_GET_BLE_ADDR = 0xC8;
     const CMD_GET_BLE_CONFIG = 0xCA;
     const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
+    const CMD_GET_SENSORS_STAT = 0xD0;
 
     const rtc_source_code = {
         0x00: "GPS",
@@ -418,6 +423,20 @@ function decoder(bytes, port) {
     };
     bitmap_sensors.BYTES = 1;
 
+    var sensor_status = function (bytes) {
+        if (bytes.length !== sensor_status.BYTES) {
+            throw new Error('Sensor status must have exactly 26 bytes');
+        }
+        let res = {};
+        res.bresser = [];
+        for (var i = 0; i < 16; i++) {
+            res.bresser[i] = "0x" + byte2hex(bytes[i]);
+        }
+        res.ble = "0x" + byte2hex(bytes[24]) + byte2hex(bytes[25]);
+        return res;
+    };
+    sensor_status.BYTES = 26;
+
     //sensorStatus = {"status": {"ws_dec_ok": true}};
     /**
      * Decodes the given bytes using the provided mask and names.
@@ -428,7 +447,7 @@ function decoder(bytes, port) {
      * @returns {Object} - The decoded values as an object.
      * @throws {Error} - If the length of the bytes is less than the mask length.
      */
-    var decode = function (bytes, mask, names) {
+    var decode = function (port, bytes, mask, names) {
 
         // Sum of all mask bytes
         var maskLength = mask.reduce(function (prev, cur) {
@@ -474,7 +493,7 @@ function decoder(bytes, port) {
                 }
                 return prev;
             }, {});
-        if (COMPATIBILITY_MODE) {
+        if ((port == 1) && COMPATIBILITY_MODE) {
             //decodedValues.status = {}; // Create a status object in the decoded values
             decodedValues.status.ws_dec_ok = ws_dec_ok;
             decodedValues.status.s1_dec_ok = s1_dec_ok;
@@ -498,6 +517,7 @@ function decoder(bytes, port) {
             latLng: latLng,
             bitmap_node: bitmap_node,
             bitmap_sensors: bitmap_sensors,
+            sensor_status: sensor_status,
             rawfloat: rawfloat,
             uint8fp1: uint8fp1,
             uint16fp1: uint16fp1,
@@ -509,6 +529,7 @@ function decoder(bytes, port) {
 
     if (port === 1) {
         return decode(
+            port,
             bytes,
             [
                 temperature,
@@ -553,6 +574,7 @@ function decoder(bytes, port) {
 
     } else if (port === CMD_GET_DATETIME) {
         return decode(
+            port,
             bytes,
             [uint32BE, rtc_source
             ],
@@ -561,6 +583,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_LW_CONFIG) {
         return decode(
+            port,
             bytes,
             [uint16BE, uint16BE
             ],
@@ -569,6 +592,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_WS_TIMEOUT) {
         return decode(
+            port,
             bytes,
             [uint8
             ],
@@ -577,6 +601,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_SENSORS_INC) {
         return decode(
+            port,
             bytes,
             [id32
             ],
@@ -585,6 +610,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_SENSORS_EXC) {
         return decode(
+            port,
             bytes,
             [id32
             ],
@@ -594,6 +620,7 @@ function decoder(bytes, port) {
     } else if (port === CMD_GET_SENSORS_CFG) {
         return decode(
             bytes,
+            port,
             [uint8, uint8, uint8
             ],
             ['max_sensors', 'rx_flags', 'en_decoders'
@@ -601,6 +628,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_BLE_ADDR) {
         return decode(
+            port,
             bytes,
             [mac48
             ],
@@ -609,6 +637,7 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_BLE_CONFIG) {
         return decode(
+            port,
             bytes,
             [uint8, uint8
             ],
@@ -616,10 +645,20 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_APP_PAYLOAD_CFG) {
         return decode(
+            port,
             bytes,
             [bresser_bitmaps, hex16, hex16, hex32
             ],
             ['bresser', 'onewire', 'analog', 'digital']
+        );
+    } else if (port === CMD_GET_SENSORS_STAT) {
+        return decode(
+            port,
+            bytes,
+            [sensor_status
+            ],
+            ['sensor_status'
+            ]
         );
     }
 
