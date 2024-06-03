@@ -130,6 +130,7 @@ const CMD_GET_LW_CONFIG = 0xB1;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_RAINGAUGE = 0xC3;
+const CMD_GET_SENSORS_STAT = 0xD0;
 const CMD_GET_SENSORS_INC = 0xC4;
 const CMD_SET_SENSORS_INC = 0xC5;
 const CMD_GET_SENSORS_EXC = 0xC6;
@@ -261,6 +262,14 @@ function encodeDownlink(input) {
             return {
                 bytes: [0],
                 fPort: CMD_GET_WS_TIMEOUT,
+                warnings: [],
+                errors: []
+            };
+        }
+        else if (input.data.cmd == "CMD_GET_SENSORS_STAT") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_SENSORS_STAT,
                 warnings: [],
                 errors: []
             };
@@ -524,6 +533,7 @@ function decodeDownlink(input) {
         case CMD_GET_DATETIME:
         case CMD_GET_LW_CONFIG:
         case CMD_GET_WS_TIMEOUT:
+        case CMD_GET_SENSORS_STAT:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
         case CMD_GET_SENSORS_CFG:
