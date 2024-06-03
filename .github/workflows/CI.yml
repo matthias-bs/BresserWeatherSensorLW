@@ -76,8 +76,8 @@ jobs:
           |
           #declare -a required_libs=("https://github.com/matthias-bs/BresserWeatherSensorReceiver.git"
           declare -a required_libs=(
-            "RadioLib@6.5.0"
-            "BresserWeatherSensorReceiver@0.28.2"
+            "RadioLib@6.6.0"
+            "BresserWeatherSensorReceiver@0.28.3"
             "LoRa Serialization@3.2.1"
             "ESP32Time@2.0.6"
             "OneWireNg@0.13.3"
@@ -87,7 +87,7 @@ jobs:
             "TheengsDecoder@1.7.5"
             "Preferences@2.1.0"
             "ArduinoJson@7.0.4"
-            "M5Unified@0.1.13"
+            "M5Unified@0.1.16"
             "M5Core2@0.1.9"
             "powerfeather-sdk@1.0.5")
           for i in "${required_libs[@]}"
