@@ -51,6 +51,7 @@
 // 20240524 Added sensor feature flags
 //          Moved PAYLOAD_SIZE from BresserWeatherSensorLW.ino
 // 20240528 Added encoding of invalid values, modified default payload, fixes
+// 20240603 Added definitions for sensor status flags
 //
 // Note:
 // Depending on board package file date, either
@@ -300,6 +301,9 @@ const uint8_t UBATT_SAMPLES = 10;
 // BLE scan mode (0: passive / 1: active)
 #define BLE_SCAN_MODE 1
 
+// BLE battery o.k. threshold in percent
+#define BLE_BATT_OK 5
+
 // List of known sensors' BLE addresses
 #define KNOWN_BLE_ADDRESSES \
     {                       \
@@ -309,6 +313,8 @@ const uint8_t UBATT_SAMPLES = 10;
 
 /// AppLayer payload configuration size in bytes
 #define APP_PAYLOAD_CFG_SIZE 24
+
+#define APP_STATUS_SIZE 26
 
 // --- Default AppLayer payload configuration ---
 
@@ -335,7 +341,9 @@ const uint8_t UBATT_SAMPLES = 10;
 // -- 868 MHz Sensor Types --
 // 0 - Weather Station; 1 Ch
 // Note: Included in APP_PAYLOAD_CFG_TYPE01
-#define APP_PAYLOAD_CFG_TYPE00 0x00
+
+// Flag: Enable battery_ok flags (to be removed)
+#define APP_PAYLOAD_CFG_TYPE00 0x01
 
 // 1 - Weather Station; 1 Ch
 //   - Professional Wind Gauge (with T and H); 1 Ch
@@ -431,6 +439,9 @@ const uint8_t UBATT_SAMPLES = 10;
 
 #define APP_PAYLOAD_OFFS_DIGITAL 20
 #define APP_PAYLOAD_BYTES_DIGITAL 4
+
+#define APP_PAYLOAD_OFFS_BLE 24
+#define APP_PAYLOAD_BYTES_BLE 2
 
 // Encoding of invalid values
 // for floating point, see
