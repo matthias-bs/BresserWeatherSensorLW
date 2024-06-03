@@ -37,6 +37,7 @@
 // 20240504 Extracted from BresserWeatherSensorLWCfg.h
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240508 Updated description of CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
+// 20240603 Added CMD_GET_SENSORS_STAT
 //
 // ToDo:
 // -
@@ -160,6 +161,10 @@
 // Reset Lightning???
 // -------------------
 
+// CMD_GET_SENSORS_STAT
+// ---------------------
+// Port: CMD_GET_SENSORS_STAT
+#define CMD_GET_SENSORS_STAT 0xD0
 
 // CMD_GET_SENSORS_INC
 // --------------------
