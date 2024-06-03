@@ -41,6 +41,7 @@
 // 20240529 Changed encoding of INV_TEMP
 // 20240530 Weather sensor: Fixed encoding of invalid temperature
 // 20240601 Added mapping of invalid RainGauge values to INV_FLOAT
+// 20240603 Added encoding of sensor battery status
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -64,13 +65,11 @@ void PayloadBresser::begin(void)
     log_i("Receiving Weather Sensor Data %s", decode_ok ? "o.k." : "failed");
 }
 
-void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
+void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
 {
-    // Handle weather sensors first
-    // SENSOR_TYPE_WEATHER0 and WEATHER_TYPE_WEATHER1 are treated as one.
-    // Those sensors only have one channel (0).
-
-    uint8_t flags = appPayloadCfg[0] | appPayloadCfg[1];
+    // Handle weather sensors - which only have one channel (0) - first.
+    // Configuration for SENSOR_TYPE_WEATHER0 is integrated into SENSOR_TYPE_WEATHER1.
+    uint8_t flags = appPayloadCfg[1];
     if (flags & 1)
     {
         // Try to find SENSOR_TYPE_WEATHER1
@@ -102,6 +101,10 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             }
         }
 #endif
+        if ((idx > -1) && weatherSensor.sensor[idx].battery_ok)
+        {
+            appStatus[1] |= 1;
+        }
         encodeWeatherSensor(idx, flags, encoder);
     }
 
@@ -116,7 +119,9 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         if (type == SENSOR_TYPE_LIGHTNING)
         {
             int idx = weatherSensor.findType(type, 0);
-#ifdef LIGHTNINGSENSOR_EN
+            if ((idx > -1) && weatherSensor.sensor[idx].battery_ok) {
+                appStatus[type] |= 1;
+            }
 
             // Check if time is valid
             if (*_rtcLastClockSync > 0)
@@ -134,7 +139,6 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                         weatherSensor.sensor[idx].startup);
                 }
             }
-#endif
 
             encodeLightningSensor(idx, appPayloadCfg[type], encoder);
             continue;
@@ -155,6 +159,8 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             int idx = weatherSensor.findType(type, ch);
             if (idx == -1) {
                 log_i("-- Failure");
+            } else if (weatherSensor.sensor[idx].battery_ok){
+                appStatus[type] |= (1 << ch);
             }
 
             if (type == SENSOR_TYPE_THERMO_HYGRO)
