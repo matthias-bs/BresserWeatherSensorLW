@@ -1,8 +1,8 @@
 <map id="AppLayer::getPayloadStage1" name="AppLayer::getPayloadStage1">
 <area shape="rect" id="node1" title="Prepare / get payload at startup." alt="" coords="5,107,213,133"/>
 <area shape="rect" id="node2" href="$class_payload_analog.html#a9e04f0c62f92287539fd53c9c01d7701" title="Encode analog data channels for LoRaWAN transmission." alt="" coords="272,5,491,32"/>
-<area shape="rect" id="node3" href="$class_payload_b_l_e.html#a0f91d7da264aad7322f1b2ba7b8370a7" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="293,56,469,83"/>
-<area shape="rect" id="node7" href="$class_payload_bresser.html#abe69edbc8676f2f3954c4654f7d59161" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="268,107,495,133"/>
+<area shape="rect" id="node3" href="$class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="293,56,469,83"/>
+<area shape="rect" id="node7" href="$class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="268,107,495,133"/>
 <area shape="rect" id="node8" href="$class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6" title="Encode digital data channels for LoRaWAN transmission." alt="" coords="274,157,489,184"/>
 <area shape="rect" id="node9" href="$class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6" title="Encode 1&#45;Wire temperature sensor values for LoRaWAN transmission." alt="" coords="261,208,501,235"/>
 <area shape="rect" id="node4" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="549,5,763,32"/>

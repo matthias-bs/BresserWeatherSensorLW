@@ -118,9 +118,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a37a8b17de19034803480562be7cab88e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">bleAddrInit</a> (void)</td></tr>
 <tr class="memdesc:a37a8b17de19034803480562be7cab88e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize list of known BLE addresses from defaults or Preferences.  <a href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">More...</a><br /></td></tr>
 <tr class="separator:a37a8b17de19034803480562be7cab88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f91d7da264aad7322f1b2ba7b8370a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_b_l_e.html#a0f91d7da264aad7322f1b2ba7b8370a7">encodeBLE</a> (uint8_t *appPayloadCfg, LoraEncoder &amp;encoder)</td></tr>
-<tr class="memdesc:a0f91d7da264aad7322f1b2ba7b8370a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode BLE temperature/humidity sensor values for LoRaWAN transmission.  <a href="class_payload_b_l_e.html#a0f91d7da264aad7322f1b2ba7b8370a7">More...</a><br /></td></tr>
-<tr class="separator:a0f91d7da264aad7322f1b2ba7b8370a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89793d96d56ee64855100435d282eeb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">encodeBLE</a> (uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:a89793d96d56ee64855100435d282eeb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode BLE temperature/humidity sensor values for LoRaWAN transmission.  <a href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">More...</a><br /></td></tr>
+<tr class="separator:a89793d96d56ee64855100435d282eeb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a id="a37a8b17de19034803480562be7cab88e"></a>
@@ -154,8 +154,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a0f91d7da264aad7322f1b2ba7b8370a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f91d7da264aad7322f1b2ba7b8370a7">&#9670;&nbsp;</a></span>encodeBLE()</h2>
+<a id="a89793d96d56ee64855100435d282eeb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89793d96d56ee64855100435d282eeb3">&#9670;&nbsp;</a></span>encodeBLE()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -165,6 +165,12 @@ Here is the call graph for this function:</div>
           <td>(</td>
           <td class="paramtype">uint8_t *&#160;</td>
           <td class="paramname"><em>appPayloadCfg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t *&#160;</td>
+          <td class="paramname"><em>appStatus</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -191,8 +197,8 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_payload_b_l_e_a0f91d7da264aad7322f1b2ba7b8370a7_cgraph.png" border="0" usemap="#aclass_payload_b_l_e_a0f91d7da264aad7322f1b2ba7b8370a7_cgraph" alt=""/></div>
-<map name="aclass_payload_b_l_e_a0f91d7da264aad7322f1b2ba7b8370a7_cgraph" id="aclass_payload_b_l_e_a0f91d7da264aad7322f1b2ba7b8370a7_cgraph">
+<div class="center"><img src="class_payload_b_l_e_a89793d96d56ee64855100435d282eeb3_cgraph.png" border="0" usemap="#aclass_payload_b_l_e_a89793d96d56ee64855100435d282eeb3_cgraph" alt=""/></div>
+<map name="aclass_payload_b_l_e_a89793d96d56ee64855100435d282eeb3_cgraph" id="aclass_payload_b_l_e_a89793d96d56ee64855100435d282eeb3_cgraph">
 <area shape="rect" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="5,56,181,83"/>
 <area shape="rect" href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="229,5,443,32"/>
 <area shape="rect" href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="259,56,413,83"/>
