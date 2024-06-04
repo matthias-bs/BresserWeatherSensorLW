@@ -83,6 +83,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [MQTT Integration](#mqtt-integration)
   * [The Things Network MQTT Integration](#the-things-network-mqtt-integration)
+  * [ChirpStack and InfluxDB Integration](#chirpstack-and-influxdb-integration)
 * [Datacake Integration](#datacake-integration)
   * [Datacake / The Things Network Setup](#datacake--the-things-network-setup)
   * [Desktop Dashboard](#desktop-dashboard)
@@ -364,6 +365,10 @@ v3 message key field jsonpaths:
 JSON-Path with Uplink-Decoder (see [scripts/uplink_formatter.js](scripts/uplink_formatter.js))
 
 `.uplink_message.decoded_payload.bytes.<variable>`
+
+### ChirpStack and InfluxDB Integration
+
+[ChirpStack and InfluxDB Integration](docs/influxdb_integration/influxdb_integration.md) kindly provided by @evon800c.
 
 ## Datacake Integration
 
