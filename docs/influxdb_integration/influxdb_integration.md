@@ -91,7 +91,7 @@ This can be done using a small number of simple paramenters, such as:
 
 ![ChirpStack - Applications - InfluxDB](images/image-10.png)
 
-At this point, ChirpStack writes data coming from the device into InfluxDB.
+Now, ChirpStack writes data coming from the device into InfluxDB.
 
 ## Exploring Data inside InfluxDB
 
