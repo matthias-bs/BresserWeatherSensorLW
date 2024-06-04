@@ -782,6 +782,9 @@ void setup()
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
 
+  // Setup the OTAA session information
+  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+  
   log_d("Recalling LoRaWAN nonces & session");
   // ##### setup the flash storage
   store.begin("radiolib");
@@ -801,9 +804,6 @@ void setup()
   // otherwise no point saying there's been a failure when it was bound to fail with an empty
   // LWsession var. At this point, bootCount has already been incremented, hence the > 2
   debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restoring session buffer failed", state, false);
-
-  // Setup the OTAA session information
-  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
 
   // loop until successful join
   while ((state != RADIOLIB_LORAWAN_NEW_SESSION) && (state != RADIOLIB_LORAWAN_SESSION_RESTORED))
