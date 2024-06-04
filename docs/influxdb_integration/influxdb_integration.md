@@ -1,129 +1,140 @@
-## introduction
-I don’t know if my experience with LoRaWan and my personal use of BresserWeatherSensorLW project can interesting someone, but I am happy to share what I have realized for my experiment.
+# ChirpStack and InfluxDB Integration
 
-I'm completely new on LoRa an LoRaWan and on all other components that I have decided to use. My approch is very basic and i think that my description is not usefull for advance users. I think instead that could be usefull for users that now are starting the trip on this world.
+by [Davide D'Asaro](https://github.com/evon800c)
 
-When we start talking about LoRaWan, we should also talk about its fundamental elements.<br>
+## Introduction
+
+I don’t know if my experience with LoRaWAN and my personal use of the BresserWeatherSensorLW project is interesting for anyone, but I am happy to share what I have realized for my experiment.
+
+LoRa and LoRaWAN and all other components that I have decided to use were completely new to me. My approch was very basic and I think that my description is not useful for advanced users. I think that it could be useful for users who are now starting the trip into this world.
+
+When we start talking about LoRaWAN, we should also talk about its fundamental elements.<br>
 Some note from https://www.thethingsnetwork.org/docs/lorawan/architecture/
 
-![alt text](images/image-00.png)
+![LoRaWAN Architecture](images/image-00.png)
 
-- network server
-- gateway
-- device
-- application server
+- Network Server
+- Gateway
+- Device
+- Application Server
 
-Instead of using a public LoRaWan network (as for example TTN), I have decided to implement my personal private one.
+Instead of using a public LoRaWAN network (as for example TTN), I have decided to implement my personal, private one.
 
-### network server
-To implement a LoRaWan Network Server, I have choose to use ChirpStack (https://www.chirpstack.io) installed on a virtual machine in my lab enviroment.
-ChirpStack is an open source solution to implemente a LoRaWan Network Server. Documentation is availabe, clear and simple, so it is not necessary that i explain here any other information.
+### Network Server
 
-### gateway
-It is necessary to choose a solution that covers everyone's personal needs.
-For my personal need, I have decide to use a Raspberry PI 4 with RAK2245 PI HAT and ChirpStack Gateway OS (https://www.chirpstack.io/docs/chirpstack-gateway-os/index.html).
-Also in this case, documentation is quiet simple and clear.
+To implement a LoRaWAN Network Server, I have decided to use ChirpStack (https://www.chirpstack.io) installed on a virtual machine in my lab enviroment.
+ChirpStack is an open source solution to implement a LoRaWAN Network Server. Documentation is available, clear and simple, so it is not necessary to explain it here.
 
-### device
-I have used an "Heltec wifi LoRa 32 v3" board, but for Matthias **BresserWeatherSensorLW** firmware, each compatible hardware list in initial project documentation, can be a good choise.
+### Gateway
 
-After initial configuration on LoRaWan Network server and in **BresserWeatherSensorLW** code we can burn the board and if everything goes right, on LoRaWan Network Server console, you can see data (as air temp, but not only) coming from device as uplink.
+It is necessary to choose a solution that covers your personal needs.
+For my personal needs, I have decided to use a Raspberry PI 4 with RAK2245 PI HAT and ChirpStack Gateway OS (https://www.chirpstack.io/docs/chirpstack-gateway-os/index.html).
+Also in this case, documentation is quite simple and clear.
 
-### application server
-Now we can speak about application server.
-I have decide to use InfluxDB to store my data as timeseries. So InfluxDB server will assume Application Server role (we can have multiple application server based on yours needed).
-We need to install a InfluxDB server, and at https://docs.influxdata.com/influxdb/v2/install/ we can choose the InfluxDB installation that we prefer and all info to do that.
+### Device
+
+I have used a "Heltec wifi LoRa 32 v3" board, but for Matthias' **BresserWeatherSensorLW** firmware, each compatible hardware listed in the initial project documentation can be a good choice.
+
+After initial configuration of the LoRaWAN Network Server and in **BresserWeatherSensorLW** code, we can flash the board. If everything goes right, you can see data (such as air temp, but not only that) on the LoRaWAN Network Server console coming as uplink from the device.
+
+### Application Server
+
+Now we can speak about the Application Server.
+I have decided to use InfluxDB to store my data as timeseries. So an InfluxDB server will assume the Application Server role (you can have multiple application servers based on your needs).
+We need to install an InfluxDB server, and at https://docs.influxdata.com/influxdb/v2/install/ we can choose the InfluxDB installation that we prefer and find all information required to do that.
 
 After InfluxDB installation, we need to configure: Organization, Bucket and Token.
 
-In the images below you can see how do this.
+In the images below, you can see how do this.
 
-create organization and bucket
+#### Create Organization and Bucket
 
-![alt text](images/image-01.png)
+![InfluxDB - Create Organization](images/image-01.png)
 
-![alt text](images/image-02.png)
+![InfluxDB - Create Bucket](images/image-02.png)
 
-create api token
+#### Create API Token
 
-![alt text](images/image-03.png)
+![InfluxDB - API Tokens](images/image-03.png)
 
-![alt text](images/image-04.png)
+![InfluxDb - Configure API Token](images/image-04.png)
 
-![alt text](images/image-05.png)
+![InfluxDb - Create API Token](images/image-05.png)
 
-![alt text](images/image-06.png)
+![InfluxDB - Copy API Token](images/image-06.png)
 
 Now, we have all elements and parameters, including the URL to access the management API, needed for next step.
 
-#### Note:
-Each public LoRaWan Network provider, offer some specific interface an features to connect to an applcation server, also ChirpStack (as a LoRaWan Network Server) is not different. What i'm going to write, i think could cover a large amount of situations.
+>  [!NOTE]
+> Each public LoRaWAN Network Provider offers some specific interface and features to connect to an Application Server. Also ChirpStack (as a LoRaWAN Network Server) is not different. What I'm going to write will cover a large amount of situations, I think.
 
 
 For integrating ChirpStack and InfluxDB we need to:
 
-create an application
+#### Create an Application in ChirpSTack
 
-![alt text](images/image-07.png)
+![Chirpstack - Create Application](images/image-07.png)
 
-create a connection to application server (InfluxDB in our case), using a small number of simple paramenter, as:
+#### Create a Connection in ChirpStack to the Application Server (InfluxDB in our case)
+
+This can be done using a small number of simple paramenters, such as:
+
 - InfluxDB version 
-- API endpoint (write) - http://InfluxDB:8086/api/v2/write (as example)
-- Organization (defined on InfluxDB side) -> my case "labnet"
-- Bucket       (defined on InfluxDB side) -> my case "ChirpStack"
+- API endpoint (write) &rarr; http://InfluxDB:8086/api/v2/write (as example)
+- Organization (defined on InfluxDB side) &rarr; in my case "labnet"
+- Bucket       (defined on InfluxDB side) &rarr; in my case "ChirpStack"
 - Token        (defined on InfluxDB side)
 
-![alt text](images/image-08.png)
+![ChirpStack - Applications - Integrations](images/image-08.png)
 
-![alt text](images/image-09.png)
+![ChirpStack - Applications](images/image-09.png)
 
-![alt text](images/image-10.png)
+![ChirpStack - Applications - InfluxDB](images/image-10.png)
 
-At this point ChirpStack write data coming from device into InfluxDB.
+At this point, ChirpStack writes data coming from the device into InfluxDB.
 
+## Exploring Data inside InfluxDB
 
-## Exploring data inside InfluxDB
+At this point, my first challenge was to understand how to explore data in InfluxDB.
 
-At this point, my first challenge was understanding how to explore data in InfluxDB.
+From the left column, switch to 'Organization' created before:
 
-From the left column, switch to organization created before
+![InfluxDB - Switch Organizations](images/image-12.png)
 
-![alt text](images/image-12.png)
+![InfluxDB - Choose an Organization](images/image-13.png)
 
-![alt text](images/image-13.png)
+Always from the left column on icon "arrow up", click on the 'Buckets' label and select the bucket created before (mybucket).
 
-Always from the left column on incon "arrow up", click on buckets label and select buckt create before (mybucket)
+![InfluxDB - Get Started](images/image-14.png)
 
-![alt text](images/image-14.png)
-
-![alt text](images/image-15.png)
+![InfluxDB - Load Data](images/image-15.png)
 
 Now, a data exploration interface is presented. Here we will be guided through the query construction.
 
-From left to right you can select parameter for query, in my case: 
-+ from:		chirpstack
-+ filter:	device_name		-> and select device name create on LoRaWan console
-+ filter:	_measurement	-> device_frmpayload_data_bytes_air_temp_c - the name defined by Matthias code (for air temp)
-+ filter:	_field			  -> value
+From left to right, you can select parameters for the query &mdash; in my case: 
++ From:		chirpstack
++ Filter:	device_name &rarr; and select device name create on LoRaWan console
++ Filter:	_measurement &rarr; device_frmpayload_data_bytes_air_temp_c - the name defined by Matthias code (for air temp)
++ Filter:	_field &rarr; value
 
-Now click on submit button.
+Now click on 'Submit' button.
 
-![alt text](images/image-16.png)
+![InfluxDB - Submit](images/image-16.png)
 
-I suppose the you receive an error "unsupported input type for mean aggregate: string", if so, near "submit" button click on "script editor". now you switch to manual query writer and you can see the query code that you write.<br>
-The issue is caused because by data type, is string insteat of float.
+I suppose that you receive an error `unsupported input type for mean aggregate: string`, too. If so, near the "Submit" button, click on "Script Editor". Now you switch to the manual query writer and you can see the query code that you write.<br>
+The issue is caused by the data type, which initially is string insteat of float.
 
-![alt text](images/image-17.png)
+![InfluxDB - unsupported input type](images/image-17.png)
 
-To be able to represent date in "graph" visualization type, you need to cast data from string to float, so add "|> toFloat()" as show below and than click on "submin" button.
+To be able to represent data in a "graph" visualization type, you need to cast the data from string to float, so add "|> toFloat()" as shown below and click the 'Submit' button.
 
-![alt text](images/image-18.png)
+![InfluxDB - Type conversion from string to float](images/image-18.png)
 
-This is the first simple query that i have write.
+This is the first simple query that I have written.
 
-If you want, you save your query and visualization (graph) in a dashboard. If you don't have any dashboard, you can create one on the fly.<br>
-On the same dashboard you can add all visualization/query that you want.<br>
+If you want, you can save your query and visualization (graph) in a dashboard. If you don't have any dashboard, you can create one on the fly.<br>
+On the same dashboard, you can add all visualizations/queries that you want.<br>
 
-From dashboard, you can select the time frame that you need to analyze.
+From the dashboard, you can select the time frame that you need to analyze.
 
-![alt text](images/image-19.png)
+![Dashboard](images/image-19.png)
