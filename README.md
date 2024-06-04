@@ -368,7 +368,7 @@ JSON-Path with Uplink-Decoder (see [scripts/uplink_formatter.js](scripts/uplink_
 
 ### ChirpStack and InfluxDB Integration
 
-[ChirpStack and InfluxDB Integration](docs/influxdb_integration/influxdb_integration.md) kindly provided by @evon800c.
+[ChirpStack and InfluxDB Integration](docs/influxdb_integration/influxdb_integration.md) kindly provided by [Davide D'Asaro](https://github.com/evon800c).
 
 ## Datacake Integration
 
