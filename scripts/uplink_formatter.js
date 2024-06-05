@@ -126,7 +126,7 @@
 // 20240603 Added sensor battery status flags (compatibility mode)
 //          Added command Added CMD_GET_SENSORS_STAT and sensor status decoder
 // 20240604 Added suppression of invalid value in unixtime decoder
-// 20240605 Fixed dedoding of NaN values, fixed flags for compatibility mode
+// 20240605 Fixed decoding of NaN values, fixed flags for compatibility mode
 //
 // ToDo:
 // -  
