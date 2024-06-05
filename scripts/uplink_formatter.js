@@ -126,6 +126,7 @@
 // 20240603 Added sensor battery status flags (compatibility mode)
 //          Added command Added CMD_GET_SENSORS_STAT and sensor status decoder
 // 20240604 Added suppression of invalid value in unixtime decoder
+// 20240605 Fixed dedoding of NaN values, fixed flags for compatibility mode
 //
 // ToDo:
 // -  
@@ -192,7 +193,7 @@ function decoder(bytes, port) {
         dateObj = new Date(bytesToInt(bytes) * 1000);
         let time = dateObj.toISOString();
         let timestamp = bytesToInt(bytes);
-        if (SKIP_INVALID_SIGNALS && timestamp === 0xFFFFFFFF) {
+        if (SKIP_INVALID_SIGNALS && timestamp == -1) {
             return NaN;
         }
         return { time: time, timestamp: timestamp };
@@ -386,7 +387,7 @@ function decoder(bytes, port) {
         var e = bits >>> 23 & 0xff;
         var m = (e === 0) ? (bits & 0x7fffff) << 1 : (bits & 0x7fffff) | 0x800000;
         var f = sign * m * Math.pow(2, e - 150);
-        if (e === 0x7F && m !== 0) {
+        if (f == 0x40000000) {
             return NaN;
         }
         return f.toFixed(1);
@@ -466,6 +467,7 @@ function decoder(bytes, port) {
         if (COMPATIBILITY_MODE) {
             var ws_dec_ok = true;
             var s1_dec_ok = true;
+            var ls_dec_ok = true;
             var ble_ok = true;
         }
         var decodedValues = mask
@@ -476,9 +478,11 @@ function decoder(bytes, port) {
                     if (COMPATIBILITY_MODE) {
                         // Check if the decoded value is NaN
                         var name = names[idx] || idx;
-                        if (name.startsWith('ws_') &&  (name != "ws_uv")) {
-                        //if (name == "ws_humidity") {
+                        if ((name == "ws_temp_c") || (name == "ws_humidity") || (name == "ws_rain_mm") || (name.startsWith('ws_wind_'))) {
                             ws_dec_ok = false;
+                        }
+                        if ((name == "lgt_strike_count") || (name == "lgt_storm_dist_km")) {
+                            ls_dec_ok = false;
                         }
                         if (name.startsWith('soil1_')) {
                             s1_dec_ok = false;
@@ -500,6 +504,7 @@ function decoder(bytes, port) {
         if ((port == 1) && COMPATIBILITY_MODE) {
             //decodedValues.status = {}; // Create a status object in the decoded values
             decodedValues.status.ws_dec_ok = ws_dec_ok;
+            decodedValues.status.ls_dec_ok = ls_dec_ok;
             decodedValues.status.s1_dec_ok = s1_dec_ok;
             decodedValues.status.ble_ok = ble_ok;
         }
