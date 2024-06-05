@@ -125,6 +125,7 @@
 //          Added compatibility mode: "status" as in BresserweatherSensorTTN
 // 20240603 Added sensor battery status flags (compatibility mode)
 //          Added command Added CMD_GET_SENSORS_STAT and sensor status decoder
+// 20240604 Added suppression of invalid value in unixtime decoder
 //
 // ToDo:
 // -  
@@ -191,6 +192,9 @@ function decoder(bytes, port) {
         dateObj = new Date(bytesToInt(bytes) * 1000);
         let time = dateObj.toISOString();
         let timestamp = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && timestamp === 0xFFFFFFFF) {
+            return NaN;
+        }
         return { time: time, timestamp: timestamp };
     };
     unixtime.BYTES = 4;
