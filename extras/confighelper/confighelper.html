@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!--
+/////////////////////////////////////////////////////////////////////////////////////////
 // confighelper.h
 //
 // BresserWeatherSensorLW LoRaWAN Payload Configuration Tool
@@ -44,9 +45,11 @@
 //          Removed unused onchange="toggleInput(id, this.checked)" properties
 // 20240531 Fixed getLightningconfig()
 // 20240606 Changed lightning signal names
+// 20240607 Added maximum payload size input, info and modified check for size limit
 //
 // ToDo:
 // -
+/////////////////////////////////////////////////////////////////////////////////////////
 -->
 <html>
 
@@ -199,6 +202,9 @@
             document.getElementById('ble').addEventListener('change', function () {
                 document.getElementById('bleInput').style.display = this.checked ? 'inline' : 'none';
             });
+
+            // Initialize the maximum size field
+            document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
 
             // Initialize the size field
             document.getElementById('size').value = 0;
@@ -429,11 +435,16 @@
                 }
             }
 
-            // Check if size exceeds PAYLOAD_SIZE_LIMIT
-            if (totalSize > PAYLOAD_SIZE_LIMIT) {
-                document.getElementById('size').style.border = '3px solid red';
+            // Get the maximum size
+            let maxSize = document.getElementById('maxSize').value;
+
+            // Check if size exceeds maxSize
+            if (totalSize > maxSize) {
+                //document.getElementById('size').style.border = '3px solid red';
+                document.getElementById('size').style.boxShadow = '0 0 3px #CC0000';
             } else {
-                document.getElementById('size').style.border = 'none';
+                //document.getElementById('size').style.border = '1px solid black';
+                document.getElementById('size').style.boxShadow = '';
             }
             // Update the size field
             document.getElementById('size').value = totalSize;
@@ -546,6 +557,18 @@
         <label for="ble">BLE Sensors:</label>
         <input type="checkbox" id="ble" name="ble">
         <input type="number" id="bleInput" name="bleInput" style="display: none; width: 40px;"><br><br>
+
+        <hr style="width:800px;text-align:left;margin-left:0"><br>
+
+        <div style="border: 1px solid black; padding: 10px; width: fit-content;">
+            The maximum payload size is essentialy limited by the maximum permitted air time, which is mandated by<br>
+            the LoRaWAN Regional Parameters and potentially a LoRaWAN Network Service Provider's fair use
+            policy.<br><br>
+            See <a href="https://avbentem.github.io/airtime-calculator/ttn/eu868" target="_blank">Airtime calculator for
+                LoRaWAN</a>.
+        </div><br>
+        <label for="size">Maximum Size (Bytes):</label><br>
+        <input type="text" id="maxSize" name="maxSize"><br><br>
 
         <label for="size">Size (Bytes):</label><br>
         <input type="text" id="size" name="size" value="0" readonly><br><br>
