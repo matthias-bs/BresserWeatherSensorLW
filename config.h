@@ -88,18 +88,28 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 // If you get an error message when compiling, it may be that the 
 // pinmap could not be determined - see the notes for more info
 
-// See https://github.com/espressif/arduino-esp32/pull/9250
-//#define FIREBEETLE_ESP32_COVER_LORA
 
 // Adafruit
-#if defined(ARDUINO_FEATHER_ESP32)
+#if defined(ARDUINO_FEATHER_ESP32) || defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
     #define PIN_LORA_NSS      14
     #define PIN_LORA_RST      27
     #define PIN_LORA_IRQ      32
     #define PIN_LORA_GPIO     33
     #define PIN_LORA_DIO2     RADIOLIB_NC
     #pragma message("NOT TESTED!!!")
-    #pragma message("ARDUINO_FEATHER_ESP32 defined; assuming RFM95W FeatherWing will be used")
+    #pragma message("ARDUINO_FEATHER_ESP32/ARDUINO_THINGPULSE_EPULSE_FEATHER defined; assuming RFM95W FeatherWing will be used")
+    #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
+    #define LORA_CHIP SX1276
+
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+    // Use pinning for Adafruit Feather ESP32S2 with RFM95W "FeatherWing" ADA3232
+    #define PIN_LORA_NSS      6
+    #define PIN_LORA_RST      9
+    #define PIN_LORA_IRQ      5
+    #define PIN_LORA_GPIO     11
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+    #pragma message("NOT TESTED!!!")
+    #pragma message("ARDUINO_ADAFRUIT_FEATHER_ESP32S2 defined; assuming RFM95W FeatherWing will be used")
     #pragma message("Required wiring: A to RST, B to DIO1, D to DIO0, E to CS")
     #define LORA_CHIP SX1276
 
@@ -181,53 +191,43 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 #elif defined(ARDUINO_HELTEC_WIFI_LORA_32)
   #pragma error ("ARDUINO_HELTEC_WIFI_LORA_32 awaiting pin map")
 
-#elif defined(ARDUINO_heltec_wifi_lora_32_V2)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V2)
   // https://github.com/espressif/arduino-esp32/tree/master/variants/heltec_wifi_lora_32_V2/pins_ardiono.h
   #define PIN_LORA_NSS      SS
   #define PIN_LORA_RST      RST_LoRa
   #define PIN_LORA_IRQ      DIO0
   #define PIN_LORA_GPIO     DIO1
   #define PIN_LORA_DIO2     DIO2
-  #pragma message("ARDUINO_heltec_wifi_lora_32_V2")
+  #pragma message("ARDUINO_HELTEC_WIFI_LORA_32_V2")
   #define LORA_CHIP SX1276
 
-#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
   // Use pinning for Heltec WiFi LoRa32 V3
   #define PIN_LORA_NSS   SS
   #define PIN_LORA_RST   RST_LoRa
   #define PIN_LORA_IRQ   DIO0
   #define PIN_LORA_GPIO  BUSY_LoRa
-  #pragma message("ARDUINO_heltec_wifi_lora_32_V3")
+  #pragma message("ARDUINO_HELTEC_WIFI_LORA_32_V3")
   #define LORA_CHIP SX1262
 
-#elif defined(ARDUINO_heltec_wireless_stick)
+#elif defined(ARDUINO_HELTEC_WIRELESS_STICK)
   // https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wireless_stick/pins_arduino.h
   #define PIN_LORA_NSS      SS
   #define PIN_LORA_RST      RST_LoRa
   #define PIN_LORA_IRQ      DIO0
   #define PIN_LORA_GPIO     DIO1
   #define PIN_LORA_DIO2     DIO2
-  #pragma message("ARDUINO_heltec_wireless_stick")
+  #pragma message("ARDUINO_HELTEC_WIRELESS_STICK")
   #define LORA_CHIP SX1276
 
-#elif defined(ARDUINO_heltec_wireless_stick_v2)
-  // https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wireless_stick/pins_arduino.h
-  #define PIN_LORA_NSS      SS
-  #define PIN_LORA_RST      RST_LoRa
-  #define PIN_LORA_IRQ      DIO0
-  #define PIN_LORA_GPIO     DIO1
-  #define PIN_LORA_DIO2     DIO2
-  #pragma message("ARDUINO_heltec_wireless_stick_v2")
-  #define LORA_CHIP SX1276
-
-#elif defined(ARDUINO_heltec_wireless_stick_v3)
+#elif defined(ARDUINO_HELTEC_WIRELESS_STICK_V3)
   https://github.com/espressif/arduino-esp32/tree/master/variants/heltec_wireless_stick_v3
   #define PIN_LORA_NSS      SS
   #define PIN_LORA_RST      RST_LoRa
   #define PIN_LORA_IRQ      DIO0
   #define PIN_LORA_GPIO     DIO1
   #define PIN_LORA_DIO2     DIO2
-  #pragma message("ARDUINO_heltec_wireless_stick_v3")
+  #pragma message("ARDUINO_HELTEC_WIRELESS_STICK_V3")
   #define LORA_CHIP SX1262
 
 // #elif defined(ARDUINO_heltec_wifi_kit_32_V2)
@@ -263,7 +263,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #define LORA_CHIP SX1276
 
 
-#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+#elif defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
   // https://wiki.dfrobot.com/FireBeetle_ESP32_IOT_Microcontroller(V3.0)__Supports_Wi-Fi_&_Bluetooth__SKU__DFR0478
   // https://wiki.dfrobot.com/FireBeetle_Covers_LoRa_Radio_868MHz_SKU_TEL0125
   #define PIN_LORA_NSS      27 // D4
@@ -271,7 +271,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #define PIN_LORA_IRQ      26 // D3
   #define PIN_LORA_GPIO      9 // D5
   #define PIN_LORA_DIO2     RADIOLIB_NC
-  #pragma message("FIREBEETLE_ESP32_COVER_LORA defined; assuming FireBeetle ESP32 with FireBeetle Cover LoRa will be used")
+  #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 defined; assuming FireBeetle ESP32 with FireBeetle Cover LoRa will be used")
   #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #define LORA_CHIP SX1276
 
