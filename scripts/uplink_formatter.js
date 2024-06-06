@@ -127,6 +127,7 @@
 //          Added command Added CMD_GET_SENSORS_STAT and sensor status decoder
 // 20240604 Added suppression of invalid value in unixtime decoder
 // 20240605 Fixed decoding of NaN values, fixed flags for compatibility mode
+// 20240606 Changed naming of post-processed lightning data
 //
 // ToDo:
 // -  
@@ -569,9 +570,9 @@ function decoder(bytes, port) {
                 'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
                 'th1_temp_c', 'th1_humidity',
                 'soil1_temp_c', 'soil1_moisture',
-                'lgt_time',
-                'lgt_events',
-                'lgt_distance_km',
+                'lgt_ev_time',
+                'lgt_ev_events',
+                'lgt_ev_dist_km',
                 'ow0_temp_c',
                 'a0_voltage_mv',
                 'ble0_temp_c',
