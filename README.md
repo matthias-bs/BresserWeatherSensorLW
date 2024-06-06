@@ -253,6 +253,10 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 * Device class A
 * Over the air activation (OTAA)
 
+> [!IMPORTANT]
+> Check the maximum permitted payload size and uplink/downlink rate according to your regional parameters and change the configuration if required!
+> See [Airtime calculator for LoRaWAN](https://avbentem.github.io/airtime-calculator/ttn/eu868).
+
 ## Software Build Configuration
 
 ### Required Configuration
