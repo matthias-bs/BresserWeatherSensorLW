@@ -43,6 +43,7 @@
 // 20240530 Added BLE sensor configuration
 //          Removed unused onchange="toggleInput(id, this.checked)" properties
 // 20240531 Fixed getLightningconfig()
+// 20240606 Changed lightning signal names
 //
 // ToDo:
 // -
@@ -296,7 +297,7 @@
             if (checkbox.checked) {
                 result |= 0x10;
                 size += 3;
-                configDecoder.signals.push("'lgt_distance_km'");
+                configDecoder.signals.push("'lgt_storm_dist_km'");
                 configDecoder.signals.push("'lgt_strike_count'");
                 configDecoder.types.push('uint8');
                 configDecoder.types.push('uint16');
@@ -305,9 +306,9 @@
             if (checkbox.checked) {
                 result |= 0x20;
                 size += 7;
-                configDecoder.signals.push("'lgt_time'");
-                configDecoder.signals.push("'lgt_events'");
-                configDecoder.signals.push("'lgt_distance_km'");
+                configDecoder.signals.push("'lgt_ev_time'");
+                configDecoder.signals.push("'lgt_ev_events'");
+                configDecoder.signals.push("'lgt_ev_dist_km'");
                 configDecoder.types.push('unixtime');
                 configDecoder.types.push('uint16');
                 configDecoder.types.push('uint8');
