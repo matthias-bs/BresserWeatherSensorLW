@@ -45,6 +45,7 @@
 // 20240530 Removed BleSensors as base class & from initializers
 // 20240531 Moved BLE specific code to PayloadBLE.h
 // 20240603 Added appStatus[]
+// 20240607 Added getAppStatusUplinkInterval()
 //
 // ToDo:
 // -
@@ -215,7 +216,7 @@ public:
     void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
 
     /*!
-     * Get configuration data for uplink
+     * \brief Get configuration data for uplink
      *
      * Get the configuration data requested in a downlink command and
      * prepare it as payload in a uplink response.
@@ -225,6 +226,19 @@ public:
      * \param encoder uplink data encoder object
      */
     void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
+
+    /*!
+     * \brief Get sensor status message uplink interval
+     *
+     * \returns status uplink interval in frame counts (0: disabled)
+     */
+    uint8_t getAppStatusUplinkInterval(void)
+    {
+        appPrefs.begin("BWS-LW-APP", false);
+        uint8_t status_interval = appPrefs.getUChar("stat_interval", STATUS_INTERVAL);
+        appPrefs.end();
+        return status_interval;
+    };
 
     /*!
      * Set AppLayer payload config in Preferences

@@ -21,6 +21,8 @@
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
+// port = CMD_GET_STATUS_INTERVAL, {"cmd": "CMD_GET_STATUS_INTERVAL"} / payload = 0x00
+// port = CMD_SET_STATUS_INTERVAL, {"status_interval": <status_interval>}
 // port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
@@ -43,6 +45,8 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
+// CMD_GET_STATUS_INTERVAL {"status_interval": <status_interval>}
+//
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
 // CMD_GET_SENSORS_INC {"sensors_inc": [<sensors_inc0>, ...]}
@@ -63,6 +67,7 @@
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
+// <status_interval>    : Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
 // <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
@@ -119,6 +124,7 @@
 // 20240519 Added CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 // 20240530 Added decoding of CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 // 20240603 Added CMD_GET_SENSORS_STAT
+// 20240607 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 //
 // ToDo:
 // -  
@@ -134,6 +140,8 @@ const CMD_GET_LW_CONFIG = 0xB1;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_RAINGAUGE = 0xC3;
+const CMD_GET_STATUS_INTERVAL = 0xD2;
+const CMD_SET_STATUS_INTERVAL = 0xD3;
 const CMD_GET_SENSORS_STAT = 0xD0;
 const CMD_GET_SENSORS_INC = 0xC4;
 const CMD_SET_SENSORS_INC = 0xC5;
@@ -270,6 +278,14 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
+        else if (input.data.cmd == "CMD_GET_STATUS_INTERVAL") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_STATUS_INTERVAL,
+                warnings: [],
+                errors: []
+            };
+        }
         else if (input.data.cmd == "CMD_GET_SENSORS_STAT") {
             return {
                 bytes: [0],
@@ -398,6 +414,13 @@ function encodeDownlink(input) {
         return {
             bytes: [value],
             fPort: CMD_RESET_RAINGAUGE,
+            warnings: [],
+            errors: []
+        };
+    } else if (input.data.hasOwnProperty('status_interval')) {
+        return {
+            bytes: [input.data.status_interval],
+            fPort: CMD_SET_STATUS_INTERVAL,
             warnings: [],
             errors: []
         };
@@ -537,6 +560,7 @@ function decodeDownlink(input) {
         case CMD_GET_DATETIME:
         case CMD_GET_LW_CONFIG:
         case CMD_GET_WS_TIMEOUT:
+        case CMD_GET_STATUS_INTERVAL:
         case CMD_GET_SENSORS_STAT:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
@@ -577,6 +601,12 @@ function decodeDownlink(input) {
             return {
                 data: {
                     reset_flags: "0x" + uint8(input.bytes).toString(16)
+                }
+            };
+        case CMD_SET_STATUS_INTERVAL:
+            return {
+                data: {
+                    status_interval: uint8(input.bytes)
                 }
             };
         case CMD_SET_SENSORS_INC:

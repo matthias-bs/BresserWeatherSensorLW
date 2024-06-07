@@ -410,6 +410,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | \<analog\>            | Bitmap for enabling analog input channels; each bit position corresponds to a channel |
 | \<digital\>           | Bitmap for enabling digital input channels in a broader sense &mdash; GPIO, SPI, I2C, UART, ... |
 | <typeN_st>            | Bitmap for Bresser sensor type \<N\> battery status; each bit position corresponds to a channel |
+| <status_interval>     | Sensor status message uplink interval in no. of uplink frames; 0...255; 0: disabled | 
 | <onewire_st>          | Bitmap for 1-Wire sensor status; each bit position corresponds to an index |
 | <analog_st>           | Bitmap for analog input status; each bit position corresponds to a channel |
 | <digital_st>          | Bitmap for digital input channel status |
@@ -445,6 +446,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
+| CMD_GET_STATUS_INTERVAL       | 0xD2 (210) | 0x00                                                                      | status_interval[7:0] |
+| CMD_SET_STATUS_INTERVAL       | 0xD3 (211) | status_interval[7:0]                                                      | n.a.            |
 | CMD_GET_SENSORS_STAT          | 0xD0 (208) | 0x00                                                                      | type00_st[7:0]<br>type01_st[7:0]<br>...<br>type15_st[7:0]<br>onewire_st[15:8]<br>onewire_st[7:0]<br>analog_st[15:8]<br>analog_st[7:0]<br>digital_st[31:24]<br>digital_st[23:16]<br>digital_st[15:8]<br>digital_st[7:0]<br>ble_st[15:8]<br>ble_st[7:0] |
 | CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
 | CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
@@ -489,6 +492,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
 | CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
 | CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |
+| CMD_GET_STATUS_INTERVAL       | {"cmd": "CMD_GET_STATUS_INTERVAL"}                                        | {"status_interval": <status_interval>} |
+| CMD_SET_STATUS_INTERVAL       | {"status_interval": <status_interval>}                                    | n.a.                         |
 | CMD_GET_SENSORS_STAT          | {"cmd": "CMD_GET_SENSORS_STAT"}                                           | "sensor_status": {"ble": <ble_stat>, "bresser": [<bresser0_st>, ..., <bresser15_st>]} |
 | CMD_GET_SENSORS_INC           | {"cmd": "CMD_GET_SENSORS_INC"}                                            | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]} |
 | CMD_SET_SENSORS_INC           | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}                    | n.a.                         |

@@ -59,6 +59,7 @@
 // 20240531 Moved BLE specific code to PayloadBLE.cpp
 // 20240603 Added encoding of sensor battery status flags
 //          Added CMD_GET_SENSORS_STAT
+// 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 //
 // ToDo:
 // -
@@ -162,6 +163,21 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         log_d("Set weathersensor_timeout: %u s", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("ws_timeout", payload[0]);
+        appPrefs.end();
+        return 0;
+    }
+
+    if ((port == CMD_GET_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get status_interval");
+        return CMD_GET_STATUS_INTERVAL;
+    }
+
+    if ((port == CMD_SET_STATUS_INTERVAL) && (size == 1))
+    {
+        log_d("Set status_interval: %u frames", payload[0]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("stat_interval", payload[0]);
         appPrefs.end();
         return 0;
     }
@@ -317,6 +333,11 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         port = CMD_GET_BLE_CONFIG;
     }
 #endif
+    else if (cmd == CMD_GET_STATUS_INTERVAL)
+    {
+        encoder.writeUint8(getAppStatusUplinkInterval());
+        port = CMD_GET_STATUS_INTERVAL;
+    }
     else if (cmd == CMD_GET_SENSORS_STAT)
     {
         for (size_t i = 0; i < APP_STATUS_SIZE; i++)
@@ -325,7 +346,14 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         }
         port = CMD_GET_SENSORS_STAT;
     }
-
+    else if (cmd == CMD_GET_SENSORS_STAT)
+    {
+        for (size_t i = 0; i < APP_STATUS_SIZE; i++)
+        {
+            encoder.writeUint8(appStatus[i]);
+        }
+        port = CMD_GET_SENSORS_STAT;
+    }
     else if (cmd == CMD_GET_SENSORS_INC)
     {
         uint8_t payload[48];

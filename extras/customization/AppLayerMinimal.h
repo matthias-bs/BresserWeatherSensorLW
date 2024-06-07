@@ -32,6 +32,7 @@
 // History:
 //
 // 20240513 Created
+// 20240607 Added getAppStatusUplinkInterval() for compatibility
 //
 // ToDo:
 // -
@@ -82,6 +83,16 @@ public:
      */
     void begin(void)
     {
+    };
+
+    /*!
+     * \brief Get sensor status message uplink interval
+     *
+     * \returns status uplink interval in frame counts (o: disabled)
+     */
+    uint8_t getAppStatusUplinkInterval(void)
+    {
+        return 0;
     };
 
     /*!

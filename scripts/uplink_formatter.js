@@ -21,6 +21,8 @@
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
+// port = CMD_GET_STATUS_INTERVAL, {"cmd": "CMD_GET_STATUS_INTERVAL"} / payload = 0x00
+// port = CMD_SET_STATUS_INTERVAL, {"status_interval": <status_interval>}
 // port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
@@ -42,6 +44,8 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
+// CMD_GET_STATUS_INTERVAL {"status_interval": <status_interval>}
+//
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
 // CMD_GET_SENSORS_INC {"sensors_inc": [<sensors_inc0>, ...]}
@@ -62,6 +66,7 @@
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
+// <status_interval>    : Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
 // <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
@@ -128,6 +133,7 @@
 // 20240604 Added suppression of invalid value in unixtime decoder
 // 20240605 Fixed decoding of NaN values, fixed flags for compatibility mode
 // 20240606 Changed naming of post-processed lightning data
+// 20240607 Added CMD_GET_STATUS_INTERVAL
 //
 // ToDo:
 // -  
@@ -153,6 +159,7 @@ function decoder(bytes, port) {
     const CMD_GET_BLE_CONFIG = 0xCA;
     const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
     const CMD_GET_SENSORS_STAT = 0xD0;
+    const CMD_GET_STATUS_INTERVAL = 0xD2;
 
     const rtc_source_code = {
         0x00: "GPS",
@@ -194,7 +201,7 @@ function decoder(bytes, port) {
         dateObj = new Date(bytesToInt(bytes) * 1000);
         let time = dateObj.toISOString();
         let timestamp = bytesToInt(bytes);
-        if (SKIP_INVALID_SIGNALS && timestamp == -1) {
+        if (SKIP_INVALID_SIGNALS && (timestamp == -1) || (timestamp == 0)) {
             return NaN;
         }
         return { time: time, timestamp: timestamp };
@@ -660,6 +667,15 @@ function decoder(bytes, port) {
             [bresser_bitmaps, hex16, hex16, hex32
             ],
             ['bresser', 'onewire', 'analog', 'digital']
+        );
+    } else if (port === CMD_GET_STATUS_INTERVAL) {
+        return decode(
+            port,
+            bytes,
+            [uint8
+            ],
+            ['status_interval'
+            ]
         );
     } else if (port === CMD_GET_SENSORS_STAT) {
         return decode(
