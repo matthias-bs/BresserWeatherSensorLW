@@ -91,9 +91,7 @@
 // 20240606 Changed appStatusUplinkInterval from const to variable
 //
 // ToDo:
-// - Fix restoring nonces/session buffers after examples in 
-//   https://github.com/radiolib-org/radiolib-persistence
-//   have been updated
+// -
 //
 // Notes:
 // - Set "Core Debug Level: Debug" for initial testing
