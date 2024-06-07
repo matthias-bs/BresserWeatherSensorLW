@@ -53,6 +53,9 @@
 // 20240528 Added encoding of invalid values, modified default payload, fixes
 // 20240603 Added definitions for sensor status flags
 //          Added appStatusUplinkInterval
+// 20240607 Added ARDUINO_DFROBOT_FIREBEETLE_ESP32 variant selection
+//          Updated HELTEC_WIFI_LORA_32_V3 definition
+//          Modified STATUS_INTERVAL
 //
 // Note:
 // Depending on board package file date, either
@@ -78,17 +81,12 @@
 // #define NVS_LOG
 
 //--- Select Board ---
-#if !defined(ARDUINO_TTGO_LoRa32_V1) && !defined(ARDUINO_TTGO_LoRa32_V2) &&               \
-    !defined(ARDUINO_TTGO_LoRa32_v21new) && !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) && \
-    !defined(ARDUINO_FEATHER_ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) &&       \
-    !defined(ARDUINO_heltec_wifi_32_lora_V3) && !defined(ARDUINO_heltec_wifi_lora_32_V3) && \
-    !defined(ARDUINO_M5STACK_Core2) && !defined(ARDUINO_M5STACK_CORE2) && \
-    !defined(ARDUINO_ESP32S3_POWERFEATHER)
+#if defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
 // Use pinning for LoRaWAN Node
-#define LORAWAN_NODE
+//#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-//#define FIREBEETLE_ESP32_COVER_LORA
+#define FIREBEETLE_ESP32_COVER_LORA
 #endif
 
 #if defined(ARDUINO_FEATHER_ESP32)
@@ -125,8 +123,8 @@ const uint8_t PAYLOAD_SIZE = 51;
 // RTC to network time sync interval (in minutes)
 #define CLOCK_SYNC_INTERVAL 24 * 60
 
-// TODO: Modify to set this value via downlink
-const uint8_t appStatusUplinkInterval = 120;
+// Status message uplink interval (in frames)
+#define STATUS_INTERVAL 120
 
 // Timeout for weather sensor data reception (seconds)
 #define WEATHERSENSOR_TIMEOUT 180
@@ -197,7 +195,7 @@ const uint8_t appStatusUplinkInterval = 120;
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
 // On-board VB
 #define PIN_ADC_IN A0
-#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -286,7 +284,7 @@ const uint8_t ADC3_SAMPLES = 10;
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 #if defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 const float UBATT_DIV = 0.6812;
-#elif defined(ARDUINO_heltec_wifi_32_lora_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
 #define ADC_CTRL 37
 // R17=100k, R14=390k => 100k / (100k + 390 k)
 const float UBATT_DIV = 0.2041;
