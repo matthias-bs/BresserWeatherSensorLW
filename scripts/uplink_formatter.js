@@ -201,7 +201,7 @@ function decoder(bytes, port) {
         dateObj = new Date(bytesToInt(bytes) * 1000);
         let time = dateObj.toISOString();
         let timestamp = bytesToInt(bytes);
-        if (SKIP_INVALID_SIGNALS && timestamp == -1) {
+        if (SKIP_INVALID_SIGNALS && (timestamp == -1) || (timestamp == 0)) {
             return NaN;
         }
         return { time: time, timestamp: timestamp };
