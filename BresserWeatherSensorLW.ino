@@ -273,7 +273,13 @@ void print_wakeup_reason()
  */
 void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey)
 {
-  if (!LittleFS.begin(true))
+
+  if (!LittleFS.begin(
+    #if defined(ESP32)
+    // Format the LittleFS partition on error; parameter only available for ESP32
+    true
+    #endif
+    ))
   {
     log_d("Could not initialize LittleFS.");
   }
@@ -895,6 +901,7 @@ void setup()
 
   // Set appStatusUplink flag if required
   uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
+  log_i("App status uplink interval: %u", appStatusUplinkInterval);
   if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
   {
     appStatusUplinkPending = true;
