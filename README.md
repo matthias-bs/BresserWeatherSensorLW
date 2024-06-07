@@ -37,35 +37,9 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
 * ESP32/RP2040 Analog Digital Converter Integration (optional)
 * [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
 * [Remote Configuration via LoRaWAN Downlink](#remote-configuration-commands--status-requests-via-lorawan)
-* Easy [Sensor Data Uplink Payload Configuration](#payload-configuration)
+* Easy [Sensor Data Uplink Payload Configuration](#payload-configuration) 
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
 * Loading of LoRaWAN secrets from JSON file on LittleFS (optional)
-
-## Project Status
-
-* [x] Weather sensor data reception
-* [x] BLE sensor data reception
-* [x] LoRaWAN join
-* [x] LoRaWAN data uplink
-* [x] LoRaWAN network time request & RTC setting
-* [x] Energy saving / battery deep-discharge protection
-* [x] Wakeup time adjustment
-* [x] LoRaWAN control downlink
-* [x] LoRaWAN status uplink
-* [x] Periodic LinkCheck
-* [x] Node/network status/debug information
-* [x] setDeviceStatus(battLevel)
-* [x] Log messages
-* [x] Supported boards
-* [x] Enforce minimum uplink interval
-* [x] RP2040 specific implementation
-* [x] Fix battery voltage measurement for HW targets FIREBEETLE_ESP32_COVER_LORA & LORAWAN_NODE
-* [x] Separate LoRaWAN network and application code
-* [x] Change LoRaWAN control downlink / status uplink messages
-* [x] Update Javascript encoders/decoders
-* [x] Implement using of BLE sensor addresses configured via downlink
-* [x] Update documentation
-* [x] Implement Heltec WiFi LoRa 32 V3 battery voltage measurement
 
 ## Contents
 
