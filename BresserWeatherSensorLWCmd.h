@@ -38,6 +38,7 @@
 // 20240507 Added CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240508 Updated description of CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240603 Added CMD_GET_SENSORS_STAT
+// 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 //
 // ToDo:
 // -
@@ -165,6 +166,29 @@
 // ---------------------
 // Port: CMD_GET_SENSORS_STAT
 #define CMD_GET_SENSORS_STAT 0xD0
+
+// CMD_GET_STATUS_INTERVAL
+// ------------------------
+// Note: Get status interval in frame counts
+// Port: CMD_GET_STATUS_INTERVAL
+#define CMD_GET_STATUS_INTERVAL 0xD2
+
+// Downlink (command):
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: status_interval[7:0]
+
+// CMD_SET_STATUS_INTERVAL
+// ------------------------
+// Note: Set status interval in frame counts
+// Port: CMD_SET_STATUS_INTERVAL
+#define CMD_SET_STATUS_INTERVAL 0xD3
+
+// Downlink (command):
+// byte0: status_interval[7:0]
+
+// Uplink: n.a.
 
 // CMD_GET_SENSORS_INC
 // --------------------
