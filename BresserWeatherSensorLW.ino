@@ -105,10 +105,6 @@
 // - After a successful transmission, the controller can go into deep sleep
 // - If joining the network or transmitting uplink data fails,
 //   the controller will go into deep sleep
-// - Weather sensor data is only received at startup; this avoids
-//   reconfiguration of the RFM95W module and its SW drivers -
-//   i.e. to work as a weather data relay to TTN, enabling sleep mode
-//   is basically the only useful option
 // - For LoRaWAN Specification 1.1.0, a small set of data (the "nonces") have to be stored persistently -
 //   this implementation uses Flash (via Preferences library
 // - Storing LoRaWAN network session information speeds up the connection (join) after a restart -
