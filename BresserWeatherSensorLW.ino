@@ -88,6 +88,7 @@
 // 20242529 Fixed payload size calculation
 // 20240530 Updated to RadioLib v6.6.0
 // 20240603 Added AppLayer status uplink
+// 20240606 Changed appStatusUplinkInterval from const to variable
 //
 // ToDo:
 // - Fix restoring nonces/session buffers after examples in 
@@ -272,7 +273,7 @@ void print_wakeup_reason()
  */
 void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey)
 {
-  if (!LittleFS.begin())
+  if (!LittleFS.begin(true))
   {
     log_d("Could not initialize LittleFS.");
   }
@@ -893,6 +894,7 @@ void setup()
   }
 
   // Set appStatusUplink flag if required
+  uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
   if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
   {
     appStatusUplinkPending = true;
@@ -1031,7 +1033,7 @@ void setup()
   uint8_t *persist = node.getBufferSession();
   memcpy(LWsession, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
 
-  // wait until next uplink - observing legal & TTN FUP constraints
+  // wait until next uplink - observing legal & TTN Fair Use Policy constraints
   gotoSleep(sleepDuration());
 }
 
