@@ -143,7 +143,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:ac01081f86f6c9350e288c09a5f4b6d76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get payload before uplink.  <a href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">More...</a><br /></td></tr>
 <tr class="separator:ac01081f86f6c9350e288c09a5f4b6d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8cf493864669eda0382ab27e763e09f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">getConfigPayload</a> (uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:ad8cf493864669eda0382ab27e763e09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get configuration data for uplink.  <a href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">More...</a><br /></td></tr>
 <tr class="separator:ad8cf493864669eda0382ab27e763e09f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad77c12ab61b2cc71b057efd2fb4453e0"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#ad77c12ab61b2cc71b057efd2fb4453e0">getAppStatusUplinkInterval</a> (void)</td></tr>
+<tr class="memdesc:ad77c12ab61b2cc71b057efd2fb4453e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get sensor status message uplink interval.  <a href="class_app_layer.html#ad77c12ab61b2cc71b057efd2fb4453e0">More...</a><br /></td></tr>
+<tr class="separator:ad77c12ab61b2cc71b057efd2fb4453e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5abe368561e741d7ddefdec635052343"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a5abe368561e741d7ddefdec635052343">setAppPayloadCfg</a> (uint8_t *bytes, uint8_t size)</td></tr>
 <tr class="separator:a5abe368561e741d7ddefdec635052343"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af225da5389cb83b2db5bc5eb4e45f1e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9">getAppPayloadCfg</a> (uint8_t *bytes, uint8_t size)</td></tr>
@@ -358,6 +362,35 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
+<a id="ad77c12ab61b2cc71b057efd2fb4453e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad77c12ab61b2cc71b057efd2fb4453e0">&#9670;&nbsp;</a></span>getAppStatusUplinkInterval()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t AppLayer::getAppStatusUplinkInterval </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get sensor status message uplink interval. </p>
+<dl class="section return"><dt>Returns</dt><dd>status uplink interval in frame counts (0: disabled) </dd></dl>
+
+</div>
+</div>
 <a id="ad8cf493864669eda0382ab27e763e09f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad8cf493864669eda0382ab27e763e09f">&#9670;&nbsp;</a></span>getConfigPayload()</h2>
 
@@ -389,7 +422,8 @@ Here is the call graph for this function:</div>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Get configuration data for uplink</p>
+
+<p>Get configuration data for uplink. </p>
 <p>Get the configuration data requested in a downlink command and prepare it as payload in a uplink response.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -404,9 +438,10 @@ Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="class_app_layer_ad8cf493864669eda0382ab27e763e09f_cgraph.png" border="0" usemap="#aclass_app_layer_ad8cf493864669eda0382ab27e763e09f_cgraph" alt=""/></div>
 <map name="aclass_app_layer_ad8cf493864669eda0382ab27e763e09f_cgraph" id="aclass_app_layer_ad8cf493864669eda0382ab27e763e09f_cgraph">
-<area shape="rect" title=" " alt="" coords="5,31,209,57"/>
-<area shape="rect" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9" title=" " alt="" coords="257,5,468,32"/>
-<area shape="rect" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80" title=" " alt="" coords="274,56,451,83"/>
+<area shape="rect" title="Get configuration data for uplink." alt="" coords="5,64,209,91"/>
+<area shape="rect" href="class_app_layer.html#af225da5389cb83b2db5bc5eb4e45f1e9" title=" " alt="" coords="262,5,473,32"/>
+<area shape="rect" href="class_app_layer.html#ad77c12ab61b2cc71b057efd2fb4453e0" title="Get sensor status message uplink interval." alt="" coords="257,57,477,98"/>
+<area shape="rect" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80" title=" " alt="" coords="279,123,456,149"/>
 </map>
 </div>
 
