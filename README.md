@@ -602,7 +602,6 @@ A typical use case would be initialization of sensors which need a certain time 
 ```
 /*!
  * \brief AppLayer initialization
- *
  */
 void begin(void);
 ```
