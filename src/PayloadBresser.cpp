@@ -42,6 +42,7 @@
 // 20240530 Weather sensor: Fixed encoding of invalid temperature
 // 20240601 Added mapping of invalid RainGauge values to INV_FLOAT
 // 20240603 Added encoding of sensor battery status
+// 20240608 Modified default number of sensors
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -52,7 +53,7 @@
 
 void PayloadBresser::begin(void)
 {
-    weatherSensor.begin();
+    weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
     weatherSensor.clearSlots();
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
