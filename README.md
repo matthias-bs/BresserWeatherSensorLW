@@ -71,6 +71,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Default Configuration](#default-configuration)
   * [Config Helper](#config-helper)
 * [Customizing the Application Layer](#customizing-the-application-layer)
+  * [AppLayer Programming Interface](#applayer-programming-interface)
 * [Implementation](#implementation)
   * [Class Diagram](#class-diagram)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
@@ -573,7 +574,7 @@ By replacing the Application Layer with your own code, you can use this project 
 
 Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinimal.h) and [extras/customization/AppLayerMinimal.cpp](extras/customization/AppLayerMinimal.cpp) as a template.
 
-### Applayer Interface
+### AppLayer Programming Interface
 
 #### Constructor
 
