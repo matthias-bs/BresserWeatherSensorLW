@@ -126,7 +126,7 @@ private:
 
 public:
     /*!
-     * \brief Constructor with BLE sensors
+     * \brief Constructor
      *
      * \param rtc Real time clock object
      * \param clocksync Timestamp of last clock synchronization
@@ -219,7 +219,7 @@ public:
      * \brief Get configuration data for uplink
      *
      * Get the configuration data requested in a downlink command and
-     * prepare it as payload in a uplink response.
+     * prepare it as payload in an uplink response.
      *
      * \param cmd command
      * \param port uplink port
