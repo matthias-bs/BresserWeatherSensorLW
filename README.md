@@ -577,7 +577,7 @@ Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinima
 
 ### Class Diagram
 
-[Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg)
+![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg)
 
 ## Doxygen Generated Source Code Documentation
 
