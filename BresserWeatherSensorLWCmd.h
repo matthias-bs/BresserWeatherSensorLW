@@ -39,6 +39,7 @@
 // 20240508 Updated description of CMD_GET_SENSORS_CFG/CMD_SET_SENSORS_CFG
 // 20240603 Added CMD_GET_SENSORS_STAT
 // 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
+// 20240608 Added CMD_GET_LW_STATUS
 //
 // ToDo:
 // -
@@ -121,6 +122,20 @@
 // byte1: sleep_interval[ 7:0]
 // byte2: sleep_interval_long[15:8]
 // byte3: sleep_interval_long[ 7:0]
+
+// CMD_GET_LW_STATUS
+// ------------------
+// Port: CMD_GET_LW_STATUS
+// Note: Get LoRaWAN device status
+#define CMD_GET_LW_STATUS 0xB2
+
+// Downlink (command):
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: u_batt[15:8]
+// byte1: u_batt[ 7:0]
+// byte2: flags[ 7:0]
 
 // -----------------------
 // -- Application layer --

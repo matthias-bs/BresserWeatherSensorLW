@@ -89,6 +89,7 @@
 // 20240530 Updated to RadioLib v6.6.0
 // 20240603 Added AppLayer status uplink
 // 20240606 Changed appStatusUplinkInterval from const to variable
+// 20240608 Added LoRaWAN device status uplink
 //
 // ToDo:
 // -
@@ -609,6 +610,12 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     return CMD_GET_LW_CONFIG;
   }
 
+  if ((port == CMD_GET_LW_STATUS) && (payload[0] == 0x00) && (size == 1))
+  {
+    log_d("Get device status");
+    return CMD_GET_LW_STATUS;
+  }
+
   log_d("appLayer.decodeDownlink(port=%d, payload[0]=0x%02X, size=%d)", port, payload[0], size);
   return appLayer.decodeDownlink(port, payload, size);
 }
@@ -648,6 +655,13 @@ void sendCfgUplink(uint8_t uplinkReq)
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
     encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
+  }
+  else if (uplinkReq == CMD_GET_LW_STATUS)
+  {
+    uint8_t status = longSleep ? 1 : 0;
+    log_d("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
+    encoder.writeUint16(getBatteryVoltage());
+    encoder.writeUint8(status);
   }
   else
   {
