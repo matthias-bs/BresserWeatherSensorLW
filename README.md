@@ -71,6 +71,8 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Default Configuration](#default-configuration)
   * [Config Helper](#config-helper)
 * [Customizing the Application Layer](#customizing-the-application-layer)
+* [Implementation](#implementation)
+  * [Class Diagram](#class-diagram)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
 * [Legal](#legal)
@@ -570,6 +572,12 @@ In the Config Helper, you select the desired sensors/interfaces and the used cha
 By replacing the Application Layer with your own code, you can use this project as a starting point for your own purpose.
 
 Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinimal.h) and [extras/customization/AppLayerMinimal.cpp](extras/customization/AppLayerMinimal.cpp) as a template.
+
+## Implementation
+
+### Class Diagram
+
+[Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg)
 
 ## Doxygen Generated Source Code Documentation
 
