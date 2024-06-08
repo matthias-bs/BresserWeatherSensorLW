@@ -573,6 +573,73 @@ By replacing the Application Layer with your own code, you can use this project 
 
 Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinimal.h) and [extras/customization/AppLayerMinimal.cpp](extras/customization/AppLayerMinimal.cpp) as a template.
 
+### Applayer Interface
+
+#### Constructor
+
+In [BresserWeatherSensorLW.ino](blob/main/BresserWeatherSensorLW.ino), the `appLayer` object is created:
+```
+/// Application layer
+AppLayer appLayer(&rtc, &rtcLastClockSync);
+```
+
+The following constructor must be implemented by the AppLayer class:
+```
+/*!
+ * \brief Constructor
+ *
+ * \param rtc Real time clock object
+ * \param clocksync Timestamp of last clock synchronization
+ */
+AppLayer(ESP32Time *rtc, time_t *clocksync);
+```
+#### begin()
+
+`appLayer.begin()` is called in [BresserWeatherSensorLW.ino: setup()](blob/main/BresserWeatherSensorLW.ino) shortly after getting the RTC time. It can be used for any initialization which cannot be done in the constructor.
+A typical use case would be initialization of sensors, which need a certain time to 'warm up' or aquire data. Other devices should be started at the latest possible stage to save energy.
+
+```
+/*!
+ * \brief AppLayer initialization
+ *
+ */
+void begin(void);
+```
+
+#### decodeDownlink()
+
+If `node.sendReceive()` provided a downlink message, the LoRaWAN network layer tries to decode it. If this fails (because its `port` is not supported), the message is passed to the ApplicationLayer via `appLayer.decodeDownlink()`.
+
+```
+/*!
+ * \brief Decode app layer specific downlink messages
+ *
+ * \param port downlink message port
+ * \param payload downlink message payload
+ * \param size payload size in bytes
+ *
+ * \returns config uplink request or 0
+ */
+uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
+```
+
+#### getConfigPayload()
+
+A non-zero return value of `decodeDownlink()` triggers execution of `getConfigPayload()`. `getConfigPayload()` passes the uplink message payload and the required uplink port to the LoRaWAN network layer.
+```
+/*!
+ * \brief Get configuration data for uplink
+ *
+ * Get the configuration data requested in a downlink command and
+ * prepare it as payload in a uplink response.
+ *
+ * \param cmd command
+ * \param port uplink port
+ * \param encoder uplink data encoder object
+ */
+void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
+```
+
 ## Implementation
 
 ### Class Diagram
