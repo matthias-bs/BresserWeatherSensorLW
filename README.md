@@ -596,7 +596,7 @@ AppLayer(ESP32Time *rtc, time_t *clocksync);
 #### begin()
 
 `appLayer.begin()` is called in [BresserWeatherSensorLW.ino: setup()](blob/main/BresserWeatherSensorLW.ino) shortly after getting the RTC time. It can be used for any initialization which cannot be done in the constructor.
-A typical use case would be initialization of sensors, which need a certain time to 'warm up' or aquire data. Other devices should be started at the latest possible stage to save energy.
+A typical use case would be initialization of sensors which need a certain time to 'warm up' or acquire data. Other devices should be started at the latest possible stage to save energy.
 
 ```
 /*!
@@ -604,6 +604,43 @@ A typical use case would be initialization of sensors, which need a certain time
  *
  */
 void begin(void);
+```
+
+#### getPayloadStage1() and getPayloadStage2()
+
+Both functions provide the uplink message payload to the LoRaWAN network layer. The parameter `port` is provided to between different kinds of messages, if required.
+
+Using the `LoraEncoder` object from [lora-serialization](https://github.com/thesolarnomad/lora-serialization) allows to encode common C++ data types as a sequence of bytes for transmission via LoRaWAN. Since maximum permitted message payload size is very limited, the encoding must use as few bytes as possible.
+
+getPayload
+
+```
+/*!
+ * \brief Prepare / get payload at startup
+ *
+ * Use this if
+ * - A sensor needs some time for warm-up or data acquisition
+ * - The data acquisition has to be done directly after startup
+ * - The radio transceiver is used for sensor communication
+ *   before starting LoRaWAN activities
+ *
+ * \param port LoRaWAN port
+ * \param encoder uplink encoder object
+ */
+void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
+
+/*!
+ * \brief Get payload before uplink
+ *
+ * Use this if
+ * - The radio transceiver is NOT used for sensor communication
+ * - The sensor preparation has been started in stage1
+ * - The data aquistion has to be done immediately before uplink
+ *
+ * \param port LoRaWAN port
+ * \param encoder uplink encoder object
+ */
+void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
 ```
 
 #### decodeDownlink()
@@ -640,6 +677,19 @@ A non-zero return value of `decodeDownlink()` triggers execution of `getConfigPa
 void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
 ```
 
+#### getAppStatusUplinkInterval()
+
+If implemented, statu messages originating from the AppLayer can be sent periodically as uplink. The return value of `getAppStatusUplinkInterval()` is used by the LoRaWAN network layer to decide when such a message is due.
+
+```
+/*!
+ * \brief Get sensor status message uplink interval
+ *
+ * \returns status uplink interval in frame counts (0: disabled)
+ */
+uint8_t getAppStatusUplinkInterval(void);
+```
+    
 ## Implementation
 
 ### Class Diagram
