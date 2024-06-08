@@ -371,6 +371,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <ws_timeout>          | Weather sensor receive timeout in seconds; 0...255                          |
 | <sleep_interval>      | Sleep interval (regular) in seconds; 0...65535                              |
 | <sleep_interval_long> | Sleep interval (energy saving mode) in seconds; 0...65535                   |
+| <ubatt_mv>            | Battery voltage in mV                                                       |
+| <long_sleep>          | 0: regular sleep interval / 1: long sleep interval (depending on U_batt)    |
 | \<epoch\>             | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
 | <reset_flags>         | Raingauge reset flags; 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF" |
 | <rtc_source>          | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
@@ -420,6 +422,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
 | CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
 | CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
+| CMD_GET_LW_STATUS             | 0xB2 (178) | 0x00                                                                      | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
 | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
@@ -466,6 +469,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>}                                      | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
 | CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
+| CMD_GET_LW_STATUS             | {"cmd": "CMD_GET_LW_STATUS"}                                              | {"ubatt_mv": <ubatt_mv>, "long_sleep": <long_sleep>} |
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
 | CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
 | CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |

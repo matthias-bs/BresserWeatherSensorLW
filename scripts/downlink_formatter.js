@@ -125,6 +125,7 @@
 // 20240530 Added decoding of CMD_GET_APP_PAYLOAD_CFG/CMD_SET_APP_PAYLOAD_CFG
 // 20240603 Added CMD_GET_SENSORS_STAT
 // 20240607 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
+// 20240608 Added CMD_GET_LW_STATUS
 //
 // ToDo:
 // -  
@@ -137,6 +138,7 @@ const CMD_SET_SLEEP_INTERVAL_LONG = 0xA9;
 const CMD_GET_DATETIME = 0x86;
 const CMD_SET_DATETIME = 0x88;
 const CMD_GET_LW_CONFIG = 0xB1;
+const CMD_GET_LW_STATUS = 0xB2;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_RAINGAUGE = 0xC3;
@@ -266,6 +268,14 @@ function encodeDownlink(input) {
             return {
                 bytes: [0],
                 fPort: CMD_GET_LW_CONFIG,
+                warnings: [],
+                errors: []
+            };
+        }
+        else if (input.data.cmd == "CMD_GET_LW_STATUS") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_LW_STATUS,
                 warnings: [],
                 errors: []
             };
@@ -559,6 +569,7 @@ function decodeDownlink(input) {
     switch (input.fPort) {
         case CMD_GET_DATETIME:
         case CMD_GET_LW_CONFIG:
+        case CMD_GET_LW_STATUS:
         case CMD_GET_WS_TIMEOUT:
         case CMD_GET_STATUS_INTERVAL:
         case CMD_GET_SENSORS_STAT:
