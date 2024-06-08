@@ -56,6 +56,7 @@
 // 20240607 Added ARDUINO_DFROBOT_FIREBEETLE_ESP32 variant selection
 //          Updated HELTEC_WIFI_LORA_32_V3 definition
 //          Modified STATUS_INTERVAL
+// 20240608 Added MAX_NUM_868MHZ_SENSORS
 //
 // Note:
 // Depending on board package file date, either
@@ -312,6 +313,9 @@ const uint8_t UBATT_SAMPLES = 10;
         "a4:c1:38:b8:1f:7f" \
     }
 #endif
+
+/// Maximum number of 868 MHz sensors - should match the default configuration below
+#define MAX_NUM_868MHZ_SENSORS 5
 
 /// AppLayer payload configuration size in bytes
 #define APP_PAYLOAD_CFG_SIZE 24
