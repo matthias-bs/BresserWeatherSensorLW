@@ -134,6 +134,7 @@
 // 20240605 Fixed decoding of NaN values, fixed flags for compatibility mode
 // 20240606 Changed naming of post-processed lightning data
 // 20240607 Added CMD_GET_STATUS_INTERVAL
+// 20240608 Added CMD_GET_LW_STATUS
 //
 // ToDo:
 // -  
@@ -151,6 +152,7 @@ function decoder(bytes, port) {
 
     const CMD_GET_DATETIME = 0x86;
     const CMD_GET_LW_CONFIG = 0xB1;
+    const CMD_GET_LW_STATUS = 0xB2;
     const CMD_GET_WS_TIMEOUT = 0xC0;
     const CMD_GET_SENSORS_INC = 0xC4;
     const CMD_GET_SENSORS_EXC = 0xC6;
@@ -605,6 +607,15 @@ function decoder(bytes, port) {
             [uint16BE, uint16BE
             ],
             ['sleep_interval', 'sleep_interval_long'
+            ]
+        );
+    } else if (port === CMD_GET_LW_STATUS) {
+        return decode(
+            port,
+            bytes,
+            [uint16, uint8
+            ],
+            ['ubatt_mv', 'long_sleep'
             ]
         );
     } else if (port === CMD_GET_WS_TIMEOUT) {
