@@ -610,7 +610,7 @@ void begin(void);
 
 Both functions provide the sensor data as uplink message payload to the LoRaWAN network layer. The parameter `port` can be used to distinguish between different kinds of messages.
 
-Using the `LoraEncoder` object from [lora-serialization](https://github.com/thesolarnomad/lora-serialization) allows to encode common C++ data types as a sequence of bytes for transmission via LoRaWAN. Since maximum permitted message payload size is very limited, the encoding must use as few bytes as possible.
+Using the `LoraEncoder` object from [lora-serialization](https://github.com/thesolarnomad/lora-serialization) allows to encode common C++ data types as a sequence of bytes for transmission via LoRaWAN. Since the maximum permitted message payload size is very limited, the encoding must use as few bytes as possible.
 
 getPayload
 
