@@ -645,7 +645,7 @@ void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
 
 #### decodeDownlink()
 
-If `node.sendReceive()` provided a downlink message, the LoRaWAN network layer tries to decode it. If this fails (because its `port` is not supported), the message is passed to the ApplicationLayer via `appLayer.decodeDownlink()`.
+If `node.sendReceive()` provided a downlink message, the LoRaWAN network layer tries to decode it. If this fails &mdash; because according to `port`, it is not directed at the network layer &mdash; the message is passed to the ApplicationLayer via `appLayer.decodeDownlink()`.
 
 ```
 /*!
@@ -668,7 +668,7 @@ A non-zero return value of `decodeDownlink()` triggers execution of `getConfigPa
  * \brief Get configuration data for uplink
  *
  * Get the configuration data requested in a downlink command and
- * prepare it as payload in a uplink response.
+ * prepare it as payload in an uplink response.
  *
  * \param cmd command
  * \param port uplink port
@@ -679,7 +679,7 @@ void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
 
 #### getAppStatusUplinkInterval()
 
-If implemented, statu messages originating from the AppLayer can be sent periodically as uplink. The return value of `getAppStatusUplinkInterval()` is used by the LoRaWAN network layer to decide when such a message is due.
+If implemented, status messages originating from the AppLayer can be sent as uplink periodically. The return value of `getAppStatusUplinkInterval()` is used by the LoRaWAN network layer to decide when such a message is due.
 
 ```
 /*!
