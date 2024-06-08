@@ -597,7 +597,7 @@ AppLayer(ESP32Time *rtc, time_t *clocksync);
 #### begin()
 
 `appLayer.begin()` is called in [BresserWeatherSensorLW.ino: setup()](blob/main/BresserWeatherSensorLW.ino) shortly after getting the RTC time. It can be used for any initialization which cannot be done in the constructor.
-A typical use case would be initialization of sensors which need a certain time to 'warm up' or acquire data. Other devices should be started at the latest possible stage to save energy.
+A typical use case would be initialization of sensors which need a certain time to 'warm up' or acquire data. Other sensors/circuits should be started at the latest possible stage to save energy.
 
 ```
 /*!
