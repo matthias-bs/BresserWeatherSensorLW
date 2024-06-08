@@ -71,6 +71,7 @@ This is a remake of [BresserWeatherSensorTTN](https://github.com/matthias-bs/Bre
   * [Default Configuration](#default-configuration)
   * [Config Helper](#config-helper)
 * [Customizing the Application Layer](#customizing-the-application-layer)
+  * [AppLayer Programming Interface](#applayer-programming-interface)
 * [Implementation](#implementation)
   * [Class Diagram](#class-diagram)
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
@@ -573,6 +574,122 @@ By replacing the Application Layer with your own code, you can use this project 
 
 Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinimal.h) and [extras/customization/AppLayerMinimal.cpp](extras/customization/AppLayerMinimal.cpp) as a template.
 
+### AppLayer Programming Interface
+
+#### Constructor
+
+In [BresserWeatherSensorLW.ino](blob/main/BresserWeatherSensorLW.ino), the `appLayer` object is created:
+```
+/// Application layer
+AppLayer appLayer(&rtc, &rtcLastClockSync);
+```
+
+The following constructor must be implemented by the AppLayer class:
+```
+/*!
+ * \brief Constructor
+ *
+ * \param rtc Real time clock object
+ * \param clocksync Timestamp of last clock synchronization
+ */
+AppLayer(ESP32Time *rtc, time_t *clocksync);
+```
+#### begin()
+
+`appLayer.begin()` is called in [BresserWeatherSensorLW.ino: setup()](blob/main/BresserWeatherSensorLW.ino) shortly after getting the RTC time. It can be used for any initialization which cannot be done in the constructor.
+A typical use case would be initialization of sensors which need a certain time to 'warm up' or acquire data. Other sensors/circuits should be started at the latest possible stage to save energy.
+
+```
+/*!
+ * \brief AppLayer initialization
+ */
+void begin(void);
+```
+
+#### getPayloadStage1() and getPayloadStage2()
+
+Both functions provide the sensor data as uplink message payload to the LoRaWAN network layer. The parameter `port` can be used to distinguish between different kinds of messages.
+
+Using the `LoraEncoder` object from [lora-serialization](https://github.com/thesolarnomad/lora-serialization) allows to encode common C++ data types as a sequence of bytes for transmission via LoRaWAN. Since the maximum permitted message payload size is very limited, the encoding must use as few bytes as possible.
+
+getPayload
+
+```
+/*!
+ * \brief Prepare / get payload at startup
+ *
+ * Use this if
+ * - A sensor needs some time for warm-up or data acquisition
+ * - The data acquisition has to be done directly after startup
+ * - The radio transceiver is used for sensor communication
+ *   before starting LoRaWAN activities
+ *
+ * \param port LoRaWAN port
+ * \param encoder uplink encoder object
+ */
+void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
+
+/*!
+ * \brief Get payload before uplink
+ *
+ * Use this if
+ * - The radio transceiver is NOT used for sensor communication
+ * - The sensor preparation has been started in stage1
+ * - The data aquistion has to be done immediately before uplink
+ *
+ * \param port LoRaWAN port
+ * \param encoder uplink encoder object
+ */
+void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
+```
+
+#### decodeDownlink()
+
+If `node.sendReceive()` provided a downlink message, the LoRaWAN network layer tries to decode it. If this fails &mdash; because according to `port`, it is not directed at the network layer &mdash; the message is passed to the ApplicationLayer via `appLayer.decodeDownlink()`.
+
+```
+/*!
+ * \brief Decode app layer specific downlink messages
+ *
+ * \param port downlink message port
+ * \param payload downlink message payload
+ * \param size payload size in bytes
+ *
+ * \returns config uplink request or 0
+ */
+uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
+```
+
+#### getConfigPayload()
+
+A non-zero return value of `decodeDownlink()` triggers execution of `getConfigPayload()`. `getConfigPayload()` passes the uplink message payload and the required uplink port to the LoRaWAN network layer.
+```
+/*!
+ * \brief Get configuration data for uplink
+ *
+ * Get the configuration data requested in a downlink command and
+ * prepare it as payload in an uplink response.
+ *
+ * \param cmd command
+ * \param port uplink port
+ * \param encoder uplink data encoder object
+ */
+void getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder);
+```
+
+#### getAppStatusUplinkInterval()
+
+If implemented, status messages originating from the AppLayer can be sent as uplink periodically. The return value of `getAppStatusUplinkInterval()` is used by the LoRaWAN network layer to decide when such a message is due.
+
+```
+/*!
+ * \brief Get sensor status message uplink interval
+ *
+ * \returns status uplink interval in frame counts (0: disabled)
+ */
+uint8_t getAppStatusUplinkInterval(void);
+```
+    
 ## Implementation
 
 ### Class Diagram
