@@ -40,6 +40,7 @@
 // 20240603 Added CMD_GET_SENSORS_STAT
 // 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 // 20240608 Added CMD_GET_LW_STATUS
+// 20240609 Refactored command encoding
 //
 // ToDo:
 // -
@@ -59,7 +60,7 @@
 
 // CMD_GET_DATETIME
 // -----------------
-#define CMD_GET_DATETIME 0x86
+#define CMD_GET_DATETIME 0x20
 
 // Downlink (command):
 // byte0:   0x00
@@ -75,7 +76,7 @@
 // CMD_SET_DATETIME
 // -----------------
 // Port: CMD_SET_DATETIME
-#define CMD_SET_DATETIME 0x88
+#define CMD_SET_DATETIME 0x21
 
 // Downlink (command):
 // byte0: unixtime[31:24]
@@ -89,7 +90,7 @@
 // -----------------------
 // Note: Set normal sleep interval in seconds
 // Port: CMD_SET_SLEEP_INTERVAL
-#define CMD_SET_SLEEP_INTERVAL 0xA8
+#define CMD_SET_SLEEP_INTERVAL 0x31
 
 // Downlink (command):
 // byte0: sleep_interval[15:8]
@@ -101,7 +102,7 @@
 // ----------------------------
 // Note: Set long sleep interval in seconds (energy saving mode)
 // Port: CMD_SET_SLEEP_INTERVAL_LONG
-#define CMD_SET_SLEEP_INTERVAL_LONG 0xA9
+#define CMD_SET_SLEEP_INTERVAL_LONG 0x33
 
 // Downlink (command):
 // byte0: sleep_interval_long[15:8]
@@ -112,7 +113,7 @@
 // CMD_GET_LW_CONFIG
 // ------------------
 // Port: CMD_GET_LW_CONFIG
-#define CMD_GET_LW_CONFIG 0xB1
+#define CMD_GET_LW_CONFIG 0x36
 
 // Downlink (command):
 // byte0: 0x00
@@ -127,7 +128,7 @@
 // ------------------
 // Port: CMD_GET_LW_STATUS
 // Note: Get LoRaWAN device status
-#define CMD_GET_LW_STATUS 0xB2
+#define CMD_GET_LW_STATUS 0x38
 
 // Downlink (command):
 // byte0: 0x00
@@ -140,6 +141,101 @@
 // -----------------------
 // -- Application layer --
 // -----------------------
+
+// CMD_GET_STATUS_INTERVAL
+// ------------------------
+// Note: Get status interval in frame counts
+// Port: CMD_GET_STATUS_INTERVAL
+#define CMD_GET_STATUS_INTERVAL 0x40
+
+// Downlink (command):
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: status_interval[7:0]
+
+// CMD_SET_STATUS_INTERVAL
+// ------------------------
+// Note: Set status interval in frame counts
+// Port: CMD_SET_STATUS_INTERVAL
+#define CMD_SET_STATUS_INTERVAL 0x41
+
+// Downlink (command):
+// byte0: status_interval[7:0]
+
+// Uplink: n.a.
+
+// CMD_GET_SENSORS_STAT
+// ---------------------
+// Port: CMD_GET_SENSORS_STAT
+#define CMD_GET_SENSORS_STAT 0x42
+
+// CMD_GET_APP_PAYLOAD_CFG
+// -----------------------
+// Port: CMD_GET_APP_PAYLOAD_CFG
+#define CMD_GET_APP_PAYLOAD_CFG 0x46
+
+// Downlink (command):
+// byte0: 0x00
+
+// Response: n.a.
+// Uplink (command):
+// byte00: type00[7:0]
+// byte01: type01[7:0]
+// byte02: type02[7:0]
+// byte03: type03[7:0]
+// byte04: type04[7:0]
+// byte05: type05[7:0]
+// byte06: type06[7:0]
+// byte07: type07[7:0]
+// byte08: type08[7:0]
+// byte09: type09[7:0]
+// byte10: type10[7:0]
+// byte11: type11[7:0]
+// byte12: type12[7:0]
+// byte13: type13[7:0]
+// byte14: type14[7:0]
+// byte15: type15[7:0]
+// byte16: onewire[15:8]
+// byte17: onewire[7:0]
+// byte18: analog[15:8]
+// byte19: analog[7:0]
+// byte20: digital[31:24]
+// byte21: digital[23:16]
+// byte22: digital[15:8]
+// byte23: digital[7:0]
+
+// CMD_SET_APP_PAYLOAD_CFG
+// Port: CMD_SET_APP_PAYLOAD_CFG
+#define CMD_SET_APP_PAYLOAD_CFG 0x47
+
+// Uplink (command):
+// byte00: type00[7:0]
+// byte01: type01[7:0]
+// byte02: type02[7:0]
+// byte03: type03[7:0]
+// byte04: type04[7:0]
+// byte05: type05[7:0]
+// byte06: type06[7:0]
+// byte07: type07[7:0]
+// byte08: type08[7:0]
+// byte09: type09[7:0]
+// byte10: type10[7:0]
+// byte11: type11[7:0]
+// byte12: type12[7:0]
+// byte13: type13[7:0]
+// byte14: type14[7:0]
+// byte15: type15[7:0]
+// byte16: onewire[15:8]
+// byte17: onewire[7:0]
+// byte18: analog[15:8]
+// byte19: analog[7:0]
+// byte20: digital[31:24]
+// byte21: digital[23:16]
+// byte22: digital[15:8]
+// byte23: digital[7:0]
+
+// Response: n.a.
 
 // CMD_GET_WS_TIMEOUT
 // -------------------
@@ -177,39 +273,11 @@
 // Reset Lightning???
 // -------------------
 
-// CMD_GET_SENSORS_STAT
-// ---------------------
-// Port: CMD_GET_SENSORS_STAT
-#define CMD_GET_SENSORS_STAT 0xD0
-
-// CMD_GET_STATUS_INTERVAL
-// ------------------------
-// Note: Get status interval in frame counts
-// Port: CMD_GET_STATUS_INTERVAL
-#define CMD_GET_STATUS_INTERVAL 0xD2
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: status_interval[7:0]
-
-// CMD_SET_STATUS_INTERVAL
-// ------------------------
-// Note: Set status interval in frame counts
-// Port: CMD_SET_STATUS_INTERVAL
-#define CMD_SET_STATUS_INTERVAL 0xD3
-
-// Downlink (command):
-// byte0: status_interval[7:0]
-
-// Uplink: n.a.
-
 // CMD_GET_SENSORS_INC
 // --------------------
 // Note: Get sensors include list (0...12 IDs)
 // Port: CMD_GET_SENSORS_INC
-#define CMD_GET_SENSORS_INC 0xC4
+#define CMD_GET_SENSORS_INC 0xC6
 
 // Downlink (command):
 // byte0: 0x00
@@ -225,7 +293,7 @@
 // --------------------
 // Note: Set sensors include list (0...12 IDs)
 // Port: CMD_SET_SENSORS_INC
-#define CMD_SET_SENSORS_INC 0xC5
+#define CMD_SET_SENSORS_INC 0xC7
 
 // Downlink (command):
 // byte0: sensors_inc0[31:24]
@@ -240,7 +308,7 @@
 // --------------------
 // Note: Get sensors exclude list (0...12 * 4 bytes)
 // Port: CMD_GET_SENSORS_EXC
-#define CMD_GET_SENSORS_EXC 0xC6
+#define CMD_GET_SENSORS_EXC 0xC8
 
 // Downlink (command):
 // byte0: 0x00
@@ -256,7 +324,7 @@
 // --------------------
 // Note: Set sensors exclude list (0...12 * 4 bytes)
 // Port: CMD_SET_SENSORS_EXC
-#define CMD_SET_SENSORS_EXC 0xC7
+#define CMD_SET_SENSORS_EXC 0xC9
 
 // Downlink (command):
 // byte0: sensors_exc0[31:24]
@@ -270,7 +338,7 @@
 // CMD_GET_SENSORS_CFG
 // --------------------
 // Port: CMD_GET_SENSORS_CFG
-#define CMD_GET_SENSORS_CFG 0xCC
+#define CMD_GET_SENSORS_CFG 0xCA
 
 // Downlink (command):
 // byte0: 0x00
@@ -283,7 +351,7 @@
 // CMD_SET_SENSORS_CFG
 // --------------------
 // Port: CMD_SET_SENSORS_CFG
-#define CMD_SET_SENSORS_CFG 0xCD
+#define CMD_SET_SENSORS_CFG 0xCB
 
 // Downlink (command):
 // byte0: max_sensors
@@ -292,11 +360,36 @@
 
 // Uplink: n.a.
 
+// CMD_GET_BLE_CONFIG
+// -------------------
+// Note: Scan time in seconds
+// Port: CMD_GET_BLE_CONFIG
+#define CMD_GET_BLE_CONFIG 0xD0
+
+// Downlink (command):
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: 0x01 (active scan) / 0x00 (passive scan)
+// byte1: scan_time[7:0]
+
+// CMD_SET_BLE_CONFIG
+// -------------------
+// Note: Scan time in seconds
+// Port: CMD_SET_BLE_CONFIG
+#define CMD_SET_BLE_CONFIG 0xD1
+
+// Uplink (command):
+// byte0: active_scan - 0x01 (active scan) / 0x00 (passive scan)
+// byte1: scan_time[7:0]
+
+// Response: n.a.
+
 // CMD_GET_BLE_ADDR
 // -----------------
 // Note: Get BLE sensors MAC addresses (0..8 * 6 bytes)
 // Port: CMD_GET_BLE_ADDR
-#define CMD_GET_BLE_ADDR 0xC8
+#define CMD_GET_BLE_ADDR 0xD2
 
 // Downlink (command):
 // byte0: 0x00
@@ -314,7 +407,7 @@
 // -----------------
 // Note: Set BLE sensors MAC addresses (0..8 * 6 bytes)
 // Port: CMD_SET_BLE_ADDR
-#define CMD_SET_BLE_ADDR 0xC9
+#define CMD_SET_BLE_ADDR 0xD3
 
 // Downlink (command):
 // byte0: ble_addr0[47:24]
@@ -326,99 +419,6 @@
 // ...
 
 // Response: n.a.
-
-// CMD_GET_BLE_CONFIG
-// -------------------
-// Note: Scan time in seconds
-// Port: CMD_GET_BLE_CONFIG
-#define CMD_GET_BLE_CONFIG 0xCA
-
-// Downlink (command):
-// byte0: 0x00
-
-// Uplink (response):
-// byte0: 0x01 (active scan) / 0x00 (passive scan)
-// byte1: scan_time[7:0]
-
-// CMD_SET_BLE_CONFIG
-// -------------------
-// Note: Scan time in seconds
-// Port: CMD_SET_BLE_CONFIG
-#define CMD_SET_BLE_CONFIG 0xCB
-
-// Uplink (command):
-// byte0: active_scan - 0x01 (active scan) / 0x00 (passive scan)
-// byte1: scan_time[7:0]
-
-// Response: n.a.
-
-// CMD_GET_APP_PAYLOAD_CFG
-// -----------------------
-// Port: CMD_GET_APP_PAYLOAD_CFG
-#define CMD_GET_APP_PAYLOAD_CFG 0xCE
-
-// Downlink (command):
-// byte0: 0x00
-
-// Response: n.a.
-// Uplink (command):
-// byte00: type00[7:0]
-// byte01: type01[7:0]
-// byte02: type02[7:0]
-// byte03: type03[7:0]
-// byte04: type04[7:0]
-// byte05: type05[7:0]
-// byte06: type06[7:0]
-// byte07: type07[7:0]
-// byte08: type08[7:0]
-// byte09: type09[7:0]
-// byte10: type10[7:0]
-// byte11: type11[7:0]
-// byte12: type12[7:0]
-// byte13: type13[7:0]
-// byte14: type14[7:0]
-// byte15: type15[7:0]
-// byte16: onewire[15:8]
-// byte17: onewire[7:0]
-// byte18: analog[15:8]
-// byte19: analog[7:0]
-// byte20: digital[31:24]
-// byte21: digital[23:16]
-// byte22: digital[15:8]
-// byte23: digital[7:0]
-
-// CMD_SET_APP_PAYLOAD_CFG
-// Port: CMD_SET_APP_PAYLOAD_CFG
-#define CMD_SET_APP_PAYLOAD_CFG 0xCF
-
-// Uplink (command):
-// byte00: type00[7:0]
-// byte01: type01[7:0]
-// byte02: type02[7:0]
-// byte03: type03[7:0]
-// byte04: type04[7:0]
-// byte05: type05[7:0]
-// byte06: type06[7:0]
-// byte07: type07[7:0]
-// byte08: type08[7:0]
-// byte09: type09[7:0]
-// byte10: type10[7:0]
-// byte11: type11[7:0]
-// byte12: type12[7:0]
-// byte13: type13[7:0]
-// byte14: type14[7:0]
-// byte15: type15[7:0]
-// byte16: onewire[15:8]
-// byte17: onewire[7:0]
-// byte18: analog[15:8]
-// byte19: analog[7:0]
-// byte20: digital[31:24]
-// byte21: digital[23:16]
-// byte22: digital[15:8]
-// byte23: digital[7:0]
-
-// Response: n.a.
-
 
 // ===========================
 #endif
