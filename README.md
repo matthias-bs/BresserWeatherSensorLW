@@ -421,7 +421,6 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_DATETIME              | 0x21  (33) | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]                 | n.a.           |
 | CMD_SET_SLEEP_INTERVAL        | 0x31  (49) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
 | CMD_SET_SLEEP_INTERVAL_LONG   | 0x33  (51) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
-
 | CMD_GET_LW_CONFIG             | 0x36  (54) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
 | CMD_GET_LW_STATUS             | 0x38 (56) | 0x00                                                                      | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
 | CMD_GET_STATUS_INTERVAL       | 0x40  (64) | 0x00                                                                      | status_interval[7:0] |
