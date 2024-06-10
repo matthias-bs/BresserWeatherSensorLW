@@ -135,6 +135,9 @@
 // 20240606 Changed naming of post-processed lightning data
 // 20240607 Added CMD_GET_STATUS_INTERVAL
 // 20240608 Added CMD_GET_LW_STATUS
+// 20240609 Refactored command encoding
+// 20240610 Fixed CMD_GET_SENSORS_CFG and CMD_GET_APP_PAYLOAD_CFG,
+//          decode function 'bits8'
 //
 // ToDo:
 // -  
@@ -150,18 +153,18 @@ function decoder(bytes, port) {
     // Compatibility mode: create "status" as in BresserweatherSensorTTN
     const COMPATIBILITY_MODE = true;
 
-    const CMD_GET_DATETIME = 0x86;
-    const CMD_GET_LW_CONFIG = 0xB1;
-    const CMD_GET_LW_STATUS = 0xB2;
+    const CMD_GET_DATETIME = 0x20;
+    const CMD_GET_LW_CONFIG = 0x36;
+    const CMD_GET_LW_STATUS = 0x38;
+    const CMD_GET_STATUS_INTERVAL = 0x40;
+    const CMD_GET_SENSORS_STAT = 0x42;
+    const CMD_GET_APP_PAYLOAD_CFG = 0x46;
     const CMD_GET_WS_TIMEOUT = 0xC0;
-    const CMD_GET_SENSORS_INC = 0xC4;
-    const CMD_GET_SENSORS_EXC = 0xC6;
-    const CMD_GET_SENSORS_CFG = 0xCC;
-    const CMD_GET_BLE_ADDR = 0xC8;
-    const CMD_GET_BLE_CONFIG = 0xCA;
-    const CMD_GET_APP_PAYLOAD_CFG = 0xCE;
-    const CMD_GET_SENSORS_STAT = 0xD0;
-    const CMD_GET_STATUS_INTERVAL = 0xD2;
+    const CMD_GET_SENSORS_INC = 0xC6;
+    const CMD_GET_SENSORS_EXC = 0xC8;
+    const CMD_GET_SENSORS_CFG = 0xCA;
+    const CMD_GET_BLE_CONFIG = 0xD0;
+    const CMD_GET_BLE_ADDR = 0xD2;
 
     const rtc_source_code = {
         0x00: "GPS",
@@ -221,6 +224,16 @@ function decoder(bytes, port) {
         return res;
     };
     uint8.BYTES = 1;
+
+    // Same as uint8, but 0xFF is not converted to NaN
+    var bits8 = function (bytes) {
+        if (bytes.length !== bits8.BYTES) {
+            throw new Error('bits8 must have exactly 1 byte');
+        }
+        let res = bytesToInt(bytes);
+        return res;
+    };
+    bits8.BYTES = 1;
 
     var uint8fp1 = function (bytes) {
         if (bytes.length !== uint8fp1.BYTES) {
@@ -538,6 +551,7 @@ function decoder(bytes, port) {
             bitmap_sensors: bitmap_sensors,
             sensor_status: sensor_status,
             rawfloat: rawfloat,
+            bits8: bits8,
             uint8fp1: uint8fp1,
             uint16fp1: uint16fp1,
             rtc_source: rtc_source,
@@ -647,9 +661,9 @@ function decoder(bytes, port) {
         );
     } else if (port === CMD_GET_SENSORS_CFG) {
         return decode(
-            bytes,
             port,
-            [uint8, uint8, uint8
+            bytes,
+            [bits8, bits8, bits8
             ],
             ['max_sensors', 'rx_flags', 'en_decoders'
             ]
@@ -667,7 +681,7 @@ function decoder(bytes, port) {
         return decode(
             port,
             bytes,
-            [uint8, uint8
+            [bits8, bits8
             ],
             ['ble_active', 'ble_scantime']
         );
@@ -683,7 +697,7 @@ function decoder(bytes, port) {
         return decode(
             port,
             bytes,
-            [uint8
+            [bits8
             ],
             ['status_interval'
             ]

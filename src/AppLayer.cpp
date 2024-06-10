@@ -86,17 +86,6 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
 
     log_i("--- Uplink Data ---");
 
-    // TODO: Handle battery status flags in PayloadBresser
-    // // Sensor status flags
-    // encoder.writeBitmap(0,
-    //                     mithermometer_valid,
-    //                     (ls > -1) ? weatherSensor.sensor[ls].valid : false,
-    //                     (ls > -1) ? weatherSensor.sensor[ls].battery_ok : false,
-    //                     (s1 > -1) ? weatherSensor.sensor[s1].valid : false,
-    //                     (s1 > -1) ? weatherSensor.sensor[s1].battery_ok : false,
-    //                     (ws > -1) ? weatherSensor.sensor[ws].valid : false,
-    //                     (ws > -1) ? weatherSensor.sensor[ws].battery_ok : false);
-
     encodeBresser(appPayloadCfg, appStatus, encoder);
 
 #ifdef ONEWIRE_EN

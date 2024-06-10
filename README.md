@@ -417,45 +417,46 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 | Command                       | Port       | Downlink                                                                  | Uplink         |
 | ----------------------------- | ---------- | ------------------------------------------------------------------------- | -------------- |
-| CMD_GET_DATETIME              | 0x86 (134) | 0x00                                                                      | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]<br>rtc_source[7:0] |
-| CMD_SET_DATETIME              | 0x88 (136) | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]                 | n.a.           |
-| CMD_SET_SLEEP_INTERVAL        | 0xA8 (168) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
-| CMD_SET_SLEEP_INTERVAL_LONG   | 0xA9 (169) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
-| CMD_GET_LW_CONFIG             | 0xB1 (177) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
-| CMD_GET_LW_STATUS             | 0xB2 (178) | 0x00                                                                      | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
+| CMD_GET_DATETIME              | 0x20  (32) | 0x00                                                                      | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]<br>rtc_source[7:0] |
+| CMD_SET_DATETIME              | 0x21  (33) | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]                 | n.a.           |
+| CMD_SET_SLEEP_INTERVAL        | 0x31  (49) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
+| CMD_SET_SLEEP_INTERVAL_LONG   | 0x33  (51) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
+| CMD_GET_LW_CONFIG             | 0x36  (54) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
+| CMD_GET_LW_STATUS             | 0x38 (56) | 0x00                                                                      | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
+| CMD_GET_STATUS_INTERVAL       | 0x40  (64) | 0x00                                                                      | status_interval[7:0] |
+| CMD_SET_STATUS_INTERVAL       | 0x41  (65) | status_interval[7:0]                                                      | n.a.            |
+| CMD_GET_SENSORS_STAT          | 0x42  (66) | 0x00                                                                      | type00_st[7:0]<br>type01_st[7:0]<br>...<br>type15_st[7:0]<br>onewire_st[15:8]<br>onewire_st[7:0]<br>analog_st[15:8]<br>analog_st[7:0]<br>digital_st[31:24]<br>digital_st[23:16]<br>digital_st[15:8]<br>digital_st[7:0]<br>ble_st[15:8]<br>ble_st[7:0] |
+| CMD_GET_APP_PAYLOAD_CFG       | 0x46  (70) | 0x00                                                                      | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] |
+| CMD_SET_APP_PAYLOAD_CFG       | 0x47  (71) | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] | n.a. |
 | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
-| CMD_GET_STATUS_INTERVAL       | 0xD2 (210) | 0x00                                                                      | status_interval[7:0] |
-| CMD_SET_STATUS_INTERVAL       | 0xD3 (211) | status_interval[7:0]                                                      | n.a.            |
-| CMD_GET_SENSORS_STAT          | 0xD0 (208) | 0x00                                                                      | type00_st[7:0]<br>type01_st[7:0]<br>...<br>type15_st[7:0]<br>onewire_st[15:8]<br>onewire_st[7:0]<br>analog_st[15:8]<br>analog_st[7:0]<br>digital_st[31:24]<br>digital_st[23:16]<br>digital_st[15:8]<br>digital_st[7:0]<br>ble_st[15:8]<br>ble_st[7:0] |
-| CMD_GET_SENSORS_INC           | 0xC4 (196) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
-| CMD_SET_SENSORS_INC           | 0xC5 (197) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
-| CMD_GET_SENSORS_EXC           | 0xC6 (198) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
-| CMD_SET_SENSORS_EXC           | 0xC7 (199) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
-| CMD_GET_SENSORS_CFG           | 0xCC (204) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0> |
-| CMD_SET_SENSORS_CFG           | 0xCD (205) | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0>                     | n.a.             |
-| CMD_GET_BLE_ADDR              | 0xC8 (200) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
-| CMD_SET_BLE_ADDR              | 0xC9 (201) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
-| CMD_GET_BLE_CONFIG            | 0xCA (202) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
-| CMD_SET_BLE_CONFIG            | 0xCB (203) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
-| CMD_GET_APP_PAYLOAD_CFG       | 0xCE (206) | 0x00                                                                      | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] |
-| CMD_SET_APP_PAYLOAD_CFG       | 0xCF (207) | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] | n.a. |
+| CMD_GET_SENSORS_INC           | 0xC6 (198) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
+| CMD_SET_SENSORS_INC           | 0xC7 (199) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
+| CMD_GET_SENSORS_EXC           | 0xC8 (200) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
+| CMD_SET_SENSORS_EXC           | 0xC9 (201) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
+| CMD_GET_SENSORS_CFG           | 0xCA (202) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0> |
+| CMD_SET_SENSORS_CFG           | 0xCB (203) | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0>                     | n.a.             |
+| CMD_GET_BLE_CONFIG            | 0xD0 (208) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
+| CMD_SET_BLE_CONFIG            | 0xD1 (209) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
+| CMD_GET_BLE_ADDR              | 0xD2 (210) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
+| CMD_SET_BLE_ADDR              | 0xD3 (211) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+
 
 #### The Things Network Examples
 
 ##### Example 1: Set SLEEP_INTERVAL to 360 seconds
-1. Set port for CMD_SET_SLEEP_INTERVAL to 168
+1. Set port for CMD_SET_SLEEP_INTERVAL to 49
 2. Convert interval to hex: 300 = 0x012C
 3. Set payload to 0x01 0x2C
 4. Send downlink via The Things Network Console
 
-![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/4b616cd9-4f50-4407-8032-44d240abc09b)
+![TTN Downlink as Hex](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/ad66a77d-1aae-4083-8d62-d09c89c3f180)
 
 
 ##### Example 2: Set Date/Time
 
-1. Set port for CMD_SET_DATETIME to 136
+1. Set port for CMD_SET_DATETIME to 33
 2. Get epoch (e.g. from https://www.epochconverter.com/hex) (Example: 0x63B2BC32); add an offset (estimated) for time until received (Example: + 64 / 0x40 seconds => 0x63B2BC**7**2) 
 3. Set payload to 0x63 0xB2 0xBC 0x72
 4. Send downlink via The Things Network Console
@@ -470,24 +471,24 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
 | CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
 | CMD_GET_LW_STATUS             | {"cmd": "CMD_GET_LW_STATUS"}                                              | {"ubatt_mv": <ubatt_mv>, "long_sleep": <long_sleep>} |
-| CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
-| CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
-| CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |
 | CMD_GET_STATUS_INTERVAL       | {"cmd": "CMD_GET_STATUS_INTERVAL"}                                        | {"status_interval": <status_interval>} |
 | CMD_SET_STATUS_INTERVAL       | {"status_interval": <status_interval>}                                    | n.a.                         |
 | CMD_GET_SENSORS_STAT          | {"cmd": "CMD_GET_SENSORS_STAT"}                                           | "sensor_status": {"ble": <ble_stat>, "bresser": [<bresser0_st>, ..., <bresser15_st>]} |
+| CMD_GET_APP_PAYLOAD_CFG       | {"cmd": "CMD_GET_APP_PAYLOAD_CFG"}                                        | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} |
+| CMD_SET_APP_PAYLOAD_CFG       | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} | n.a. |
+| CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
+| CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
+| CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |
 | CMD_GET_SENSORS_INC           | {"cmd": "CMD_GET_SENSORS_INC"}                                            | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]} |
 | CMD_SET_SENSORS_INC           | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}                    | n.a.                         |
 | CMD_GET_SENSORS_EXC           | {"cmd": "CMD_GET_SENSORS_EXC"}                                            | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]} |
 | CMD_SET_SENSORS_EXC           | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]}                    | n.a.                         |
 | CMD_GET_SENSORS_CFG           | {"cmd": "CMD_GET_SENSORS_CFG"}                                            | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>} |
 | CMD_SET_SENSORS_CFG           | {"max_sensors": <max_sensors>, "rx_flags": <rx_flags>, "en_decoders": <en_decoders>} | n.a.                         |
-| CMD_GET_BLE_ADDR              | {"cmd": "CMD_GET_BLE_ADDR"}                                               | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]} |
-| CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
 | CMD_GET_BLE_CONFIG            | {"cmd": "CMD_GET_BLE_CONFIG"}                                             | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>} |
 | CMD_SET_BLE_CONFIG            | {"ble_active": <ble_active>, "ble_scantime": <ble_scantime>}              | n.a.                         |
-| CMD_GET_APP_PAYLOAD_CFG       | {"cmd": "CMD_GET_APP_PAYLOAD_CFG"}                                        | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} |
-| CMD_SET_APP_PAYLOAD_CFG       | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} | n.a. |
+| CMD_GET_BLE_ADDR              | {"cmd": "CMD_GET_BLE_ADDR"}                                               | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]} |
+| CMD_SET_BLE_ADDR              | {"ble_addr": [<ble_addr0>, ..., <ble_addrN>]}                             | n.a.                         |
 
 #### The Things Network Examples 
 
