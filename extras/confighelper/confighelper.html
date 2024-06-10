@@ -46,6 +46,8 @@
 // 20240531 Fixed getLightningconfig()
 // 20240606 Changed lightning signal names
 // 20240607 Added maximum payload size input, info and modified check for size limit
+// 20240610 Changed Weather Sensor configuration according to modification 
+//          of PayloadBresser (assign to configArray[1])
 //
 // ToDo:
 // -
@@ -449,7 +451,7 @@
             // Update the size field
             document.getElementById('size').value = totalSize;
 
-            configArray[0] = weatherValue;
+            configArray[1] = weatherValue;
 
             // Get the current JSON output
             let jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
