@@ -33,6 +33,7 @@
 //
 // 20240531 Moved from AppLayer.cpp
 // 20240603 Added BLE sensor battery status
+// 20240610 Fixed exception with empty list of BLE addresses
 //
 // ToDo:
 // -
@@ -111,6 +112,10 @@ void PayloadBLE::bleAddrInit(void)
         knownBLEAddresses = knownBLEAddressesDef;
         log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
     }
+    else if (knownBLEAddressesDef.size() == 0)
+    {
+        log_d("No BLE addresses specified.");
+    }
     else
     {
         log_d("Using BLE addresses from Preferences:");
@@ -127,9 +132,11 @@ void PayloadBLE::bleAddrInit(void)
 /*
  * Encode BLE temperature/humidity sensor values for LoRaWAN transmission
  */
-void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &encoder)
+void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
 {
-#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
+    if (bleSensors.data.size() == 0)
+        return;
+
     float indoor_temp_c;
     float indoor_humidity;
 
@@ -144,7 +151,6 @@ void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEnco
     appPrefs.end();
     // Get sensor data - run BLE scan for <bleScanTime>
     bleSensors.getData(ble_scantime, ble_active);
-#endif
 
     // BLE Temperature/Humidity Sensors
 #if defined(MITHERMOMETER_EN)
