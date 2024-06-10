@@ -775,18 +775,6 @@ void setup()
 
   LoraEncoder encoder(uplinkPayload);
 
-  // Note:
-  // This should be enabled by a LoRaWAN downlink command if required.
-  // // LoRaWAN node status flags
-  // encoder.writeBitmap(0,
-  //                     0,
-  //                     0,
-  //                     0,
-  //                     0,
-  //                     longSleep,
-  //                     0,
-  //                     0);
-
   appLayer.getPayloadStage1(1, encoder);
 
   int16_t state = 0; // return value for calls to RadioLib
@@ -972,7 +960,7 @@ void setup()
     // Did we get a downlink with data for us
     if (downlinkSize > 0)
     {
-      log_i("Downlink data: ");
+      log_i("Downlink port %u, data: ", downlinkDetails.fPort);
       arrayDump(downlinkPayload, downlinkSize);
 
       if (downlinkDetails.fPort > 0)
