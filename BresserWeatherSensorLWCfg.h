@@ -308,9 +308,14 @@ const uint8_t UBATT_SAMPLES = 10;
 #define BLE_BATT_OK 5
 
 // List of known sensors' BLE addresses
+// #define KNOWN_BLE_ADDRESSES \
+//     {                       \
+//         "a4:c1:38:b8:1f:7f" \
+//     }
+// #endif
 #define KNOWN_BLE_ADDRESSES \
     {                       \
-        "a4:c1:38:b8:1f:7f" \
+                            \
     }
 #endif
 
@@ -348,8 +353,8 @@ const uint8_t UBATT_SAMPLES = 10;
 // 0 - Weather Station; 1 Ch
 // Note: Included in APP_PAYLOAD_CFG_TYPE01
 
-// Flag: Enable battery_ok flags (to be removed)
-#define APP_PAYLOAD_CFG_TYPE00 0x01
+// Flag: Bit 0: Enable battery_ok flags (to be removed)
+#define APP_PAYLOAD_CFG_TYPE00 0x00
 
 // 1 - Weather Station; 1 Ch
 //   - Professional Wind Gauge (with T and H); 1 Ch
