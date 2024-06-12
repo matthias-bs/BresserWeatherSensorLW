@@ -138,6 +138,8 @@
 // 20240609 Refactored command encoding
 // 20240610 Fixed CMD_GET_SENSORS_CFG and CMD_GET_APP_PAYLOAD_CFG,
 //          decode function 'bits8'
+// 20240612 Disabled BLE temperature/humidity and compatibility mode due to 
+//          issues #65 & #68
 //
 // ToDo:
 // -  
@@ -148,10 +150,10 @@ function decoder(bytes, port) {
     // bytes is of type Buffer
 
     // Skip signals encoded as invalid
-    const SKIP_INVALID_SIGNALS = true;
+    const SKIP_INVALID_SIGNALS = false;
 
     // Compatibility mode: create "status" as in BresserweatherSensorTTN
-    const COMPATIBILITY_MODE = true;
+    const COMPATIBILITY_MODE = false;
 
     const CMD_GET_DATETIME = 0x20;
     const CMD_GET_LW_CONFIG = 0x36;
@@ -579,9 +581,9 @@ function decoder(bytes, port) {
                 uint8,
                 temperature,
                 uint16,
-                temperature,
-                uint8,
-                bitmap_sensors
+                //temperature,
+                //uint8,
+                //bitmap_sensors
             ],
             [
                 'ws_temp_c',
@@ -598,9 +600,9 @@ function decoder(bytes, port) {
                 'lgt_ev_dist_km',
                 'ow0_temp_c',
                 'a0_voltage_mv',
-                'ble0_temp_c',
-                'ble0_humidity',
-                'status'
+                //'ble0_temp_c',
+                //'ble0_humidity',
+                //'status'
             ]
         );
         //return {...res, ...sensorStatus};
