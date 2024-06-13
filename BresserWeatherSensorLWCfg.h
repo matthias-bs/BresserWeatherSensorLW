@@ -57,6 +57,7 @@
 //          Updated HELTEC_WIFI_LORA_32_V3 definition
 //          Modified STATUS_INTERVAL
 // 20240608 Added MAX_NUM_868MHZ_SENSORS
+// 20240613 Removed workaround for ARDUINO_THINGPULSE_EPULSE_FEATHER
 //
 // Note:
 // Depending on board package file date, either
@@ -88,13 +89,6 @@
 
 // Use pinning for Firebeetle Cover LoRa
 #define FIREBEETLE_ESP32_COVER_LORA
-#endif
-
-#if defined(ARDUINO_FEATHER_ESP32)
-// The Thingpulse ePulse Feather board has the same pinout as
-// the Adafruit Feather ESP32 board, but a different VBAT voltage divider!
-// See https://github.com/matthias-bs/BresserWeatherSensorTTN/issues/55
-//#define ARDUINO_THINGPULSE_EPULSE_FEATHER
 #endif
 
 // Uplink message payload size
