@@ -38,6 +38,7 @@
 // 20240426 Added define ARDUINO_heltec_wifi_lora_32_V3
 // 20240530 Added stateDecode(), updated debug() from RadioLib v6.6.0
 //          (examples/LoRaWAN/LoRaWAN_Reference/config.h)
+// 20240613 Added LORAWAN_NODE (DFRobot FireBeetle ESP32 wiring variant)
 //
 // ToDo:
 // - 
