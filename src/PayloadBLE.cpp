@@ -91,7 +91,7 @@ std::vector<std::string> PayloadBLE::getBleAddr(void)
     for (size_t i = 0; i < size; i += 6)
     {
         char addr[18];
-        snprintf(addr, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
+        snprintf(addr, 18, "%02x:%02x:%02x:%02x:%02x:%02x",
                  addrBytes[i], addrBytes[i + 1], addrBytes[i + 2], addrBytes[i + 3], addrBytes[i + 4], addrBytes[i + 5]);
         bleAddr.push_back(addr);
     }
@@ -106,19 +106,19 @@ void PayloadBLE::bleAddrInit(void)
 {
     knownBLEAddressesDef = KNOWN_BLE_ADDRESSES;
     knownBLEAddresses = getBleAddr();
-    if (knownBLEAddresses.size() == 0)
+    if (knownBLEAddresses.size() != 0)
+    {
+        log_d("Using BLE addresses from Preferences:");
+    }
+    else if (knownBLEAddressesDef.size() != 0)
     {
         // No addresses stored in Preferences, use default
         knownBLEAddresses = knownBLEAddressesDef;
         log_d("Using BLE addresses from BresserWeatherSensorLWCfg.h:");
     }
-    else if (knownBLEAddressesDef.size() == 0)
-    {
-        log_d("No BLE addresses specified.");
-    }
     else
     {
-        log_d("Using BLE addresses from Preferences:");
+        log_d("No BLE addresses specified.");
     }
     bleSensors = BleSensors(knownBLEAddresses);
 
