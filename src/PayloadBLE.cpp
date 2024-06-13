@@ -34,6 +34,7 @@
 // 20240531 Moved from AppLayer.cpp
 // 20240603 Added BLE sensor battery status
 // 20240610 Fixed exception with empty list of BLE addresses
+// 20240613 Fixed using BLE addresses from preferences
 //
 // ToDo:
 // -
