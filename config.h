@@ -49,6 +49,7 @@
 
 #include <RadioLib.h>
 #include "secrets.h"
+#include "BresserWeatherSensorLWCfg.h"
 
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
@@ -264,13 +265,23 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 
 
 #elif defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
-  // https://wiki.dfrobot.com/FireBeetle_ESP32_IOT_Microcontroller(V3.0)__Supports_Wi-Fi_&_Bluetooth__SKU__DFR0478
-  // https://wiki.dfrobot.com/FireBeetle_Covers_LoRa_Radio_868MHz_SKU_TEL0125
-  #define PIN_LORA_NSS      27 // D4
-  #define PIN_LORA_RST      25 // D2
-  #define PIN_LORA_IRQ      26 // D3
-  #define PIN_LORA_GPIO      9 // D5
-  #define PIN_LORA_DIO2     RADIOLIB_NC
+  #if defined(LORAWAN_NODE)
+    // Use pinning for LoRaWAN_Node (https://github.com/matthias-bs/LoRaWAN_Node)
+    #define PIN_LORA_NSS      14
+    #define PIN_LORA_RST      12
+    #define PIN_LORA_IRQ       4
+    #define PIN_LORA_GPIO     16
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+    
+  #else
+    // https://wiki.dfrobot.com/FireBeetle_ESP32_IOT_Microcontroller(V3.0)__Supports_Wi-Fi_&_Bluetooth__SKU__DFR0478
+    // https://wiki.dfrobot.com/FireBeetle_Covers_LoRa_Radio_868MHz_SKU_TEL0125
+    #define PIN_LORA_NSS      27 // D4
+    #define PIN_LORA_RST      25 // D2
+    #define PIN_LORA_IRQ      26 // D3
+    #define PIN_LORA_GPIO      9 // D5
+    #define PIN_LORA_DIO2     RADIOLIB_NC
+  #endif
   #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 defined; assuming FireBeetle ESP32 with FireBeetle Cover LoRa will be used")
   #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #define LORA_CHIP SX1276
