@@ -112,11 +112,6 @@ public:
     };
 #endif
 
-#ifdef RAINDATA_EN
-    /// Rain data statistics
-    RainGauge rainGauge;
-#endif
-
 private:
     ESP32Time *_rtc;
     time_t *_rtcLastClockSync;
@@ -124,13 +119,22 @@ private:
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
 
+
+#ifdef RAINDATA_EN
+public:
+    /// Rain data statistics
+    RainGauge rainGauge;
+#endif
+
 #ifdef LIGHTNINGSENSOR_EN
+public:
+    /// Lightning sensor post-processing
+    Lightning lightningProc;
+
+private:
     time_t lightn_ts;
     int lightn_events;
     uint8_t lightn_distance;
-
-    /// Lightning sensor post-processing
-    Lightning lightningProc;
 #endif
 
 public:
