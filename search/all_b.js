@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['temperature_38',['temperature',['../struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1',1,'BleDataS']]]
+  ['setaddresses_36',['setAddresses',['../class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928',1,'BleSensors']]],
+  ['setapppayloadcfg_37',['setAppPayloadCfg',['../class_app_layer.html#a5abe368561e741d7ddefdec635052343',1,'AppLayer']]],
+  ['setbleaddr_38',['setBleAddr',['../class_payload_b_l_e.html#ac55579175f958ba7cbf809cae0c47aae',1,'PayloadBLE']]]
 ];

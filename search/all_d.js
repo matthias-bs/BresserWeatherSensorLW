@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['weathersensor_40',['weatherSensor',['../class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a',1,'PayloadBresser']]]
+  ['valid_40',['valid',['../struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358',1,'BleDataS']]]
 ];
