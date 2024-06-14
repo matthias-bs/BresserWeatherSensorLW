@@ -8,46 +8,29 @@
             "recvTime": "2024-05-13T22:13:00.000+02:00"
         },
         "output": {
-            "data": {
+            "bytes": {
                 // decoded form of the uplink payload
-                "air_temp_c": "20.3",
-                "humidity": 42,
-                "indoor_humidity": 45,
-                "indoor_temp_c": "24.9",
-                "lightning_distance_km": 0,
-                "lightning_events": 0,
-                "lightning_time": 0,
-                "rain_day": "-1.0",
-                "rain_hr": "0.0",
-                "rain_mm": "925.6",
-                "rain_mon": "-1.0",
-                "rain_week": "-1.0",
-                "soil_moisture": 33,
-                "soil_temp_c": "16.3",
-                "status": {
-                    "ble_ok": true,
-                    "ls_batt_ok": true,
-                    "ls_dec_ok": true,
-                    "res0": false,
-                    "s1_batt_ok": true,
-                    "s1_dec_ok": true,
-                    "ws_batt_ok": false,
-                    "ws_dec_ok": true
+                "ws_temp_c": "20.3",
+                "ws_humidity": 42,
+                "ble0_humidity": 45,
+                "ble0_temp_c": "24.9",
+                "lgt_ev_dist_km": 0,
+                "lgt_ev_events": 0,
+                "lgt_ev_time": {
+                    "time": "1970-01-01T00:00:00.000Z",
+                    "timestamp": 0
                 },
-                "status_node": {
-                    "res0": false,
-                    "res1": false,
-                    "res2": false,
-                    "res3": false,
-                    "res4": false,
-                    "res5": false,
-                    "res6": false,
-                    "res7": false
-                },
-                "supply_v": 4169,
-                "wind_avg_meter_sec": "0.7",
-                "wind_direction_deg": "196.0",
-                "wind_gust_meter_sec": "0.7"
+                "ws_rain_daily_mm": "-1.0",
+                "ws_rain_hourly_mm": "0.0",
+                "ws_rain_mmin_mm": "925.6",
+                "ws_rain_monthly_mm": "-1.0",
+                "ws_rain_weekly_mm": "-1.0",
+                "soil1_moisture": 33,
+                "soil1_temp_c": "16.3",
+                "a0_voltage_mv": 4169,
+                "ws_wind_avg_ms": "0.7",
+                "ws_wind_dir_deg": "196.0",
+                "ws_wind_gust_ms": "0.7"
             },
             "warnings": []
         }
