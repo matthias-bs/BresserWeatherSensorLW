@@ -17,7 +17,7 @@
 // port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
-// port = CMD_RESET_RAINGAUGE, {"reset_flags": <flags>}
+// port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
@@ -127,6 +127,7 @@
 // 20240607 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 // 20240608 Added CMD_GET_LW_STATUS
 // 20240609 Refactored command encoding
+// 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
 //
 // ToDo:
 // -  
@@ -147,7 +148,7 @@ const CMD_GET_APP_PAYLOAD_CFG = 0x46;
 const CMD_SET_APP_PAYLOAD_CFG = 0x47;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
-const CMD_RESET_RAINGAUGE = 0xC3;
+const CMD_RESET_WS_POSTPROC = 0xC3;
 const CMD_GET_SENSORS_INC = 0xC6;
 const CMD_SET_SENSORS_INC = 0xC7;
 const CMD_GET_SENSORS_EXC = 0xC8;
@@ -424,7 +425,7 @@ function encodeDownlink(input) {
         }
         return {
             bytes: [value],
-            fPort: CMD_RESET_RAINGAUGE,
+            fPort: CMD_RESET_WS_POSTPROC,
             warnings: [],
             errors: []
         };
@@ -609,7 +610,7 @@ function decodeDownlink(input) {
                     ws_timeout: uint8(input.bytes)
                 }
             };
-        case CMD_RESET_RAINGAUGE:
+        case CMD_RESET_WS_POSTPROC:
             return {
                 data: {
                     reset_flags: "0x" + uint8(input.bytes).toString(16)
