@@ -41,6 +41,7 @@
 // 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 // 20240608 Added CMD_GET_LW_STATUS
 // 20240609 Refactored command encoding
+// 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
 //
 // ToDo:
 // -
@@ -260,18 +261,15 @@
 
 // Uplink: n.a.
 
-// CMD_RESET_RAINGAUGE
-// --------------------
-// Port: CMD_RESET_RAINGAUGE
-#define CMD_RESET_RAINGAUGE 0xC3
+// CMD_RESET_WS_POSTPROC
+// ----------------------
+// Port: CMD_RESET_WS_POSTPROC
+#define CMD_RESET_WS_POSTPROC 0xC3
 
 // Downlink (command):
-// byte0: flags[7:0] (optional)
+// byte0: flags[ 7: 0]
 
 // Uplink: n.a.
-
-// Reset Lightning???
-// -------------------
 
 // CMD_GET_SENSORS_INC
 // --------------------
