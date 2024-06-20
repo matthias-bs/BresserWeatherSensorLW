@@ -400,7 +400,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <digital_st>          | Bitmap for digital input channel status |
 | <ble_st>              | Bitmap for BLE sensor battery status |
 
-> [!INFORMATION]
+> [!NOTE]
 > See [Payload Configuration](#payload-configuration) for more details!
 
 > [!WARNING]
