@@ -188,6 +188,16 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma error ("ARDUINO_TBEAM_USE_RADIO_SX1276 awaiting pin map")
   #define LORA_CHIP SX1276
 
+// AZ-Delievry
+#elif defined(ARDUINO_D1_MINI32)
+  // ESP32-WROOM-32 
+  #define PIN_LORA_NSS      27
+  #define PIN_LORA_RST      32
+  #define PIN_LORA_IRQ      21
+  #define PIN_LORA_GPIO     33
+  #define PIN_LORA_DIO2     RADIOLIB_NC
+  #pragma message("wemos_d1_mini32 - WEMOS D1 MINI ESP32 defined; assuming RFM95W will be used")
+  #define LORA_CHIP SX1276
 
 // Heltec
 #elif defined(ARDUINO_HELTEC_WIFI_LORA_32)
