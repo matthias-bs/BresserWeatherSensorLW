@@ -82,7 +82,7 @@
 // 20240504 PowerFeather: added BATTERY_CAPACITY_MAH to init()
 //          Added BresserWeatherSensorLWCmd.h
 // 20240505 Implemented loading of LoRaWAN secrets from file on LittleFS (if available)
-// 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve 
+// 20230524 Modified PAYLOAD_SIZE: Moved define to header file, added small reserve
 //          to uplinkPayload[], modified actual size in sendReceive()
 // 20240528 Disabled uplink transmission of LoRaWAN node status flags
 // 20242529 Fixed payload size calculation
@@ -90,6 +90,7 @@
 // 20240603 Added AppLayer status uplink
 // 20240606 Changed appStatusUplinkInterval from const to variable
 // 20240608 Added LoRaWAN device status uplink
+// 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
 //
 // ToDo:
 // -
@@ -257,7 +258,7 @@ void print_wakeup_reason()
  * \brief Load LoRaWAN secrets from file 'secrets.json' on LittleFS, if available
  *
  * Returns all values by reference/pointer
- * 
+ *
  * Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading
  * the file to Flash.
  *
@@ -270,11 +271,11 @@ void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *
 {
 
   if (!LittleFS.begin(
-    #if defined(ESP32)
-    // Format the LittleFS partition on error; parameter only available for ESP32
-    true
-    #endif
-    ))
+#if defined(ESP32)
+          // Format the LittleFS partition on error; parameter only available for ESP32
+          true
+#endif
+          ))
   {
     log_d("Could not initialize LittleFS.");
   }
@@ -417,7 +418,7 @@ void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *
         memcpy(nwkKey, _nwkKey, 16);
         memcpy(appKey, _appKey, 16);
       } // deserializeJson o.k.
-    }   // file read o.k.
+    } // file read o.k.
     file.close();
   } // LittleFS o.k.
 }
@@ -551,15 +552,7 @@ void printDateTime(void)
 uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   log_v("Port: %d", port);
-  // char buf[255];
-  //*buf = '\0';
 
-  // if (port > 0)
-  // {
-  // for (size_t i = 0; i < nBuffer; i++) {
-  //       sprintf(&buf[strlen(buf)], "%02X ", pBuffer[i]);
-  // }
-  // log_v("Data: %s", buf);
   if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
   {
     log_d("Get date/time");
@@ -687,6 +680,99 @@ void sendCfgUplink(uint8_t uplinkReq)
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 }
 
+/*!
+ * \brief Activate node by restoring session or otherwise joining the network
+ *
+ * \return RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
+ */
+int16_t lwActivate(void)
+{
+  int16_t state = RADIOLIB_ERR_UNKNOWN;
+
+  // setup the OTAA session information
+  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+
+  log_d("Recalling LoRaWAN nonces & session");
+  // ##### setup the flash storage
+  store.begin("radiolib");
+  // ##### if we have previously saved nonces, restore them and try to restore session as well
+  if (store.isKey("nonces"))
+  {
+    uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
+    store.getBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // get them from the store
+    state = node.setBufferNonces(buffer);                               // send them to LoRaWAN
+    debug(state != RADIOLIB_ERR_NONE, "Restoring nonces buffer failed", state, false);
+
+    // recall session from RTC deep-sleep preserved variable
+    state = node.setBufferSession(LWsession); // send them to LoRaWAN stack
+
+    // if we have booted more than once we should have a session to restore, so report any failure
+    // otherwise no point saying there's been a failure when it was bound to fail with an empty LWsession var.
+    debug((state != RADIOLIB_ERR_NONE) && (bootCount > 1), "Restoring session buffer failed", state, false);
+
+    // if Nonces and Session restored successfully, activation is just a formality
+    // moreover, Nonces didn't change so no need to re-save them
+    if (state == RADIOLIB_ERR_NONE)
+    {
+      log_d("Succesfully restored session - now activating");
+      state = node.activateOTAA();
+      debug((state != RADIOLIB_LORAWAN_SESSION_RESTORED), "Failed to activate restored session", state, true);
+
+      // ##### close the store before returning
+      store.end();
+      return (state);
+    }
+  }
+  else
+  { // store has no key "nonces"
+    log_d("No Nonces saved - starting fresh.");
+  }
+
+  // if we got here, there was no session to restore, so start trying to join
+  state = RADIOLIB_ERR_NETWORK_NOT_JOINED;
+  while (state != RADIOLIB_LORAWAN_NEW_SESSION)
+  {
+    log_d("Join ('login') to the LoRaWAN Network");
+    state = node.activateOTAA();
+
+    // ##### save the join counters (nonces) to permanent store
+    log_d("Saving nonces to flash");
+    uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
+    uint8_t *persist = node.getBufferNonces();                          // get pointer to nonces
+    memcpy(buffer, persist, RADIOLIB_LORAWAN_NONCES_BUF_SIZE);          // copy in to buffer
+    store.putBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // send them to the store
+
+    // we'll save the session after an uplink
+
+    if (state != RADIOLIB_LORAWAN_NEW_SESSION)
+    {
+      log_d("Join failed: %d", state);
+
+      // how long to wait before join attempts. This is an interim solution pending
+      // implementation of TS001 LoRaWAN Specification section #7 - this doc applies to v1.0.4 & v1.1
+      // it sleeps for longer & longer durations to give time for any gateway issues to resolve
+      // or whatever is interfering with the device <-> gateway airwaves.
+      uint32_t sleepForSeconds = min((bootCountSinceUnsuccessfulJoin++ + 1UL) * 60UL, 3UL * 60UL);
+      log_i("Boots since unsuccessful join: %u", bootCountSinceUnsuccessfulJoin);
+      log_i("Retrying join in %u seconds", sleepForSeconds);
+
+      gotoSleep(sleepForSeconds);
+
+    } // if activateOTAA state
+  } // while join
+
+  log_d("Joined");
+
+  // reset the failed join count
+  bootCountSinceUnsuccessfulJoin = 0;
+
+  delay(1000); // hold off off hitting the airwaves again too soon - an issue in the US
+
+  // ##### close the store
+  store.end();
+  return (state);
+}
+
 // setup & execute all device functions ...
 void setup()
 {
@@ -785,72 +871,9 @@ void setup()
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
 
-  // Setup the OTAA session information
-  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
-  
-  log_d("Recalling LoRaWAN nonces & session");
-  // ##### setup the flash storage
-  store.begin("radiolib");
-  // ##### if we have previously saved nonces, restore them
-  if (store.isKey("nonces"))
-  {
-    uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
-    store.getBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // get them to the store
-    state = node.setBufferNonces(buffer);                               // send them to LoRaWAN
-    debug(state != RADIOLIB_ERR_NONE, "Restoring nonces buffer failed", state, false);
-  }
-
-  // recall session from RTC deep-sleep preserved variable
-  state = node.setBufferSession(LWsession); // send them to LoRaWAN stack
-
-  // if we have booted at least once we should have a session to restore, so report any failure
-  // otherwise no point saying there's been a failure when it was bound to fail with an empty
-  // LWsession var. At this point, bootCount has already been incremented, hence the > 2
-  debug((state != RADIOLIB_ERR_NONE) && (bootCount > 2), "Restoring session buffer failed", state, false);
-
-  // loop until successful join
-  while ((state != RADIOLIB_LORAWAN_NEW_SESSION) && (state != RADIOLIB_LORAWAN_SESSION_RESTORED))
-  {
-    log_d("Join ('login') to the LoRaWAN Network");
-    state = node.activateOTAA();
-
-    if ((state != RADIOLIB_LORAWAN_NEW_SESSION) && (state != RADIOLIB_LORAWAN_SESSION_RESTORED))
-    {
-      log_d("Join failed: %d", state);
-
-      // how long to wait before join attempts. This is an interim solution pending
-      // implementation of TS001 LoRaWAN Specification section #7 - this doc applies to v1.0.4 & v1.1
-      // it sleeps for longer & longer durations to give time for any gateway issues to resolve
-      // or whatever is interfering with the device <-> gateway airwaves.
-      uint32_t sleepForSeconds = min((bootCountSinceUnsuccessfulJoin++ + 1UL) * 60UL, 3UL * 60UL);
-      log_i("Boots since unsuccessful join: %u", bootCountSinceUnsuccessfulJoin);
-      log_i("Retrying join in %u seconds", (unsigned int)sleepForSeconds);
-
-      gotoSleep(sleepForSeconds);
-    }
-    else
-    { // join was successful
-      log_i("Joined");
-
-      // ##### save the join counters (nonces) to permanent store
-      log_d("Saving nonces to flash");
-      uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
-      uint8_t *persist = node.getBufferNonces();                          // get pointer to nonces
-      memcpy(buffer, persist, RADIOLIB_LORAWAN_NONCES_BUF_SIZE);          // copy in to buffer
-      store.putBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // send them to the store
-
-      // we'll save the session after the uplink
-
-      // reset the failed join count
-      bootCountSinceUnsuccessfulJoin = 0;
-
-      delay(1000); // hold off off hitting the airwaves again too soon - an issue in the US
-
-    } // if beginOTAA state
-  }   // while join
-
-  // ##### close the store
-  store.end();
+  // activate node by restoring session or otherwise joining the network
+  state = lwActivate();
+  // state is one of RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
 
   // Set battery fill level -
   // the LoRaWAN network server may periodically request this information
@@ -926,28 +949,26 @@ void setup()
   if (fCntUp % 64 == 0)
   {
     state = node.sendReceive(
-      uplinkPayload,
-      payloadSize,
-      port,
-      downlinkPayload,
-      &downlinkSize,
-      true,
-      &uplinkDetails,
-      &downlinkDetails
-    );
+        uplinkPayload,
+        payloadSize,
+        port,
+        downlinkPayload,
+        &downlinkSize,
+        true,
+        &uplinkDetails,
+        &downlinkDetails);
   }
   else
   {
     state = node.sendReceive(
-      uplinkPayload,
-      payloadSize,
-      port,
-      downlinkPayload,
-      &downlinkSize,
-      false,
-      nullptr,
-      &downlinkDetails
-    );
+        uplinkPayload,
+        payloadSize,
+        port,
+        downlinkPayload,
+        &downlinkSize,
+        false,
+        nullptr,
+        &downlinkDetails);
   }
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 
@@ -1018,14 +1039,17 @@ void setup()
     log_d("[LoRaWAN] LinkCheck count:\t%u", gwCnt);
   }
 
-  if (appStatusUplinkPending) {
+  if (appStatusUplinkPending)
+  {
     log_i("AppLayer status uplink pending");
   }
 
   if (uplinkReq)
   {
     sendCfgUplink(uplinkReq);
-  } else if (appStatusUplinkPending) {
+  }
+  else if (appStatusUplinkPending)
+  {
     sendCfgUplink(CMD_GET_SENSORS_STAT);
     appStatusUplinkPending = false;
   }
