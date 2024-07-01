@@ -301,20 +301,20 @@ const uint8_t UBATT_SAMPLES = 10;
 // BLE battery o.k. threshold in percent
 #define BLE_BATT_OK 5
 
-/*
 // List of known sensors' BLE addresses
 #define KNOWN_BLE_ADDRESSES \
      {                       \
          "a4:c1:38:b8:1f:7f" \
      }
-*/
 
+
+/*
 // Empty list - BLE disabled
 #define KNOWN_BLE_ADDRESSES \
     {                       \
                             \
     }
-
+*/
 #endif
 
 /// Maximum number of 868 MHz sensors - should match the default configuration below

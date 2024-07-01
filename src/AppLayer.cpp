@@ -61,6 +61,7 @@
 //          Added CMD_GET_SENSORS_STAT
 // 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 // 20240614 Added lightning statistics reset
+// 20240701 Fixed CMD_GET_BLE_ADDR (get default if Preferences are empty/zero)
 //
 // ToDo:
 // -
@@ -131,181 +132,180 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
     if ((port == CMD_RESET_WS_POSTPROC) && (size == 1))
     {
-        #ifdef RAINDATA_EN
+#ifdef RAINDATA_EN
         if (payload[0] & 0xF)
         {
             log_d("Reset rain statistics - flags: 0x%X", payload[0]);
             rainGauge.reset(payload[0] & 0xF);
         }
-        #endif
-        #ifdef LIGHTNINGSENSOR_EN
+#endif
+#ifdef LIGHTNINGSENSOR_EN
         if (payload[0] & 0x10)
         {
             log_d("Reset lightning statistics");
             lightningProc.reset();
         }
-        #endif
+#endif
         return 0;
     }
 
-
-if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get weathersensor_timeout");
-    return CMD_GET_WS_TIMEOUT;
-}
-
-if ((port == CMD_SET_WS_TIMEOUT) && (size == 1))
-{
-    log_d("Set weathersensor_timeout: %u s", payload[0]);
-    appPrefs.begin("BWS-LW-APP", false);
-    appPrefs.putUChar("ws_timeout", payload[0]);
-    appPrefs.end();
-    return 0;
-}
-
-if ((port == CMD_GET_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get status_interval");
-    return CMD_GET_STATUS_INTERVAL;
-}
-
-if ((port == CMD_SET_STATUS_INTERVAL) && (size == 1))
-{
-    log_d("Set status_interval: %u frames", payload[0]);
-    appPrefs.begin("BWS-LW-APP", false);
-    appPrefs.putUChar("stat_interval", payload[0]);
-    appPrefs.end();
-    return 0;
-}
-
-if ((port == CMD_GET_SENSORS_STAT) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get sensors' status");
-    return CMD_GET_SENSORS_STAT;
-}
-
-if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get sensors include list");
-    return CMD_GET_SENSORS_INC;
-}
-
-if ((port == CMD_SET_SENSORS_INC) && (size % 4 == 0))
-{
-    log_d("Set sensors include list");
-    for (size_t i = 0; i < size; i += 4)
+    if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("%08X:",
-              (payload[i] << 24) |
-                  (payload[i + 1] << 16) |
-                  (payload[i + 2] << 8) |
-                  payload[i + 3]);
+        log_d("Get weathersensor_timeout");
+        return CMD_GET_WS_TIMEOUT;
     }
-    weatherSensor.setSensorsInc(payload, size);
-    return 0;
-}
 
-if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get sensors exclude list");
-    return CMD_GET_SENSORS_EXC;
-}
-
-if ((port == CMD_SET_SENSORS_EXC) && (size % 4 == 0))
-{
-    log_d("Set sensors exclude list");
-    for (size_t i = 0; i < size - 1; i += 4)
+    if ((port == CMD_SET_WS_TIMEOUT) && (size == 1))
     {
-        log_d("%08X:",
-              (payload[i] << 24) |
-                  (payload[i + 1] << 16) |
-                  (payload[i + 2] << 8) |
-                  payload[i + 3]);
+        log_d("Set weathersensor_timeout: %u s", payload[0]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ws_timeout", payload[0]);
+        appPrefs.end();
+        return 0;
     }
-    weatherSensor.setSensorsExc(payload, size);
-    return 0;
-}
 
-if ((port == CMD_GET_SENSORS_CFG) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get sensors configuration");
-    return CMD_GET_SENSORS_CFG;
-}
+    if ((port == CMD_GET_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get status_interval");
+        return CMD_GET_STATUS_INTERVAL;
+    }
 
-if ((port == CMD_SET_SENSORS_CFG) && (size == 3))
-{
-    log_d("Set sensors configuration - max_sensors: %u, rx_flags: %u, en_decoders: %u",
-          payload[0], payload[1], payload[2]);
-    weatherSensor.setSensorsCfg(payload[0], payload[1], payload[2]);
-    return 0;
-}
+    if ((port == CMD_SET_STATUS_INTERVAL) && (size == 1))
+    {
+        log_d("Set status_interval: %u frames", payload[0]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("stat_interval", payload[0]);
+        appPrefs.end();
+        return 0;
+    }
+
+    if ((port == CMD_GET_SENSORS_STAT) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors' status");
+        return CMD_GET_SENSORS_STAT;
+    }
+
+    if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors include list");
+        return CMD_GET_SENSORS_INC;
+    }
+
+    if ((port == CMD_SET_SENSORS_INC) && (size % 4 == 0))
+    {
+        log_d("Set sensors include list");
+        for (size_t i = 0; i < size; i += 4)
+        {
+            log_d("%08X:",
+                  (payload[i] << 24) |
+                      (payload[i + 1] << 16) |
+                      (payload[i + 2] << 8) |
+                      payload[i + 3]);
+        }
+        weatherSensor.setSensorsInc(payload, size);
+        return 0;
+    }
+
+    if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors exclude list");
+        return CMD_GET_SENSORS_EXC;
+    }
+
+    if ((port == CMD_SET_SENSORS_EXC) && (size % 4 == 0))
+    {
+        log_d("Set sensors exclude list");
+        for (size_t i = 0; i < size - 1; i += 4)
+        {
+            log_d("%08X:",
+                  (payload[i] << 24) |
+                      (payload[i + 1] << 16) |
+                      (payload[i + 2] << 8) |
+                      payload[i + 3]);
+        }
+        weatherSensor.setSensorsExc(payload, size);
+        return 0;
+    }
+
+    if ((port == CMD_GET_SENSORS_CFG) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get sensors configuration");
+        return CMD_GET_SENSORS_CFG;
+    }
+
+    if ((port == CMD_SET_SENSORS_CFG) && (size == 3))
+    {
+        log_d("Set sensors configuration - max_sensors: %u, rx_flags: %u, en_decoders: %u",
+              payload[0], payload[1], payload[2]);
+        weatherSensor.setSensorsCfg(payload[0], payload[1], payload[2]);
+        return 0;
+    }
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
-if ((port == CMD_GET_BLE_CONFIG) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get BLE config");
-    return CMD_GET_BLE_CONFIG;
-}
-
-if ((port == CMD_SET_BLE_CONFIG) && (size == 2))
-{
-    appPrefs.begin("BWS-LW-APP", false);
-    appPrefs.putUChar("ble_active", payload[0]);
-    appPrefs.putUChar("ble_scantime", payload[1]);
-    appPrefs.end();
-    return 0;
-}
-
-if ((port == CMD_GET_BLE_ADDR) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get BLE sensors MAC addresses");
-    return CMD_GET_BLE_ADDR;
-}
-
-if ((port == CMD_SET_BLE_ADDR) && (size % 6 == 0))
-{
-    log_d("Set BLE sensors MAC addresses");
-    for (size_t i = 0; i < size - 1; i += 6)
+    if ((port == CMD_GET_BLE_CONFIG) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("%02X:%02X:%02X:%02X:%02X:%02X",
-              payload[i],
-              payload[i + 1],
-              payload[i + 2],
-              payload[i + 3],
-              payload[i + 4],
-              payload[i + 5]);
+        log_d("Get BLE config");
+        return CMD_GET_BLE_CONFIG;
     }
 
-    setBleAddr(payload, size);
-    bleAddrInit();
-
-    return 0;
-}
-
-if ((port == CMD_GET_APP_PAYLOAD_CFG) && (payload[0] == 0x00) && (size == 1))
-{
-    log_d("Get AppLayer payload configuration");
-    return CMD_GET_APP_PAYLOAD_CFG;
-}
-
-if ((port == CMD_SET_APP_PAYLOAD_CFG) && (size == 24))
-{
-    log_d("Set AppLayer payload configuration");
-    for (size_t i = 0; i < 16; i++)
+    if ((port == CMD_SET_BLE_CONFIG) && (size == 2))
     {
-        log_d("Type%02d: 0x%X", i, payload[i]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ble_active", payload[0]);
+        appPrefs.putUChar("ble_scantime", payload[1]);
+        appPrefs.end();
+        return 0;
     }
-    log_d("1-Wire:  0x%04X", payload[16] << 8 | payload[17]);
-    log_d("Analog:  0x%04X", (payload[18] << 8) | payload[19]);
-    log_d("Digital: 0x%08X", (payload[20] << 24) | (payload[21] << 16) | (payload[22] << 8) | payload[23]);
 
-    setAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
-    return 0;
-}
+    if ((port == CMD_GET_BLE_ADDR) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get BLE sensors MAC addresses");
+        return CMD_GET_BLE_ADDR;
+    }
+
+    if ((port == CMD_SET_BLE_ADDR) && (size % 6 == 0))
+    {
+        log_d("Set BLE sensors MAC addresses");
+        for (size_t i = 0; i < size - 1; i += 6)
+        {
+            log_d("%02X:%02X:%02X:%02X:%02X:%02X",
+                  payload[i],
+                  payload[i + 1],
+                  payload[i + 2],
+                  payload[i + 3],
+                  payload[i + 4],
+                  payload[i + 5]);
+        }
+
+        setBleAddr(payload, size);
+        bleAddrInit();
+
+        return 0;
+    }
+
+    if ((port == CMD_GET_APP_PAYLOAD_CFG) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_d("Get AppLayer payload configuration");
+        return CMD_GET_APP_PAYLOAD_CFG;
+    }
+
+    if ((port == CMD_SET_APP_PAYLOAD_CFG) && (size == 24))
+    {
+        log_d("Set AppLayer payload configuration");
+        for (size_t i = 0; i < 16; i++)
+        {
+            log_d("Type%02d: 0x%X", i, payload[i]);
+        }
+        log_d("1-Wire:  0x%04X", payload[16] << 8 | payload[17]);
+        log_d("Analog:  0x%04X", (payload[18] << 8) | payload[19]);
+        log_d("Digital: 0x%08X", (payload[20] << 24) | (payload[21] << 16) | (payload[22] << 8) | payload[23]);
+
+        setAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
+        return 0;
+    }
 
 #endif
-return 0;
+    return 0;
 }
 
 void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder)
@@ -385,11 +385,13 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)
     {
-        uint8_t payload[48];
-        uint8_t size = getBleAddr(payload);
-        for (size_t i = 0; i < min(size, static_cast<uint8_t>(48)); i++)
+        for (const std::string &addr : knownBLEAddresses)
         {
-            encoder.writeUint8(payload[i]);
+            for (int i = 0; i < 6; i++)
+            {
+                uint8_t byte = std::stoi(addr.substr(3 * i, 2), nullptr, 16);
+                encoder.writeUint8(byte);
+            }
         }
         port = CMD_GET_BLE_ADDR;
     }

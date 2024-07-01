@@ -65,11 +65,6 @@ private:
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
 
-    /// Default BLE MAC addresses
-    std::vector<std::string> knownBLEAddressesDef;
-    /// Actual BLE MAC addresses; either from Preferences or from defaults
-    std::vector<std::string> knownBLEAddresses;
-
 #ifdef MITHERMOMETER_EN
     /// BLE Temperature/Humidity Sensors
     ATC_MiThermometer bleSensors; //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
@@ -78,6 +73,13 @@ private:
     /// Bluetooth Low Energy sensors
     BleSensors bleSensors;
 #endif
+
+    /// Default BLE MAC addresses
+    std::vector<std::string> knownBLEAddressesDef;
+
+public:
+    /// Actual BLE MAC addresses; either from Preferences or from defaults
+    std::vector<std::string> knownBLEAddresses;
 
 public:
     /*!
