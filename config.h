@@ -188,7 +188,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma error ("ARDUINO_TBEAM_USE_RADIO_SX1276 awaiting pin map")
   #define LORA_CHIP SX1276
 
-// AZ-Delievry
+// AZ-Delivery
 #elif defined(ARDUINO_D1_MINI32)
   // ESP32-WROOM-32 
   #define PIN_LORA_NSS      27
