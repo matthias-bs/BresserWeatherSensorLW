@@ -39,6 +39,7 @@
 // 20240530 Added stateDecode(), updated debug() from RadioLib v6.6.0
 //          (examples/LoRaWAN/LoRaWAN_Reference/config.h)
 // 20240613 Added LORAWAN_NODE (DFRobot FireBeetle ESP32 wiring variant)
+// 20240704 Moved MAX_DOWNLINK_SIZE to BresserWeatherSensorLWCfg.h
 //
 // ToDo:
 // - 
@@ -54,9 +55,6 @@
 
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
-
-// Maximum downlink payload size (bytes)
-#define MAX_DOWNLINK_SIZE 5
 
 // JoinEUI - previous versions of LoRaWAN called this AppEUI
 // for development purposes you can use all zeros - see wiki for details
