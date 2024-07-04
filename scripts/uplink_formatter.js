@@ -138,8 +138,7 @@
 // 20240609 Refactored command encoding
 // 20240610 Fixed CMD_GET_SENSORS_CFG and CMD_GET_APP_PAYLOAD_CFG,
 //          decode function 'bits8'
-// 20240612 Disabled BLE temperature/humidity and compatibility mode due to 
-//          issues #65 & #68
+// 20240704 Fixed/improved compatibility mode
 //
 // ToDo:
 // -  
@@ -211,7 +210,11 @@ function decoder(bytes, port) {
         if (SKIP_INVALID_SIGNALS && (timestamp == -1) || (timestamp == 0)) {
             return NaN;
         }
-        return { time: time, timestamp: timestamp };
+        if (!COMPATIBILITY_MODE) {
+            return { time: time, timestamp: timestamp };
+        } else {
+            return timestamp;
+        }
     };
     unixtime.BYTES = 4;
 
@@ -467,7 +470,6 @@ function decoder(bytes, port) {
     };
     sensor_status.BYTES = 26;
 
-    //sensorStatus = {"status": {"ws_dec_ok": true}};
     /**
      * Decodes the given bytes using the provided mask and names.
      *
@@ -499,9 +501,9 @@ function decoder(bytes, port) {
             .map(function (decodeFn, idx) {
                 var current = bytes.slice(offset, offset += decodeFn.BYTES);
                 var decodedValue = decodeFn(current);
+                // Check if the decoded value is NaN
                 if (isNaN(decodedValue) && decodedValue.constructor === Number) {
                     if (COMPATIBILITY_MODE) {
-                        // Check if the decoded value is NaN
                         var name = names[idx] || idx;
                         if ((name == "ws_temp_c") || (name == "ws_humidity") || (name == "ws_rain_mm") || (name.startsWith('ws_wind_'))) {
                             ws_dec_ok = false;
@@ -531,6 +533,9 @@ function decoder(bytes, port) {
             decodedValues.status.ws_dec_ok = ws_dec_ok;
             decodedValues.status.ls_dec_ok = ls_dec_ok;
             decodedValues.status.s1_dec_ok = s1_dec_ok;
+            decodedValues.status.ws_batt_ok = decodedValues.status.ws_batt_ok || !ws_dec_ok;
+            decodedValues.status.ls_batt_ok = decodedValues.status.ls_batt_ok || !ls_dec_ok;
+            decodedValues.status.s1_batt_ok = decodedValues.status.s1_batt_ok || !s1_dec_ok;
             decodedValues.status.ble_ok = ble_ok;
         }
         return decodedValues;
@@ -563,48 +568,92 @@ function decoder(bytes, port) {
 
 
     if (port === 1) {
-        return decode(
-            port,
-            bytes,
-            [
-                temperature,
-                uint8,
-                rawfloat,
-                uint16fp1, uint16fp1, uint16fp1,
-                uint8fp1,
-                rawfloat,
-                rawfloat, rawfloat, rawfloat,
-                temperature, uint8,
-                temperature, uint8,
-                unixtime,
-                uint16,
-                uint8,
-                temperature,
-                uint16,
-                //temperature,
-                //uint8,
-                //bitmap_sensors
-            ],
-            [
-                'ws_temp_c',
-                'ws_humidity',
-                'ws_rain_mm',
-                'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
-                'ws_uv',
-                'ws_rain_hourly_mm',
-                'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
-                'th1_temp_c', 'th1_humidity',
-                'soil1_temp_c', 'soil1_moisture',
-                'lgt_ev_time',
-                'lgt_ev_events',
-                'lgt_ev_dist_km',
-                'ow0_temp_c',
-                'a0_voltage_mv',
-                //'ble0_temp_c',
-                //'ble0_humidity',
-                //'status'
-            ]
-        );
+        if (!COMPATIBILITY_MODE) {
+            return decode(
+                port,
+                bytes,
+                [
+                    temperature,
+                    uint8,
+                    rawfloat,
+                    uint16fp1, uint16fp1, uint16fp1,
+                    uint8fp1,
+                    rawfloat,
+                    rawfloat, rawfloat, rawfloat,
+                    temperature, uint8,
+                    temperature, uint8,
+                    unixtime,
+                    uint16,
+                    uint8,
+                    temperature,
+                    uint16,
+                    temperature,
+                    uint8
+                ],
+                [
+                    'ws_temp_c',
+                    'ws_humidity',
+                    'ws_rain_mm',
+                    'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
+                    'ws_uv',
+                    'ws_rain_hourly_mm',
+                    'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
+                    'th1_temp_c', 'th1_humidity',
+                    'soil1_temp_c', 'soil1_moisture',
+                    'lgt_ev_time',
+                    'lgt_ev_events',
+                    'lgt_ev_dist_km',
+                    'ow0_temp_c',
+                    'a0_voltage_mv',
+                    'ble0_temp_c',
+                    'ble0_humidity'
+                ]
+            );
+        } else {
+            // COMPATIBILITY_MODE - not recommended for new designs!
+            return decode(
+                port,
+                bytes,
+                [
+                    temperature,
+                    uint8,
+                    rawfloat,
+                    uint16fp1, uint16fp1, uint16fp1,
+                    uint8fp1,
+                    rawfloat,
+                    rawfloat, rawfloat, rawfloat,
+                    temperature, uint8,
+                    temperature, uint8,
+                    unixtime,
+                    uint16,
+                    uint8,
+                    temperature,
+                    uint16,
+                    temperature,
+                    uint8,
+                    bitmap_sensors
+                ],
+                [
+                    'air_temp_c',
+                    'humidity',
+                    'rain_mm',
+                    'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
+                    'ws_uv', // new
+                    'rain_hr',
+                    'rain_day', 'rain_week', 'rain_month',
+                    'th1_temp_c', 'th1_humidity', //new
+                    'soil_temp_c', 'soil_moisture',
+                    'lightning_time',
+                    'lightning_events',
+                    'lightning_distance_km',
+                    'water_temp_c',
+                    'supply_v',
+                    'indoor_temp_c',
+                    'indoor_humidity',
+                    'status'
+                ]
+            );
+        }
         //return {...res, ...sensorStatus};
 
     } else if (port === CMD_GET_DATETIME) {
