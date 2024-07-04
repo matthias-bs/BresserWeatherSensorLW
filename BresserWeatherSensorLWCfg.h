@@ -58,11 +58,13 @@
 //          Modified STATUS_INTERVAL
 // 20240608 Added MAX_NUM_868MHZ_SENSORS
 // 20240613 Removed workaround for ARDUINO_THINGPULSE_EPULSE_FEATHER
+// 20240704 Moved MAX_DOWNLINK_SIZE from config.h, changed to 51
 //
 // Note:
-// Depending on board package file date, either
-// ARDUINO_M5STACK_Core2 or ARDUINO_M5STACK_CORE2
-// is used - see https://github.com/espressif/arduino-esp32/issues/9423!
+// Depending on board package file date, some defines are written either
+// in mixed-case or upper-case letters, for example,
+// ARDUINO_M5STACK_Core2 or ARDUINO_M5STACK_CORE2 -
+// see https://github.com/espressif/arduino-esp32/issues/9423!
 // Consequently both variants have to be checked!!!
 //
 // ToDo:
@@ -94,6 +96,9 @@
 // Uplink message payload size
 // The maximum allowed for all data rates is 51 bytes.
 const uint8_t PAYLOAD_SIZE = 51;
+
+// Maximum downlink payload size (bytes)
+const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
