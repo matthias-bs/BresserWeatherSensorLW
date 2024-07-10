@@ -40,6 +40,7 @@
 //          (examples/LoRaWAN/LoRaWAN_Reference/config.h)
 // 20240613 Added LORAWAN_NODE (DFRobot FireBeetle ESP32 wiring variant)
 // 20240704 Moved MAX_DOWNLINK_SIZE to BresserWeatherSensorLWCfg.h
+// 20260710 Fixed pragma messages fro Firebeetle ESP32 pin config
 //
 // ToDo:
 // - 
