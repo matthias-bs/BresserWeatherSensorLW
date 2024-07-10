@@ -294,7 +294,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 & DFROBOT_COVER_LORA defined; assuming this is a FireBeetle ESP32 with FireBeetle Cover LoRa")
     #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #else 
-    #pragma error ("Either LORAWAN_NODE or DFROBOT_COVER_LORA must be defined")
+    #pragma message("Either LORAWAN_NODE or DFROBOT_COVER_LORA must be defined")
   #endif
 
   #define LORA_CHIP SX1276
