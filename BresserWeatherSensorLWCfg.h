@@ -90,7 +90,7 @@
 //#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-#define FIREBEETLE_ESP32_COVER_LORA
+#define DFROBOT_COVER_LORA
 #endif
 
 // Uplink message payload size
