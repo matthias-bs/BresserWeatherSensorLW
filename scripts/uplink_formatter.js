@@ -139,6 +139,7 @@
 // 20240610 Fixed CMD_GET_SENSORS_CFG and CMD_GET_APP_PAYLOAD_CFG,
 //          decode function 'bits8'
 // 20240704 Fixed/improved compatibility mode
+// 20240716 Added CMD_SCAN_SENSORS
 //
 // ToDo:
 // -  
@@ -161,6 +162,7 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_STAT = 0x42;
     const CMD_GET_APP_PAYLOAD_CFG = 0x46;
     const CMD_GET_WS_TIMEOUT = 0xC0;
+    const CMD_SCAN_SENSORS = 0xC4;
     const CMD_GET_SENSORS_INC = 0xC6;
     const CMD_GET_SENSORS_EXC = 0xC8;
     const CMD_GET_SENSORS_CFG = 0xCA;
@@ -174,6 +176,33 @@ function decoder(bytes, port) {
         0x03: "unsynched",
         0x04: "set (source unknown)"
     };
+
+    const sensor_types = {
+        0: "Weather Sensor",
+        1: "Weather Sensor",
+        2: "Thermo-/Hygro-Sensor",
+        3: "Pool / Spa Thermometer",
+        4: "Soil Temperature and Moisture Sensor",
+        5: "Water Leakage Sensor",
+        6: "undefined",
+        7: "undefined",
+        8: "Air Quality Sensor (Particulate Matter)",
+        9: "Lightning Sensor",
+        10: "CO2 Sensor",
+        11: "Air Quality Sensor (HCHO and VOC)",
+        12: "undefined",
+        13: "undefined",
+        14: "undefined",
+        15: "undefined"
+    };
+
+    const sensor_decoders = {
+        0: "5-in-1",
+        1: "6-in-1",
+        2: "7-in-1",
+        3: "Lightning",
+        4: "Leakage"
+    }
 
     var rtc_source = function (bytes) {
         if (bytes.length !== rtc_source.BYTES) {
@@ -470,6 +499,29 @@ function decoder(bytes, port) {
     };
     sensor_status.BYTES = 26;
 
+    function found_sensors(bytes) {
+        let res = [];
+        for (let i = 0; i < bytes.length; i += 8) {
+            const decoded_id = hex32(bytes.slice(i, i + 4));
+            const tmp = uint8(bytes.slice(i + 4, i + 5));
+            const decoded_type = sensor_types[tmp & 0x0F];
+            const decoded_decoder = sensor_decoders[tmp >> 4];
+            const decoded_channel = uint8(bytes.slice(i + 5, i + 6));
+            const decoded_flags = "0x" + byte2hex(bytes[i + 6]);
+            const decoded_rssi = -uint8(bytes.slice(i + 7, i + 8));
+            res.push({
+                'id': decoded_id,
+                'type': decoded_type,
+                'decoder': decoded_decoder,
+                'ch': decoded_channel,
+                'flags': decoded_flags,
+                'rssi': decoded_rssi
+            });
+        }
+        return res;
+    }
+
+
     /**
      * Decodes the given bytes using the provided mask and names.
      *
@@ -562,6 +614,7 @@ function decoder(bytes, port) {
             uint8fp1: uint8fp1,
             uint16fp1: uint16fp1,
             rtc_source: rtc_source,
+            found_sensors: found_sensors,
             decode: decode
         };
     }
@@ -753,7 +806,10 @@ function decoder(bytes, port) {
             ['status_interval'
             ]
         );
-    } else if (port === CMD_GET_SENSORS_STAT) {
+    } else if (port === CMD_SCAN_SENSORS) {
+        return {'found_sensors': found_sensors(bytes)};
+    }
+    else if (port === CMD_GET_SENSORS_STAT) {
         return decode(
             port,
             bytes,

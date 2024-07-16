@@ -128,6 +128,7 @@
 // 20240608 Added CMD_GET_LW_STATUS
 // 20240609 Refactored command encoding
 // 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
+// 20240615 Added CMD_SCAN_SENSORS
 //
 // ToDo:
 // -  
@@ -149,6 +150,7 @@ const CMD_SET_APP_PAYLOAD_CFG = 0x47;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_WS_POSTPROC = 0xC3;
+const CMD_SCAN_SENSORS = 0xC4;
 const CMD_GET_SENSORS_INC = 0xC6;
 const CMD_SET_SENSORS_INC = 0xC7;
 const CMD_GET_SENSORS_EXC = 0xC8;
@@ -429,6 +431,13 @@ function encodeDownlink(input) {
             warnings: [],
             errors: []
         };
+    } else if (input.data.hasOwnProperty('ws_scantime')) {
+        return {
+            bytes: [input.data.ws_scantime],
+            fPort: CMD_SCAN_SENSORS,
+            warnings: [],
+            errors: []
+        };
     } else if (input.data.hasOwnProperty('status_interval')) {
         return {
             bytes: [input.data.status_interval],
@@ -614,6 +623,12 @@ function decodeDownlink(input) {
             return {
                 data: {
                     reset_flags: "0x" + uint8(input.bytes).toString(16)
+                }
+            };
+        case CMD_SCAN_SENSORS:
+            return {
+                data: {
+                    ws_scantime: uint8(input.bytes)
                 }
             };
         case CMD_SET_STATUS_INTERVAL:
