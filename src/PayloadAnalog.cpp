@@ -60,7 +60,7 @@ void PayloadAnalog::encodeAnalog(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 if ((ch == UBATT_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
                 {
                     uint16_t uBatt = getBatteryVoltage();
-                    log_i("ch %02u: U_batt:   %04u mv", ch, uBatt);
+                    log_i("ch %02u: U_batt: %04u mv", ch, uBatt);
                     encoder.writeUint16(uBatt);
                 }
 
