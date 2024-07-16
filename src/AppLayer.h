@@ -158,7 +158,10 @@ public:
     {
         // bleAddrInit();
         PayloadBresser::begin();
-        if (ws_scan_time) {
+
+        // Sensor scan requested,
+        // no other payload encoders will be used
+        if (ws_scantime) {
             return;
         }
 
