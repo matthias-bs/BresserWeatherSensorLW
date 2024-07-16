@@ -42,6 +42,7 @@
 // 20240608 Added CMD_GET_LW_STATUS
 // 20240609 Refactored command encoding
 // 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
+// 20240716 Added CMD_SCAN_SENSORS
 //
 // ToDo:
 // -
@@ -49,7 +50,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #if !defined(_LWCMD_H)
-#define LWCMD_H
+#define _LWCMD_H
 
 // ===========================
 // LoRaWAN command interface
@@ -270,6 +271,26 @@
 // byte0: flags[ 7: 0]
 
 // Uplink: n.a.
+
+// CMD_SCAN_SENSORS
+// -----------------
+// Note: Scan for 868 MHz sensors
+// Port: CMD_SCAN_SENSORS
+#define CMD_SCAN_SENSORS 0xC4
+
+// Downlink (command):
+// byte0: ws_scantime[ 7: 0]
+
+// Uplink (response):
+// byte0: id0[31:24]
+// byte1: id0[23:16]
+// byte2: id0[15: 8]
+// byte3: id0[ 7: 0]
+// byte4: decoder0[3:0] << 4 | type0[3:0]
+// byte5: ch0[7:0]
+// byte6: data_flags0[7:0]
+// byte7: rssi0[7:0]
+// ...
 
 // CMD_GET_SENSORS_INC
 // --------------------
