@@ -46,6 +46,7 @@
 // 20240531 Moved BLE specific code to PayloadBLE.h
 // 20240603 Added appStatus[]
 // 20240607 Added getAppStatusUplinkInterval()
+// 20240716 Added CMD_SCAN_SENSORS
 //
 // ToDo:
 // -
@@ -157,6 +158,10 @@ public:
     {
         // bleAddrInit();
         PayloadBresser::begin();
+        if (ws_scan_time) {
+            return;
+        }
+
         PayloadAnalog::begin();
         PayloadDigital::begin();
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
@@ -200,7 +205,7 @@ public:
      * \param port LoRaWAN port
      * \param encoder uplink encoder object
      */
-    void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
+    void getPayloadStage1(uint8_t &port, LoraEncoder &encoder);
 
     /*!
      * \brief Get payload before uplink
@@ -213,7 +218,7 @@ public:
      * \param port LoRaWAN port
      * \param encoder uplink encoder object
      */
-    void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
+    void getPayloadStage2(uint8_t &port, LoraEncoder &encoder);
 
     /*!
      * \brief Get configuration data for uplink

@@ -62,6 +62,7 @@
 // 20240606 Added CMD_GET_STATUS_INTERVAL/CMD_SET_STATUS_INTERVAL
 // 20240614 Added lightning statistics reset
 // 20240701 Fixed CMD_GET_BLE_ADDR (get default if Preferences are empty/zero)
+// 20240716 Added CMD_SCAN_SENSORS
 //
 // ToDo:
 // -
@@ -79,9 +80,18 @@ void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
     weatherSensor.genMessage(1, 0xfff1, SENSOR_TYPE_SOIL);
 }
 
-void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
 {
     (void)port; // eventually suppress warning regarding unused parameter
+
+    if (ws_scan_time)
+    {
+        log_i("Scan sensors");
+        scanBresser(ws_scan_time, encoder);
+        port = CMD_SCAN_SENSORS;
+        ws_scan_time = 0;
+        return;
+    }
 
     log_v("Port: %d", port);
 
@@ -121,7 +131,7 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     }
 }
 
-void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage2(uint8_t &port, LoraEncoder &encoder)
 {
     (void)port;
     (void)encoder;
@@ -146,6 +156,20 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
             lightningProc.reset();
         }
 #endif
+        return 0;
+    }
+
+    if ((port == CMD_SCAN_SENSORS) && (size == 1))
+    {
+        log_d("Scan sensors - time: %u s", payload[0]);
+        // 1. Set flag in Preferences to trigger sensor scan and set scan time
+        // 2. If flag is set, perform sensors scan instead of normal operation in 
+        //    PayloadBresser::begin(void)
+        // 3. Reset flag after scan
+        // 4. Uplink scan results instead of normal sensor data
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ws_scan_t", payload[0]);
+        appPrefs.end();
         return 0;
     }
 
