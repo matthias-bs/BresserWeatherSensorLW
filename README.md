@@ -382,6 +382,13 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <long_sleep>          | 0: regular sleep interval / 1: long sleep interval (depending on U_batt)    |
 | \<epoch\>             | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
 | <reset_flags>         | Raingauge reset flags; 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF" |
+| <ws_scantime>         | Bresser sensor scan time in seconds; 0...255 (only for CMD_SCAN_SENSORS)    |
+| \<idX\>               | Sensor ID                                                                   |
+| \<decoderX\>          | Matching payload decoder                                                    |
+| \<typeX\>             | Sensor type                                                                 |
+| \<chX\>               | Sensor channel                                                              |
+| <data_flagsX>         | Sensor data flags                                                           |
+| \<rssi\>              | Sensor radio signal RSSI in dBm (sign inverted)                             |
 | <rtc_source>          | Real time clock source; 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown) |
 | <sensors_incX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
 | <sensors_excX>        | Bresser sensor IDs include list; e.g. "0xDEADBEEF"; "0x00000000" => empty list => default values          |
@@ -438,16 +445,17 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_WS_TIMEOUT            | 0xC0 (192) | 0x00                                                                      | ws_timeout[7:0] |
 | CMD_SET_WS_TIMEOUT            | 0xC1 (193) | ws_timeout[7:0]                                                           | n.a.            |
 | CMD_RESET_RAINGAUGE           | 0xC3 (195) | flags[7:0]                                                                | n.a.            |
+| CMD_SCAN_SENSORS              | 0xC4 (196) | ws_scantime[7:0]                                                          | id0[31:24]<br>id0[23:16]<br>id0[15:8]<br>id0[7:0]<br>decoder0[3:0]<br>type0[3:0]<br>ch0[7:0]<br>data_flags0[7:0]<br>rssi0[7:0]<br>... | 
 | CMD_GET_SENSORS_INC           | 0xC6 (198) | 0x00                                                                      | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... |
-| CMD_SET_SENSORS_INC           | 0xC7 (199) | sensors_inc0[31:24]<br>sensors_inc0[23:15]<br>sensors_inc0[16:8]<br>sensors_inc0[7:0]<br>... | n.a. |
+| CMD_SET_SENSORS_INC           | 0xC7 (199) | sensors_inc0[31:24]<br>sensors_inc0[23:16]<br>sensors_inc0[15:8]<br>sensors_inc0[7:0]<br>... | n.a. |
 | CMD_GET_SENSORS_EXC           | 0xC8 (200) | 0x00                                                                      | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... |
-| CMD_SET_SENSORS_EXC           | 0xC9 (201) | sensors_exc0[31:24]<br>sensors_exc0[23:15]<br>sensors_exc0[16:8]<br>sensors_exc0[7:0]<br>... | n.a. |
+| CMD_SET_SENSORS_EXC           | 0xC9 (201) | sensors_exc0[31:24]<br>sensors_exc0[23:16]<br>sensors_exc0[15:8]<br>sensors_exc0[7:0]<br>... | n.a. |
 | CMD_GET_SENSORS_CFG           | 0xCA (202) | 0x00                                                                      | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0> |
 | CMD_SET_SENSORS_CFG           | 0xCB (203) | max_sensors[7:0]<br>rx_flags[7:0]<br>en_decoders<7:0>                     | n.a.             |
 | CMD_GET_BLE_CONFIG            | 0xD0 (208) | 0x00                                                                      | ble_active[7:0]<br>ble_scantime[7:0] |
 | CMD_SET_BLE_CONFIG            | 0xD1 (209) | ble_active[7:0]<br>ble_scantime[7:0]                                      | n.a.            |
-| CMD_GET_BLE_ADDR              | 0xD2 (210) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... |
-| CMD_SET_BLE_ADDR              | 0xD3 (211) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:15]<br>ble_addr0[16:8]<br>ble_addr0[7:0]<br>... | n.a. |
+| CMD_GET_BLE_ADDR              | 0xD2 (210) | 0x00                                                                      | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:16]<br>ble_addr0[15:8]<br>ble_addr0[7:0]<br>... |
+| CMD_SET_BLE_ADDR              | 0xD3 (211) | ble_addr0[47:40]<br>ble_addr0[39:32]<br>ble_addr0[31:24]<br>ble_addr0[23:16]<br>ble_addr0[15:8]<br>ble_addr0[7:0]<br>... | n.a. |
 
 
 #### The Things Network Examples
@@ -486,6 +494,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
 | CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
 | CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |
+| CMD_SCAN_SENSORS              | {"ws_scantime": <ws_scantime>}                                            | {"found_sensors": [{"id": \<id0\>, "decoder": \<decoder0\>, "type": \<type0\>, "ch": \<ch0\>, "data_flags": <data_flags0>, "rssi": \<rssi0\>}, ...]}
 | CMD_GET_SENSORS_INC           | {"cmd": "CMD_GET_SENSORS_INC"}                                            | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]} |
 | CMD_SET_SENSORS_INC           | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}                    | n.a.                         |
 | CMD_GET_SENSORS_EXC           | {"cmd": "CMD_GET_SENSORS_EXC"}                                            | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]} |
