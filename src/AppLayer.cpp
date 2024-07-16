@@ -84,12 +84,12 @@ void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
 {
     (void)port; // eventually suppress warning regarding unused parameter
 
-    if (ws_scan_time)
+    if (ws_scantime)
     {
         log_i("Scan sensors");
-        scanBresser(ws_scan_time, encoder);
+        scanBresser(ws_scantime, encoder);
         port = CMD_SCAN_SENSORS;
-        ws_scan_time = 0;
+        ws_scantime = 0;
         return;
     }
 
