@@ -136,12 +136,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a8ee82c577f2eb1100a91fa8259536f5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">genPayload</a> (uint8_t port, LoraEncoder &amp;encoder)</td></tr>
 <tr class="memdesc:a8ee82c577f2eb1100a91fa8259536f5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate payload (by emulation)  <a href="class_app_layer.html#a8ee82c577f2eb1100a91fa8259536f5a">More...</a><br /></td></tr>
 <tr class="separator:a8ee82c577f2eb1100a91fa8259536f5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a566d1495e400b1735e3a8976801b5793"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">getPayloadStage1</a> (uint8_t port, LoraEncoder &amp;encoder)</td></tr>
-<tr class="memdesc:a566d1495e400b1735e3a8976801b5793"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare / get payload at startup.  <a href="class_app_layer.html#a566d1495e400b1735e3a8976801b5793">More...</a><br /></td></tr>
-<tr class="separator:a566d1495e400b1735e3a8976801b5793"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac01081f86f6c9350e288c09a5f4b6d76"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">getPayloadStage2</a> (uint8_t port, LoraEncoder &amp;encoder)</td></tr>
-<tr class="memdesc:ac01081f86f6c9350e288c09a5f4b6d76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get payload before uplink.  <a href="class_app_layer.html#ac01081f86f6c9350e288c09a5f4b6d76">More...</a><br /></td></tr>
-<tr class="separator:ac01081f86f6c9350e288c09a5f4b6d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e3ae1a6f6220caa0592bdc728e6b8ab"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#a7e3ae1a6f6220caa0592bdc728e6b8ab">getPayloadStage1</a> (uint8_t &amp;port, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:a7e3ae1a6f6220caa0592bdc728e6b8ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare / get payload at startup.  <a href="class_app_layer.html#a7e3ae1a6f6220caa0592bdc728e6b8ab">More...</a><br /></td></tr>
+<tr class="separator:a7e3ae1a6f6220caa0592bdc728e6b8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9e642eef83ff296db1c40716b53f837"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#aa9e642eef83ff296db1c40716b53f837">getPayloadStage2</a> (uint8_t &amp;port, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:aa9e642eef83ff296db1c40716b53f837"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get payload before uplink.  <a href="class_app_layer.html#aa9e642eef83ff296db1c40716b53f837">More...</a><br /></td></tr>
+<tr class="separator:aa9e642eef83ff296db1c40716b53f837"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8cf493864669eda0382ab27e763e09f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">getConfigPayload</a> (uint8_t cmd, uint8_t &amp;port, LoraEncoder &amp;encoder)</td></tr>
 <tr class="memdesc:ad8cf493864669eda0382ab27e763e09f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get configuration data for uplink.  <a href="class_app_layer.html#ad8cf493864669eda0382ab27e763e09f">More...</a><br /></td></tr>
 <tr class="separator:ad8cf493864669eda0382ab27e763e09f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,6 +161,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">begin</a> (void)</td></tr>
 <tr class="memdesc:adb2aeefccdd9c9f759f7235a2a5c7dc1 inherit pub_methods_class_payload_bresser"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bresser sensors startup code. <br /></td></tr>
 <tr class="separator:adb2aeefccdd9c9f759f7235a2a5c7dc1 inherit pub_methods_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a134c066b8cf0363c761f27e072b4af8b inherit pub_methods_class_payload_bresser"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b">scanBresser</a> (uint8_t <a class="el" href="class_payload_bresser.html#a450c9313611e82b01486a2c1279a7fca">ws_scantime</a>, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:a134c066b8cf0363c761f27e072b4af8b inherit pub_methods_class_payload_bresser"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scan for Bresser sensors.  <a href="class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b">More...</a><br /></td></tr>
+<tr class="separator:a134c066b8cf0363c761f27e072b4af8b inherit pub_methods_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03643c8507eda1302c7f9026c65fbe15 inherit pub_methods_class_payload_bresser"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15">encodeBresser</a> (uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &amp;encoder)</td></tr>
 <tr class="memdesc:a03643c8507eda1302c7f9026c65fbe15 inherit pub_methods_class_payload_bresser"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode Bresser sensor data for LoRaWAN transmission.  <a href="class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15">More...</a><br /></td></tr>
 <tr class="separator:a03643c8507eda1302c7f9026c65fbe15 inherit pub_methods_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,6 +175,10 @@ Additional Inherited Members</h2></td></tr>
 WeatherSensor&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">weatherSensor</a></td></tr>
 <tr class="memdesc:a7262003f3dc4341ed826fdb64ba0ac5a inherit pub_attribs_class_payload_bresser"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bresser Weather Sensor Receiver. <br /></td></tr>
 <tr class="separator:a7262003f3dc4341ed826fdb64ba0ac5a inherit pub_attribs_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a450c9313611e82b01486a2c1279a7fca inherit pub_attribs_class_payload_bresser"><td class="memItemLeft" align="right" valign="top"><a id="a450c9313611e82b01486a2c1279a7fca"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a450c9313611e82b01486a2c1279a7fca">ws_scantime</a> = 0</td></tr>
+<tr class="memdesc:a450c9313611e82b01486a2c1279a7fca inherit pub_attribs_class_payload_bresser"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weather Sensor Scan Request. <br /></td></tr>
+<tr class="separator:a450c9313611e82b01486a2c1279a7fca inherit pub_attribs_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff25b493d5444fd70835ba29a827e863 inherit pub_attribs_class_payload_bresser"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>payloadSize</b> [16]</td></tr>
 <tr class="separator:aff25b493d5444fd70835ba29a827e863 inherit pub_attribs_class_payload_bresser"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a0726be7b5ac2b3f3f15ddb5ac1a994 inherit pub_attribs_class_payload_bresser"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><b>sensorTypes</b> [16]</td></tr>
@@ -450,8 +457,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="a566d1495e400b1735e3a8976801b5793"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a566d1495e400b1735e3a8976801b5793">&#9670;&nbsp;</a></span>getPayloadStage1()</h2>
+<a id="a7e3ae1a6f6220caa0592bdc728e6b8ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e3ae1a6f6220caa0592bdc728e6b8ab">&#9670;&nbsp;</a></span>getPayloadStage1()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -459,7 +466,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">void AppLayer::getPayloadStage1 </td>
           <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype">uint8_t &amp;&#160;</td>
           <td class="paramname"><em>port</em>, </td>
         </tr>
         <tr>
@@ -492,14 +499,15 @@ Here is the call graph for this function:</div>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="class_app_layer_a566d1495e400b1735e3a8976801b5793_cgraph.png" border="0" usemap="#aclass_app_layer_a566d1495e400b1735e3a8976801b5793_cgraph" alt=""/></div>
-<map name="aclass_app_layer_a566d1495e400b1735e3a8976801b5793_cgraph" id="aclass_app_layer_a566d1495e400b1735e3a8976801b5793_cgraph">
-<area shape="rect" title="Prepare / get payload at startup." alt="" coords="5,107,213,133"/>
+<div class="center"><img src="class_app_layer_a7e3ae1a6f6220caa0592bdc728e6b8ab_cgraph.png" border="0" usemap="#aclass_app_layer_a7e3ae1a6f6220caa0592bdc728e6b8ab_cgraph" alt=""/></div>
+<map name="aclass_app_layer_a7e3ae1a6f6220caa0592bdc728e6b8ab_cgraph" id="aclass_app_layer_a7e3ae1a6f6220caa0592bdc728e6b8ab_cgraph">
+<area shape="rect" title="Prepare / get payload at startup." alt="" coords="5,132,213,159"/>
 <area shape="rect" href="class_payload_analog.html#a9e04f0c62f92287539fd53c9c01d7701" title="Encode analog data channels for LoRaWAN transmission." alt="" coords="272,5,491,32"/>
 <area shape="rect" href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="293,56,469,83"/>
 <area shape="rect" href="class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="268,107,495,133"/>
 <area shape="rect" href="class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6" title="Encode digital data channels for LoRaWAN transmission." alt="" coords="274,157,489,184"/>
 <area shape="rect" href="class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6" title="Encode 1&#45;Wire temperature sensor values for LoRaWAN transmission." alt="" coords="261,208,501,235"/>
+<area shape="rect" href="class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b" title="Scan for Bresser sensors." alt="" coords="277,259,486,285"/>
 <area shape="rect" href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="549,5,763,32"/>
 <area shape="rect" href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="579,56,733,83"/>
 <area shape="rect" href="class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="573,107,739,133"/>
@@ -508,8 +516,8 @@ Here is the call graph for this function:</div>
 
 </div>
 </div>
-<a id="ac01081f86f6c9350e288c09a5f4b6d76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac01081f86f6c9350e288c09a5f4b6d76">&#9670;&nbsp;</a></span>getPayloadStage2()</h2>
+<a id="aa9e642eef83ff296db1c40716b53f837"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9e642eef83ff296db1c40716b53f837">&#9670;&nbsp;</a></span>getPayloadStage2()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +525,7 @@ Here is the call graph for this function:</div>
         <tr>
           <td class="memname">void AppLayer::getPayloadStage2 </td>
           <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramtype">uint8_t &amp;&#160;</td>
           <td class="paramname"><em>port</em>, </td>
         </tr>
         <tr>

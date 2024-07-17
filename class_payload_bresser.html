@@ -110,6 +110,9 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1">begin</a> (void)</td></tr>
 <tr class="memdesc:adb2aeefccdd9c9f759f7235a2a5c7dc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bresser sensors startup code. <br /></td></tr>
 <tr class="separator:adb2aeefccdd9c9f759f7235a2a5c7dc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a134c066b8cf0363c761f27e072b4af8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b">scanBresser</a> (uint8_t <a class="el" href="class_payload_bresser.html#a450c9313611e82b01486a2c1279a7fca">ws_scantime</a>, LoraEncoder &amp;encoder)</td></tr>
+<tr class="memdesc:a134c066b8cf0363c761f27e072b4af8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scan for Bresser sensors.  <a href="class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b">More...</a><br /></td></tr>
+<tr class="separator:a134c066b8cf0363c761f27e072b4af8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03643c8507eda1302c7f9026c65fbe15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15">encodeBresser</a> (uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &amp;encoder)</td></tr>
 <tr class="memdesc:a03643c8507eda1302c7f9026c65fbe15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode Bresser sensor data for LoRaWAN transmission.  <a href="class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15">More...</a><br /></td></tr>
 <tr class="separator:a03643c8507eda1302c7f9026c65fbe15"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,6 +123,10 @@ Public Attributes</h2></td></tr>
 WeatherSensor&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a">weatherSensor</a></td></tr>
 <tr class="memdesc:a7262003f3dc4341ed826fdb64ba0ac5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bresser Weather Sensor Receiver. <br /></td></tr>
 <tr class="separator:a7262003f3dc4341ed826fdb64ba0ac5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a450c9313611e82b01486a2c1279a7fca"><td class="memItemLeft" align="right" valign="top"><a id="a450c9313611e82b01486a2c1279a7fca"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_payload_bresser.html#a450c9313611e82b01486a2c1279a7fca">ws_scantime</a> = 0</td></tr>
+<tr class="memdesc:a450c9313611e82b01486a2c1279a7fca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Weather Sensor Scan Request. <br /></td></tr>
+<tr class="separator:a450c9313611e82b01486a2c1279a7fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff25b493d5444fd70835ba29a827e863"><td class="memItemLeft" align="right" valign="top">const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>payloadSize</b> [16]</td></tr>
 <tr class="separator:aff25b493d5444fd70835ba29a827e863"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a0726be7b5ac2b3f3f15ddb5ac1a994"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><b>sensorTypes</b> [16]</td></tr>
@@ -170,6 +177,43 @@ Lightning&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">appPayloadCfg</td><td>LoRaWAN payload configuration bitmaps </td></tr>
+    <tr><td class="paramname">encoder</td><td>LoRaWAN payload encoder object </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a134c066b8cf0363c761f27e072b4af8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a134c066b8cf0363c761f27e072b4af8b">&#9670;&nbsp;</a></span>scanBresser()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PayloadBresser::scanBresser </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>ws_scantime</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">LoraEncoder &amp;&#160;</td>
+          <td class="paramname"><em>encoder</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Scan for Bresser sensors. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ws_scantime</td><td>Scan time in seconds </td></tr>
     <tr><td class="paramname">encoder</td><td>LoRaWAN payload encoder object </td></tr>
   </table>
   </dd>
