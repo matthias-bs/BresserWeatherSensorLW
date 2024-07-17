@@ -44,6 +44,8 @@
 // 20240603 Added encoding of sensor battery status
 // 20240608 Modified default number of sensors
 // 20240609 Fixed exception caused by max_num_sensors = 0
+// 20240717 Fixed handling of rxFlags in begin(): getData()
+//          Added scanBresser(), modified begin() to trigger scan
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -54,10 +56,25 @@
 
 void PayloadBresser::begin(void)
 {
-    weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
+
+    appPrefs.begin("BWS-LW-APP", false);
+    ws_scantime = appPrefs.getUChar("ws_scan_t", 0);
+
+    // Clear scan time in Preferences set in previous run
+    // (additionally used as scan request flag)
+    appPrefs.putUChar("ws_scan_t", 0);
+    appPrefs.end();
+    if (ws_scantime > 0)
+    {
+        log_d("ws_scantime: %u s", ws_scantime);
+        weatherSensor.begin(PAYLOAD_SIZE / 8, false);
+        return;
+    }
+
     if (weatherSensor.sensor.size() == 0)
         return;
 
+    weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
     weatherSensor.clearSlots();
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
@@ -65,16 +82,69 @@ void PayloadBresser::begin(void)
     appPrefs.end();
 
     log_i("Waiting for Weather Sensor Data; timeout %u s", ws_timeout);
-    bool decode_ok = weatherSensor.getData(ws_timeout * 1000, DATA_ALL_SLOTS);
+    bool decode_ok = weatherSensor.getData(ws_timeout * 1000, weatherSensor.rxFlags);
     (void)decode_ok;
     log_i("Receiving Weather Sensor Data %s", decode_ok ? "o.k." : "failed");
+}
+
+void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
+{
+    weatherSensor.clearSlots();
+    
+    log_i("Scanning for 868 MHz sensors (max.: %u); timeout %u s", weatherSensor.sensor.size(), ws_scantime);
+    weatherSensor.getData(ws_scantime * 1000, DATA_ALL_SLOTS | DATA_COMPLETE);
+
+    for (size_t i = 0; i < weatherSensor.sensor.size(); i++)
+    {
+        if (!weatherSensor.sensor[i].valid)
+            continue;
+
+        // Convert decoder bitmap to decoder number
+        uint8_t decoder = 0;
+        for (int j = 0; j < 8; j++)
+        {
+            if ((weatherSensor.sensor[i].decoder >> j) & 0x1)
+            {
+                decoder = j;
+                break;
+            }
+        }
+        uint8_t flags = 0;
+        if ((weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER0) ||
+            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER1))
+        {
+            if (weatherSensor.sensor[i].w.temp_ok)
+                flags |= 0x1;
+            if (weatherSensor.sensor[i].w.humidity_ok)
+                flags |= 0x2;
+            if (weatherSensor.sensor[i].w.wind_ok)
+                flags |= 0x4;
+            if (weatherSensor.sensor[i].w.rain_ok)
+                flags |= 0x8;
+            if (weatherSensor.sensor[i].w.uv_ok)
+                flags |= 0x10;
+            if (weatherSensor.sensor[i].w.light_ok)
+                flags |= 0x20;
+        }
+
+        encoder.writeUint8(weatherSensor.sensor[i].sensor_id >> 24);
+        encoder.writeUint8((weatherSensor.sensor[i].sensor_id >> 16) & 0xFF);
+        encoder.writeUint8((weatherSensor.sensor[i].sensor_id >> 8) & 0xFF);
+        encoder.writeUint8(weatherSensor.sensor[i].sensor_id & 0xFF);
+        encoder.writeUint8((decoder << 4) | weatherSensor.sensor[i].s_type);
+        encoder.writeUint8(weatherSensor.sensor[i].chan);
+        encoder.writeUint8(flags);
+        encoder.writeUint8(static_cast<uint8_t>(-weatherSensor.sensor[i].rssi));
+    }
+
+    log_d("Size: %u", encoder.getLength());
 }
 
 void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
 {
     if (weatherSensor.sensor.size() == 0)
         return;
-    
+
     // Handle weather sensors - which only have one channel (0) - first.
     // Configuration for SENSOR_TYPE_WEATHER0 is integrated into SENSOR_TYPE_WEATHER1.
     uint8_t flags = appPayloadCfg[1];
@@ -127,7 +197,8 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         if (type == SENSOR_TYPE_LIGHTNING)
         {
             int idx = weatherSensor.findType(type, 0);
-            if ((idx > -1) && weatherSensor.sensor[idx].battery_ok) {
+            if ((idx > -1) && weatherSensor.sensor[idx].battery_ok)
+            {
                 appStatus[type] |= 1;
             }
 
@@ -165,9 +236,12 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
 
             log_i("%s Sensor Ch %u", sensorTypes[type], ch);
             int idx = weatherSensor.findType(type, ch);
-            if (idx == -1) {
+            if (idx == -1)
+            {
                 log_i("-- Failure");
-            } else if (weatherSensor.sensor[idx].battery_ok){
+            }
+            else if (weatherSensor.sensor[idx].battery_ok)
+            {
                 appStatus[type] |= (1 << ch);
             }
 
@@ -338,7 +412,8 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
             bool valid = false;
             float rainPasthour = rainGauge.pastHour(&valid);
             log_i("Rain past 60min:  %7.1f mm", rainPasthour);
-            if (!valid) {
+            if (!valid)
+            {
                 rainPasthour = INV_FLOAT;
             }
             encoder.writeRawFloat(rainPasthour);
@@ -347,21 +422,24 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
         {
             float rain = rainGauge.currentDay();
             log_i("Rain curr. day:   %7.1f mm", rain);
-            if (rain == -1) {
+            if (rain == -1)
+            {
                 rain = INV_FLOAT;
             }
             encoder.writeRawFloat(rain);
 
             rain = rainGauge.currentWeek();
             log_i("Rain curr. week:  %7.1f mm", rain);
-            if (rain == -1) {
+            if (rain == -1)
+            {
                 rain = INV_FLOAT;
             }
             encoder.writeRawFloat(rain);
 
             rain = rainGauge.currentMonth();
             log_i("Rain curr. month: %7.1f mm", rain);
-            if (rain == -1) {
+            if (rain == -1)
+            {
                 rain = INV_FLOAT;
             }
             encoder.writeRawFloat(rain);

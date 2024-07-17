@@ -40,6 +40,7 @@
 // 20240528 Moved encoding of invalid values to BresserWeatherSensorLWCmd.h
 // 20240530 Added missing entries in sensorTypes[]
 // 20240603 encodeBresser(): added appStatus parameter
+// 20240716 Added ws_scantime and scanBresser()
 //
 // ToDo:
 // -
@@ -70,6 +71,9 @@ class PayloadBresser
 public:
     /// Bresser Weather Sensor Receiver
     WeatherSensor weatherSensor;
+
+    /// Weather Sensor Scan Request
+    uint8_t ws_scantime = 0;
 
     // Payload size in bytes
     const uint8_t payloadSize[16] = {
@@ -151,6 +155,14 @@ public:
      * \brief Bresser sensors startup code
      */
     void begin(void);
+
+    /*!
+     * \brief Scan for Bresser sensors
+     *
+     * \param ws_scantime Scan time in seconds
+     * \param encoder LoRaWAN payload encoder object
+     */
+    void scanBresser(uint8_t ws_scantime, LoraEncoder &encoder);
 
     /*!
      * \brief Encode Bresser sensor data for LoRaWAN transmission

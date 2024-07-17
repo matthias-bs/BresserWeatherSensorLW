@@ -28,7 +28,7 @@
 // RadioLib                             6.6.0
 // LoRa_Serialization                   3.2.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.28.2
+// BresserWeatherSensorReceiver         0.28.9
 // OneWireNg                            0.13.1 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.1 (optional)
@@ -91,6 +91,7 @@
 // 20240606 Changed appStatusUplinkInterval from const to variable
 // 20240608 Added LoRaWAN device status uplink
 // 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
+// 20240716 Modified port to allow modifications by appLayer.getPayloadStage<1|2>()
 //
 // ToDo:
 // -
@@ -861,7 +862,8 @@ void setup()
 
   LoraEncoder encoder(uplinkPayload);
 
-  appLayer.getPayloadStage1(1, encoder);
+  uint8_t port = 1;
+  appLayer.getPayloadStage1(port, encoder);
 
   int16_t state = 0; // return value for calls to RadioLib
 
@@ -926,13 +928,9 @@ void setup()
     appStatusUplinkPending = true;
   }
 
-  // ----- and now for the main event -----
-  log_i("Sending uplink");
-
   // get payload immediately before uplink - not used here
-  appLayer.getPayloadStage2(1, encoder);
+  appLayer.getPayloadStage2(port, encoder);
 
-  uint8_t port = 1;
   uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
   size_t downlinkSize;                        // To hold the actual payload size rec'd
   LoRaWANEvent_t uplinkDetails;
@@ -944,6 +942,9 @@ void setup()
     log_w("Payload size exceeds maximum of %u bytes - truncating", PAYLOAD_SIZE);
     payloadSize = PAYLOAD_SIZE;
   }
+
+  // ----- and now for the main event -----
+  log_i("Sending uplink; port %u, size %u", port, payloadSize);
 
   // perform an uplink & optionally receive downlink
   if (fCntUp % 64 == 0)
