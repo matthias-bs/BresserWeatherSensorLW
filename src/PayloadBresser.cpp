@@ -46,6 +46,7 @@
 // 20240609 Fixed exception caused by max_num_sensors = 0
 // 20240717 Fixed handling of rxFlags in begin(): getData()
 //          Added scanBresser(), modified begin() to trigger scan
+// 20240718 Fixed premature return from begin() leading to empty payload
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -71,10 +72,11 @@ void PayloadBresser::begin(void)
         return;
     }
 
+    weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
+
     if (weatherSensor.sensor.size() == 0)
         return;
-
-    weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
+    
     weatherSensor.clearSlots();
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
