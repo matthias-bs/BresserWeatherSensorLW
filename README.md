@@ -69,6 +69,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [Parameters](#parameters)
   * [Using Raw Data](#using-raw-data)
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
+* [Scanning for Sensors](#scanning-for-sensors)
 * [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
 * [Payload Configuration](#payload-configuration)
   * [Default Configuration](#default-configuration)
@@ -478,6 +479,9 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 ### Using the Javascript Uplink/Downlink Formatters
 
+> [!NOTE]
+> The command (`"cmd": ...`) may be omitted if it can be derived from the given parameters.
+
 | Command                       | Downlink                                                                  | Uplink                       |
 | ----------------------------- | ------------------------------------------------------------------------- | ---------------------------- |
 | CMD_GET_DATETIME              | {"cmd": "CMD_GET_DATETIME"}                                               | {"epoch": \<epoch\>}         |
@@ -520,6 +524,84 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 1. Get epoch (e.g. from https://www.epochconverter.com) (Example: 1692729833); add an offset (estimated) for time until received (Example: + 64 seconds => 16927298**97**) 
 2. Build payload as JSON string: {"epoch": 1692729897} 
 3. Send downlink via The Things Network Console
+
+## Scanning for Sensors
+
+The command `CMD_SCAN_SENSORS` allows to gather information about all sensors within range. 
+
+The differences between regular sensor reception and `CMD_SCAN_SENSORS` are:
+* Scanning will run for `<ws_scantime>` seconds (as opposed to `ws_timeout`)
+* `rx_flags` is set to `DATA_ALL_SLOTS | DATA_COMPLETE` implicitly, i.e. 
+   * As many sensors as possible will be received and
+   * For weather sensors using the 6-in-1 protocol, both message types have to be received
+
+   before scanning is finished. (Scanning is also stopped when `<ws_scantime>` has expired.)
+* The sensor ID filters (include/exclude list) are disabled
+* Different information is provided in the uplink message
+
+The number of sensors which can be reported is limited by the LoRaWAN uplink payload size, e.g. with a limit of 51 bytes, a maximum of 6 sensors can be reported. Scanning can be repeated to get another sample (due to a more or less random relation between sensor's start of transmission and start of scan process).
+
+Example uplink (response to `{"ws_scantime": 180}`):
+```json
+"found_sensors": [
+            {
+              "ch": 0,
+              "decoder": "6-in-1",
+              "flags": "0x0c",
+              "id": "0x792882a2",
+              "rssi": -100,
+              "type": "Weather Sensor"
+            },
+            {
+              "ch": 1,
+              "decoder": "6-in-1",
+              "flags": "0x00",
+              "id": "0x22400873",
+              "rssi": -52,
+              "type": "Pool / Spa Thermometer"
+            },
+            {
+              "ch": 0,
+              "decoder": "6-in-1",
+              "flags": "0x1f",
+              "id": "0x39582376",
+              "rssi": -78,
+              "type": "Weather Sensor"
+            },
+            {
+              "ch": 0,
+              "decoder": "Lightning",
+              "flags": "0x00",
+              "id": "0x0000eefb",
+              "rssi": -107,
+              "type": "Lightning Sensor"
+            },
+            {
+              "ch": 1,
+              "decoder": "6-in-1",
+              "flags": "0x00",
+              "id": "0x67566300",
+              "rssi": -96,
+              "type": "Soil Temperature and Moisture Sensor"
+            },
+            {
+              "ch": 3,
+              "decoder": "Leakage",
+              "flags": "0x00",
+              "id": "0x28966796",
+              "rssi": -106,
+              "type": "Water Leakage Sensor"
+            }
+          ]
+```
+
+This allows the following actions:
+* `rssi`: Improvement of reception
+* `type` & `ch`: Identification of sensors
+* `type`, `ch`, `flags`: Payload configuration (`CMD_SET_APP_PAYLOAD_CFG`)
+* `id`: Configuration of reception filters (include or exclude list; `CMD_SET_SENSORS_INC`/`CMD_SET_SENSORS_EXC`)
+* `decoder`: Optimization of execution time by disabling unused decoders (`CMD_SET_SENSORS_CFG`)
+* No. of available sensors: Optimization of execution time by adjusting `max_sensors` (`CMD_SET_SENSORS_CFG`)
 
 ## Loading LoRaWAN Network Service Credentials from File
 
