@@ -47,6 +47,7 @@
 // 20240717 Fixed handling of rxFlags in begin(): getData()
 //          Added scanBresser(), modified begin() to trigger scan
 // 20240718 Fixed premature return from begin() leading to empty payload
+// 20240719 Fixed enabling of all decoders in scanBresser()
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -93,6 +94,12 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
 {
     weatherSensor.clearSlots();
     
+    // Save enabled decoders
+    uint8_t enabled_decoders = weatherSensor.enDecoders;
+
+    // Enable all decoders
+    weatherSensor.enDecoders = 0xFF;
+
     log_i("Scanning for 868 MHz sensors (max.: %u); timeout %u s", weatherSensor.sensor.size(), ws_scantime);
     weatherSensor.getData(ws_scantime * 1000, DATA_ALL_SLOTS | DATA_COMPLETE);
 
@@ -140,6 +147,9 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
     }
 
     log_d("Size: %u", encoder.getLength());
+
+    // Restore enabled decoders
+    weatherSensor.enDecoders = enabled_decoders;
 }
 
 void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
