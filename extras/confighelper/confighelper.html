@@ -48,6 +48,7 @@
 // 20240607 Added maximum payload size input, info and modified check for size limit
 // 20240610 Changed Weather Sensor configuration according to modification 
 //          of PayloadBresser (assign to configArray[1])
+// 20240721 Added tooltips and visual feedback for empty input fields
 //
 // ToDo:
 // -
@@ -167,6 +168,7 @@
                 var input = document.createElement('input');
                 input.type = "text";
                 input.id = "inputChannel" + i;
+                input.title="Specify comma-separated list of channel numbers to enable." 
                 input.name = "inputChannel" + i;
 
                 labelColumn.appendChild(label);
@@ -185,24 +187,142 @@
                 document.getElementById('checkboxContainer').style.display = this.checked ? 'inline' : 'none';
             });
 
+
+            //const checkboxes = document.querySelectorAll('.checkboxContainer input[type="checkbox"]');
+            //const inputChannels = document.querySelectorAll('.inputChannelContainer input[type="text"]');
+            //checkboxes.forEach(checkbox, index) => {
+            for (var i = 2; i <= 11; i++) {
+                if (i == 9)
+                    continue;
+                // Add event listener to "Multichannel Sensors" checkbox
+                let checkbox = document.getElementById('checkbox' + i);
+                let inputChannels = document.getElementById('inputChannel' + i);
+                checkbox.addEventListener('change', function () {
+                    // Check if the checkbox is checked and the corresponding input is empty
+                    if (checkbox.checked && inputChannels.value.trim() === '') {
+                        // Set the boxShadow style if the input is empty and the checkbox is checked
+                        //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                        inputChannels.style.backgroundColor = 'LightCoral';
+
+                    } else {
+                        // Remove the boxShadow style otherwise
+                        //inputChannels.style.boxShadow = '';
+                        inputChannels.style.backgroundColor = '';
+                    }
+                });
+                inputChannels.addEventListener('input', function () {
+                    // Check if the input is not empty
+                    if (checkbox.checked && inputChannels.value.trim() === '') {
+                        // Set the boxShadow style if the input is empty and the checkbox is checked
+                        //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                        inputChannels.style.backgroundColor = 'LightCoral';
+                    } else {
+                        // Remove the boxShadow style if the input is not empty
+                        //inputChannels.style.boxShadow = '';
+                        inputChannels.style.backgroundColor = '';
+                    }
+                });
+            }
+
             // Add event listener to "1-Wire Sensors" checkbox
             document.getElementById('onewire').addEventListener('change', function () {
-                document.getElementById('onewireInput').style.display = this.checked ? 'inline' : 'none';
+                let onewireInput = document.getElementById('onewireInput');
+                onewireInput.style.display = this.checked ? 'inline' : 'none';
+                // Check if the checkbox is checked and the corresponding input is empty
+                if (document.getElementById('onewire').checked && onewireInput.value.trim() === '') {
+                    // Set the boxShadow style if the input is empty and the checkbox is checked
+                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                    onewireInput.style.backgroundColor = 'LightCoral';
+
+                } else {
+                    // Remove the boxShadow style otherwise
+                    //inputChannels.style.boxShadow = '';
+                    onewireInput.style.backgroundColor = '';
+                }
+            });
+
+            // Add event listener to "1-Wire Sensors" channel input field
+            document.getElementById('onewireInput').addEventListener('change', function () {
+        
+                // Check if the input is not empty
+                if (document.getElementById('onewire').checked && this.value.trim() === '') {
+                    // Set the boxShadow style if the input is empty and the checkbox is checked
+                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                    this.style.backgroundColor = 'LightCoral';
+                } else {
+                    // Remove the boxShadow style if the input is not empty
+                    //inputChannels.style.boxShadow = '';
+                    this.style.backgroundColor = '';
+                }
             });
 
             // Add event listener to "Analog Sensors" checkbox
             document.getElementById('analog').addEventListener('change', function () {
-                document.getElementById('analogInput').style.display = this.checked ? 'inline' : 'none';
+                let analogInput = document.getElementById('analogInput');
+                analogInput.style.display = this.checked ? 'inline' : 'none';
+                // Check if the checkbox is checked and the corresponding input is empty
+                if (document.getElementById('analog').checked && analogInput.value.trim() === '') {
+                    // Set the boxShadow style if the input is empty and the checkbox is checked
+                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                    analogInput.style.backgroundColor = 'LightCoral';
+
+                } else {
+                    // Remove the boxShadow style otherwise
+                    //inputChannels.style.boxShadow = '';
+                    analogInput.style.backgroundColor = '';
+                }
+            });
+
+            // Add event listener to "Analog Sensors" channel input field
+            document.getElementById('analogInput').addEventListener('change', function () {
+                // Check if the input is not empty
+                if (document.getElementById('analog').checked && this.value.trim() === '') {
+                    // Set the boxShadow style if the input is empty and the checkbox is checked
+                    this.style.backgroundColor = 'LightCoral';
+                } else {
+                    // Remove the boxShadow style if the input is not empty
+                    this.style.backgroundColor = '';
+                }
             });
 
             // Add event listener to "Digital Sensors" checkbox
             document.getElementById('digital').addEventListener('change', function () {
-                document.getElementById('digitalInput').style.display = this.checked ? 'inline' : 'none';
+                digitalInput = document.getElementById('digitalInput');
+                digitalInput.style.display = this.checked ? 'inline' : 'none';
+                if (document.getElementById('digital').checked && digitalInput.value.trim() === '') {
+                    digitalInput.style.backgroundColor = 'LightCoral';
+                } else {
+                    digitalInput.style.backgroundColor = '';
+                } 
+            });
+
+            // Add event listener to "Digital Sensors" channel input field
+            document.getElementById('digitalInput').addEventListener('change', function () {
+                if (document.getElementById('digital').checked && this.value.trim() === '') {
+                    this.style.backgroundColor = 'LightCoral';
+                } else {
+                    this.style.backgroundColor = '';
+                }
             });
 
             // Add event listener to "BLE Sensors" checkbox
             document.getElementById('ble').addEventListener('change', function () {
-                document.getElementById('bleInput').style.display = this.checked ? 'inline' : 'none';
+                bleInput = document.getElementById('bleInput');
+                bleInput.style.display = this.checked ? 'inline' : 'none';
+                if (document.getElementById('ble').checked && bleInput.value.trim() === '') {
+                    bleInput.style.backgroundColor = 'LightCoral';
+                } else {
+                    bleInput.style.backgroundColor = '';
+                }
+            });
+
+            // Add event listener to "BLE Sensors" number input field
+            document.getElementById('bleInput').addEventListener('change', function () {
+                if (document.getElementById('ble').checked && this.value.trim() === '') {
+                    this.style.backgroundColor = 'LightCoral';
+                } else {
+                    this.style.backgroundColor = '';
+                }
             });
 
             // Initialize the maximum size field
@@ -511,7 +631,8 @@
             <li>If weather/lightning sensor is enabled, select options via checkboxes.</li>
             <li>For other sensors, enter channel numbers separated by commas into text fields.</li>
             <li>Check if assumptions regarding data field sizes are valid.</li>
-            <li>BLE sensors are enabled separately by specifying their MAC addresses.</li>
+            <li>Note: BLE sensors are enabled separately by specifying their MAC addresses.</li>
+            <li>Press 'Submit' button.</li>
         </ul>
     </div>
     <br><br>
@@ -546,19 +667,19 @@
 
         <label for="onewire">1-Wire Sensors:</label>
         <input type="checkbox" id="onewire" name="onewire">
-        <input type="text" id="onewireInput" name="onewireInput" style="display: none;"><br><br>
+        <input type="text" id="onewireInput" title="Specify comma-separated list of sensor indices to enable." name="onewireInput" style="display: none;"><br><br>
 
         <label for="analog">Analog Interfaces:</label>
         <input type="checkbox" id="analog" name="analog">
-        <input type="text" id="analogInput" name="analogInput" style="display: none;"><br><br>
+        <input type="text" id="analogInput" title="Specify comma-separated list of channel numbers to enable." name="analogInput" style="display: none;"><br><br>
 
         <label for="digital">Digital Interfaces:</label>
         <input type="checkbox" id="digital" name="digital">
-        <input type="text" id="digitalInput" name="digitalInput" style="display: none;"><br><br>
+        <input type="text" id="digitalInput" title="Specify comma-separated list of channel numbers to enable." name="digitalInput" style="display: none;"><br><br>
 
         <label for="ble">BLE Sensors:</label>
         <input type="checkbox" id="ble" name="ble">
-        <input type="number" id="bleInput" name="bleInput" style="display: none; width: 40px;"><br><br>
+        <input type="number" id="bleInput" title="Specify number of BLE sensors to enable." name="bleInput" style="display: none; width: 40px;" min="0" max="16"><br><br>
 
         <hr style="width:800px;text-align:left;margin-left:0"><br>
 
