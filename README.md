@@ -379,6 +379,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | <ws_timeout>          | Weather sensor receive timeout in seconds; 0...255                          |
 | <sleep_interval>      | Sleep interval (regular) in seconds; 0...65535                              |
 | <sleep_interval_long> | Sleep interval (energy saving mode) in seconds; 0...65535                   |
+| <lw_status_interval>  | LoRaWAN node status message uplink interval in no. of uplink frames; 0...255; 0: disabled |
 | <ubatt_mv>            | Battery voltage in mV                                                       |
 | <long_sleep>          | 0: regular sleep interval / 1: long sleep interval (depending on U_batt)    |
 | \<epoch\>             | Unix epoch time, see https://www.epochconverter.com/ ( \<integer\> / "0x....") |
@@ -404,7 +405,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | \<analog\>            | Bitmap for enabling analog input channels; each bit position corresponds to a channel |
 | \<digital\>           | Bitmap for enabling digital input channels in a broader sense &mdash; GPIO, SPI, I2C, UART, ... |
 | <typeN_st>            | Bitmap for Bresser sensor type \<N\> battery status; each bit position corresponds to a channel |
-| <status_interval>     | Sensor status message uplink interval in no. of uplink frames; 0...255; 0: disabled | 
+| <app_status_interval> | App Layer (sensor status) message uplink interval in no. of uplink frames; 0...255; 0: disabled |
 | <onewire_st>          | Bitmap for 1-Wire sensor status; each bit position corresponds to an index |
 | <analog_st>           | Bitmap for analog input status; each bit position corresponds to a channel |
 | <digital_st>          | Bitmap for digital input channel status |
@@ -436,10 +437,11 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_DATETIME              | 0x21  (33) | epoch[31:24]<br>epoch[23:16]<br>epoch[15:8]<br>epoch[7:0]                 | n.a.           |
 | CMD_SET_SLEEP_INTERVAL        | 0x31  (49) | sleep_interval[15:8]<br>sleep_interval[7:0]                               | n.a.           |
 | CMD_SET_SLEEP_INTERVAL_LONG   | 0x33  (51) | sleep_interval_long[15:8]<br>sleep_interval_long[7:0]                     | n.a.           |
+| CMD_SET_LW_STATUS_INTERVAL    | 0x35  (53) | lw_status_interval[7:0]                                                   | n.a.           |
 | CMD_GET_LW_CONFIG             | 0x36  (54) | 0x00                                                                      | sleep_interval[15:8]<br>sleep_interval[7:0]<br>sleep_interval_long[15:8]<br>sleep_interval_long[7:0] |
-| CMD_GET_LW_STATUS             | 0x38 (56) | 0x00                                                                      | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
-| CMD_GET_STATUS_INTERVAL       | 0x40  (64) | 0x00                                                                      | status_interval[7:0] |
-| CMD_SET_STATUS_INTERVAL       | 0x41  (65) | status_interval[7:0]                                                      | n.a.            |
+| CMD_GET_LW_STATUS             | 0x38 (56) | 0x00                                                                       | ubatt_mv[15:8]<br>ubatt_mv[7:0]<br>long_sleep[7:0] |
+| CMD_GET_APP_STATUS_INTERVAL   | 0x40  (64) | 0x00                                                                      | app_status_interval[7:0] |
+| CMD_SET_APP_STATUS_INTERVAL   | 0x41  (65) | app_status_interval[7:0]                                                  | n.a.            |
 | CMD_GET_SENSORS_STAT          | 0x42  (66) | 0x00                                                                      | type00_st[7:0]<br>type01_st[7:0]<br>...<br>type15_st[7:0]<br>onewire_st[15:8]<br>onewire_st[7:0]<br>analog_st[15:8]<br>analog_st[7:0]<br>digital_st[31:24]<br>digital_st[23:16]<br>digital_st[15:8]<br>digital_st[7:0]<br>ble_st[15:8]<br>ble_st[7:0] |
 | CMD_GET_APP_PAYLOAD_CFG       | 0x46  (70) | 0x00                                                                      | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] |
 | CMD_SET_APP_PAYLOAD_CFG       | 0x47  (71) | type00[7:0]<br>type01[7:0]<br>...<br>type15[7:0]<br>onewire[15:8]<br>onewire[7:0]<br>analog[15:8]<br>analog[7:0]<br>digital[31:24]<br>digital[23:16]<br>digital[15:8]<br>digital[7:0] | n.a. |
@@ -488,10 +490,11 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_SET_DATETIME              | {"epoch": \<epoch\>}                                                      | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL        | {"sleep_interval": <sleep_interval>}                                      | n.a.                         |
 | CMD_SET_SLEEP_INTERVAL_LONG   | {"sleep_interval_long": <sleep_interval_long>}                            | n.a.                         |
-| CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_longC>} |
+| CMD_SET_LW_STATUS_INTERVAL    | {"lw_status_interval": <lw_status_interval>}                              | n.a.                         |
+| CMD_GET_LW_CONFIG             | {"cmd": "CMD_GET_LW_CONFIG"}                                              | {"sleep_interval": <sleep_interval>, "sleep_interval_long": <sleep_interval_long>, "lw_status_interval": <lw_status_interval>} |
 | CMD_GET_LW_STATUS             | {"cmd": "CMD_GET_LW_STATUS"}                                              | {"ubatt_mv": <ubatt_mv>, "long_sleep": <long_sleep>} |
-| CMD_GET_STATUS_INTERVAL       | {"cmd": "CMD_GET_STATUS_INTERVAL"}                                        | {"status_interval": <status_interval>} |
-| CMD_SET_STATUS_INTERVAL       | {"status_interval": <status_interval>}                                    | n.a.                         |
+| CMD_GET_APP_STATUS_INTERVAL   | {"cmd": "CMD_GET_APP_STATUS_INTERVAL"}                                    | {"app_status_interval": <app_status_interval>} |
+| CMD_SET_APP_STATUS_INTERVAL   | {"app_status_interval": <app_status_interval>}                            | n.a.                         |
 | CMD_GET_SENSORS_STAT          | {"cmd": "CMD_GET_SENSORS_STAT"}                                           | "sensor_status": {"ble": <ble_stat>, "bresser": [<bresser0_st>, ..., <bresser15_st>]} |
 | CMD_GET_APP_PAYLOAD_CFG       | {"cmd": "CMD_GET_APP_PAYLOAD_CFG"}                                        | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} |
 | CMD_SET_APP_PAYLOAD_CFG       | {"bresser": [\<type0\>, \<type1\>, ..., \<type15\>], "onewire": \<onewire\>, "analog": \<analog\>, "digital": \<digital\>} | n.a. |
