@@ -47,6 +47,7 @@
 // 20240603 Added appStatus[]
 // 20240607 Added getAppStatusUplinkInterval()
 // 20240716 Added CMD_SCAN_SENSORS
+// 20240722 Renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
 //
 // ToDo:
 // -
@@ -243,7 +244,7 @@ public:
     uint8_t getAppStatusUplinkInterval(void)
     {
         appPrefs.begin("BWS-LW-APP", false);
-        uint8_t status_interval = appPrefs.getUChar("stat_interval", STATUS_INTERVAL);
+        uint8_t status_interval = appPrefs.getUChar("app_stat_interval", APP_STATUS_INTERVAL);
         appPrefs.end();
         return status_interval;
     };
