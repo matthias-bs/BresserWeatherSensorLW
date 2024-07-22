@@ -609,7 +609,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     prefs.lw_stat_interval = payload[0];
     log_d("Set LoRaWAN node status uplink interval: %u s", prefs.lw_stat_interval);
     preferences.begin("BWS-LW", false);
-    preferences.putUChar("lw_stat_interval", payload[0]);
+    preferences.putUChar("lw_stat_interval", prefs.lw_stat_interval);
     preferences.end();
 
     return 0;
