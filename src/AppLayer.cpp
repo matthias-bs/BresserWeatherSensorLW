@@ -63,6 +63,7 @@
 // 20240614 Added lightning statistics reset
 // 20240701 Fixed CMD_GET_BLE_ADDR (get default if Preferences are empty/zero)
 // 20240716 Added CMD_SCAN_SENSORS
+// 20240722 Renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
 //
 // ToDo:
 // -
@@ -188,17 +189,17 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
         return 0;
     }
 
-    if ((port == CMD_GET_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
+    if ((port == CMD_GET_APP_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get status_interval");
-        return CMD_GET_STATUS_INTERVAL;
+        log_d("Get App status_interval");
+        return CMD_GET_APP_STATUS_INTERVAL;
     }
 
-    if ((port == CMD_SET_STATUS_INTERVAL) && (size == 1))
+    if ((port == CMD_SET_APP_STATUS_INTERVAL) && (size == 1))
     {
-        log_d("Set status_interval: %u frames", payload[0]);
+        log_d("Set App status_interval: %u frames", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
-        appPrefs.putUChar("stat_interval", payload[0]);
+        appPrefs.putUChar("app_stat_interval", payload[0]);
         appPrefs.end();
         return 0;
     }
@@ -354,10 +355,10 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         port = CMD_GET_BLE_CONFIG;
     }
 #endif
-    else if (cmd == CMD_GET_STATUS_INTERVAL)
+    else if (cmd == CMD_GET_APP_STATUS_INTERVAL)
     {
         encoder.writeUint8(getAppStatusUplinkInterval());
-        port = CMD_GET_STATUS_INTERVAL;
+        port = CMD_GET_APP_STATUS_INTERVAL;
     }
     else if (cmd == CMD_GET_SENSORS_STAT)
     {
