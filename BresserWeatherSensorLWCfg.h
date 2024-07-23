@@ -466,4 +466,23 @@ const uint8_t UBATT_SAMPLES = 10;
 #define INV_UINT8 0xFF
 #define INV_TEMP 327.67
 
+// Time source & status, see below
+//
+// bits 0..3 time source
+//    0x00 = GPS
+//    0x01 = RTC
+//    0x02 = LORA
+//    0x03 = unsynched
+//    0x04 = set (source unknown)
+//
+// bits 4..7 esp32 sntp time status (not used)
+enum class E_TIME_SOURCE : uint8_t
+{
+  E_GPS = 0x00,
+  E_RTC = 0x01,
+  E_LORA = 0x02,
+  E_UNSYNCHED = 0x04,
+  E_SET = 0x08
+};
+
 #endif // _LWCFG_H

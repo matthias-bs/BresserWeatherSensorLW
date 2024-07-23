@@ -93,6 +93,7 @@
 // 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
 // 20240716 Modified port to allow modifications by appLayer.getPayloadStage<1|2>()
 // 20240723 Moved loadSecrets() to LoadSecrets.cpp/.h
+//          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
 //
 // ToDo:
 // -
@@ -134,12 +135,13 @@
 static Preferences store;
 
 /// Preferences (stored in flash memory)
-static Preferences preferences;
+Preferences preferences;
 
 struct sPrefs
 {
   uint16_t sleep_interval;      //!< preferences: sleep interval
   uint16_t sleep_interval_long; //!< preferences: sleep interval long
+  uint8_t lw_stat_interval;     //!< preferences: LoRaWAN node status uplink interval
 } prefs;
 
 // Logging macros for RP2040
@@ -175,24 +177,6 @@ using namespace PowerFeather;
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
 
-// Time source & status, see below
-//
-// bits 0..3 time source
-//    0x00 = GPS
-//    0x01 = RTC
-//    0x02 = LORA
-//    0x03 = unsynched
-//    0x04 = set (source unknown)
-//
-// bits 4..7 esp32 sntp time status (not used)
-enum class E_TIME_SOURCE : uint8_t
-{
-  E_GPS = 0x00,
-  E_RTC = 0x01,
-  E_LORA = 0x02,
-  E_UNSYNCHED = 0x04,
-  E_SET = 0x08
-};
 
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
@@ -375,147 +359,6 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
-
-/*!
- * \brief Decode downlink
- *
- * \param port      downlink message port
- * \param payload   downlink message payload
- * \param size      downlink message size in bytes
- *
- * \returns command ID, if downlink message requests a response, otherwise 0
- */
-uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
-{
-  log_v("Port: %d", port);
-
-  if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get date/time");
-    return CMD_GET_DATETIME;
-  }
-
-  if ((port == CMD_SET_DATETIME) && (size == 4))
-  {
-    time_t set_time = (payload[0] << 24) | (payload[1] << 16) | (payload[2] << 8) | payload[3];
-    rtc.setTime(set_time);
-    rtcLastClockSync = rtc.getLocalEpoch();
-    rtcTimeSource = E_TIME_SOURCE::E_SET;
-
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-    char tbuf[25];
-    struct tm timeinfo;
-
-    localtime_r(&set_time, &timeinfo);
-    strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-    log_d("Set date/time: %s", tbuf);
-#endif
-    return 0;
-  }
-
-  if ((port == CMD_SET_SLEEP_INTERVAL) && (size == 2))
-  {
-    prefs.sleep_interval = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int", prefs.sleep_interval);
-    preferences.end();
-    return 0;
-  }
-
-  if ((port == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 2))
-  {
-    prefs.sleep_interval_long = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
-    preferences.end();
-    return 0;
-  }
-
-  if ((port == CMD_GET_LW_CONFIG) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get config");
-    return CMD_GET_LW_CONFIG;
-  }
-
-  if ((port == CMD_GET_LW_STATUS) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get device status");
-    return CMD_GET_LW_STATUS;
-  }
-
-  log_d("appLayer.decodeDownlink(port=%d, payload[0]=0x%02X, size=%d)", port, payload[0], size);
-  return appLayer.decodeDownlink(port, payload, size);
-}
-
-
-/*!
- * \brief Send configuration uplink
- *
- * \param uplinkRequest command ID of uplink request
- */
-void sendCfgUplink(uint8_t uplinkReq)
-{
-  log_d("--- Uplink Configuration/Status ---");
-
-  uint8_t uplinkPayload[48];
-  uint8_t port = uplinkReq;
-
-  //
-  // Encode data as byte array for LoRaWAN transmission
-  //
-  LoraEncoder encoder(uplinkPayload);
-
-  if (uplinkReq == CMD_GET_DATETIME)
-  {
-    log_d("Date/Time");
-    time_t t_now = rtc.getLocalEpoch();
-    encoder.writeUint8((t_now >> 24) & 0xff);
-    encoder.writeUint8((t_now >> 16) & 0xff);
-    encoder.writeUint8((t_now >> 8) & 0xff);
-    encoder.writeUint8(t_now & 0xff);
-
-    encoder.writeUint8(static_cast<uint8_t>(rtcTimeSource));
-  }
-  else if (uplinkReq == CMD_GET_LW_CONFIG)
-  {
-    log_d("LoRaWAN Config");
-    encoder.writeUint8(prefs.sleep_interval >> 8);
-    encoder.writeUint8(prefs.sleep_interval & 0xFF);
-    encoder.writeUint8(prefs.sleep_interval_long >> 8);
-    encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
-  }
-  else if (uplinkReq == CMD_GET_LW_STATUS)
-  {
-    uint8_t status = longSleep ? 1 : 0;
-    log_d("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
-    encoder.writeUint16(getBatteryVoltage());
-    encoder.writeUint8(status);
-  }
-  else
-  {
-    appLayer.getConfigPayload(uplinkReq, port, encoder);
-  }
-  log_d("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
-
-  for (int i = 0; i < encoder.getLength(); i++)
-  {
-    Serial.printf("%02X ", uplinkPayload[i]);
-  }
-  Serial.println();
-
-  // wait before sending uplink
-  uint32_t minimumDelay = uplinkIntervalSeconds * 1000UL;
-  uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
-  uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
-
-  log_d("Sending configuration uplink in %u s", delayMs / 1000);
-  delay(delayMs);
-  log_d("Sending configuration uplink now.");
-  int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
-}
 
 
 /*!
@@ -884,11 +727,11 @@ void setup()
 
   if (uplinkReq)
   {
-    sendCfgUplink(uplinkReq);
+    sendCfgUplink(uplinkReq, uplinkIntervalSeconds);
   }
   else if (appStatusUplinkPending)
   {
-    sendCfgUplink(CMD_GET_SENSORS_STAT);
+    sendCfgUplink(CMD_GET_SENSORS_STAT, uplinkIntervalSeconds);
     appStatusUplinkPending = false;
   }
 

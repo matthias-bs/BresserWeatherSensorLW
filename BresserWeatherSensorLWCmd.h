@@ -52,6 +52,9 @@
 #if !defined(_LWCMD_H)
 #define _LWCMD_H
 
+#include <Arduino.h>
+#include <LoraEncoder.h>
+
 // ===========================
 // LoRaWAN command interface
 // ===========================
@@ -440,4 +443,23 @@
 // Response: n.a.
 
 // ===========================
+
+/*!
+ * \brief Decode downlink
+ *
+ * \param port      downlink message port
+ * \param payload   downlink message payload
+ * \param size      downlink message size in bytes
+ *
+ * \returns command ID, if downlink message requests a response, otherwise 0
+ */
+uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
+
+/*!
+ * \brief Send configuration uplink
+ *
+ * \param uplinkRequest command ID of uplink request
+ */
+void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval);
+
 #endif
