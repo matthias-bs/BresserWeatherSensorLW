@@ -94,19 +94,19 @@ With the default configuration, the device will periodically send 3 different up
 
   * Payload: see [Default Configuration](#default-configuration)
   * Port: 1
-  * Interval: ~`<sleep_interval>` / `<sleep_interval_long>` (depending on battery voltage)
+  * Interval: ~`<sleep_interval>` / `<sleep_interval_long>` (depending on battery voltage); see [Default Parameter Values](#default-parameter-values)
 
 2. LoRaWAN Node Status
 
   * Payload: Battery Voltage and Sleep Duration Flag
   * Port: `CMD_GET_LW_STATUS`
-  * Interval: `<lw_status_interval>` (default: 120 uplink frames)
+  * Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
 3. Application Layer / Sensor Status
 
   * Payload: Bresser/BLE Sensor Battery Status (Bitmap)
   * Port: `CMD_GET_SENSORS_STAT`
-  * Interval: `<app_status_interval>` (default: 120 uplink frames)
+  * Interval: `<app_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
 See [Parameters](#parameters) for more details.
 
@@ -455,6 +455,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 #### Default Parameter Values
 
 * Sleep interval (long): `SLEEP_INTERVAL`, `SLEEP_INTERVAL_LONG`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L120C9-L120C23)
+* `LW_STATUS_INTERVAL`: see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L129)
+* `APP_STATUS_INTERVAL`: see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L132)
 * BLE addresses and scan parameters: `BLE_SCAN_TIME`, `BLE_SCAN_MODE`, `KNOWN_BLE_ADDRESSES`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L307)
 * Weather sensor receive timeout: `WEATHERSENSOR_TIMEOUT`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L135)
 * Sensor IDs include/exclude list: `SENSOR_IDS_EXC`/`SENSOR_IDS_INC`; see [WeatherSensorCfg.h](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/ff450b68f669fe312af9a3e00ae9736804df12b6/src/WeatherSensorCfg.h#L83)
