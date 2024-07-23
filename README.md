@@ -454,10 +454,10 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 #### Default Parameter Values
 
-* Sleep interval (long): see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
-* BLE addresses and scan parameters: see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
-* Weather sensor receive timeout: see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
-* Sensor IDs include/exclude list: see [WeatherSensorCfg.h](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/main/src/WeatherSensorCfg.h)
+* Sleep interval (long): `SLEEP_INTERVAL`, `SLEEP_INTERVAL_LONG`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L120C9-L120C23)
+* BLE addresses and scan parameters: `BLE_SCAN_TIME`, `BLE_SCAN_MODE`, `KNOWN_BLE_ADDRESSES`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L307)
+* Weather sensor receive timeout: `WEATHERSENSOR_TIMEOUT`; see [BresserWeatherSensorLWCfg.h](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/3760ae7ea98417d702f97aa62d3a03b0e704f715/BresserWeatherSensorLWCfg.h#L135)
+* Sensor IDs include/exclude list: `SENSOR_IDS_EXC`/`SENSOR_IDS_INC`; see [WeatherSensorCfg.h](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/ff450b68f669fe312af9a3e00ae9736804df12b6/src/WeatherSensorCfg.h#L83)
 * Sensor data uplink payload configuration: see [Payload Configuration](#payload-configuration)
 
 ### Using Raw Data
