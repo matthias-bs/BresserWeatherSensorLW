@@ -456,7 +456,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 * Sleep interval (long): see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
 * BLE addresses and scan parameters: see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
-* Weather sensor receive timeout: see [WeatherSensorCfg.h](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/main/src/WeatherSensorCfg.h)
+* Weather sensor receive timeout: see [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h)
 * Sensor IDs include/exclude list: see [WeatherSensorCfg.h](https://github.com/matthias-bs/BresserWeatherSensorReceiver/blob/main/src/WeatherSensorCfg.h)
 * Sensor data uplink payload configuration: see [Payload Configuration](#payload-configuration)
 
