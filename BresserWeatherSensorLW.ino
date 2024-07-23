@@ -92,6 +92,7 @@
 // 20240608 Added LoRaWAN device status uplink
 // 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
 // 20240716 Modified port to allow modifications by appLayer.getPayloadStage<1|2>()
+// 20240723 Moved loadSecrets() to LoadSecrets.cpp/.h
 //
 // ToDo:
 // -
@@ -167,6 +168,7 @@ using namespace PowerFeather;
 #include <ArduinoJson.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
+#include "src/LoadSecrets.h"
 #include "src/AppLayer.h"
 #include "src/adc/adc.h"
 
@@ -233,7 +235,6 @@ ESP32Time rtc;
 AppLayer appLayer(&rtc, &rtcLastClockSync);
 
 #if defined(ESP32)
-
 /*!
  * \brief Print wakeup reason (ESP32 only)
  *
@@ -255,174 +256,6 @@ void print_wakeup_reason()
 }
 #endif
 
-/*!
- * \brief Load LoRaWAN secrets from file 'secrets.json' on LittleFS, if available
- *
- * Returns all values by reference/pointer
- *
- * Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading
- * the file to Flash.
- *
- * \param joinEUI
- * \param devEUI
- * \param nwkKey
- * \param appKey
- */
-void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey)
-{
-
-  if (!LittleFS.begin(
-#if defined(ESP32)
-          // Format the LittleFS partition on error; parameter only available for ESP32
-          true
-#endif
-          ))
-  {
-    log_d("Could not initialize LittleFS.");
-  }
-  else
-  {
-    File file = LittleFS.open("/secrets.json", "r");
-
-    if (!file)
-    {
-      log_i("File 'secrets.json' not found.");
-    }
-    else
-    {
-      log_d("Reading 'secrets.json'");
-      JsonDocument doc;
-
-      // Deserialize the JSON document
-      DeserializationError error = deserializeJson(doc, file);
-      if (error)
-      {
-        log_d("Failed to read JSON file, using defaults.");
-      }
-      else
-      {
-        const char *joinEUIStr = doc["joinEUI"];
-        if (joinEUIStr == nullptr)
-        {
-          log_e("Missing joinEUI.");
-          file.close();
-          return;
-        }
-        uint64_t _joinEUI = 0;
-        for (int i = 2; i < 18; i += 2)
-        {
-          char tmpStr[3] = "";
-          unsigned int tmpByte;
-          strncpy(tmpStr, &joinEUIStr[i], 2);
-          sscanf(tmpStr, "%x", &tmpByte);
-          _joinEUI = (_joinEUI << 8) | tmpByte;
-        }
-        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
-        log_d("joinEUI: 0x%08X%08X", static_cast<uint32_t>(_joinEUI >> 32), static_cast<uint32_t>(_joinEUI & 0xFFFFFFFF));
-
-        const char *devEUIStr = doc["devEUI"];
-        if (devEUIStr == nullptr)
-        {
-          log_e("Missing devEUI.");
-          file.close();
-          return;
-        }
-        uint64_t _devEUI = 0;
-        for (int i = 2; i < 18; i += 2)
-        {
-          char tmpStr[3] = "";
-          unsigned int tmpByte;
-          strncpy(tmpStr, &devEUIStr[i], 2);
-          sscanf(tmpStr, "%x", &tmpByte);
-          _devEUI = (_devEUI << 8) | tmpByte;
-        }
-        if (_devEUI == 0)
-        {
-          log_e("devEUI is zero.");
-          file.close();
-          return;
-        }
-        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
-        log_d("devEUI: 0x%08X%08X", static_cast<uint32_t>(_devEUI >> 32), static_cast<uint32_t>(_devEUI & 0xFFFFFFFF));
-
-        uint8_t check = 0;
-        bool fail = false;
-
-        log_d("nwkKey:");
-        uint8_t _nwkKey[16];
-        for (size_t i = 0; i < 16; i++)
-        {
-          const char *buf = doc["nwkKey"][i];
-          if (buf == nullptr)
-          {
-            fail = true;
-            break;
-          }
-          unsigned int tmp;
-          sscanf(buf, "%x", &tmp);
-          _nwkKey[i] = static_cast<uint8_t>(tmp);
-          check |= _nwkKey[i];
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-          printf("0x%02X", _nwkKey[i]);
-          if (i < 15)
-          {
-            printf(", ");
-          }
-#endif
-        } // for all nwk_key bytes
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        printf("\n");
-#endif
-        if (fail || (check == 0))
-        {
-          log_e("nwkKey parse error");
-          file.close();
-          return;
-        }
-
-        check = 0;
-        log_i("appKey:");
-        uint8_t _appKey[16];
-        for (size_t i = 0; i < 16; i++)
-        {
-          const char *buf = doc["appKey"][i];
-          if (buf == nullptr)
-          {
-            fail = true;
-            break;
-          }
-          unsigned int tmp;
-          sscanf(buf, "%x", &tmp);
-          _appKey[i] = static_cast<uint8_t>(tmp);
-          check |= _appKey[i];
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-          printf("0x%02X", _appKey[i]);
-          if (i < 15)
-          {
-            printf(", ");
-          }
-#endif
-        } // for all app_key bytes
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        printf("\n");
-#endif
-        if (fail || (check == 0))
-        {
-          log_e("appKey parse error");
-          file.close();
-          return;
-        }
-
-        // Every check passed, copy intermediate values as result
-        joinEUI = _joinEUI;
-        devEUI = _devEUI;
-        memcpy(nwkKey, _nwkKey, 16);
-        memcpy(appKey, _appKey, 16);
-      } // deserializeJson o.k.
-    } // file read o.k.
-    file.close();
-  } // LittleFS o.k.
-}
 
 /*!
  * \brief Compute sleep duration
@@ -467,8 +300,8 @@ uint32_t sleepDuration(void)
   return sleep_interval;
 }
 
-#if defined(ESP32)
 
+#if defined(ESP32)
 /*!
  * \brief Enter sleep mode (ESP32 variant)
  *
@@ -529,6 +362,7 @@ void gotoSleep(uint32_t seconds)
 }
 #endif
 
+
 /// Print date and time (i.e. local time)
 void printDateTime(void)
 {
@@ -540,6 +374,7 @@ void printDateTime(void)
   strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
   log_i("%s", tbuf);
 }
+
 
 /*!
  * \brief Decode downlink
@@ -614,6 +449,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
   return appLayer.decodeDownlink(port, payload, size);
 }
 
+
 /*!
  * \brief Send configuration uplink
  *
@@ -680,6 +516,7 @@ void sendCfgUplink(uint8_t uplinkReq)
   int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 }
+
 
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
