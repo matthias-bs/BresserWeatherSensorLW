@@ -448,8 +448,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 > Confirmed downlinks should not be used! (see [here](https://www.thethingsnetwork.org/forum/t/how-to-purge-a-scheduled-confirmed-downlink/56849/7) for an explanation.)
 
 > [!IMPORTANT]
-> To set sensors_inc / sensors_exc to the compile time default configuration, set the first ID in CMD_SET_SENSORS_INC / CMD_SET_SENSORS_EXC to 0x00000000.
-> To set the BLE sensor addresses to the compile time default configuration, set the first address in CMD_SET_BLE_ADDR to 0x000000000000.
+> To set sensors_inc / sensors_exc to the compile time default configuration, set the first ID in CMD_SET_SENSORS_INC / CMD_SET_SENSORS_EXC to "0x00000000".
+> To set the BLE sensor addresses to the compile time default configuration, set the first address in CMD_SET_BLE_ADDR to "00:00:00:00:00:00".
 
 
 #### Default Parameter Values
