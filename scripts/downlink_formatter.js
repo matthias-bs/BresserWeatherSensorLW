@@ -129,6 +129,8 @@
 // 20240609 Refactored command encoding
 // 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
 // 20240615 Added CMD_SCAN_SENSORS
+// 20240722 Added CMD_SET_LW_STATUS_INTERVAL,
+//          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 //
 // ToDo:
 // -  
@@ -140,10 +142,11 @@ const CMD_GET_DATETIME = 0x20;
 const CMD_SET_DATETIME = 0x21;
 const CMD_SET_SLEEP_INTERVAL = 0x31;
 const CMD_SET_SLEEP_INTERVAL_LONG = 0x33;
+const CMD_SET_LW_STATUS_INTERVAL = 0x35;
 const CMD_GET_LW_CONFIG = 0x36;
 const CMD_GET_LW_STATUS = 0x38;
-const CMD_GET_STATUS_INTERVAL = 0x40;
-const CMD_SET_STATUS_INTERVAL = 0x41;
+const CMD_GET_APP_STATUS_INTERVAL = 0x40;
+const CMD_SET_APP_STATUS_INTERVAL = 0x41;
 const CMD_GET_SENSORS_STAT = 0x42;
 const CMD_GET_APP_PAYLOAD_CFG = 0x46;
 const CMD_SET_APP_PAYLOAD_CFG = 0x47;
@@ -292,10 +295,10 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
-        else if (input.data.cmd == "CMD_GET_STATUS_INTERVAL") {
+        else if (input.data.cmd == "CMD_GET_APP_STATUS_INTERVAL") {
             return {
                 bytes: [0],
-                fPort: CMD_GET_STATUS_INTERVAL,
+                fPort: CMD_GET_APP_STATUS_INTERVAL,
                 warnings: [],
                 errors: []
             };
@@ -379,6 +382,14 @@ function encodeDownlink(input) {
             errors: []
         };
     }
+    else if (input.data.hasOwnProperty('lw_status_interval')) {
+        return {
+            bytes: [input.data.lw_status_interval],
+            fPort: CMD_SET_LW_STATUS_INTERVAL,
+            warnings: [],
+            errors: []
+        };
+    }
     else if (input.data.hasOwnProperty('epoch')) {
         if (typeof input.data.epoch == "string") {
             if (input.data.epoch.substr(0, 2) == "0x") {
@@ -438,10 +449,10 @@ function encodeDownlink(input) {
             warnings: [],
             errors: []
         };
-    } else if (input.data.hasOwnProperty('status_interval')) {
+    } else if (input.data.hasOwnProperty('app_status_interval')) {
         return {
-            bytes: [input.data.status_interval],
-            fPort: CMD_SET_STATUS_INTERVAL,
+            bytes: [input.data.app_status_interval],
+            fPort: CMD_SET_APP_STATUS_INTERVAL,
             warnings: [],
             errors: []
         };
@@ -582,7 +593,7 @@ function decodeDownlink(input) {
         case CMD_GET_LW_CONFIG:
         case CMD_GET_LW_STATUS:
         case CMD_GET_WS_TIMEOUT:
-        case CMD_GET_STATUS_INTERVAL:
+        case CMD_GET_APP_STATUS_INTERVAL:
         case CMD_GET_SENSORS_STAT:
         case CMD_GET_SENSORS_INC:
         case CMD_GET_SENSORS_EXC:
@@ -613,6 +624,12 @@ function decodeDownlink(input) {
                     sleep_interval_long: uint16BE(input.bytes)
                 }
             };
+        case CMD_SET_LW_STATUS_INTERVAL:
+            return {
+                data: {
+                    lw_status_interval: uint8(input.bytes)
+                }
+            };
         case CMD_SET_WS_TIMEOUT:
             return {
                 data: {
@@ -631,7 +648,7 @@ function decodeDownlink(input) {
                     ws_scantime: uint8(input.bytes)
                 }
             };
-        case CMD_SET_STATUS_INTERVAL:
+        case CMD_SET_APP_STATUS_INTERVAL:
             return {
                 data: {
                     status_interval: uint8(input.bytes)
