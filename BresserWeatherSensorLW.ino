@@ -93,6 +93,8 @@
 // 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
 // 20240716 Modified port to allow modifications by appLayer.getPayloadStage<1|2>()
 // 20240722 Added periodic uplink of LoRaWAN node status messages
+// 20240723 Moved loadSecrets() to LoadSecrets.cpp/.h
+//          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
 //
 // ToDo:
 // -
@@ -134,13 +136,13 @@
 static Preferences store;
 
 /// Preferences (stored in flash memory)
-static Preferences preferences;
+Preferences preferences;
 
 struct sPrefs
 {
   uint16_t sleep_interval;      //!< preferences: sleep interval
   uint16_t sleep_interval_long; //!< preferences: sleep interval long
-  uint8_t lw_stat_interval;     //!< preferences: LoRaWAN status uplink interval
+  uint8_t lw_stat_interval;     //!< preferences: LoRaWAN node status uplink interval
 } prefs;
 
 // Logging macros for RP2040
@@ -169,30 +171,13 @@ using namespace PowerFeather;
 #include <ArduinoJson.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
+#include "src/LoadSecrets.h"
 #include "src/AppLayer.h"
 #include "src/adc/adc.h"
 
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
 
-// Time source & status, see below
-//
-// bits 0..3 time source
-//    0x00 = GPS
-//    0x01 = RTC
-//    0x02 = LORA
-//    0x03 = unsynched
-//    0x04 = set (source unknown)
-//
-// bits 4..7 esp32 sntp time status (not used)
-enum class E_TIME_SOURCE : uint8_t
-{
-  E_GPS = 0x00,
-  E_RTC = 0x01,
-  E_LORA = 0x02,
-  E_UNSYNCHED = 0x04,
-  E_SET = 0x08
-};
 
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
@@ -239,7 +224,6 @@ ESP32Time rtc;
 AppLayer appLayer(&rtc, &rtcLastClockSync);
 
 #if defined(ESP32)
-
 /*!
  * \brief Print wakeup reason (ESP32 only)
  *
@@ -261,174 +245,6 @@ void print_wakeup_reason()
 }
 #endif
 
-/*!
- * \brief Load LoRaWAN secrets from file 'secrets.json' on LittleFS, if available
- *
- * Returns all values by reference/pointer
- *
- * Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading
- * the file to Flash.
- *
- * \param joinEUI
- * \param devEUI
- * \param nwkKey
- * \param appKey
- */
-void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey)
-{
-
-  if (!LittleFS.begin(
-#if defined(ESP32)
-          // Format the LittleFS partition on error; parameter only available for ESP32
-          true
-#endif
-          ))
-  {
-    log_d("Could not initialize LittleFS.");
-  }
-  else
-  {
-    File file = LittleFS.open("/secrets.json", "r");
-
-    if (!file)
-    {
-      log_i("File 'secrets.json' not found.");
-    }
-    else
-    {
-      log_d("Reading 'secrets.json'");
-      JsonDocument doc;
-
-      // Deserialize the JSON document
-      DeserializationError error = deserializeJson(doc, file);
-      if (error)
-      {
-        log_d("Failed to read JSON file, using defaults.");
-      }
-      else
-      {
-        const char *joinEUIStr = doc["joinEUI"];
-        if (joinEUIStr == nullptr)
-        {
-          log_e("Missing joinEUI.");
-          file.close();
-          return;
-        }
-        uint64_t _joinEUI = 0;
-        for (int i = 2; i < 18; i += 2)
-        {
-          char tmpStr[3] = "";
-          unsigned int tmpByte;
-          strncpy(tmpStr, &joinEUIStr[i], 2);
-          sscanf(tmpStr, "%x", &tmpByte);
-          _joinEUI = (_joinEUI << 8) | tmpByte;
-        }
-        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
-        log_d("joinEUI: 0x%08X%08X", static_cast<uint32_t>(_joinEUI >> 32), static_cast<uint32_t>(_joinEUI & 0xFFFFFFFF));
-
-        const char *devEUIStr = doc["devEUI"];
-        if (devEUIStr == nullptr)
-        {
-          log_e("Missing devEUI.");
-          file.close();
-          return;
-        }
-        uint64_t _devEUI = 0;
-        for (int i = 2; i < 18; i += 2)
-        {
-          char tmpStr[3] = "";
-          unsigned int tmpByte;
-          strncpy(tmpStr, &devEUIStr[i], 2);
-          sscanf(tmpStr, "%x", &tmpByte);
-          _devEUI = (_devEUI << 8) | tmpByte;
-        }
-        if (_devEUI == 0)
-        {
-          log_e("devEUI is zero.");
-          file.close();
-          return;
-        }
-        // printf() cannot print 64-bit hex numbers (sic!), so we split it in two 32-bit numbers...
-        log_d("devEUI: 0x%08X%08X", static_cast<uint32_t>(_devEUI >> 32), static_cast<uint32_t>(_devEUI & 0xFFFFFFFF));
-
-        uint8_t check = 0;
-        bool fail = false;
-
-        log_d("nwkKey:");
-        uint8_t _nwkKey[16];
-        for (size_t i = 0; i < 16; i++)
-        {
-          const char *buf = doc["nwkKey"][i];
-          if (buf == nullptr)
-          {
-            fail = true;
-            break;
-          }
-          unsigned int tmp;
-          sscanf(buf, "%x", &tmp);
-          _nwkKey[i] = static_cast<uint8_t>(tmp);
-          check |= _nwkKey[i];
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-          printf("0x%02X", _nwkKey[i]);
-          if (i < 15)
-          {
-            printf(", ");
-          }
-#endif
-        } // for all nwk_key bytes
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        printf("\n");
-#endif
-        if (fail || (check == 0))
-        {
-          log_e("nwkKey parse error");
-          file.close();
-          return;
-        }
-
-        check = 0;
-        log_i("appKey:");
-        uint8_t _appKey[16];
-        for (size_t i = 0; i < 16; i++)
-        {
-          const char *buf = doc["appKey"][i];
-          if (buf == nullptr)
-          {
-            fail = true;
-            break;
-          }
-          unsigned int tmp;
-          sscanf(buf, "%x", &tmp);
-          _appKey[i] = static_cast<uint8_t>(tmp);
-          check |= _appKey[i];
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-          printf("0x%02X", _appKey[i]);
-          if (i < 15)
-          {
-            printf(", ");
-          }
-#endif
-        } // for all app_key bytes
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
-        printf("\n");
-#endif
-        if (fail || (check == 0))
-        {
-          log_e("appKey parse error");
-          file.close();
-          return;
-        }
-
-        // Every check passed, copy intermediate values as result
-        joinEUI = _joinEUI;
-        devEUI = _devEUI;
-        memcpy(nwkKey, _nwkKey, 16);
-        memcpy(appKey, _appKey, 16);
-      } // deserializeJson o.k.
-    } // file read o.k.
-    file.close();
-  } // LittleFS o.k.
-}
 
 /*!
  * \brief Compute sleep duration
@@ -473,8 +289,8 @@ uint32_t sleepDuration(void)
   return sleep_interval;
 }
 
-#if defined(ESP32)
 
+#if defined(ESP32)
 /*!
  * \brief Enter sleep mode (ESP32 variant)
  *
@@ -535,6 +351,7 @@ void gotoSleep(uint32_t seconds)
 }
 #endif
 
+
 /// Print date and time (i.e. local time)
 void printDateTime(void)
 {
@@ -547,157 +364,6 @@ void printDateTime(void)
   log_i("%s", tbuf);
 }
 
-/*!
- * \brief Decode downlink
- *
- * \param port      downlink message port
- * \param payload   downlink message payload
- * \param size      downlink message size in bytes
- *
- * \returns command ID, if downlink message requests a response, otherwise 0
- */
-uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
-{
-  log_v("Port: %d", port);
-
-  if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get date/time");
-    return CMD_GET_DATETIME;
-  }
-
-  if ((port == CMD_SET_DATETIME) && (size == 4))
-  {
-    time_t set_time = (payload[0] << 24) | (payload[1] << 16) | (payload[2] << 8) | payload[3];
-    rtc.setTime(set_time);
-    rtcLastClockSync = rtc.getLocalEpoch();
-    rtcTimeSource = E_TIME_SOURCE::E_SET;
-
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-    char tbuf[25];
-    struct tm timeinfo;
-
-    localtime_r(&set_time, &timeinfo);
-    strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-    log_d("Set date/time: %s", tbuf);
-#endif
-    return 0;
-  }
-
-  if ((port == CMD_SET_SLEEP_INTERVAL) && (size == 2))
-  {
-    prefs.sleep_interval = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval: %u s", prefs.sleep_interval);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int", prefs.sleep_interval);
-    preferences.end();
-    return 0;
-  }
-
-  if ((port == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 2))
-  {
-    prefs.sleep_interval_long = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
-    preferences.end();
-    return 0;
-  }
-
-  if ((port == CMD_SET_LW_STATUS_INTERVAL) && (size == 1))
-  {
-    prefs.lw_stat_interval = payload[0];
-    log_d("Set LoRaWAN node status uplink interval: %u frames", prefs.lw_stat_interval);
-    preferences.begin("BWS-LW", false);
-    preferences.putUChar("lw_stat_int", prefs.lw_stat_interval);
-    preferences.end();
-
-    return 0;
-  }
-
-  if ((port == CMD_GET_LW_CONFIG) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get config");
-    return CMD_GET_LW_CONFIG;
-  }
-
-  if ((port == CMD_GET_LW_STATUS) && (payload[0] == 0x00) && (size == 1))
-  {
-    log_d("Get device status");
-    return CMD_GET_LW_STATUS;
-  }
-
-  log_d("appLayer.decodeDownlink(port=%d, payload[0]=0x%02X, size=%d)", port, payload[0], size);
-  return appLayer.decodeDownlink(port, payload, size);
-}
-
-/*!
- * \brief Send configuration uplink
- *
- * \param uplinkRequest command ID of uplink request
- */
-void sendCfgUplink(uint8_t uplinkReq)
-{
-  log_d("--- Uplink Configuration/Status ---");
-
-  uint8_t uplinkPayload[48];
-  uint8_t port = uplinkReq;
-
-  //
-  // Encode data as byte array for LoRaWAN transmission
-  //
-  LoraEncoder encoder(uplinkPayload);
-
-  if (uplinkReq == CMD_GET_DATETIME)
-  {
-    log_d("Date/Time");
-    time_t t_now = rtc.getLocalEpoch();
-    encoder.writeUint8((t_now >> 24) & 0xff);
-    encoder.writeUint8((t_now >> 16) & 0xff);
-    encoder.writeUint8((t_now >> 8) & 0xff);
-    encoder.writeUint8(t_now & 0xff);
-
-    encoder.writeUint8(static_cast<uint8_t>(rtcTimeSource));
-  }
-  else if (uplinkReq == CMD_GET_LW_CONFIG)
-  {
-    log_d("LoRaWAN Config");
-    encoder.writeUint8(prefs.sleep_interval >> 8);
-    encoder.writeUint8(prefs.sleep_interval & 0xFF);
-    encoder.writeUint8(prefs.sleep_interval_long >> 8);
-    encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
-    encoder.writeUint8(prefs.lw_stat_interval);
-  }
-  else if (uplinkReq == CMD_GET_LW_STATUS)
-  {
-    uint8_t status = longSleep ? 1 : 0;
-    log_d("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
-    encoder.writeUint16(getBatteryVoltage());
-    encoder.writeUint8(status);
-  }
-  else
-  {
-    appLayer.getConfigPayload(uplinkReq, port, encoder);
-  }
-  log_d("Configuration uplink: port=%d, size=%d", port, encoder.getLength());
-
-  for (int i = 0; i < encoder.getLength(); i++)
-  {
-    Serial.printf("%02X ", uplinkPayload[i]);
-  }
-  Serial.println();
-
-  // wait before sending uplink
-  uint32_t minimumDelay = uplinkIntervalSeconds * 1000UL;
-  uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
-  uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
-
-  log_d("Sending configuration uplink in %u s", delayMs / 1000);
-  delay(delayMs);
-  log_d("Sending configuration uplink now.");
-  int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
-}
 
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
@@ -1077,16 +743,16 @@ void setup()
 
   if (uplinkReq)
   {
-    sendCfgUplink(uplinkReq);
+    sendCfgUplink(uplinkReq, uplinkIntervalSeconds);
   }
   else if (lwStatusUplinkPending)
   {
-    sendCfgUplink(CMD_GET_LW_STATUS);
+    sendCfgUplink(CMD_GET_LW_STATUS, uplinkIntervalSeconds);
     lwStatusUplinkPending = false;
   }
   else if (appStatusUplinkPending)
   {
-    sendCfgUplink(CMD_GET_SENSORS_STAT);
+    sendCfgUplink(CMD_GET_SENSORS_STAT, uplinkIntervalSeconds);
     appStatusUplinkPending = false;
   }
 
