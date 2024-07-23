@@ -126,10 +126,10 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #define CLOCK_SYNC_INTERVAL 24 * 60
 
 // LoRaWAN Node status message interval (in frames)
-#define LW_STATUS_INTERVAL 120
+#define LW_STATUS_INTERVAL 60
 
 // Status message uplink interval (in frames)
-#define APP_STATUS_INTERVAL 120
+#define APP_STATUS_INTERVAL 60
 
 // Timeout for weather sensor data reception (seconds)
 #define WEATHERSENSOR_TIMEOUT 180
