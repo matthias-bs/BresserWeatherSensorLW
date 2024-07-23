@@ -92,6 +92,7 @@
 // 20240608 Added LoRaWAN device status uplink
 // 20240630 Switched to lwActivate() from radiolib-persistence/examples/LoRaWAN_ESP32
 // 20240716 Modified port to allow modifications by appLayer.getPayloadStage<1|2>()
+// 20240722 Added periodic uplink of LoRaWAN node status messages
 // 20240723 Moved loadSecrets() to LoadSecrets.cpp/.h
 //          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
 //
@@ -190,6 +191,7 @@ RTC_DATA_ATTR uint16_t bootCount = 1;
 RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
 RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource;
 RTC_DATA_ATTR bool appStatusUplinkPending = false;
+RTC_DATA_ATTR bool lwStatusUplinkPending = false;
 RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
 
 #else
@@ -210,6 +212,9 @@ E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
 
 /// AppLayer status uplink pending
 bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
+
+/// LoRaWAN Node status uplink pending
+bool lwStatusUplinkPending __attribute__((section(".uninitialized_data")));
 #endif
 
 /// Real time clock
@@ -358,7 +363,6 @@ void printDateTime(void)
   strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
   log_i("%s", tbuf);
 }
-
 
 
 /*!
@@ -511,6 +515,7 @@ void setup()
   {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
     appStatusUplinkPending = 0;
+    lwStatusUplinkPending = 0;
   }
 
   // Set time zone
@@ -528,6 +533,8 @@ void setup()
   log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
   log_d("Preferences: sleep_interval_long:   %u s", prefs.sleep_interval_long);
+  prefs.lw_stat_interval = preferences.getUChar("lw_stat_int", LW_STATUS_INTERVAL);
+  log_d("Preferences: lw_stat_interval:      %u cycles", prefs.lw_stat_interval);
   preferences.end();
 
   uint16_t voltage = getBatteryVoltage();
@@ -602,10 +609,14 @@ void setup()
 
   // Set appStatusUplink flag if required
   uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
-  log_i("App status uplink interval: %u", appStatusUplinkInterval);
   if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
   {
     appStatusUplinkPending = true;
+  }
+
+  if (prefs.lw_stat_interval && (fCntUp % prefs.lw_stat_interval == 0))
+  {
+    lwStatusUplinkPending = true;
   }
 
   // get payload immediately before uplink - not used here
@@ -722,12 +733,22 @@ void setup()
 
   if (appStatusUplinkPending)
   {
-    log_i("AppLayer status uplink pending");
+    log_i("App status uplink pending");
+  }
+
+  if (lwStatusUplinkPending)
+  {
+    log_i("LoRaWAN node status uplink pending");
   }
 
   if (uplinkReq)
   {
     sendCfgUplink(uplinkReq, uplinkIntervalSeconds);
+  }
+  else if (lwStatusUplinkPending)
+  {
+    sendCfgUplink(CMD_GET_LW_STATUS);
+    lwStatusUplinkPending = false;
   }
   else if (appStatusUplinkPending)
   {

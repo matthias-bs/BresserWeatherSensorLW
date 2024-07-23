@@ -15,14 +15,15 @@
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <timeout_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL, {"sleep_interval": <interval_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
+// port = CMD_SET_LW_STATUS_INTERVAL, {"lw_status_interval": <interval_in_frames>}
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
 // port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
-// port = CMD_GET_STATUS_INTERVAL, {"cmd": "CMD_GET_STATUS_INTERVAL"} / payload = 0x00
-// port = CMD_SET_STATUS_INTERVAL, {"status_interval": <status_interval>}
+// port = CMD_GET_APP_STATUS_INTERVAL, {"cmd": "CMD_GET_APP_STATUS_INTERVAL"} / payload = 0x00
+// port = CMD_SET_APP_STATUS_INTERVAL, {"app_status_interval": <app_status_interval>}
 // port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
@@ -44,7 +45,7 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
-// CMD_GET_STATUS_INTERVAL {"status_interval": <status_interval>}
+// CMD_GET_APP_STATUS_INTERVAL {"app_status_interval": <app_status_interval>}
 //
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
@@ -62,11 +63,12 @@
 //
 // <ws_timeout>         : 0...255
 // <sleep_interval>     : 0...65535
-// <sleep_interval>     : 0...65535
+// <sleep_interval_long>: 0...65535
+// <lw_status_interval> : LoRaWAN node status message uplink interval in no. of frames (0...255, 0: disabled)
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
-// <status_interval>    : Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
+// <app_status_interval>: Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
 // <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
@@ -140,6 +142,8 @@
 //          decode function 'bits8'
 // 20240704 Fixed/improved compatibility mode
 // 20240716 Added CMD_SCAN_SENSORS
+// 20240722 Added CMD_SET_LW_STATUS_INTERVAL, modified CMD_GET_LW_CONFIG,
+//          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 //
 // ToDo:
 // -  
@@ -158,7 +162,7 @@ function decoder(bytes, port) {
     const CMD_GET_DATETIME = 0x20;
     const CMD_GET_LW_CONFIG = 0x36;
     const CMD_GET_LW_STATUS = 0x38;
-    const CMD_GET_STATUS_INTERVAL = 0x40;
+    const CMD_GET_APP_STATUS_INTERVAL = 0x40;
     const CMD_GET_SENSORS_STAT = 0x42;
     const CMD_GET_APP_PAYLOAD_CFG = 0x46;
     const CMD_GET_WS_TIMEOUT = 0xC0;
@@ -722,9 +726,9 @@ function decoder(bytes, port) {
         return decode(
             port,
             bytes,
-            [uint16BE, uint16BE
+            [uint16BE, uint16BE, uint8
             ],
-            ['sleep_interval', 'sleep_interval_long'
+            ['sleep_interval', 'sleep_interval_long', 'lw_status_interval'
             ]
         );
     } else if (port === CMD_GET_LW_STATUS) {
@@ -797,13 +801,13 @@ function decoder(bytes, port) {
             ],
             ['bresser', 'onewire', 'analog', 'digital']
         );
-    } else if (port === CMD_GET_STATUS_INTERVAL) {
+    } else if (port === CMD_GET_APP_STATUS_INTERVAL) {
         return decode(
             port,
             bytes,
             [bits8
             ],
-            ['status_interval'
+            ['app_status_interval'
             ]
         );
     } else if (port === CMD_SCAN_SENSORS) {

@@ -43,6 +43,8 @@
 // 20240609 Refactored command encoding
 // 20240614 Renamed CMD_RESET_RAINGAUGE to CMD_RESET_WS_POSTPROC
 // 20240716 Added CMD_SCAN_SENSORS
+// 20240722 Added CMD_SET_LW_STATUS_INTERVAL, renamed 
+//          CMD_<GET|SET>_STATUS_INTERVAL to CMD_<GET|SET>_APP_STATUS_INTERVAL
 //
 // ToDo:
 // -
@@ -115,6 +117,17 @@
 
 // Uplink: n.a.
 
+// CMD_SET_LW_STATUS_INTERVAL
+// ---------------------------
+// Note: Set LoRaWAN status interval in frame counts
+// Port: CMD_SET_LW_STATUS_INTERVAL
+#define CMD_SET_LW_STATUS_INTERVAL 0x35
+
+// Downlink (command):
+// byte0: lw_status_interval[7:0]
+
+// Uplink: n.a.
+
 // CMD_GET_LW_CONFIG
 // ------------------
 // Port: CMD_GET_LW_CONFIG
@@ -147,11 +160,11 @@
 // -- Application layer --
 // -----------------------
 
-// CMD_GET_STATUS_INTERVAL
+// CMD_GET_APP_STATUS_INTERVAL
 // ------------------------
 // Note: Get status interval in frame counts
-// Port: CMD_GET_STATUS_INTERVAL
-#define CMD_GET_STATUS_INTERVAL 0x40
+// Port: CMD_GET_APP_STATUS_INTERVAL
+#define CMD_GET_APP_STATUS_INTERVAL 0x40
 
 // Downlink (command):
 // byte0: 0x00
@@ -159,11 +172,11 @@
 // Uplink (response):
 // byte0: status_interval[7:0]
 
-// CMD_SET_STATUS_INTERVAL
+// CMD_SET_APP_STATUS_INTERVAL
 // ------------------------
 // Note: Set status interval in frame counts
-// Port: CMD_SET_STATUS_INTERVAL
-#define CMD_SET_STATUS_INTERVAL 0x41
+// Port: CMD_SET_APP_STATUS_INTERVAL
+#define CMD_SET_APP_STATUS_INTERVAL 0x41
 
 // Downlink (command):
 // byte0: status_interval[7:0]
