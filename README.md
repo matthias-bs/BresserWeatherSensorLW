@@ -23,6 +23,9 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * The default payload configuration is different from [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
 * LoRaWAN downlink commands (and responses) are not compatible with [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
+* [Don't Panic](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#Don't_Panic)
+
+  While the software has quite many configuration options, most users won't need any or just a few. See [Required Configuration](#required-configuration) and the bare minimum configuration (and maybe [Default Configuration](#default-configuration)).
 
 ## Features
 
@@ -45,6 +48,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 ## Contents
 
+* [LoRaWAN Uplink Messages](#lorawan-uplink-messages)
 * [Supported Hardware](#supported-hardware)
   * [Predefined Board Configurations](#predefined-board-configurations)
   * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
@@ -81,6 +85,32 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * [Doxygen Generated Source Code Documentation](#doxygen-generated-source-code-documentation)
 * [References](#references)
 * [Legal](#legal)
+
+## LoRaWAN Uplink Messages
+
+With the default configuration, the device will periodically send 3 different uplink messages:
+
+1. Sensor Data
+
+  * Payload: see [Default Configuration](#default-configuration)
+  * Port: 1
+  * Interval: ~`<sleep_interval>` / `<sleep_interval_long>` (depending on battery voltage)
+
+2. LoRaWAN Node Status
+
+  * Payload: Battery Voltage and Sleep Duration Flag
+  * Port: `CMD_GET_LW_STATUS`
+  * Interval: `<lw_status_interval>` (default: 120 uplink frames)
+
+3. Application Layer / Sensor Status
+
+  * Payload: Bresser/BLE Sensor Battery Status (Bitmap)
+  * Port: `CMD_GET_SENSORS_STAT`
+  * Interval: `<app_status_interval>` (default: 120 uplink frames)
+
+See [Parameters](#parameters) for more details.
+
+(2) & (3) can be disabled by setting the interval to zero.
 
 ## Supported Hardware
 
