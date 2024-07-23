@@ -609,7 +609,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     prefs.lw_stat_interval = payload[0];
     log_d("Set LoRaWAN node status uplink interval: %u s", prefs.lw_stat_interval);
     preferences.begin("BWS-LW", false);
-    preferences.putUChar("lw_stat_interval", prefs.lw_stat_interval);
+    preferences.putUChar("lw_stat_int", prefs.lw_stat_interval);
     preferences.end();
 
     return 0;
@@ -867,7 +867,7 @@ void setup()
   log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
   log_d("Preferences: sleep_interval_long:   %u s", prefs.sleep_interval_long);
-  prefs.lw_stat_interval = preferences.getUChar("lw_stat_interval", LW_STATUS_INTERVAL);
+  prefs.lw_stat_interval = preferences.getUChar("lw_stat_int", LW_STATUS_INTERVAL);
   log_d("Preferences: lw_stat_interval:      %u cycles", prefs.lw_stat_interval);
   preferences.end();
 
@@ -943,7 +943,6 @@ void setup()
 
   // Set appStatusUplink flag if required
   uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
-  log_i("App status uplink interval: %u", appStatusUplinkInterval);
   if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
   {
     appStatusUplinkPending = true;

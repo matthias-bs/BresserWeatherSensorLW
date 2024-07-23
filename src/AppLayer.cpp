@@ -199,7 +199,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
     {
         log_d("Set App status_interval: %u frames", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
-        appPrefs.putUChar("app_stat_interval", payload[0]);
+        appPrefs.putUChar("app_stat_int", payload[0]);
         appPrefs.end();
         return 0;
     }

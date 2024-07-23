@@ -244,7 +244,7 @@ public:
     uint8_t getAppStatusUplinkInterval(void)
     {
         appPrefs.begin("BWS-LW-APP", false);
-        uint8_t status_interval = appPrefs.getUChar("app_stat_interval", APP_STATUS_INTERVAL);
+        uint8_t status_interval = appPrefs.getUChar("app_stat_int", APP_STATUS_INTERVAL);
         appPrefs.end();
         return status_interval;
     };
