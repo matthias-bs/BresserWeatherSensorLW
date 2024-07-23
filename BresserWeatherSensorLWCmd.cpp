@@ -178,6 +178,7 @@ void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval)
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
     encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
+    encoder.writeUint8(prefs.lw_stat_interval);
   }
   else if (uplinkReq == CMD_GET_LW_STATUS)
   {
