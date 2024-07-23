@@ -747,7 +747,7 @@ void setup()
   }
   else if (lwStatusUplinkPending)
   {
-    sendCfgUplink(CMD_GET_LW_STATUS);
+    sendCfgUplink(CMD_GET_LW_STATUS, uplinkIntervalSeconds);
     lwStatusUplinkPending = false;
   }
   else if (appStatusUplinkPending)
