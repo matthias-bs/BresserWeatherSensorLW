@@ -49,6 +49,7 @@
 // 20240610 Changed Weather Sensor configuration according to modification 
 //          of PayloadBresser (assign to configArray[1])
 // 20240721 Added tooltips and visual feedback for empty input fields
+// 20240725 Added saving of form values to localStorage, added reset to default values
 //
 // ToDo:
 // -
@@ -84,6 +85,32 @@
             types: []
         };
 
+        const defaultValues = {
+            weather: true,
+            weatherHumidity: true,
+            weatherRain: true,
+            weatherWind: true,
+            weatherUV: true,
+            weatherLight: false,
+            weatherRainHourly: true,
+            weatherRainDWM: true,
+            multiChannel: true,
+            checkbox2: true,
+            inputChannel2: '1',
+            checkbox4: true,
+            inputChannel4: '1',
+            onewire: true,
+            onewireInput: '1',
+            analog: true,
+            analogInput: '0',
+            digital: false,
+            ble: false,
+            bleInput: 0,
+            lightning: true,
+            lightningRaw: false,
+            lightningProc: true
+        };
+
         // [Name, Size in bytes, Signals, Types]
         const sensorTypes = [
             ["Weather", 0],
@@ -104,6 +131,42 @@
             [2, 'ble*_temp_c', 'temperature'],
             [1, 'ble*_humidity', 'uint8']
         ]
+
+        function triggerInput(input) {
+            // Manually trigger the change event
+            if ('createEvent' in document) {
+                // Compatibility mode for older browsers
+                var evt = document.createEvent('HTMLEvents');
+                // Arguments: type, canBubble, cancelable
+                // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
+                evt.initEvent('input', false, true);
+                input.dispatchEvent(evt);
+            } else {
+                // For modern browsers
+                input.fireEvent('oninput');
+            }
+        }
+
+        function checkWidgets(widget) {
+            let checkbox = document.getElementById(widget);
+            let input = document.getElementById(widget + 'Input');
+            //input.style.display = checkbox.checked ? 'inline' : 'none';
+            if (checkbox.checked && input.value.trim() === '') {
+                input.style.backgroundColor = 'LightCoral';
+            } else {
+                input.style.backgroundColor = '';
+            }
+        }
+
+        function checkInput(widget) {
+            let input = document.getElementById(widget);
+            console.log(input.id, input.value);
+            if (input.value.trim() === '') {
+                input.style.backgroundColor = 'LightCoral';
+            } else {
+                input.style.backgroundColor = '';
+            }
+        }
 
         // Toggle input field visibility
         window.onload = function () {
@@ -168,7 +231,7 @@
                 var input = document.createElement('input');
                 input.type = "text";
                 input.id = "inputChannel" + i;
-                input.title="Specify comma-separated list of channel numbers to enable." 
+                input.title = "Specify comma-separated list of channel numbers to enable."
                 input.name = "inputChannel" + i;
 
                 labelColumn.appendChild(label);
@@ -200,130 +263,78 @@
                 checkbox.addEventListener('change', function () {
                     // Check if the checkbox is checked and the corresponding input is empty
                     if (checkbox.checked && inputChannels.value.trim() === '') {
-                        // Set the boxShadow style if the input is empty and the checkbox is checked
-                        //inputChannels.style.boxShadow = '0 0 3px #CC0000';
                         inputChannels.style.backgroundColor = 'LightCoral';
-
                     } else {
-                        // Remove the boxShadow style otherwise
-                        //inputChannels.style.boxShadow = '';
                         inputChannels.style.backgroundColor = '';
                     }
                 });
-                inputChannels.addEventListener('input', function () {
+                inputChannels.addEventListener('change', function () {
                     // Check if the input is not empty
                     if (checkbox.checked && inputChannels.value.trim() === '') {
-                        // Set the boxShadow style if the input is empty and the checkbox is checked
-                        //inputChannels.style.boxShadow = '0 0 3px #CC0000';
                         inputChannels.style.backgroundColor = 'LightCoral';
                     } else {
-                        // Remove the boxShadow style if the input is not empty
-                        //inputChannels.style.boxShadow = '';
                         inputChannels.style.backgroundColor = '';
                     }
                 });
             }
 
-            // Add event listener to "1-Wire Sensors" checkbox
-            document.getElementById('onewire').addEventListener('change', function () {
-                let onewireInput = document.getElementById('onewireInput');
-                onewireInput.style.display = this.checked ? 'inline' : 'none';
-                // Check if the checkbox is checked and the corresponding input is empty
-                if (document.getElementById('onewire').checked && onewireInput.value.trim() === '') {
-                    // Set the boxShadow style if the input is empty and the checkbox is checked
-                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
-                    onewireInput.style.backgroundColor = 'LightCoral';
-
+            // Add event listener to "1-Wire Sensors" input field
+            document.getElementById('onewireInput').addEventListener('change', function () {
+                // Check if the input is not empty
+                if (this.value.trim() === '') {
+                    this.style.backgroundColor = 'LightCoral';
                 } else {
-                    // Remove the boxShadow style otherwise
-                    //inputChannels.style.boxShadow = '';
-                    onewireInput.style.backgroundColor = '';
+                    this.style.backgroundColor = '';
                 }
             });
 
-            // Add event listener to "1-Wire Sensors" channel input field
-            document.getElementById('onewireInput').addEventListener('change', function () {
-        
+            // Add event listener to "Analog Sensors" input field
+            document.getElementById('analogInput').addEventListener('change', function () {
                 // Check if the input is not empty
-                if (document.getElementById('onewire').checked && this.value.trim() === '') {
-                    // Set the boxShadow style if the input is empty and the checkbox is checked
-                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
+                if (this.value.trim() === '') {
                     this.style.backgroundColor = 'LightCoral';
                 } else {
-                    // Remove the boxShadow style if the input is not empty
-                    //inputChannels.style.boxShadow = '';
                     this.style.backgroundColor = '';
                 }
+            });
+
+            // Add event listener to "Digital Sensors" input field
+            document.getElementById('digitalInput').addEventListener('change', function () {
+                // Check if the input is not empty
+                if (this.value.trim() === '') {
+                    this.style.backgroundColor = 'LightCoral';
+                } else {
+                    this.style.backgroundColor = '';
+                }
+            });
+
+            // Add event listener to "1-Wire Sensors" checkbox
+            document.getElementById('onewire').addEventListener('change', function () {
+                onewireInput = document.getElementById('onewireInput');
+                onewireInput.style.display = onewire.checked ? 'inline' : 'none';
             });
 
             // Add event listener to "Analog Sensors" checkbox
             document.getElementById('analog').addEventListener('change', function () {
-                let analogInput = document.getElementById('analogInput');
+                analogInput = document.getElementById('analogInput');
                 analogInput.style.display = this.checked ? 'inline' : 'none';
-                // Check if the checkbox is checked and the corresponding input is empty
-                if (document.getElementById('analog').checked && analogInput.value.trim() === '') {
-                    // Set the boxShadow style if the input is empty and the checkbox is checked
-                    //inputChannels.style.boxShadow = '0 0 3px #CC0000';
-                    analogInput.style.backgroundColor = 'LightCoral';
-
-                } else {
-                    // Remove the boxShadow style otherwise
-                    //inputChannels.style.boxShadow = '';
-                    analogInput.style.backgroundColor = '';
-                }
-            });
-
-            // Add event listener to "Analog Sensors" channel input field
-            document.getElementById('analogInput').addEventListener('change', function () {
-                // Check if the input is not empty
-                if (document.getElementById('analog').checked && this.value.trim() === '') {
-                    // Set the boxShadow style if the input is empty and the checkbox is checked
-                    this.style.backgroundColor = 'LightCoral';
-                } else {
-                    // Remove the boxShadow style if the input is not empty
-                    this.style.backgroundColor = '';
-                }
             });
 
             // Add event listener to "Digital Sensors" checkbox
             document.getElementById('digital').addEventListener('change', function () {
                 digitalInput = document.getElementById('digitalInput');
                 digitalInput.style.display = this.checked ? 'inline' : 'none';
-                if (document.getElementById('digital').checked && digitalInput.value.trim() === '') {
-                    digitalInput.style.backgroundColor = 'LightCoral';
-                } else {
-                    digitalInput.style.backgroundColor = '';
-                } 
-            });
-
-            // Add event listener to "Digital Sensors" channel input field
-            document.getElementById('digitalInput').addEventListener('change', function () {
-                if (document.getElementById('digital').checked && this.value.trim() === '') {
-                    this.style.backgroundColor = 'LightCoral';
-                } else {
-                    this.style.backgroundColor = '';
-                }
             });
 
             // Add event listener to "BLE Sensors" checkbox
             document.getElementById('ble').addEventListener('change', function () {
                 bleInput = document.getElementById('bleInput');
                 bleInput.style.display = this.checked ? 'inline' : 'none';
-                if (document.getElementById('ble').checked && bleInput.value.trim() === '') {
-                    bleInput.style.backgroundColor = 'LightCoral';
-                } else {
-                    bleInput.style.backgroundColor = '';
-                }
+                triggerInput(bleInput);
             });
 
-            // Add event listener to "BLE Sensors" number input field
-            document.getElementById('bleInput').addEventListener('change', function () {
-                if (document.getElementById('ble').checked && this.value.trim() === '') {
-                    this.style.backgroundColor = 'LightCoral';
-                } else {
-                    this.style.backgroundColor = '';
-                }
-            });
+            // Attach event listener to the reset button
+            document.getElementById('resetButton').addEventListener('click', resetForm);
 
             // Initialize the maximum size field
             document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
@@ -345,7 +356,126 @@
             }
             configStr += "}";
             document.getElementById('arrayOutput').value = configStr;
+
+            // Restore values
+            // Show input widget if checkbox is checked
+            // Highlight input widget if checkbox is checked and input is empty
+            document.querySelectorAll('#configForm input').forEach(input => {
+                const savedValue = localStorage.getItem(input.id);
+                if (savedValue !== null) {
+                    if (input.type === 'checkbox') {
+                        console.log(input.id, input.checked);
+                        input.checked = savedValue === 'true';
+                        if (input == document.getElementById('lightning') && input.checked) {
+                            document.getElementById('lightningRaw').style.display = 'inline';
+                            document.getElementById('labelLightningRaw').style.display = 'inline';
+                            document.getElementById('lightningProc').style.display = 'inline';
+                            document.getElementById('labelLightningProc').style.display = 'inline';
+                        }
+                        if (input == document.getElementById('multiChannel') && input.checked) {
+                            document.getElementById('checkboxContainer').style.display = 'inline';
+                        }
+                        for (var i = 2; i <= 11; i++) {
+                            if (i == 9)
+                                continue;
+                            if (input == document.getElementById('checkbox' + i) && input.checked) {
+                                let inputChannels = document.getElementById('inputChannel' + i);
+                                if (inputChannels.value.trim() === '') {
+                                    inputChannels.style.backgroundColor = 'LightCoral';
+                                }
+                            }
+                        }
+                    } else if (input.type === 'number') {
+                        input.value = savedValue;
+                    } else {
+                        input.value = savedValue;
+                        console.log(input.id, input.value);
+                        for (var i = 2; i <= 11; i++) {
+                            if (i == 9)
+                                continue;
+                            if (input == document.getElementById('inputChannel' + i) && input.value.trim() === '') {
+                                if (document.getElementById('checkbox' + i).checked) {
+                                    input.style.backgroundColor = 'LightCoral';
+                                }
+                            }
+                        }
+                        // if (input == document.getElementById('onewireInput') && input.value.trim() === '') {
+                        //     if (document.getElementById('onewire').checked) {
+                        //         input.style.backgroundColor = 'LightCoral';
+                        //     } else {
+                        //         input.style.backgroundColor = '';
+                        //     }
+                        // }
+                    }
+                }
+                // Manually trigger the change event
+                if ('createEvent' in document) {
+                    // Compatibility mode for older browsers
+                    var evt = document.createEvent('HTMLEvents');
+                    // Arguments: type, canBubble, cancelable
+                    // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
+                    evt.initEvent('change', false, true);
+                    input.dispatchEvent(evt);
+                    evt.initEvent('input', false, true);
+                    input.dispatchEvent(evt);
+                } else {
+                    // For modern browsers
+                    input.fireEvent('onchange');
+                    input.fireEvent('oninput');
+                }
+            });
         }; // window.onload
+
+        // Reset the form
+        function resetForm() {
+            //document.getElementById('jsonOutput').value = "{}";
+            //document.getElementById('jsonOutput2').value = "{}";
+            //document.getElementById('arrayOutput').value = "{}";
+            document.querySelectorAll('#configForm input').forEach(input => {
+                switch (input.type) {
+                    case 'text':
+                        if (input.id in defaultValues) {
+                            input.value = defaultValues[input.id];
+                        } else {
+                            input.value = '';
+                        }
+                        break;
+                    case 'checkbox':
+                        if (input.id in defaultValues) {
+                            input.checked = defaultValues[input.id] ? true : false;
+                        } else {
+                            input.checked = false;
+                        }
+                        break;
+                    case 'number':
+                        if (input.id in defaultValues) {
+                            input.value = defaultValues[input.id];
+                        } else {
+                            input.value = 0;
+                        }
+                        break;
+                }
+
+                // Manually trigger the change event
+                if ('createEvent' in document) {
+                    // Compatibility mode for older browsers
+                    var evt = document.createEvent('HTMLEvents');
+                    // Arguments: type, canBubble, cancelable
+                    // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
+                    evt.initEvent('change', false, true);
+                    input.dispatchEvent(evt);
+                    evt.initEvent('input', false, true);
+                    input.dispatchEvent(evt);
+                } else {
+                    // For modern browsers
+                    input.fireEvent('onchange');
+                    input.fireEvent('oninput');
+                }
+            });
+
+            document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
+            document.getElementById('configForm').submit();
+        }
 
         // Get [size, bitmap] from a comma-separated list of channel numbers
         function getChannels(id, length, size_per_channel) {
@@ -618,6 +748,16 @@
             }
             configStr += "}";
             arrayOutput.value = configStr;
+
+            // Store values
+            document.querySelectorAll('#configForm input').forEach(input => {
+                console.log(input.id, input.checked);
+                if (input.type === 'checkbox') {
+                    localStorage.setItem(input.id, input.checked);
+                } else {
+                    localStorage.setItem(input.id, input.value);
+                }
+            });
         }
 
     </script>
@@ -636,7 +776,7 @@
         </ul>
     </div>
     <br><br>
-    <form onsubmit="handleFormSubmit(event)">
+    <form id="configForm" onsubmit="handleFormSubmit(event)">
         <label for="weather">Weather Sensor:</label>
         <input type="checkbox" id="weather" name="weather">
         <label for="weatherHumidity" id="labelWeatherHumidity">Humidity:</label>
@@ -667,19 +807,23 @@
 
         <label for="onewire">1-Wire Sensors:</label>
         <input type="checkbox" id="onewire" name="onewire">
-        <input type="text" id="onewireInput" title="Specify comma-separated list of sensor indices to enable." name="onewireInput" style="display: none;"><br><br>
+        <input type="text" id="onewireInput" title="Specify comma-separated list of sensor indices to enable."
+            name="onewireInput" style="display: none;"><br><br>
 
         <label for="analog">Analog Interfaces:</label>
         <input type="checkbox" id="analog" name="analog">
-        <input type="text" id="analogInput" title="Specify comma-separated list of channel numbers to enable." name="analogInput" style="display: none;"><br><br>
+        <input type="text" id="analogInput" title="Specify comma-separated list of channel numbers to enable."
+            name="analogInput" style="display: none;"><br><br>
 
         <label for="digital">Digital Interfaces:</label>
         <input type="checkbox" id="digital" name="digital">
-        <input type="text" id="digitalInput" title="Specify comma-separated list of channel numbers to enable." name="digitalInput" style="display: none;"><br><br>
+        <input type="text" id="digitalInput" title="Specify comma-separated list of channel numbers to enable."
+            name="digitalInput" style="display: none;"><br><br>
 
         <label for="ble">BLE Sensors:</label>
         <input type="checkbox" id="ble" name="ble">
-        <input type="number" id="bleInput" title="Specify number of BLE sensors to enable." name="bleInput" style="display: none; width: 40px;" min="0" max="16"><br><br>
+        <input type="number" id="bleInput" title="Specify number of BLE sensors to enable." name="bleInput"
+            style="display: none; width: 40px;" min="0" max="16"><br><br>
 
         <hr style="width:800px;text-align:left;margin-left:0"><br>
 
@@ -706,7 +850,7 @@
         <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
         <textarea id="arrayOutput" name="arrayOutput" readonly cols="100" rows="3"></textarea><br><br>
 
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit">&nbsp;&nbsp;&nbsp;<button id="resetButton">Reset to Defaults</button>
     </form>
     <br>
     <br>
