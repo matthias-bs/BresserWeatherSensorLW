@@ -787,10 +787,12 @@
             <li>For other sensors, enter channel numbers separated by commas into text fields.</li>
             <li>Check if assumptions regarding data field sizes are valid.</li>
             <li>Note: BLE sensors are enabled separately by specifying their MAC addresses.</li>
-            <li>Press 'Submit' button.</li>
+            <li>Press 'Update' ('Submit') button.</li>
         </ul>
     </div>
     <br><br>
+    <h2>Input</h2>
+    <hr style="width:800px;text-align:left;margin-left:0"><br>
     <form id="configForm" onsubmit="handleFormSubmit(event)">
         <label for="weather">Weather Sensor:</label>
         <input type="checkbox" id="weather" name="weather">
@@ -840,8 +842,6 @@
         <input type="number" id="bleInput" title="Specify number of BLE sensors to enable." name="bleInput"
             style="display: none; width: 40px;" min="0" max="16"><br><br>
 
-        <hr style="width:800px;text-align:left;margin-left:0"><br>
-
         <div style="border: 1px solid black; padding: 10px; width: fit-content;">
             The maximum payload size is essentialy limited by the maximum permitted air time, which is mandated by<br>
             the LoRaWAN Regional Parameters and potentially a LoRaWAN Network Service Provider's fair use
@@ -850,9 +850,11 @@
                 LoRaWAN</a>.
         </div><br>
         <label for="size">Maximum Size (Bytes):</label><br>
-        <input type="text" id="maxSize" name="maxSize"><br><br>
+        <input type="text" id="maxSize" name="maxSize"><br><br><br>
 
-        <label for="size">Size (Bytes):</label><br>
+        <h2>Output</h2>
+        <hr style="width:800px;text-align:left;margin-left:0"><br>
+        <label for="size">Actual Size (Bytes):</label><br>
         <input type="text" id="size" name="size" value="0" readonly><br><br>
 
         <label for="jsonOutput">Node Configuration Downlink:</label><br>
@@ -862,18 +864,21 @@
             <code>decode()</code>):</label><br>
         <textarea id="jsonOutput2" name="jsonOutput2" readonly cols="100" rows="23"></textarea><br><br>
 
-        <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
-        <textarea id="arrayOutput" name="arrayOutput" readonly cols="100" rows="3"></textarea><br><br>
+        <b>Note: Configuration via downlink is recommended instead of modifying the source code!</b><br>
+        <label for="arrayOutput" style="vertical-align: top;">Arduino Source Code (<code>AppLayer.h</code>, <code>appPayloadCfgDef[]</code>):</label><br>
+        <textarea id="arrayOutput" name="arrayOutput" readonly cols="100" rows="3"></textarea><br><br><br>
+
+        <hr style="width:800px;text-align:left;margin-left:0"><br>
 
         <!-- Load button -->
-        <button id="saveButton">Save Configuration</button><br><br>
+        <button id="saveButton">Save Configuration</button>&nbsp;&nbsp;&nbsp;
 
         <!-- Load file widget & button -->
         <input type="file" id="fileInput" style="display:none;" accept=".json" />
         <button id="loadButton">Load Configuration</button><br><br>
 
         <!-- Submit button -->
-        <input type="submit" value="Submit">&nbsp;&nbsp;&nbsp;<button id="resetButton">Reset to Defaults</button>
+        <input type="submit" value="Update" />&nbsp;&nbsp;&nbsp;<button id="resetButton">Reset to Defaults</button>
 
     </form>
     <br>
