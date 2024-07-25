@@ -695,7 +695,7 @@ The default sensor data uplink configuration is defined in https://github.com/ma
 
 Changing the configuration by setting bitmaps is not really comfortable. Therefore the Config Helper has been created.
 
-![Config_Helper-20240531](https://github.com/matthias-bs/BresserWeatherSensorLW/assets/83612361/36fe486b-3ffe-474d-9b1f-762415ff47db)
+![config_helper_20240725](https://github.com/user-attachments/assets/e69ed1e3-4de6-42ea-85e1-f4edc0d58dc7)
 
 [Config Helper](https://matthias-bs.github.io/BresserWeatherSensorLW/confighelper.html)
 
