@@ -50,6 +50,7 @@
 //          of PayloadBresser (assign to configArray[1])
 // 20240721 Added tooltips and visual feedback for empty input fields
 // 20240725 Added saving of form values to localStorage, added reset to default values
+//          Added saving/loading of configuration to/from JSON file
 //
 // ToDo:
 // -
@@ -97,18 +98,34 @@
             multiChannel: true,
             checkbox2: true,
             inputChannel2: '1',
+            checkbox3: false,
+            inputChannel3: '',
             checkbox4: true,
             inputChannel4: '1',
+            checkbox5: false,
+            inputChannel5: '',
+            checkbox6: false,
+            inputChannel6: '',
+            checkbox7: false,
+            inputChannel7: '',
+            checkbox8: false,
+            inputChannel8: '',
+            checkbox10: false,
+            inputChannel10: '',
+            checkbox11: false,
+            inputChannel11: '',
             onewire: true,
-            onewireInput: '1',
+            onewireInput: '0',
             analog: true,
             analogInput: '0',
             digital: false,
-            ble: false,
+            digitalInput: '',
+            ble: true,
             bleInput: 1,
             lightning: true,
             lightningRaw: false,
-            lightningProc: true
+            lightningProc: true,
+            maxSize: 51
         };
 
         // [Name, Size in bytes, Signals, Types]
@@ -132,41 +149,6 @@
             [1, 'ble*_humidity', 'uint8']
         ]
 
-        function triggerInput(input) {
-            // Manually trigger the change event
-            if ('createEvent' in document) {
-                // Compatibility mode for older browsers
-                var evt = document.createEvent('HTMLEvents');
-                // Arguments: type, canBubble, cancelable
-                // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
-                evt.initEvent('input', false, true);
-                input.dispatchEvent(evt);
-            } else {
-                // For modern browsers
-                input.fireEvent('oninput');
-            }
-        }
-
-        function checkWidgets(widget) {
-            let checkbox = document.getElementById(widget);
-            let input = document.getElementById(widget + 'Input');
-            //input.style.display = checkbox.checked ? 'inline' : 'none';
-            if (checkbox.checked && input.value.trim() === '') {
-                input.style.backgroundColor = 'LightCoral';
-            } else {
-                input.style.backgroundColor = '';
-            }
-        }
-
-        function checkInput(widget) {
-            let input = document.getElementById(widget);
-            console.log(input.id, input.value);
-            if (input.value.trim() === '') {
-                input.style.backgroundColor = 'LightCoral';
-            } else {
-                input.style.backgroundColor = '';
-            }
-        }
 
         // Toggle input field visibility
         window.onload = function () {
@@ -250,10 +232,6 @@
                 document.getElementById('checkboxContainer').style.display = this.checked ? 'inline' : 'none';
             });
 
-
-            //const checkboxes = document.querySelectorAll('.checkboxContainer input[type="checkbox"]');
-            //const inputChannels = document.querySelectorAll('.inputChannelContainer input[type="text"]');
-            //checkboxes.forEach(checkbox, index) => {
             for (var i = 2; i <= 11; i++) {
                 if (i == 9)
                     continue;
@@ -330,14 +308,13 @@
             document.getElementById('ble').addEventListener('change', function () {
                 bleInput = document.getElementById('bleInput');
                 bleInput.style.display = this.checked ? 'inline' : 'none';
-                triggerInput(bleInput);
             });
 
             // Attach event listener to the reset button
             document.getElementById('resetButton').addEventListener('click', resetForm);
 
             // Initialize the maximum size field
-            document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
+            //document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
 
             // Initialize the size field
             document.getElementById('size').value = 0;
@@ -416,21 +393,84 @@
                     // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
                     evt.initEvent('change', false, true);
                     input.dispatchEvent(evt);
-                    evt.initEvent('input', false, true);
-                    input.dispatchEvent(evt);
+                    //evt.initEvent('input', false, true);
+                    //input.dispatchEvent(evt);
                 } else {
                     // For modern browsers
                     input.fireEvent('onchange');
-                    input.fireEvent('oninput');
+                    //input.fireEvent('oninput');
                 }
+            });
+
+            document.getElementById('saveButton').addEventListener('click', function () {
+                // Collect current form values
+                let currentValues = {};
+
+                for (key in defaultValues) {
+                    let input = document.getElementById(key);
+                    if (input.type === 'checkbox') {
+                        console.log(input.id, input.checked);
+                        currentValues[key] = input.checked;
+                    } else if (input.type === 'number' || input.type === 'text') {
+                        console.log(input.id, input.value);
+                        currentValues[key] = input.value;
+                    }
+                }
+                //currentValues['maxSize'] = document.getElementById('maxSize').value;
+
+                // Convert to JSON string
+                const jsonStr = JSON.stringify(currentValues, null, 2); // Pretty print JSON
+                const blob = new Blob([jsonStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+
+                // Create a link and trigger download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "payload_config.json"; // File name
+                document.body.appendChild(a); // Required for Firefox
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url); // Clean up
+            });
+
+            document.getElementById('loadButton').addEventListener('click', function () {
+                document.getElementById('fileInput').click(); // Trigger file input
+            });
+
+            document.getElementById('fileInput').addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Create a FileReader to read the file
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const contents = e.target.result;
+                        // Parse the JSON contents of the file
+                        const config = JSON.parse(contents);
+                        // Update the UI with the loaded configuration
+                        updateUIWithConfig(config);
+                    };
+                    reader.readAsText(file); // Read the file as text
+                }
+                document.getElementById('fileInput').value = ''; // Clear the file input
             });
         }; // window.onload
 
+
+
+        function updateUIWithConfig(config) {
+            for (key in config) {
+                let input = document.getElementById(key);
+                if (input.type === 'checkbox') {
+                    input.checked = config[key];
+                } else {
+                    input.value = config[key];
+                }
+            }
+            computeResults();
+        }
+
         // Reset the form
         function resetForm() {
-            //document.getElementById('jsonOutput').value = "{}";
-            //document.getElementById('jsonOutput2').value = "{}";
-            //document.getElementById('arrayOutput').value = "{}";
             document.querySelectorAll('#configForm input').forEach(input => {
                 switch (input.type) {
                     case 'text':
@@ -464,17 +504,17 @@
                     // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
                     evt.initEvent('change', false, true);
                     input.dispatchEvent(evt);
-                    evt.initEvent('input', false, true);
-                    input.dispatchEvent(evt);
+                    //evt.initEvent('input', false, true);
+                    //input.dispatchEvent(evt);
                 } else {
                     // For modern browsers
                     input.fireEvent('onchange');
-                    input.fireEvent('oninput');
+                    //input.fireEvent('oninput');
                 }
             });
 
-            document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
-            document.getElementById('configForm').submit();
+            //document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
+            computeResults();
         }
 
         // Get [size, bitmap] from a comma-separated list of channel numbers
@@ -616,10 +656,7 @@
             return size;
         }
 
-        // Calculate the size of the payload and update the JSON output
-        function handleFormSubmit(event) {
-            event.preventDefault(); // Prevent the form from submitting
-
+        function computeResults() {
             let totalSize = 0;
             let configDecoder = {
                 signals: [],
@@ -760,6 +797,13 @@
             });
         }
 
+        // Calculate the size of the payload and update the JSON output
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent the form from submitting
+            
+            computeResults();
+        }
+
     </script>
 </head>
 
@@ -850,7 +894,16 @@
         <label for="arrayOutput" style="vertical-align: top;"><code>appPayloadCfgDef[]:</code></label><br>
         <textarea id="arrayOutput" name="arrayOutput" readonly cols="100" rows="3"></textarea><br><br>
 
+        <!-- Load button -->
+        <button id="saveButton">Save Configuration</button><br><br>
+
+        <!-- Load file widget & button -->
+        <input type="file" id="fileInput" style="display:none;" accept=".json" />
+        <button id="loadButton">Load Configuration</button><br><br>
+
+        <!-- Submit button -->
         <input type="submit" value="Submit">&nbsp;&nbsp;&nbsp;<button id="resetButton">Reset to Defaults</button>
+
     </form>
     <br>
     <br>
