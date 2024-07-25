@@ -4,6 +4,10 @@
 // confighelper.h
 //
 // BresserWeatherSensorLW LoRaWAN Payload Configuration Tool
+// - Visual feedback for empty input fields
+// - Saving of form values to localStorage
+// - Reset to default values
+// - Saving/loading of configuration to/from JSON file
 //
 // created: 05/2024
 //
@@ -86,6 +90,9 @@
             types: []
         };
 
+        // Default values
+        // see
+        // https://github.com/matthias-bs/BresserWeatherSensorLW/blob/main/README.md#default-configuration
         const defaultValues = {
             weather: true,
             weatherHumidity: true,
@@ -144,13 +151,14 @@
             ["Air Quality (HCHO/VOC)", 3, ['aq*_hcho_ppb', 'aq*_voc'], ['uint16', 'uint16']],
         ];
 
+        // [Size in bytes, Signal name, Type]
         const bleSensors = [
             [2, 'ble*_temp_c', 'temperature'],
             [1, 'ble*_humidity', 'uint8']
         ]
 
 
-        // Toggle input field visibility
+        // Initialize document and set up event listeners
         window.onload = function () {
             // Add event listener to "Weather Sensors" checkbox
             document.getElementById('weather').addEventListener('change', function () {
@@ -178,6 +186,7 @@
                 document.getElementById('labelLightningProc').style.display = this.checked ? 'inline' : 'none';
             });
 
+            // Create "Multi-Channel Bresser Sensors" checkboxes and input fields
             var checkboxContainer = document.getElementById('checkboxContainer');
             for (var i = 2; i <= 11; i++) {
                 if (i == 9)
@@ -232,6 +241,7 @@
                 document.getElementById('checkboxContainer').style.display = this.checked ? 'inline' : 'none';
             });
 
+            // Update the input field's style if either the checkbox or the input field changes
             for (var i = 2; i <= 11; i++) {
                 if (i == 9)
                     continue;
@@ -256,6 +266,9 @@
                 });
             }
 
+            //
+            // Change input field's style
+            //
             // Add event listener to "1-Wire Sensors" input field
             document.getElementById('onewireInput').addEventListener('change', function () {
                 // Check if the input is not empty
@@ -286,6 +299,9 @@
                 }
             });
 
+            //
+            // Hide or show input fields
+            //
             // Add event listener to "1-Wire Sensors" checkbox
             document.getElementById('onewire').addEventListener('change', function () {
                 onewireInput = document.getElementById('onewireInput');
@@ -313,9 +329,6 @@
             // Attach event listener to the reset button
             document.getElementById('resetButton').addEventListener('click', resetForm);
 
-            // Initialize the maximum size field
-            //document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
-
             // Initialize the size field
             document.getElementById('size').value = 0;
 
@@ -334,57 +347,22 @@
             configStr += "}";
             document.getElementById('arrayOutput').value = configStr;
 
-            // Restore values
-            // Show input widget if checkbox is checked
-            // Highlight input widget if checkbox is checked and input is empty
+            // Restore values from localStorage
             document.querySelectorAll('#configForm input').forEach(input => {
                 const savedValue = localStorage.getItem(input.id);
                 if (savedValue !== null) {
                     if (input.type === 'checkbox') {
-                        console.log(input.id, input.checked);
                         input.checked = savedValue === 'true';
-                        if (input == document.getElementById('lightning') && input.checked) {
-                            document.getElementById('lightningRaw').style.display = 'inline';
-                            document.getElementById('labelLightningRaw').style.display = 'inline';
-                            document.getElementById('lightningProc').style.display = 'inline';
-                            document.getElementById('labelLightningProc').style.display = 'inline';
-                        }
-                        if (input == document.getElementById('multiChannel') && input.checked) {
-                            document.getElementById('checkboxContainer').style.display = 'inline';
-                        }
-                        for (var i = 2; i <= 11; i++) {
-                            if (i == 9)
-                                continue;
-                            if (input == document.getElementById('checkbox' + i) && input.checked) {
-                                let inputChannels = document.getElementById('inputChannel' + i);
-                                if (inputChannels.value.trim() === '') {
-                                    inputChannels.style.backgroundColor = 'LightCoral';
-                                }
-                            }
-                        }
-                    } else if (input.type === 'number') {
+                    } else if (input.type === 'number' || input.type === 'text') {
                         input.value = savedValue;
                     } else {
                         input.value = savedValue;
-                        console.log(input.id, input.value);
-                        for (var i = 2; i <= 11; i++) {
-                            if (i == 9)
-                                continue;
-                            if (input == document.getElementById('inputChannel' + i) && input.value.trim() === '') {
-                                if (document.getElementById('checkbox' + i).checked) {
-                                    input.style.backgroundColor = 'LightCoral';
-                                }
-                            }
-                        }
-                        // if (input == document.getElementById('onewireInput') && input.value.trim() === '') {
-                        //     if (document.getElementById('onewire').checked) {
-                        //         input.style.backgroundColor = 'LightCoral';
-                        //     } else {
-                        //         input.style.backgroundColor = '';
-                        //     }
-                        // }
                     }
+                } else {
+                    // Get default values
+                    resetForm();
                 }
+
                 // Manually trigger the change event
                 if ('createEvent' in document) {
                     // Compatibility mode for older browsers
@@ -393,30 +371,24 @@
                     // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
                     evt.initEvent('change', false, true);
                     input.dispatchEvent(evt);
-                    //evt.initEvent('input', false, true);
-                    //input.dispatchEvent(evt);
                 } else {
                     // For modern browsers
                     input.fireEvent('onchange');
-                    //input.fireEvent('oninput');
                 }
             });
 
             document.getElementById('saveButton').addEventListener('click', function () {
-                // Collect current form values
                 let currentValues = {};
 
+                // Collect current form values
                 for (key in defaultValues) {
                     let input = document.getElementById(key);
                     if (input.type === 'checkbox') {
-                        console.log(input.id, input.checked);
                         currentValues[key] = input.checked;
                     } else if (input.type === 'number' || input.type === 'text') {
-                        console.log(input.id, input.value);
                         currentValues[key] = input.value;
                     }
                 }
-                //currentValues['maxSize'] = document.getElementById('maxSize').value;
 
                 // Convert to JSON string
                 const jsonStr = JSON.stringify(currentValues, null, 2); // Pretty print JSON
@@ -433,10 +405,12 @@
                 URL.revokeObjectURL(url); // Clean up
             });
 
+            // Add event listener to the load button
             document.getElementById('loadButton').addEventListener('click', function () {
                 document.getElementById('fileInput').click(); // Trigger file input
             });
 
+            // Add event listener to the file input
             document.getElementById('fileInput').addEventListener('change', function (event) {
                 const file = event.target.files[0];
                 if (file) {
@@ -453,10 +427,11 @@
                 }
                 document.getElementById('fileInput').value = ''; // Clear the file input
             });
+            computeResults();
         }; // window.onload
 
 
-
+        // Update the UI with the loaded configuration
         function updateUIWithConfig(config) {
             for (key in config) {
                 let input = document.getElementById(key);
@@ -469,7 +444,7 @@
             computeResults();
         }
 
-        // Reset the form
+        // Reset the form to default values
         function resetForm() {
             document.querySelectorAll('#configForm input').forEach(input => {
                 switch (input.type) {
@@ -504,16 +479,11 @@
                     // https://developer.mozilla.org/en-US/docs/Web/API/Event/initEvent
                     evt.initEvent('change', false, true);
                     input.dispatchEvent(evt);
-                    //evt.initEvent('input', false, true);
-                    //input.dispatchEvent(evt);
                 } else {
                     // For modern browsers
                     input.fireEvent('onchange');
-                    //input.fireEvent('oninput');
                 }
             });
-
-            //document.getElementById('maxSize').value = PAYLOAD_SIZE_LIMIT;
             computeResults();
         }
 
@@ -656,6 +626,7 @@
             return size;
         }
 
+        // Compute the size of the payload and update the output fields
         function computeResults() {
             let totalSize = 0;
             let configDecoder = {
@@ -797,7 +768,7 @@
             });
         }
 
-        // Calculate the size of the payload and update the JSON output
+        // Form submit handler which updates the form
         function handleFormSubmit(event) {
             event.preventDefault(); // Prevent the form from submitting
             
