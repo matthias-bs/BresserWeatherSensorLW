@@ -766,7 +766,7 @@ getPayload
  * \param port LoRaWAN port
  * \param encoder uplink encoder object
  */
-void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
+void getPayloadStage1(uint8_t &port, LoraEncoder &encoder);
 
 /*!
  * \brief Get payload before uplink
@@ -779,7 +779,7 @@ void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
  * \param port LoRaWAN port
  * \param encoder uplink encoder object
  */
-void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
+void getPayloadStage2(uint8_t &port, LoraEncoder &encoder);
 ```
 
 #### decodeDownlink()
