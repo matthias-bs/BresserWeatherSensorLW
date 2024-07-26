@@ -61,6 +61,7 @@
 // 20240704 Moved MAX_DOWNLINK_SIZE from config.h, changed to 51
 // 20240722 Added LW_STATUS_INTERVAL, 
 //          renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
+// 20240726 Renamed BATTERY_DISCHARGE_LIMIT/BATTERY_CHARGE_LIMIT
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -110,8 +111,8 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #define BATTERY_LOW 3200
 
 // Battery voltage limits in mV (usable range for the device) for battery state calculation
-#define BATTERY_DISCHARGE_LIMIT 3200
-#define BATTERY_CHARGE_LIMIT 4200
+#define BATTERY_DISCHARGE_LIM 3200
+#define BATTERY_CHARGE_LIM 4200
 
 // Minimum sleep interval (in seconds)
 #define SLEEP_INTERVAL_MIN 60
