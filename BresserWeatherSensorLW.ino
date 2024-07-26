@@ -477,8 +477,8 @@ void setup()
   String timeZoneInfo(TZ_INFO);
   uint16_t battery_weak = BATTERY_WEAK;
   uint16_t battery_low = BATTERY_LOW;
-  uint16_t battery_discharge_limit = BATTERY_DISCHARGE_LIMIT;
-  uint16_t battery_charge_limit = BATTERY_CHARGE_LIMIT;
+  uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
+  uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
 #if defined(BATTERY_CAPACITY_MAH)
   uint16_t battery_capacity_mah = BATTERY_CAPACITY_MAH;
 #else
@@ -489,8 +489,8 @@ void setup()
       timeZoneInfo,
       battery_weak,
       battery_low,
-      battery_discharge_limit,
-      battery_charge_limit,
+      battery_discharge_lim,
+      battery_charge_lim,
       battery_capacity_mah);
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -592,14 +592,14 @@ void setup()
   {
     battLevel = 255;
   }
-  else if (voltage > battery_charge_limit)
+  else if (voltage > battery_charge_lim)
   {
     battLevel = 0;
   }
   else
   {
     battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - battery_discharge_limit) / static_cast<float>(battery_charge_limit - battery_discharge_limit) * 255);
+        static_cast<float>(voltage - battery_discharge_lim) / static_cast<float>(battery_charge_lim - battery_discharge_lim) * 255);
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
