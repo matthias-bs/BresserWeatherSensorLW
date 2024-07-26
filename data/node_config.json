@@ -1,0 +1,8 @@
+{
+    "timezone": "CET-1CEST,M3.5.0,M10.5.0/3",
+    "battery_weak": 3301,
+    "battery_low": 3401,
+    "battery_discharge_lim": 3201,
+    "battery_charge_lim": 4201,
+    "battery_capacity": 2201
+}

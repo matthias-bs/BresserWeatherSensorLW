@@ -95,6 +95,8 @@
 // 20240722 Added periodic uplink of LoRaWAN node status messages
 // 20240723 Moved loadSecrets() to LoadSecrets.cpp/.h
 //          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
+// 20240725 Added reading of hardware/deployment specific configuration node_config.json
+//          from LittleFS (optional)
 //
 // ToDo:
 // -
@@ -172,12 +174,12 @@ using namespace PowerFeather;
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
 #include "src/LoadSecrets.h"
+#include "src/LoadNodeCfg.h"
 #include "src/AppLayer.h"
 #include "src/adc/adc.h"
 
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
-
 
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
@@ -245,7 +247,6 @@ void print_wakeup_reason()
 }
 #endif
 
-
 /*!
  * \brief Compute sleep duration
  *
@@ -261,14 +262,14 @@ void print_wakeup_reason()
  *
  * \returns sleep duration in seconds
  */
-uint32_t sleepDuration(void)
+uint32_t sleepDuration(uint16_t battery_weak)
 {
   uint32_t sleep_interval = prefs.sleep_interval;
   longSleep = false;
 
   uint16_t voltage = getBatteryVoltage();
   // Long sleep interval if battery is weak
-  if (voltage && voltage <= BATTERY_WEAK)
+  if (voltage && voltage <= battery_weak)
   {
     sleep_interval = prefs.sleep_interval_long;
     longSleep = true;
@@ -288,7 +289,6 @@ uint32_t sleepDuration(void)
   sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
   return sleep_interval;
 }
-
 
 #if defined(ESP32)
 /*!
@@ -351,7 +351,6 @@ void gotoSleep(uint32_t seconds)
 }
 #endif
 
-
 /// Print date and time (i.e. local time)
 void printDateTime(void)
 {
@@ -363,7 +362,6 @@ void printDateTime(void)
   strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
   log_i("%s", tbuf);
 }
-
 
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
@@ -472,16 +470,35 @@ void setup()
   M5.begin(cfg);
 #endif
 
-#if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  delay(2000);
-  Board.init(BATTERY_CAPACITY_MAH); // Note: Battery capacity / type has to be set for voltage measurement
-  Board.enable3V3(true);            // Power supply for FeatherWing
-  Board.enableVSQT(true);           // Power supply for battery management chip (voltage measurement)
-#endif
-
   Serial.begin(115200);
   delay(2000); // give time to switch to the serial monitor
   log_i("Setup");
+
+  String timeZoneInfo(TZ_INFO);
+  uint16_t battery_weak = BATTERY_WEAK;
+  uint16_t battery_low = BATTERY_LOW;
+  uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
+  uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
+#if defined(BATTERY_CAPACITY_MAH)
+  uint16_t battery_capacity_mah = BATTERY_CAPACITY_MAH;
+#else
+  uint16_t battery_capacity_mah = 0;
+#endif
+
+  loadNodeCfg(
+      timeZoneInfo,
+      battery_weak,
+      battery_low,
+      battery_discharge_lim,
+      battery_charge_lim,
+      battery_capacity_mah);
+
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  delay(2000);
+  Board.init(battery_capacity_mah); // Note: Battery capacity / type has to be set for voltage measurement
+  Board.enable3V3(true);            // Power supply for FeatherWing
+  Board.enableVSQT(true);           // Power supply for battery management chip (voltage measurement)
+#endif
 
 #if defined(ARDUINO_ARCH_RP2040)
   // see pico-sdk/src/rp2_common/hardware_rtc/rtc.c
@@ -519,7 +536,7 @@ void setup()
   }
 
   // Set time zone
-  setenv("TZ", TZ_INFO, 1);
+  setenv("TZ", timeZoneInfo.c_str(), 1);
   printDateTime();
 
   // Try to load LoRaWAN secrets from LittleFS file, if available
@@ -538,10 +555,10 @@ void setup()
   preferences.end();
 
   uint16_t voltage = getBatteryVoltage();
-  if (voltage && voltage <= BATTERY_LOW)
+  if (voltage && voltage <= battery_low)
   {
     log_i("Battery low!");
-    gotoSleep(sleepDuration());
+    gotoSleep(sleepDuration(battery_weak));
   }
 
   // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
@@ -575,14 +592,14 @@ void setup()
   {
     battLevel = 255;
   }
-  else if (voltage > BATTERY_CHARGE_LIMIT)
+  else if (voltage > battery_charge_lim)
   {
     battLevel = 0;
   }
   else
   {
     battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - BATTERY_DISCHARGE_LIMIT) / static_cast<float>(BATTERY_CHARGE_LIMIT - BATTERY_DISCHARGE_LIMIT) * 255);
+        static_cast<float>(voltage - battery_discharge_lim) / static_cast<float>(battery_charge_lim - battery_discharge_lim) * 255);
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
@@ -614,6 +631,7 @@ void setup()
     appStatusUplinkPending = true;
   }
 
+  // Set lwStatusUplink flag if required
   if (prefs.lw_stat_interval && (fCntUp % prefs.lw_stat_interval == 0))
   {
     lwStatusUplinkPending = true;
@@ -763,7 +781,7 @@ void setup()
   memcpy(LWsession, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
 
   // wait until next uplink - observing legal & TTN Fair Use Policy constraints
-  gotoSleep(sleepDuration());
+  gotoSleep(sleepDuration(battery_weak));
 }
 
 // The ESP32 wakes from deep-sleep and starts from the very beginning.

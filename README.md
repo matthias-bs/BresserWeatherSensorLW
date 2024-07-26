@@ -75,6 +75,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [Using the Javascript Uplink/Downlink Formatters](#using-the-javascript-uplinkdownlink-formatters)
 * [Scanning for Sensors](#scanning-for-sensors)
 * [Loading LoRaWAN Network Service Credentials from File](#loading-lorawan-network-service-credentials-from-file)
+* [Loading LoRaWAN Node Configuration from File](#loading-lorawan-node-configuration-from-file)
 * [Payload Configuration](#payload-configuration)
   * [Default Configuration](#default-configuration)
   * [Config Helper](#config-helper)
@@ -296,15 +297,26 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 
 ### Optional Configuration
 
-In [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
+Header
+:    [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h).
 
-* Configure your time zone by editing `TZ_INFO`
-* Disable sensor/interface features which you do not want to use
-* Adjust battery voltage levels
-* Configure the timing parameters if required
-* If enabled, configure your ATC MiThermometer's / Theengs Decoder's BLE MAC Address by by editing `KNOWN_BLE_ADDRESSES`
-* Configure the ADC's input pins, dividers and oversampling settings as needed
-* Disable sensor decoders wich are not needed
+Downlink
+:    see [Remote Configuration Commands](#remote-configuration-commands--status-requests-via-lorawan)
+
+File
+:    see [Loading LoRaWAN Node Configuration from File](#loading-lorawan-node-configuration-from-file)
+
+| Parameter              | Description                                                | Header | Downlink | File |
+| ---------------------- | ---------------------------------------------------------- |:------:|:--------:|:----:|
+| `TZ_INFO` / `timezone` | your time zone                                             |    X   |          |   X  |
+| `KNOWN_BLE_ADDRESSES`  | BLE Sensor MAC Addresses                                   |    X   |     X    |      |
+| `SLEEP_INTERVAL`<br>`SLEEP_INTERVAL_LONG`<br>`LW_STATUS_INTERVAL`<br>`APP_STATUS_INTERVAL`<br>`WEATHERSENSOR_TIMEOUT` | Timing parameters                                                                            |    X   |     X    |      |
+| `en_decoders`          | Enabled sensor decoders (saves CPU cycles / energy)        |        |     X    |      |
+| `BATTERY_WEAK`<br>`BATTERY_LOW`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
+| `BATTERY_CAPACITY_MAH` /<br>`battery_capacity` | Battery capacity                   |    X   |          |   X  |
+| see header file        | ADC's input pins, dividers and oversampling                |    X   |          |      |
+
+
 
 ### Enabling Debug Output
 
@@ -641,14 +653,42 @@ This allows the following actions:
 
 ## Loading LoRaWAN Network Service Credentials from File
 
+```[!NOTE]
 To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a JSON file. This allows to use the same source code and binary file for a fleet of devices.
+```
 
 If a valid file `secrets.json` exists on LittleFS, the settings defined at compile time (in `secrets.h`) are overridden.
 
 Modify the example [data/secrets.json](data/secrets.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
 
 > [!WARNING]
-> Only very basic validation of the file `secrets.json` is implemented.
+> Only very basic validation of the file `secrets.json` is implemented &mdash; check the debug output.
+
+## Loading LoRaWAN Node Configuration from File
+
+```[!NOTE]
+To simplify deployment of a larger number of devices, LoRaWAN node configuration parameters can be read from a JSON file. These parameters are used for hardware or deployment environment specific settings. This allows to use the same source code and binary file for a fleet of devices.
+```
+
+If a valid file `node_config.json` exists on LittleFS, the default settings defined at compile time (in `BresserWeatherSensorCfg.h`) are overridden.
+If a parameter cannot be read from the file, its default value will be used.
+
+The following parameters are available:
+
+| Parameter             | Description | Default Value |
+| --------------------- | ----------------------------------------------------------------------- | -------------:|
+| timezone              | Time Zone<br>see [Time Zone Abbreviations](https://remotemonitoringsystems.ca/time-zone-abbreviations.php) | `"CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"` |
+| battery_weak          | Voltage threshold in mV for power saving mode<br>(long sleep interval)  | `3500` |
+| battery_low           | Voltage threshold in mV for deep-discharge protection<br>(power off)    | `3200` |
+| battery_discharge_lim | Discharging voltage limit in mV<br>for battery level estimation         | `3200` |
+| battery_charge_lim    | Charging voltage limit in mV<br>for battery level estimation            | `4200` |
+| battery_capacity      | Battery capacity in mAh<br>(curently only used by ESP32S3 PowerFeather) | `0`    |
+
+
+Modify the example [data/node_config.json](data/node_config.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
+
+> [!WARNING]
+> No validation of the file `node_config.json` is implemented &mdash; check the debug output.
 
 ## Payload Configuration
 
