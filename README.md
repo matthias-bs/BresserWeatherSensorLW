@@ -654,9 +654,9 @@ This allows the following actions:
 
 ## Loading LoRaWAN Network Service Credentials from File
 
-```[!NOTE]
-To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a JSON file. This allows to use the same source code and binary file for a fleet of devices.
-```
+> [!NOTE]
+> To simplify deployment of a larger number of devices, LoRaWAN credentials can be read from a JSON file. This allows to use the same source code and binary file for a fleet of devices.
+
 
 If a valid file `secrets.json` exists on LittleFS, the settings defined at compile time (in `secrets.h`) are overridden.
 
@@ -667,9 +667,8 @@ Modify the example [data/secrets.json](data/secrets.json) as required and instal
 
 ## Loading LoRaWAN Node Configuration from File
 
-```[!NOTE]
-To simplify deployment of a larger number of devices, LoRaWAN node configuration parameters can be read from a JSON file. These parameters are used for hardware or deployment environment specific settings. This allows to use the same source code and binary file for a fleet of devices.
-```
+> [!NOTE]
+> To simplify deployment of a larger number of devices, LoRaWAN node configuration parameters can be read from a JSON file. These parameters are used for hardware or deployment environment specific settings. This allows to use the same source code and binary file for a fleet of devices.
 
 If a valid file `node_config.json` exists on LittleFS, the default settings defined at compile time (in `BresserWeatherSensorCfg.h`) are overridden.
 If a parameter cannot be read from the file, its default value will be used.
