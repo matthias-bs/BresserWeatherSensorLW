@@ -140,7 +140,7 @@ See [Parameters](#parameters) for more details.
 ### Predefined Board Configurations
 
 > [!NOTE]
-> By using one of the boards listed in [Supported Hardware](#supported-hardware) and selecting this board / board revision in the Arduino IDE, you get a working hardware configuration.
+> By using one of the boards listed in [Supported Hardware](#supported-hardware) and selecting this **Board** / **Board Revision** in the Arduino IDE, you get a working hardware configuration.
  
 By selecting a Board and a Board Revision in the Arduino IDE, a define is passed to the preprocessor/compiler. A default configuration is assumed based on this define. If this is not what you need, you have to switch to Manual Configuration.
 
