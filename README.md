@@ -703,7 +703,7 @@ The default payload configuration is as follows:
 
 | Sensor                    | Signal                          | Unit  | Type        | Bytes |
 | ------------------------- | ------------------------------- | ----- | ----------- | ----- |
-| Bresser Sensors                                                                           |
+| **Bresser Sensors**                                                                       |
 | Weather                   | Temperature                     | °C    | temperature |     2 |
 | Weather                   | Humidity                        | %     | uint8       |     1 |
 | Weather                   | Rain Gauge                      | mm    | rawfloat    |     4 |
@@ -722,13 +722,13 @@ The default payload configuration is as follows:
 | Lightning                 | Post-processed: Event timestamp | epoch | unixtime    |     4 |
 | Lightning                 | Post-processed: No. of events   | -     | uint16      |     2 |
 | Lightning                 | Post-processed: Storm distance  | km    | uint8       |     1 |
-| 1-Wire Sensors                                                                            |
+| **1-Wire Sensors**                                                                        |
 | Temperature               | Temperature                     | °C    | temperature |     2 |
-| Analog Interface                                                                          |
+| **Analog Interface**                                                                      |
 | Ch 00                     | Battery voltage                 | mV    | uint16      |     2 |
-| Digital Interface                                                                         |
-| -- none --                                                                                |
-| BLE Sensors                                                                               |
+| **Digital Interface**                                                                     |
+| &mdash; none &mdash;                                                                      |
+| **BLE Sensors**                                                                           |
 | Temperature/Humidity      | Temperature                     | °C    | temperature |     2 |
 | Temperature/Humidity      | Humidity                        | %     | uint8       |     1 |
 
