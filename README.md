@@ -297,21 +297,18 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 
 ### Optional Configuration
 
-Header
-:    [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h).
+**Header:** [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h).
 
-Downlink
-:    see [Remote Configuration Commands](#remote-configuration-commands--status-requests-via-lorawan)
+**Downlink:** see [Remote Configuration Commands](#remote-configuration-commands--status-requests-via-lorawan)
 
-File
-:    see [Loading LoRaWAN Node Configuration from File](#loading-lorawan-node-configuration-from-file)
+**File**: see [Loading LoRaWAN Node Configuration from File](#loading-lorawan-node-configuration-from-file)
 
 | Parameter              | Description                                                | Header | Downlink | File |
 | ---------------------- | ---------------------------------------------------------- |:------:|:--------:|:----:|
 | `TZ_INFO` / `timezone` | your time zone                                             |    X   |          |   X  |
 | `KNOWN_BLE_ADDRESSES`  | BLE Sensor MAC Addresses                                   |    X   |     X    |      |
 | `SLEEP_INTERVAL`<br>`SLEEP_INTERVAL_LONG`<br>`LW_STATUS_INTERVAL`<br>`APP_STATUS_INTERVAL`<br>`WEATHERSENSOR_TIMEOUT` | Timing parameters                                                                            |    X   |     X    |      |
-| `en_decoders`          | Enabled sensor decoders (saves CPU cycles / energy)        |        |     X    |      |
+| `en_decoders`          | Enabled sensor decoders (disabling unused decoders saves CPU cycles / energy)        |        |     X    |      |
 | `BATTERY_WEAK`<br>`BATTERY_LOW`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
 | see header file        | ADC's input pins, dividers and oversampling                |    X   |          |      |
 | &mdash;                | PowerFeather specific configuration                        |        |          |      |
