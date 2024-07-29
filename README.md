@@ -45,7 +45,8 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * [Remote Configuration via LoRaWAN Downlink](#remote-configuration-commands--status-requests-via-lorawan)
 * Easy [Sensor Data Uplink Payload Configuration](#payload-configuration) 
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
-* Loading of LoRaWAN secrets from JSON file on LittleFS (optional)
+* Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
+* Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
 
 ## Contents
 
