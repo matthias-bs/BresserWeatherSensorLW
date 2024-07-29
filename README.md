@@ -577,7 +577,8 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 
 ## Scanning for Sensors
 
-The command `CMD_SCAN_SENSORS` allows to gather information about all sensors within range. 
+> [!NOTE]
+> The command `CMD_SCAN_SENSORS` allows to gather information about all sensors within range. 
 
 The differences between regular sensor reception and `CMD_SCAN_SENSORS` are:
 * Scanning will run for `<ws_scantime>` seconds (as opposed to `ws_timeout`)
