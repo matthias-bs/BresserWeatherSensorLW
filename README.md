@@ -686,7 +686,7 @@ The following parameters are available:
 | powerfeather/         | PowerFeather specific (see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)) |   |
 | &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected) | `0`    |
 | &nbsp;&nbsp;supply_maintain_voltage | see [PowerFeather Docs: `setSupplyMaintainVoltage()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setsupplymaintainvoltageuint16_t-voltage) | `5500` |
-| &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `setSupplyMaintainVoltage(enableBatteryTempSense)`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
+| &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `enableBatteryTempSense()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
 | &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
 
 
