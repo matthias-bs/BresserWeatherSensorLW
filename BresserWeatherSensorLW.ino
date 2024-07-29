@@ -97,7 +97,7 @@
 //          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
 // 20240725 Added reading of hardware/deployment specific configuration node_config.json
 //          from LittleFS (optional)
-// 20240729 PowerFeather: Enabled battery temperature measurement
+// 20240729 PowerFeather: Enabled battery temperature measurement, added specific configuration
 //
 // ToDo:
 // -
@@ -225,6 +225,17 @@ ESP32Time rtc;
 
 /// Application layer
 AppLayer appLayer(&rtc, &rtcLastClockSync);
+
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+struct sPowerFeatherCfg PowerFeatherCfg = {
+    .battery_capacity = BATTERY_CAPACITY_MAH,
+    .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
+    .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
+    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE
+};
+#else
+struct sPowerFeatherCfg PowerFeatherCfg = {0};
+#endif
 
 #if defined(ESP32)
 /*!
@@ -480,11 +491,11 @@ void setup()
   uint16_t battery_low = BATTERY_LOW;
   uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
   uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
-#if defined(BATTERY_CAPACITY_MAH)
-  uint16_t battery_capacity_mah = BATTERY_CAPACITY_MAH;
-#else
-  uint16_t battery_capacity_mah = 0;
-#endif
+// #if defined(BATTERY_CAPACITY_MAH)
+  // uint16_t battery_capacity_mah = BATTERY_CAPACITY_MAH;
+// #else
+  // uint16_t battery_capacity_mah = 0;
+// #endif
 
   loadNodeCfg(
       timeZoneInfo,
@@ -492,14 +503,18 @@ void setup()
       battery_low,
       battery_discharge_lim,
       battery_charge_lim,
-      battery_capacity_mah);
+      PowerFeatherCfg);
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
-  Board.init(battery_capacity_mah); // Note: Battery capacity / type has to be set for voltage measurement
-  Board.enable3V3(true);            // Power supply for FeatherWing
-  Board.enableVSQT(true);           // Power supply for battery management chip (voltage measurement)
-  Board.enableBatteryTempSense(true); // Enable battery temperature measurement
+  // Note: Battery capacity / type has to be set for voltage measurement
+  Board.init(PowerFeatherCfg.battery_capacity);                            
+  Board.enable3V3(true);  // Power supply for FeatherWing
+  Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
+  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement);   // Enable battery temperature measurement
+  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);        // Enable battery fuel gauge
+  Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
+  Board.enableBatteryCharging(true); // Enable battery charging
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)

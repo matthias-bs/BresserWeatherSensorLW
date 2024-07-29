@@ -35,6 +35,7 @@
 // History:
 //
 // 20240725 Created
+// 20240729 Added PowerFeather specific configuration
 //
 // ToDo:
 // -
@@ -44,6 +45,7 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include "BresserWeatherSensorLWCfg.h"
 #include "logging.h"
 
 /*!
@@ -59,7 +61,12 @@
  *   "battery_low": 3400,
  *   "battery_discharge_lim": 3200,
  *   "battery_charge_lim": 4200,
- *   "battery_capacity": 2200
+ *   "powerfeather": {
+ *     "battery_capacity":, 2200
+ *     "supply_maintain_voltage": 5500,
+ *     "temperature_measurement": true,
+ *     "battery_fuel_gauge": true
+ *   }
  * }
  */
 void loadNodeCfg(
@@ -68,4 +75,4 @@ void loadNodeCfg(
     uint16_t &batt_low,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
-    uint16_t &batt_capacity);
+    struct sPowerFeatherCfg &powerFeatherCfg);
