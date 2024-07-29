@@ -45,7 +45,7 @@
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
-#include "BresserWeatherSensorLWCfg.h"
+#include "../BresserWeatherSensorLWCfg.h"
 #include "logging.h"
 
 /*!
