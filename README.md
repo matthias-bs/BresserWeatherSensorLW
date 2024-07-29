@@ -21,8 +21,9 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * You currently need [RadioLib v6.6.0](https://github.com/jgromes/RadioLib/releases/tag/6.6.0)
 * You need [espressif/arduino-esp32 v3.0.X](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
-* The default payload configuration is different from [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
-* LoRaWAN downlink commands (and responses) are not compatible with [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
+* If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
+   * The default payload configuration is different
+   * LoRaWAN downlink commands (and responses) are different
 * [Don't Panic](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#Don't_Panic)
 
   While the software has quite many configuration options, most users won't need any or just a few. See [Required Configuration](#required-configuration) for the bare minimum configuration (and maybe [Default Parameter Values](#default-parameter-values) & [Default Configuration](#default-configuration)).
