@@ -316,7 +316,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `en_decoders`          | Enabled sensor decoders<br>(disabling unused decoders saves CPU cycles / energy)        |        |     X    |      |
 | `BATTERY_WEAK`<br>`BATTERY_LOW`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
 | see header file        | ADC's input pins, dividers and oversampling                |    X   |          |      |
-| &mdash;                | PowerFeather specific configuration                        |        |          |      |
+| **PowerFeather specific Configuration**                                                                        |
 | `BATTERY_CAPACITY_MAH` /<br>`powerfeather/battery_capacity` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_TEMPERATURE_MEASUREMENT` / <br>`powerfeather/temperature_measurement` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
