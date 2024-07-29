@@ -750,7 +750,7 @@ In the Config Helper, you select the desired sensors/interfaces and the used cha
 3. A JSON string to configure the [Uplink Payload Formatter](#lorawan-payload-formatters)
 
 > [!NOTE]
-> You do not have to modify the source code if you use the configuration via LoRaWAN downlink!
+> You do not have to modify the source code if you apply the configuration via LoRaWAN downlink!
 
 ## Customizing the Application Layer
 
