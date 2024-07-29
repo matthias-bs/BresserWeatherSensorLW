@@ -97,6 +97,7 @@
 //          Moved decodeDownlink() & sendCfgUplink() to BresserWeatherSensorLWCmd.cpp/.h
 // 20240725 Added reading of hardware/deployment specific configuration node_config.json
 //          from LittleFS (optional)
+// 20240729 PowerFeather: Enabled battery temperature measurement
 //
 // ToDo:
 // -
@@ -498,6 +499,7 @@ void setup()
   Board.init(battery_capacity_mah); // Note: Battery capacity / type has to be set for voltage measurement
   Board.enable3V3(true);            // Power supply for FeatherWing
   Board.enableVSQT(true);           // Power supply for battery management chip (voltage measurement)
+  Board.enableBatteryTempSense(true); // Enable battery temperature measurement
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)
