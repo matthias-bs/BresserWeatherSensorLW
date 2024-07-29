@@ -4,5 +4,9 @@
     "battery_low": 3201,
     "battery_discharge_lim": 3201,
     "battery_charge_lim": 4201,
-    "battery_capacity": 2201
+    "powerfeather": {
+        "battery_capacity": 2201,
+        "temperature_measurement": true,
+        "battery_fuel_gauge": true
+    }
 }

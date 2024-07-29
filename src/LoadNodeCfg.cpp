@@ -35,6 +35,7 @@
 // History:
 //
 // 20240725 Created
+// 20240729 Added PowerFeather specific configuration
 //
 // ToDo:
 // -
@@ -50,9 +51,9 @@ void loadNodeCfg(
     uint16_t &batt_low,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
-    uint16_t &batt_capacity)
+    struct sPowerFeatherCfg &powerFeatherCfg)
 {
-    uint16_t foo = 42;
+
 
     if (!LittleFS.begin(
 #if defined(ESP32)
@@ -94,8 +95,21 @@ void loadNodeCfg(
                     batt_discharge_lim = doc["battery_discharge_lim"];
                 if (doc.containsKey("battery_charge_lim"))
                     batt_charge_lim = doc["battery_charge_lim"];
-                if (doc.containsKey("battery_capacity"))
-                    batt_capacity = doc["battery_capacity"];
+                if (doc.containsKey("powerfeather")) {
+                    JsonObject pf = doc["powerfeather"];
+                    if (pf.containsKey("battery_capacity")) {
+                        powerFeatherCfg.battery_capacity = pf["battery_capacity"];
+                    }
+                    if (pf.containsKey("supply_maintain_voltage")) {
+                        powerFeatherCfg.supply_maintain_voltage = pf["supply_maintain_voltage"];
+                    }
+                    if (pf.containsKey("temperature_measurement")) {
+                        powerFeatherCfg.temperature_measurement = pf["temperature_measurement"];
+                    }
+                    if (pf.containsKey("battery_fuel_gauge")) {
+                        powerFeatherCfg.battery_fuel_gauge = pf["battery_fuel_gauge"];
+                    }
+                }
             } // deserializeJson o.k.
         } // file read o.k.
         file.close();
@@ -106,5 +120,9 @@ void loadNodeCfg(
     log_d("Battery low:             %4d mV", batt_low);
     log_d("Battery discharge limit: %4d mV", batt_discharge_lim);
     log_d("Battery charge limit:    %4d mV", batt_charge_lim);
-    log_d("Battery capacity:        %4d mAh", batt_capacity);
+    log_d("PowerFeather");
+    log_d("  Battery capacity:        %4d mAh", powerFeatherCfg.battery_capacity);
+    log_d("  Supply maintain voltage: %4d mV", powerFeatherCfg.supply_maintain_voltage);
+    log_d("  Temperature measurement: %s", powerFeatherCfg.temperature_measurement ? "true" : "false");
+    log_d("  Battery fuel gauge:      %s", powerFeatherCfg.battery_fuel_gauge ? "true" : "false");
 } // loadNodeCfg()

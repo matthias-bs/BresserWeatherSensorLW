@@ -313,9 +313,12 @@ File
 | `SLEEP_INTERVAL`<br>`SLEEP_INTERVAL_LONG`<br>`LW_STATUS_INTERVAL`<br>`APP_STATUS_INTERVAL`<br>`WEATHERSENSOR_TIMEOUT` | Timing parameters                                                                            |    X   |     X    |      |
 | `en_decoders`          | Enabled sensor decoders (saves CPU cycles / energy)        |        |     X    |      |
 | `BATTERY_WEAK`<br>`BATTERY_LOW`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
-| `BATTERY_CAPACITY_MAH` /<br>`battery_capacity` | Battery capacity                   |    X   |          |   X  |
 | see header file        | ADC's input pins, dividers and oversampling                |    X   |          |      |
-
+| &mdash;                | PowerFeather specific configuration                        |        |          |      |
+| `BATTERY_CAPACITY_MAH` /<br>`powerfeather/battery_capacity` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
+| `PF_TEMPERATURE_MEASUREMENT` / <br>`powerfeather/temperature_measurement` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
+| `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
+| `PF_SUPPLY_MAINTAIN_VOLTAGE` / <br>`powerfeather/supply_maintain_voltage` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 
 
 ### Enabling Debug Output
@@ -682,7 +685,11 @@ The following parameters are available:
 | battery_low           | Voltage threshold in mV for deep-discharge protection<br>(power off)    | `3200` |
 | battery_discharge_lim | Discharging voltage limit in mV<br>for battery level estimation         | `3200` |
 | battery_charge_lim    | Charging voltage limit in mV<br>for battery level estimation            | `4200` |
-| battery_capacity      | Battery capacity in mAh<br>(curently only used by ESP32S3 PowerFeather) | `0`    |
+| powerfeather/         | PowerFeather specific (see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)) |   |
+| &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected) | `0`    |
+| &nbsp;&nbsp;supply_maintain_voltage | see [PowerFeather Docs: `setSupplyMaintainVoltage()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setsupplymaintainvoltageuint16_t-voltage) | `5500` |
+| &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `setSupplyMaintainVoltage(enableBatteryTempSense)`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
+| &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
 
 
 Modify the example [data/node_config.json](data/node_config.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).

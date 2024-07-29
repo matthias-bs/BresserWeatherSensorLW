@@ -62,6 +62,7 @@
 // 20240722 Added LW_STATUS_INTERVAL, 
 //          renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
 // 20240726 Renamed BATTERY_DISCHARGE_LIMIT/BATTERY_CHARGE_LIMIT
+// 20240729 Added PowerFeather specific configuration
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -95,6 +96,16 @@
 // Use pinning for Firebeetle Cover LoRa
 #define DFROBOT_COVER_LORA
 #endif
+
+// PowerFeather specific configuration
+struct sPowerFeatherCfg {
+  
+  uint16_t battery_capacity; /// Battery capacity in mAh
+  uint16_t supply_maintain_voltage; /// Supply voltage to maintain in mV
+  bool temperature_measurement; /// Enable temperature measurement
+  bool battery_fuel_gauge; /// Enable battery fuel gauge
+};
+
 
 // Uplink message payload size
 // The maximum allowed for all data rates is 51 bytes.
@@ -205,8 +216,11 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
-// Set battery capacity in mAh
-#define BATTERY_CAPACITY_MAH 0
+// See https://docs.powerfeather.dev
+#define BATTERY_CAPACITY_MAH 2200 // battery capacity in mAh
+#define PF_TEMPERATURE_MEASUREMENT true // enable/diable temperature measurement
+#define PF_SUPPLY_MAINTAIN_VOLTAGE 5500 // ~maximum power point (MPP) voltage if using a solar panel
+#define PF_BATTERY_FUEL_GAUGE true // enable/disable battery fuel gauge
 #if BATTERY_CAPACITY_MAH == 0
 #pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
 #endif

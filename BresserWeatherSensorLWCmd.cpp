@@ -35,6 +35,7 @@
 // History:
 //
 // 20240723 Extracted from BresserWeatherSensorLW.ino
+// 20240729 Added PowerFeather specific status information
 //
 // ToDo:
 // -
@@ -48,6 +49,10 @@
 #include <ESP32Time.h>
 #include "src/AppLayer.h"
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+#include <PowerFeather.h>
+using namespace PowerFeather;
+#endif
 
 /*
  * From config.h
@@ -186,6 +191,96 @@ void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval)
     log_d("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
     encoder.writeUint16(getBatteryVoltage());
     encoder.writeUint8(status);
+    #if defined(ARDUINO_ESP32S3_POWERFEATHER)
+    Result res;
+    uint16_t voltage;
+    int16_t current;
+    uint8_t battery_soc;
+    uint8_t battery_soh;
+    uint16_t battery_cycles;
+    float battery_temp;
+    int time_left;
+
+    res = Board.getSupplyVoltage(voltage);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint16(voltage);
+    }
+    else
+    {
+      encoder.writeUint16(INV_UINT16);
+    }
+    
+    res = Board.getSupplyCurrent(current);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint16(current + 0x8000);
+    }
+    else
+    {
+      encoder.writeUint16(INV_UINT16);
+    }
+
+    res = Board.getBatteryCurrent(current);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint16(current + 0x8000);
+    }
+    else
+    {
+      encoder.writeUint16(INV_UINT16);
+    }
+
+    res = Board.getBatteryCharge(battery_soc);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint8(battery_soc);
+    }
+    else
+    {
+      encoder.writeUint8(INV_UINT8);
+    }
+
+    res = Board.getBatteryHealth(battery_soh);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint8(battery_soh);
+    }
+    else
+    {
+      encoder.writeUint8(INV_UINT8);
+    }
+
+    res = Board.getBatteryCycles(battery_cycles);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint16(battery_cycles);
+    }
+    else
+    {
+      encoder.writeUint16(INV_UINT16);
+    }
+
+    res = Board.getBatteryTimeLeft(time_left);
+    if (res == Result::Ok)
+    {
+      encoder.writeUint32(time_left + 0x80000000);
+    }
+    else
+    {
+      encoder.writeUint32(INV_UINT32);
+    }
+
+    res = Board.getBatteryTemperature(battery_temp);
+    if (res == Result::Ok)
+    {
+      encoder.writeTemperature(battery_temp);
+    }
+    else
+    {
+      encoder.writeTemperature(INV_TEMP);
+    }
+    #endif
   }
   else
   {
