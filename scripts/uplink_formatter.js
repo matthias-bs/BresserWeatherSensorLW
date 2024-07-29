@@ -144,6 +144,7 @@
 // 20240716 Added CMD_SCAN_SENSORS
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL, modified CMD_GET_LW_CONFIG,
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
+// 20240729 Added PowerFeather specific status information
 //
 // ToDo:
 // -  
@@ -158,6 +159,9 @@ function decoder(bytes, port) {
 
     // Compatibility mode: create "status" as in BresserweatherSensorTTN
     const COMPATIBILITY_MODE = false;
+
+    // Enable PowerFeather specific information in LoRaWAN Node Status message
+    const POWERFEATHER = false;
 
     const CMD_GET_DATETIME = 0x20;
     const CMD_GET_LW_CONFIG = 0x36;
@@ -334,6 +338,30 @@ function decoder(bytes, port) {
         return bytesToIntBE(bytes);
     };
     uint32BE.BYTES = 4;
+
+    var int16 = function (bytes) {
+        if (bytes.length !== int16.BYTES) {
+            throw new Error('int must have exactly 2 bytes');
+        }
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
+            return NaN;
+        }
+        return res - 0x8000;
+    };
+    int16.BYTES = 2;
+
+    var int32 = function (bytes) {
+        if (bytes.length !== int32.BYTES) {
+            throw new Error('int must have exactly 4 bytes');
+        }
+        let res = bytesToInt(bytes);
+        if (SKIP_INVALID_SIGNALS && res === 0xFFFF) {
+            return NaN;
+        }
+        return res - 0x80000000;
+    };
+    int32.BYTES = 4;
 
     function byte2hex(byte) {
         return ('0' + byte.toString(16)).slice(-2);
@@ -603,6 +631,8 @@ function decoder(bytes, port) {
             uint8: uint8,
             uint16: uint16,
             uint32: uint32,
+            int16: int16,
+            int32: int32,
             uint16BE: uint16BE,
             uint32BE: uint32BE,
             mac48: mac48,
@@ -732,14 +762,25 @@ function decoder(bytes, port) {
             ]
         );
     } else if (port === CMD_GET_LW_STATUS) {
-        return decode(
-            port,
-            bytes,
-            [uint16, uint8
-            ],
-            ['ubatt_mv', 'long_sleep'
-            ]
-        );
+        if (POWERFEATHER) {
+            return decode(
+                port,
+                bytes,
+                [uint16, uint8, uint16, int16, int16, uint8, uint8, uint16, int32, temperature
+                ],
+                ['ubatt_mv', 'long_sleep', 'usupply_mv', 'isupply_ma', 'ibatt_ma', 'soc', 'soh', 'batt_cycles', 'Tbatt_min', 'batt_temp_c'
+                ]
+            );
+        } else {
+            return decode(
+                port,
+                bytes,
+                [uint16, uint8
+                ],
+                ['ubatt_mv', 'long_sleep'
+                ]
+            );
+        }
     } else if (port === CMD_GET_WS_TIMEOUT) {
         return decode(
             port,
@@ -811,7 +852,7 @@ function decoder(bytes, port) {
             ]
         );
     } else if (port === CMD_SCAN_SENSORS) {
-        return {'found_sensors': found_sensors(bytes)};
+        return { 'found_sensors': found_sensors(bytes) };
     }
     else if (port === CMD_GET_SENSORS_STAT) {
         return decode(
