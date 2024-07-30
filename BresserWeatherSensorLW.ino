@@ -98,6 +98,7 @@
 // 20240725 Added reading of hardware/deployment specific configuration node_config.json
 //          from LittleFS (optional)
 // 20240729 PowerFeather: Enabled battery temperature measurement, added specific configuration
+// 20240730 PowerFeather: modified setSupplyMaintainVoltage()
 //
 // ToDo:
 // -
@@ -491,11 +492,6 @@ void setup()
   uint16_t battery_low = BATTERY_LOW;
   uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
   uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
-// #if defined(BATTERY_CAPACITY_MAH)
-  // uint16_t battery_capacity_mah = BATTERY_CAPACITY_MAH;
-// #else
-  // uint16_t battery_capacity_mah = 0;
-// #endif
 
   loadNodeCfg(
       timeZoneInfo,
@@ -513,7 +509,9 @@ void setup()
   Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
   Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement);   // Enable battery temperature measurement
   Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);        // Enable battery fuel gauge
-  Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
+  if (PowerFeatherCfg.supply_maintain_voltage) {
+      Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
+  }
   Board.enableBatteryCharging(true); // Enable battery charging
 #endif
 
