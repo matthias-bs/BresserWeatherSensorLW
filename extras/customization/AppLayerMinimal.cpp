@@ -37,6 +37,7 @@
 // History:
 //
 // 20240513 Created
+// 20240730 Updated getPayloadStage1()/2()
 //
 //
 // ToDo:
@@ -58,7 +59,7 @@ void AppLayer::genPayload(uint8_t port, LoraEncoder &encoder)
     (void)encoder; // suppress warning regarding unused parameter
 }
 
-void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
 {
     (void)port; // suppress warning regarding unused parameter
 
@@ -77,7 +78,7 @@ void AppLayer::getPayloadStage1(uint8_t port, LoraEncoder &encoder)
     encoder.writeRawFloat(21.3);
 }
 
-void AppLayer::getPayloadStage2(uint8_t port, LoraEncoder &encoder)
+void AppLayer::getPayloadStage2(uint8_t &port, LoraEncoder &encoder)
 {
     (void)port; // suppress warning regarding unused parameter
     (void)encoder; // suppress warning regarding unused parameter
