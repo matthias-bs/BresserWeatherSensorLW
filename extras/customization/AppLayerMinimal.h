@@ -33,6 +33,7 @@
 //
 // 20240513 Created
 // 20240607 Added getAppStatusUplinkInterval() for compatibility
+// 20240730 Updated getPayloadStage1()/2()
 //
 // ToDo:
 // -
@@ -126,7 +127,7 @@ public:
      * \param port LoRaWAN port
      * \param encoder uplink encoder object
      */
-    void getPayloadStage1(uint8_t port, LoraEncoder &encoder);
+    void getPayloadStage1(uint8_t &port, LoraEncoder &encoder);
 
     /*!
      * \brief Get payload before uplink
@@ -139,7 +140,7 @@ public:
      * \param port LoRaWAN port
      * \param encoder uplink encoder object
      */
-    void getPayloadStage2(uint8_t port, LoraEncoder &encoder);
+    void getPayloadStage2(uint8_t &port, LoraEncoder &encoder);
 
     /*!
      * Get configuration data for uplink
