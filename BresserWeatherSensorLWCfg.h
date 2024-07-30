@@ -63,6 +63,7 @@
 //          renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
 // 20240726 Renamed BATTERY_DISCHARGE_LIMIT/BATTERY_CHARGE_LIMIT
 // 20240729 Added PowerFeather specific configuration
+// 20240730 Modified PF_SUPPLY_MAINTAIN_VOLTAGE
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -219,7 +220,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // See https://docs.powerfeather.dev
 #define BATTERY_CAPACITY_MAH 2200 // battery capacity in mAh
 #define PF_TEMPERATURE_MEASUREMENT true // enable/diable temperature measurement
-#define PF_SUPPLY_MAINTAIN_VOLTAGE 5500 // ~maximum power point (MPP) voltage if using a solar panel
+#define PF_SUPPLY_MAINTAIN_VOLTAGE 0 // ~maximum power point (MPP) voltage if using a solar panel; 0: disabled
 #define PF_BATTERY_FUEL_GAUGE true // enable/disable battery fuel gauge
 #if BATTERY_CAPACITY_MAH == 0
 #pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
