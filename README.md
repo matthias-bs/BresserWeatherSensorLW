@@ -118,8 +118,8 @@ With the default configuration, the device will periodically send 3 different up
   | batt_temp_c               | Battery Temperature                   | °C      | temperature |     2 |
 
 
-    The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters]
-    (#lorawan-payload-formatters). `int16` and `int32` are extensions in the payload formatter for signed integers (implemented as `uint<16|32>` + offset).
+  The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters]
+  (#lorawan-payload-formatters). `int16` and `int32` are extensions in the payload formatter for signed integers (implemented as `uint<16|32>` + offset).
 
   * Port: `CMD_GET_LW_STATUS`
   * Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
