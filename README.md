@@ -101,7 +101,26 @@ With the default configuration, the device will periodically send 3 different up
 
 2. LoRaWAN Node Status
 
-  * Payload: Battery Voltage and Sleep Duration Flag
+  * Payload:
+
+  | Signal                    | description                           | Unit    | Type        | Bytes |
+  | ------------------------- | ------------------------------------- | ------- | ----------- | ----- |
+  | ubatt_mv                  | Battery Voltage                       | mv      | uint16      |     2 |
+  | long_sleep                | Flag: Long sleep time (energy saving) | &mdash; | uint8       |     1 |
+  | **PowerFeather specific**                                                                         |
+  | usupply_mv                | Supply Voltage (VDC or USB input)     | mv      | uint16      |     2 |
+  | isupply_ma                | Supply Current (VDC or USB input)     | mA      | int16       |     2 |
+  | isupply_ma                | Battery Current                       | mA      | int16       |     2 |
+  | soc                       | Battery State of Charge               | %       | uint8       |     1 |
+  | soh                       | Battery State of Health               | %       | uint8       |     1 |
+  | battery_cycles            | Estimated Battery Cycles              | &mdash; | uint16      |     2 |
+  | batt_time_min             | Estimated time to charge/discharge    | min     | int32       |     4 |
+  | batt_temp_c               | Battery Temperature                   | °C      | temperature |     2 |
+
+
+    The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters]
+    (#lorawan-payload-formatters). `int16` and `int32` are extensions in the payload formatter for signed integers (implemented as `uint<16|32>` + offset).
+
   * Port: `CMD_GET_LW_STATUS`
   * Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
