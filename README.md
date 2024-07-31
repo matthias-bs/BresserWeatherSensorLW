@@ -94,7 +94,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 ## LoRaWAN Uplink Messages
 
-With the default configuration, the device will periodically send 3 different uplink messages:
+With the default configuration, the device will periodically send 3 different uplink messages.
 
 ### Sensor Data
 
