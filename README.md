@@ -96,15 +96,15 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 With the default configuration, the device will periodically send 3 different uplink messages:
 
-1. Sensor Data
+### Sensor Data
 
-  * Payload: see [Default Configuration](#default-configuration)
-  * Port: 1
-  * Interval: ~`<sleep_interval>` / `<sleep_interval_long>` (depending on battery voltage); see [Default Parameter Values](#default-parameter-values)
+* Payload: see [Default Configuration](#default-configuration)
+* Port: 1
+* Interval: ~`<sleep_interval>` / `<sleep_interval_long>` (depending on battery voltage); see [Default Parameter Values](#default-parameter-values)
 
-2. LoRaWAN Node Status
+### LoRaWAN Node Status
 
-  * Payload:
+* Payload:
 
   | Signal                    | description                           | Unit    | Type        | Bytes |
   | ------------------------- | ------------------------------------- | ------- | ----------- | ----- |
@@ -121,17 +121,17 @@ With the default configuration, the device will periodically send 3 different up
   | batt_temp_c               | Battery Temperature                   | °C      | temperature |     2 |
 
 
-  The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters]
-  (#lorawan-payload-formatters). `int16` and `int32` are extensions in the payload formatter for signed integers (implemented as `uint<16|32>` + offset).
+The data types are implemented in [lora-serialization](https://github.com/thesolarnomad/lora-serialization) and the [Payload Formatters]
+(#lorawan-payload-formatters). `int16` and `int32` are extensions in the payload formatter for signed integers (implemented as `uint<16|32>` + offset).
 
-  * Port: `CMD_GET_LW_STATUS`
-  * Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
+* Port: `CMD_GET_LW_STATUS`
+* Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
 3. Application Layer / Sensor Status
 
-  * Payload: Bresser/BLE Sensor Battery Status (Bitmap)
-  * Port: `CMD_GET_SENSORS_STAT`
-  * Interval: `<app_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
+* Payload: Bresser/BLE Sensor Battery Status (Bitmap)
+* Port: `CMD_GET_SENSORS_STAT`
+* Interval: `<app_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
 See [Parameters](#parameters) for more details.
 
