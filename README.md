@@ -51,6 +51,9 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 ## Contents
 
 * [LoRaWAN Uplink Messages](#lorawan-uplink-messages)
+  * [Sensor Data](#sensor-data)
+  * [LoRaWAN Node Status](#lorawan-node-status)
+  * [Application Layer / Sensor Status](#application-layer--sensor-status)
 * [Supported Hardware](#supported-hardware)
   * [Predefined Board Configurations](#predefined-board-configurations)
   * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
