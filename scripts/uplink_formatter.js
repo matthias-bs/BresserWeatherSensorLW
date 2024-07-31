@@ -768,7 +768,7 @@ function decoder(bytes, port) {
                 bytes,
                 [uint16, uint8, uint16, int16, int16, uint8, uint8, uint16, int32, temperature
                 ],
-                ['ubatt_mv', 'long_sleep', 'usupply_mv', 'isupply_ma', 'ibatt_ma', 'soc', 'soh', 'batt_cycles', 'Tbatt_min', 'batt_temp_c'
+                ['ubatt_mv', 'long_sleep', 'usupply_mv', 'isupply_ma', 'ibatt_ma', 'soc', 'soh', 'batt_cycles', 'batt_time_min', 'batt_temp_c'
                 ]
             );
         } else {
