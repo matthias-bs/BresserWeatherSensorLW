@@ -94,7 +94,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 ## LoRaWAN Uplink Messages
 
-With the default configuration, the device will periodically send 3 different uplink messages.
+With the default configuration, the device will periodically send 3 different uplink messages. The [LoRaWAN Node Status](#lorawan-node-status) message and the [Application Layer / Sensor Status](#application-layer--sensor-status) message can be disabled by setting the corresponding interval to zero.
 
 ### Sensor Data
 
@@ -127,7 +127,7 @@ The data types are implemented in [lora-serialization](https://github.com/thesol
 * Port: `CMD_GET_LW_STATUS`
 * Interval: `<lw_status_interval>` (uplink frames); see [Default Parameter Values](#default-parameter-values)
 
-3. Application Layer / Sensor Status
+### Application Layer / Sensor Status
 
 * Payload: Bresser/BLE Sensor Battery Status (Bitmap)
 * Port: `CMD_GET_SENSORS_STAT`
@@ -135,7 +135,6 @@ The data types are implemented in [lora-serialization](https://github.com/thesol
 
 See [Parameters](#parameters) for more details.
 
-(2) & (3) can be disabled by setting the interval to zero.
 
 ## Supported Hardware
 
