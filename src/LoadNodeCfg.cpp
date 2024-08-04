@@ -36,6 +36,7 @@
 //
 // 20240725 Created
 // 20240729 Added PowerFeather specific configuration
+// 20240804 Added max_charge_current
 //
 // ToDo:
 // -
@@ -103,6 +104,9 @@ void loadNodeCfg(
                     if (pf.containsKey("supply_maintain_voltage")) {
                         powerFeatherCfg.supply_maintain_voltage = pf["supply_maintain_voltage"];
                     }
+                    if (pf.containsKey("max_charge_current")) {
+                        powerFeatherCfg.max_charge_current = pf["max_charge_current"];
+                    }
                     if (pf.containsKey("temperature_measurement")) {
                         powerFeatherCfg.temperature_measurement = pf["temperature_measurement"];
                     }
@@ -123,6 +127,7 @@ void loadNodeCfg(
     log_d("PowerFeather");
     log_d("  Battery capacity:        %4d mAh", powerFeatherCfg.battery_capacity);
     log_d("  Supply maintain voltage: %4d mV", powerFeatherCfg.supply_maintain_voltage);
+    log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
     log_d("  Temperature measurement: %s", powerFeatherCfg.temperature_measurement ? "true" : "false");
     log_d("  Battery fuel gauge:      %s", powerFeatherCfg.battery_fuel_gauge ? "true" : "false");
 } // loadNodeCfg()
