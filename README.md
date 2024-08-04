@@ -342,8 +342,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `PF_TEMPERATURE_MEASUREMENT` / <br>`powerfeather/temperature_measurement` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_SUPPLY_MAINTAIN_VOLTAGE` / <br>`powerfeather/supply_maintain_voltage` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
-| `PF_MAX_CHARGE_CURRENT_MAH` / <br>`powerfeather/max_charge_current` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)
-X   |          |   X  |
+| `PF_MAX_CHARGE_CURRENT_MAH` / <br>`powerfeather/max_charge_current` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                              |  X   |          |   X  |
 
 ### Enabling Debug Output
 
