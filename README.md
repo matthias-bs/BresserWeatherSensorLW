@@ -342,7 +342,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `PF_TEMPERATURE_MEASUREMENT` / <br>`powerfeather/temperature_measurement` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_SUPPLY_MAINTAIN_VOLTAGE` / <br>`powerfeather/supply_maintain_voltage` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
-
+| `PF_MAX_CHARGE_CURRENT_MAH` / <br>`powerfeather/max_charge_current` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                              |  X   |          |   X  |
 
 ### Enabling Debug Output
 
@@ -711,6 +711,7 @@ The following parameters are available:
 | powerfeather/         | PowerFeather specific (see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)) |   |
 | &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected)<br>see [PowerFeather Docs: `init()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-inituint16_t-capacity--0-batterytype-type--batterytypegeneric_3v7) | `0`    |
 | &nbsp;&nbsp;supply_maintain_voltage | see [PowerFeather Docs: `setSupplyMaintainVoltage()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setsupplymaintainvoltageuint16_t-voltage)<br>`0`: not set | `0` |
+| &nbsp;&nbsp;max_charge_current | see [PowerFeather Docs: `setBatteryChargingMaxCurrent()`](https://docs.powerfeather.dev/sdk/api/mainboard##result-setbatterychargingmaxcurrentuint16_t-current) | `50` |
 | &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `enableBatteryTempSense()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
 | &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
 

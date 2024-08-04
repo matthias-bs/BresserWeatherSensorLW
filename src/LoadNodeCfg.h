@@ -36,6 +36,7 @@
 //
 // 20240725 Created
 // 20240729 Added PowerFeather specific configuration
+// 20240804 Added max_charge_current
 //
 // ToDo:
 // -
@@ -64,6 +65,7 @@
  *   "powerfeather": {
  *     "battery_capacity":, 2200
  *     "supply_maintain_voltage": 5500,
+ *     "max_charge_current": 50,
  *     "temperature_measurement": true,
  *     "battery_fuel_gauge": true
  *   }

@@ -99,6 +99,7 @@
 //          from LittleFS (optional)
 // 20240729 PowerFeather: Enabled battery temperature measurement, added specific configuration
 // 20240730 PowerFeather: modified setSupplyMaintainVoltage()
+// 20240804 PowerFeather: Added configuration of maximum battery charging current
 //
 // ToDo:
 // -
@@ -231,6 +232,7 @@ AppLayer appLayer(&rtc, &rtcLastClockSync);
 struct sPowerFeatherCfg PowerFeatherCfg = {
     .battery_capacity = BATTERY_CAPACITY_MAH,
     .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
+    .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
     .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
     .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE
 };
@@ -513,6 +515,7 @@ void setup()
       Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
   }
   Board.enableBatteryCharging(true); // Enable battery charging
+  Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)

@@ -64,6 +64,7 @@
 // 20240726 Renamed BATTERY_DISCHARGE_LIMIT/BATTERY_CHARGE_LIMIT
 // 20240729 Added PowerFeather specific configuration
 // 20240730 Modified PF_SUPPLY_MAINTAIN_VOLTAGE
+// 20240804 PowerFeather: Added configuration of max. battery charging current
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -103,6 +104,7 @@ struct sPowerFeatherCfg {
   
   uint16_t battery_capacity; /// Battery capacity in mAh
   uint16_t supply_maintain_voltage; /// Supply voltage to maintain in mV
+  uint16_t max_charge_current; /// Maximum charging current in mA
   bool temperature_measurement; /// Enable temperature measurement
   bool battery_fuel_gauge; /// Enable battery fuel gauge
 };
@@ -222,6 +224,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #define PF_TEMPERATURE_MEASUREMENT true // enable/diable temperature measurement
 #define PF_SUPPLY_MAINTAIN_VOLTAGE 0 // ~maximum power point (MPP) voltage if using a solar panel; 0: disabled
 #define PF_BATTERY_FUEL_GAUGE true // enable/disable battery fuel gauge
+#define PF_MAX_CHARGE_CURRENT_MAH 50 // maximum charging current in mA
 #if BATTERY_CAPACITY_MAH == 0
 #pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
 #endif
