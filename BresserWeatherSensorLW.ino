@@ -100,6 +100,7 @@
 // 20240729 PowerFeather: Enabled battery temperature measurement, added specific configuration
 // 20240730 PowerFeather: modified setSupplyMaintainVoltage()
 // 20240804 PowerFeather: Added configuration of maximum battery charging current
+// 20240818 Fixed bootCount
 //
 // ToDo:
 // -
@@ -544,14 +545,15 @@ void setup()
 #else
   print_wakeup_reason();
 #endif
-  log_i("Boot count: %u", bootCount++);
+  log_i("Boot count: %u", bootCount);
 
   if (bootCount == 1)
   {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
-    appStatusUplinkPending = 0;
-    lwStatusUplinkPending = 0;
+    appStatusUplinkPending = false;
+    lwStatusUplinkPending = false;
   }
+  bootCount++;
 
   // Set time zone
   setenv("TZ", timeZoneInfo.c_str(), 1);
