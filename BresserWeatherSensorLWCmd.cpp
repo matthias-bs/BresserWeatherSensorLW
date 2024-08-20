@@ -36,6 +36,7 @@
 //
 // 20240723 Extracted from BresserWeatherSensorLW.ino
 // 20240729 Added PowerFeather specific status information
+// 20240818 Replaced delay() with light sleep for ESP32
 //
 // ToDo:
 // -
@@ -300,7 +301,12 @@ void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval)
   uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
 
   log_d("Sending configuration uplink in %u s", delayMs / 1000);
+  #if defined(ESP32)
+  esp_sleep_enable_timer_wakeup(delayMs * 1000);
+  esp_light_sleep_start();
+  #else
   delay(delayMs);
+  #endif
   log_d("Sending configuration uplink now.");
   int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
   debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
