@@ -235,8 +235,7 @@ struct sPowerFeatherCfg PowerFeatherCfg = {
     .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
     .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
     .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
-    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE
-};
+    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
 #else
 struct sPowerFeatherCfg PowerFeatherCfg = {0};
 #endif
@@ -507,15 +506,16 @@ void setup()
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
   // Note: Battery capacity / type has to be set for voltage measurement
-  Board.init(PowerFeatherCfg.battery_capacity);                            
-  Board.enable3V3(true);  // Power supply for FeatherWing
-  Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
-  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement);   // Enable battery temperature measurement
-  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);        // Enable battery fuel gauge
-  if (PowerFeatherCfg.supply_maintain_voltage) {
-      Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
+  Board.init(PowerFeatherCfg.battery_capacity);
+  Board.enable3V3(true);                                                 // Power supply for FeatherWing
+  Board.enableVSQT(true);                                                // Power supply for battery management chip (voltage measurement)
+  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement); // Enable battery temperature measurement
+  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);      // Enable battery fuel gauge
+  if (PowerFeatherCfg.supply_maintain_voltage)
+  {
+    Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
   }
-  Board.enableBatteryCharging(true); // Enable battery charging
+  Board.enableBatteryCharging(true);                                      // Enable battery charging
   Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
 #endif
 
