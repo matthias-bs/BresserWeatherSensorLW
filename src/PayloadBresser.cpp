@@ -50,12 +50,18 @@
 // 20240719 Fixed enabling of all decoders in scanBresser()
 // 20240821 Fixed validation of rain statistics
 //
+// Note:
+// - Special version with weather sensor data on OLED display
+//
 // ToDo:
 // - Add handling of Professional Rain Gauge
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "PayloadBresser.h"
+// @mczakk: Not sure why you need this and what it contains
+// #include "globals.h"
+#include "DisplayWeatherData.h"
 
 void PayloadBresser::begin(void)
 {
@@ -78,7 +84,7 @@ void PayloadBresser::begin(void)
 
     if (weatherSensor.sensor.size() == 0)
         return;
-    
+
     weatherSensor.clearSlots();
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
@@ -94,7 +100,7 @@ void PayloadBresser::begin(void)
 void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
 {
     weatherSensor.clearSlots();
-    
+
     // Save enabled decoders
     uint8_t enabled_decoders = weatherSensor.enDecoders;
 
@@ -331,6 +337,8 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
     }
     else
     {
+        initDisplay();
+        displayWeatherData(weatherSensor.sensor[idx], rainGauge, _rtc->getLocalEpoch());
         if (weatherSensor.sensor[idx].w.temp_ok)
         {
             log_i("Air Temperature:    %3.1f °C", weatherSensor.sensor[idx].w.temp_c);
