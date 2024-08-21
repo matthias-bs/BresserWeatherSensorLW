@@ -48,6 +48,7 @@
 //          Added scanBresser(), modified begin() to trigger scan
 // 20240718 Fixed premature return from begin() leading to empty payload
 // 20240719 Fixed enabling of all decoders in scanBresser()
+// 20240821 Fixed validation of rain statistics
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -417,7 +418,7 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
 
     // Rain data statistics
 #ifdef RAINDATA_EN
-    if ((idx) && weatherSensor.sensor[idx].valid && weatherSensor.sensor[idx].w.rain_ok)
+    if ((idx > -1) && weatherSensor.sensor[idx].valid && weatherSensor.sensor[idx].w.rain_ok)
     {
         if (flags & PAYLOAD_WS_RAIN_H)
         {
