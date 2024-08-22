@@ -324,7 +324,7 @@ void gotoSleep(uint32_t seconds)
 
   // if this appears in the serial debug, we didn't go to sleep!
   // so take defensive action so we don't continually uplink
-  log_w("\n\n### Sleep failed, delay of 5 minutes & then restart ###");
+  log_w("\n\n### Sleep failed ###");
   delay(5UL * 60UL * 1000UL);
   ESP.restart();
 }
