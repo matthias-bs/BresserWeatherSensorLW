@@ -94,8 +94,6 @@ void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
         return;
     }
 
-    log_v("Port: %d", port);
-
     log_i("--- Uplink Data ---");
 
     encodeBresser(appPayloadCfg, appStatus, encoder);
@@ -182,7 +180,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_SET_WS_TIMEOUT) && (size == 1))
     {
-        log_d("Set weathersensor_timeout: %u s", payload[0]);
+        log_d("Set ws_timeout: %u s", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("ws_timeout", payload[0]);
         appPrefs.end();
@@ -191,13 +189,13 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_APP_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get App status_interval");
+        log_d("Get App status interval");
         return CMD_GET_APP_STATUS_INTERVAL;
     }
 
     if ((port == CMD_SET_APP_STATUS_INTERVAL) && (size == 1))
     {
-        log_d("Set App status_interval: %u frames", payload[0]);
+        log_d("Set App status interval: %u frames", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("app_stat_int", payload[0]);
         appPrefs.end();
