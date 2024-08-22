@@ -90,8 +90,6 @@ extern E_TIME_SOURCE rtcTimeSource;
 // Decode downlink
 uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
-  log_v("Port: %d", port);
-
   if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
   {
     log_d("Get date/time");
