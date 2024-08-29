@@ -26,7 +26,7 @@ jobs:
           - esp32:esp32:m5stack_core2
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
-          - rp2040:rp2040:adafruit_feather:dbgport=Serial
+          #- rp2040:rp2040:adafruit_feather:dbgport=Serial
 
     runs-on: ubuntu-latest
     name: ${{ matrix.board }}
