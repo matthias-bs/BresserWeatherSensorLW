@@ -10,6 +10,7 @@
 
 #include "pico.h"
 #include "hardware/rtc.h"
+#include "hardware/clocks.h"
 
 #ifdef __cplusplus
 extern "C" {
