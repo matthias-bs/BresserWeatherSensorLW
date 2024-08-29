@@ -93,10 +93,10 @@
 //--- Select Board ---
 #if defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
 // Use pinning for LoRaWAN Node
-//#define LORAWAN_NODE
+#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-#define DFROBOT_COVER_LORA
+//#define DFROBOT_COVER_LORA
 #endif
 
 // PowerFeather specific configuration
