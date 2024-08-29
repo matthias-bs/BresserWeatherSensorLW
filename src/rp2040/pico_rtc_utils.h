@@ -52,6 +52,7 @@
 #include <time.h>
 #include <pico/stdlib.h>
 #include <hardware/rtc.h>
+#include <hardware/clocks.h>
 #include "pico_sleep.h"
 #include "pico_rosc.h"
 #include "../logging.h"

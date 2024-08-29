@@ -114,7 +114,7 @@ void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
 #endif
 
     // FIXME: To be removed later
-    // Battery status flags for compatibility with BresserWeatherSensorTTN
+    // Battery status flags for compatibility with BresserWeatherSensorTTN and ESP32-e-Paper-Weather-Display
     if ((appPayloadCfg[0] & 1) && (encoder.getLength() <= PAYLOAD_SIZE - 1))
     {
         log_i("Battery status flags: ws=%u, soil=%u, lgt=%u", appStatus[SENSOR_TYPE_WEATHER1] & 1,
