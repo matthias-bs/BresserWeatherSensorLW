@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+#import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_pdf import PdfPages
@@ -53,8 +54,7 @@ def title_page(plt, pdf, title, font_size=24):
     plt.close(fig)
 
 def plot_data(plt, pdf, df, columns, title, xlabel, ylabels, colors, avg_label, avg_colors):
-
-    fig, axes = plt.subplots(len(columns), 1, figsize=(12, 6))
+    fig, axes = plt.subplots(len(columns), 1, figsize=(12, 6), layout="tight")
     for i in range(len(columns)):
         if len(columns) == 1:
             ax = axes
@@ -78,14 +78,14 @@ def plot_data(plt, pdf, df, columns, title, xlabel, ylabels, colors, avg_label, 
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
 
     fig.suptitle(title, fontsize=16)
-    plt.tight_layout()
+    #plt.tight_layout()
 
     pdf.savefig(fig)
     plt.close(fig)
 
 # Create a new figure for Rain Gauge
 def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), layout="tight")
 
     # Plot the Rain Gauge differences as a bar graph
     ax1.bar(df_diff.index, df_diff, label=ylabel[0], color=color)
@@ -95,6 +95,7 @@ def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
     #ax.tick_params(axis='y', labelcolor='b')
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
     ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+    #ax1.set_xticklabels([])
     
     ax1.legend()
     ax1.grid(True)
@@ -104,6 +105,54 @@ def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
     if xlabel:
         ax2.set_xlabel(xlabel)
     ax2.set_ylabel(ylabel[1])
+    ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
+    ax2.xaxis.set_major_locator(mdates.AutoDateLocator())
+
+    ax2.legend()
+    ax2.grid(True)
+
+    # Rotate x-axis labels for better readability
+    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+    plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+
+    # Adjust layout to prevent clipping of tick-labels
+    #plt.tight_layout()
+
+    # Set the title of the figure
+    fig.suptitle(title, fontsize=16)
+
+    # Save the current figure to the PDF
+    pdf.savefig(fig)
+
+    # Close the figure to free up memory
+    plt.close(fig)
+
+# Create a new figure for Rain Gauge
+def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
+
+    # Plot the Rain Gauge differences as a bar graph
+    ax1.plot(df.index, df.iloc[:, columns[1]], label=ylabel[2], color=colors[1], linewidth=2)
+    ax1.plot(df.index, df.iloc[:, columns[0]], label=ylabel[1], color=colors[0], linewidth=2)
+    if xlabel:
+        ax1.set_xlabel(xlabel)
+    ax1.set_ylabel(ylabel[0])
+    #ax.tick_params(axis='y', labelcolor='b')
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
+    ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+    #ax1.set_xticklabels([])
+    ax1.legend()
+    ax1.grid(True)
+
+    # Plot column 1 on the second subplot
+    # Create a quiver plot
+    #u = columns[0] * np.cos(df.iloc[:, columns[2]]/180*np.pi)
+    #v = columns[0] * np.sin(df.iloc[:, columns[2]]/180*np.pi)
+    #ax2.quiver(df.index, [0] * len(df.index), u, v, color=colors[2])
+    ax2.plot(df.index, df.iloc[:, columns[2]], label=ylabel[2], color=colors[2])
+    if xlabel:
+        ax2.set_xlabel(xlabel)
+    ax2.set_ylabel(ylabel[3])
     ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
     ax2.xaxis.set_major_locator(mdates.AutoDateLocator())
 
@@ -125,7 +174,7 @@ def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
 
     # Close the figure to free up memory
     plt.close(fig)
-                 
+
 # Create a PdfPages object to save the figures
 with PdfPages(pdf_file) as pdf:
     title_page(plt, pdf, 'Wetterbericht Lehmanger, Garten 95')
@@ -144,6 +193,8 @@ with PdfPages(pdf_file) as pdf:
     plot_rain(plt, pdf, rain_df, combined_df, 'Niederschlag', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'], 'b')
 
     plot_data(plt, pdf, combined_df, [11], 'Warmwasser', None, ['Temperatur [°C]'], ['orange'], 'tägl. Durchschnitt', ['k'])
+
+    plot_wind(plt, pdf, combined_df, [12, 14, 13], 'Wind', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'], ['g', 'b', 'k'])
 
     title_page(plt, pdf, 'Monatsberichte', 18)
 
@@ -166,4 +217,6 @@ with PdfPages(pdf_file) as pdf:
         plot_rain(plt, pdf, rain_df, month_df, f'Niederschlag {month}', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'], 'b')
 
         plot_data(plt, pdf, month_df, [11], f'Warmwasser {month}', None, ['Temperatur [°C]'], ['orange'], 'tägl. Durchschnitt', ['k'])
+
+        plot_wind(plt, pdf, month_df, [12, 14, 13], f'Wind {month}', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'], ['g', 'b', 'k'])
 
