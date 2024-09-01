@@ -1,9 +1,61 @@
+###################################################################################################
+# datacake_report.py
+#
+# This script generates a PDF report from CSV files containing sensor data
+# which are provided by Datacake.
+#
+# created: 08/2024
+#
+#
+# MIT License
+#
+# Copyright (c) 2024 Matthias Prinke
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+#
+# History:
+#
+# 20240901 Created
+#
+# ToDo:
+# -
+###################################################################################################
+
 import os
 import pandas as pd
 #import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_pdf import PdfPages
+
+COLUMNS = {
+    'ws_temp_c': 0,
+    'ws_humidity': 1,
+    'soil_temp_c': 10,
+    'soil_moisture': 9,
+    'rain_mm': 6,
+    'hot_water_temp_c': 11,
+    'wind_avg': 12,
+    'wind_gust': 14,
+    'wind_direction': 13
+}
 
 # Directory containing the CSV files
 src_dir = "/home/mp/pCloudDrive/datacake/Garten"
@@ -43,7 +95,7 @@ print(combined_df)
 combined_df.dropna(inplace=True)
 
 # Drop rows where column 3 (Humidity) is zero
-combined_df = combined_df[combined_df.iloc[:, 1] != 0]
+combined_df = combined_df[combined_df.iloc[:, COLUMNS['ws_humidity']] != 0]
 
 
 def title_page(plt, pdf, title, font_size=24):
@@ -84,7 +136,7 @@ def plot_data(plt, pdf, df, columns, title, xlabel, ylabels, colors, avg_label, 
     plt.close(fig)
 
 # Create a new figure for Rain Gauge
-def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
+def plot_rain(plt, pdf, df_diff, df, column, title, xlabel, ylabel, color):
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), layout="tight")
 
     # Plot the Rain Gauge differences as a bar graph
@@ -100,8 +152,8 @@ def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
     ax1.legend()
     ax1.grid(True)
 
-    # Plot column 1 on the second subplot
-    ax2.plot(df.index, df.iloc[:, 6], label=ylabel[1], color=color)
+    # Plot raw rain gauge value on the second subplot
+    ax2.plot(df.index, df.iloc[:, column], label=ylabel[1], color=color)
     if xlabel:
         ax2.set_xlabel(xlabel)
     ax2.set_ylabel(ylabel[1])
@@ -129,7 +181,7 @@ def plot_rain(plt, pdf, df_diff, df, title, xlabel, ylabel, color):
 
 # Create a new figure for Rain Gauge
 def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), layout="tight")
 
     # Plot the Rain Gauge differences as a bar graph
     ax1.plot(df.index, df.iloc[:, columns[1]], label=ylabel[2], color=colors[1], linewidth=2)
@@ -149,7 +201,8 @@ def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
     #u = columns[0] * np.cos(df.iloc[:, columns[2]]/180*np.pi)
     #v = columns[0] * np.sin(df.iloc[:, columns[2]]/180*np.pi)
     #ax2.quiver(df.index, [0] * len(df.index), u, v, color=colors[2])
-    ax2.plot(df.index, df.iloc[:, columns[2]], label=ylabel[2], color=colors[2])
+    hourly_avg = df.iloc[:, columns[2]].resample('H').mean()
+    ax2.plot(hourly_avg.index, hourly_avg, label=ylabel[3], color=colors[2])
     if xlabel:
         ax2.set_xlabel(xlabel)
     ax2.set_ylabel(ylabel[3])
@@ -162,9 +215,6 @@ def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
     # Rotate x-axis labels for better readability
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
     plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
-
-    # Adjust layout to prevent clipping of tick-labels
-    plt.tight_layout()
 
     # Set the title of the figure
     fig.suptitle(title, fontsize=16)
@@ -181,20 +231,36 @@ with PdfPages(pdf_file) as pdf:
 
     title_page(plt, pdf, 'Jahresübersicht', 18)
 
-    plot_data(plt, pdf, combined_df, [0, 1], 'Luftemperatur und -feuchte', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],['r', 'b'], 'tägl. Durchschnitt', ['k', 'k'])
+    plot_data(plt, pdf, combined_df, 
+              [COLUMNS['ws_temp_c'], COLUMNS['ws_humidity']], 
+              'Luftemperatur und -feuchte', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],
+              ['r', 'b'], 
+              'tägl. Durchschnitt', ['k', 'k'])
 
-    # Filter out rows where soil moisture (column 9) is zero
-    soil_df = combined_df[combined_df.iloc[:, 9] != 0]
-    plot_data(plt, pdf, soil_df, [10, 9], 'Bodentemperatur und -feuchte', None, ['Temperatur [°C]', 'Feuchte [%]'],['m', 'g'], 'tägl. Durchschnitt', ['k', None])
+    # Filter out rows where soil moisture is zero
+    soil_df = combined_df[combined_df.iloc[:, COLUMNS['soil_moisture']] != 0]
+    plot_data(plt, pdf, soil_df, 
+              [COLUMNS['soil_temp_c'], COLUMNS['ws_humidity']],
+              'Bodentemperatur und -feuchte', None, ['Temperatur [°C]', 'Feuchte [%]'],
+              ['m', 'g'],
+              'tägl. Durchschnitt', ['k', None])
 
-    # Calculate the difference between consecutive values in column 6 (Rain Gauge)
-    rain_df = combined_df.iloc[:, 6].diff().fillna(0)
+    # Calculate the difference between consecutive values in column "Rain Gauge"
+    rain_df = combined_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
     rain_df = rain_df[rain_df >= 0]
-    plot_rain(plt, pdf, rain_df, combined_df, 'Niederschlag', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'], 'b')
+    plot_rain(plt, pdf, rain_df, combined_df, COLUMNS['rain_mm'],
+              'Niederschlag', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'],
+              'b')
 
-    plot_data(plt, pdf, combined_df, [11], 'Warmwasser', None, ['Temperatur [°C]'], ['orange'], 'tägl. Durchschnitt', ['k'])
+    plot_data(plt, pdf, combined_df, [COLUMNS['hot_water_temp_c']], 
+              'Warmwasser', None, ['Temperatur [°C]'],
+              ['orange'], 'tägl. Durchschnitt',
+              ['k'])
 
-    plot_wind(plt, pdf, combined_df, [12, 14, 13], 'Wind', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'], ['g', 'b', 'k'])
+    plot_wind(plt, pdf, combined_df,
+              [COLUMNS['wind_avg'], COLUMNS['wind_gust'], COLUMNS['wind_direction']],
+              'Wind', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'],
+              ['g', 'b', 'k'])
 
     title_page(plt, pdf, 'Monatsberichte', 18)
 
@@ -205,18 +271,34 @@ with PdfPages(pdf_file) as pdf:
     for month, month_df in combined_df.groupby('Month'):
         title_page(plt, pdf, month, 16)
 
-        plot_data(plt, pdf, month_df, [0, 1], f'Luftemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],['r', 'b'], 'tägl. Durchschnitt', ['k', 'k'])
+        plot_data(plt, pdf, month_df,
+                  [COLUMNS['ws_temp_c'], COLUMNS['ws_humidity']],
+                  f'Luftemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],
+                  ['r', 'b'],
+                  'tägl. Durchschnitt', ['k', 'k'])
 
         # Filter out rows where soil moisture (column 9) is zero
-        soil_df = month_df[month_df.iloc[:, 9] != 0]
-        plot_data(plt, pdf, soil_df, [10, 9], f'Bodentemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'Feuchte [%]'],['m', 'g'], 'tägl. Durchschnitt', ['k', None])
+        soil_df = month_df[month_df.iloc[:, COLUMNS['soil_moisture']] != 0]
+        plot_data(plt, pdf, soil_df,
+                  [COLUMNS['soil_temp_c'], COLUMNS['soil_moisture']], f'Bodentemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'Feuchte [%]'],
+                  ['m', 'g'],
+                  'tägl. Durchschnitt', ['k', None])
 
-        # Calculate the difference between consecutive values in column 6 (Rain Gauge)
-        rain_df = month_df.iloc[:, 6].diff().fillna(0)
+        # Calculate the difference between consecutive values in column "Rain Gauge"
+        rain_df = month_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
         rain_df = rain_df[rain_df >= 0]
-        plot_rain(plt, pdf, rain_df, month_df, f'Niederschlag {month}', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'], 'b')
+        plot_rain(plt, pdf, rain_df, month_df, COLUMNS['rain_mm'],
+                  f'Niederschlag {month}', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'],
+                  'b')
 
-        plot_data(plt, pdf, month_df, [11], f'Warmwasser {month}', None, ['Temperatur [°C]'], ['orange'], 'tägl. Durchschnitt', ['k'])
+        plot_data(plt, pdf, month_df,
+                  [COLUMNS['hot_water_temp_c']], f'Warmwasser {month}', None, ['Temperatur [°C]'],
+                  ['orange'],
+                  'tägl. Durchschnitt',
+                  ['k'])
 
-        plot_wind(plt, pdf, month_df, [12, 14, 13], f'Wind {month}', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'], ['g', 'b', 'k'])
+        plot_wind(plt, pdf, month_df,
+                  [COLUMNS['wind_avg'], COLUMNS['wind_gust'], COLUMNS['wind_direction']],
+                  f'Wind {month}', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'],
+                  ['g', 'b', 'k'])
 
