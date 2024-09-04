@@ -1,5 +1,5 @@
 ###################################################################################################
-# datacake_report.py
+# datacake_report-2.py
 #
 # This script generates a PDF report from CSV files containing sensor data
 # which are provided by Datacake.
@@ -45,22 +45,84 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.backends.backend_pdf import PdfPages
 
-COLUMNS = {
-    'ws_temp_c': 0,
-    'ws_humidity': 1,
-    'soil_temp_c': 10,
-    'soil_moisture': 9,
-    'rain_mm': 6,
-    'hot_water_temp_c': 11,
-    'wind_avg': 12,
-    'wind_gust': 14,
-    'wind_direction': 13
-}
+LOCATION = '<Location>'
+
+# Set the desired language
+LANG = 'en'
 
 # Directory containing the CSV files
-src_dir = "/home/mp/pCloudDrive/datacake/Garten"
-pdf_file = "/home/mp/pCloudDrive/datacake/Garten/garten.pdf"
-last_column = 16
+src_dir = "datacake_csv"
+
+# Output PDF file
+pdf_file = "weather_report.pdf"
+
+# Define the last column in the CSV files
+last_column = 11
+
+COLUMNS = {
+    'ws_temp_c': 0,
+    'ws_humidity': 6,
+    'rain_mm': 8,
+    'wind_avg': 5,
+    'wind_gust': 9,
+    'wind_direction': 10,
+    'battery_voltage': 11,
+}
+
+COLORS = {
+    'ws_temp_c': 'r',
+    'ws_humidity': 'skyblue',
+    'rain_mm': 'b',
+    'wind_avg': 'g',
+    'wind_gust': 'lime',
+    'wind_direction': 'gray',
+    'battery_voltage': 'orange',
+}
+
+
+# Define translations
+translations = {
+    'en': {
+        'Weather Report': 'Weather Report',
+        'Annual Overview': 'Annual Overview',
+        'Air Temperature and Humidity': 'Air Temperature and Humidity',
+        'Temperature [°C]': 'Temperature [°C]',
+        'Relative Humidity [%]': 'Relative Humidity [%]',
+        'Daily Avg.': 'Daily Avg.',
+        'Rain': 'Rain',
+        'Rain [mm]': 'Rain [mm]',
+        'Rain [mm] (Rain Gauge)': 'Rain [mm] (Rain Gauge)',
+        'Wind': 'Wind',
+        'Average [m/s]': 'Average [m/s]',
+        'Gusts [m/s]': 'Gusts [m/s]',
+        'Direction [°]': 'Direction [°]',
+        'Battery Voltage': 'Battery Voltage',
+        'Voltage [mV]': 'Voltage [mV]',
+        'Monthly Reports': 'Monthly Reports'
+    },
+    'de': {
+        'Weather Report': 'Wetterbericht',
+        'Annual Overview': 'Jahresübersicht',
+        'Air Temperature and Humidity': 'Luftemperatur und -feuchte',
+        'Temperature [°C]': 'Temperatur [°C]',
+        'Relative Humidity [%]': 'rel. Feuchte [%]',
+        'Daily Avg.': 'tägl. Durchschnitt',
+        'Rain': 'Regen',
+        'Rain [mm]': 'Regen [mm]',
+        'Rain [mm] (Rain Gauge)': 'Regen [mm] (Regenmesser)',
+        'Wind': 'Wind',
+        'Average [m/s]': 'Durchschnitt [m/s]',
+        'Gusts [m/s]': 'Böen [m/s]',
+        'Direction [°]': 'Richtung [°]',
+        'Battery Voltage': 'Batteriespannung',
+        'Voltage [mV]': 'Spannung [mV]',
+        'Monthly Reports': 'Monatsberichte'
+    }
+}
+
+def tr(text):
+    return translations.get(LANG, {}).get(text, text)
+
 
 # List all CSV files in the directory
 csv_files = [f for f in os.listdir(src_dir) if f.endswith('.csv')]
@@ -74,7 +136,7 @@ for file in csv_files:
     df = pd.read_csv(file_path, skiprows=0, parse_dates=[0], date_parser=lambda x: pd.to_datetime(x, format='%a, %d %b %Y %H:%M:%S'))
     
     for col in range(1, last_column):
-        # Replace comma with dot in the second column and convert to float
+        # Replace comma with dot and convert to float
         df.iloc[:, col] = df.iloc[:, col].astype(float)
 
     dataframes.append(df)
@@ -119,6 +181,9 @@ def plot_data(plt, pdf, df, columns, title, xlabel, ylabels, colors, avg_label, 
         #ax.tick_params(axis='y', labelcolor=colors[i])
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
         ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        if i < len(columns) - 1:
+            # Remove x-axis labels for all but the last subplot
+            ax.set_xticklabels([])
         if avg_colors[i]:
             daily_avg = df.iloc[:, columns[i]].resample('D').mean()
             ax.plot(daily_avg.index, daily_avg, label=f'{avg_label} {ylabels[i]}', color=avg_colors[i], linestyle='--', linewidth=2)
@@ -130,7 +195,6 @@ def plot_data(plt, pdf, df, columns, title, xlabel, ylabels, colors, avg_label, 
         plt.setp(ax.xaxis.get_majorticklabels(), rotation=45)
 
     fig.suptitle(title, fontsize=16)
-    #plt.tight_layout()
 
     pdf.savefig(fig)
     plt.close(fig)
@@ -167,9 +231,6 @@ def plot_rain(plt, pdf, df_diff, df, column, title, xlabel, ylabel, color):
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
     plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
 
-    # Adjust layout to prevent clipping of tick-labels
-    #plt.tight_layout()
-
     # Set the title of the figure
     fig.suptitle(title, fontsize=16)
 
@@ -179,19 +240,20 @@ def plot_rain(plt, pdf, df_diff, df, column, title, xlabel, ylabel, color):
     # Close the figure to free up memory
     plt.close(fig)
 
-# Create a new figure for Rain Gauge
+# Create a new figure for Wind
 def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 6), layout="tight")
 
-    # Plot the Rain Gauge differences as a bar graph
-    ax1.plot(df.index, df.iloc[:, columns[1]], label=ylabel[2], color=colors[1], linewidth=2)
-    ax1.plot(df.index, df.iloc[:, columns[0]], label=ylabel[1], color=colors[0], linewidth=2)
+    # Plot average and gust wind speed on the first subplot
+    ax1.plot(df.index, df.iloc[:, columns[1]], label=ylabel[1], color=colors[1], linewidth=2)
+    ax1.plot(df.index, df.iloc[:, columns[0]], label=ylabel[0], color=colors[0], linewidth=2)
     if xlabel:
         ax1.set_xlabel(xlabel)
     ax1.set_ylabel(ylabel[0])
     #ax.tick_params(axis='y', labelcolor='b')
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
     ax1.xaxis.set_major_locator(mdates.AutoDateLocator())
+    ax1.set_xticklabels([])
     #ax1.set_xticklabels([])
     ax1.legend()
     ax1.grid(True)
@@ -202,12 +264,13 @@ def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
     #v = columns[0] * np.sin(df.iloc[:, columns[2]]/180*np.pi)
     #ax2.quiver(df.index, [0] * len(df.index), u, v, color=colors[2])
     hourly_avg = df.iloc[:, columns[2]].resample('H').mean()
-    ax2.plot(hourly_avg.index, hourly_avg, label=ylabel[3], color=colors[2])
+    ax2.plot(hourly_avg.index, hourly_avg, label=ylabel[2], color=colors[2])
     if xlabel:
         ax2.set_xlabel(xlabel)
-    ax2.set_ylabel(ylabel[3])
+    ax2.set_ylabel(ylabel[2])
     ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y %H:%M'))
     ax2.xaxis.set_major_locator(mdates.AutoDateLocator())
+    
 
     ax2.legend()
     ax2.grid(True)
@@ -227,42 +290,38 @@ def plot_wind(plt, pdf, df, columns, title, xlabel, ylabel, colors):
 
 # Create a PdfPages object to save the figures
 with PdfPages(pdf_file) as pdf:
-    title_page(plt, pdf, 'Wetterbericht Lehmanger, Garten 95')
+    title_page(plt, pdf, tr('Weather Report') + f' {LOCATION}')
 
-    title_page(plt, pdf, 'Jahresübersicht', 18)
+    title_page(plt, pdf, tr('Annual Overview'), 18)
 
     plot_data(plt, pdf, combined_df, 
               [COLUMNS['ws_temp_c'], COLUMNS['ws_humidity']], 
-              'Luftemperatur und -feuchte', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],
-              ['r', 'b'], 
-              'tägl. Durchschnitt', ['k', 'k'])
-
-    # Filter out rows where soil moisture is zero
-    soil_df = combined_df[combined_df.iloc[:, COLUMNS['soil_moisture']] != 0]
-    plot_data(plt, pdf, soil_df, 
-              [COLUMNS['soil_temp_c'], COLUMNS['ws_humidity']],
-              'Bodentemperatur und -feuchte', None, ['Temperatur [°C]', 'Feuchte [%]'],
-              ['m', 'g'],
-              'tägl. Durchschnitt', ['k', None])
+              tr('Air Temperature and Humidity'), None, 
+              [tr('Temperature [°C]'), tr('Relative Humidity [%]')],
+              [COLORS['ws_temp_c'], COLORS['ws_humidity']], 
+              tr('Daily Avg.'), ['k', 'k'])
 
     # Calculate the difference between consecutive values in column "Rain Gauge"
-    rain_df = combined_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
-    rain_df = rain_df[rain_df >= 0]
-    plot_rain(plt, pdf, rain_df, combined_df, COLUMNS['rain_mm'],
-              'Niederschlag', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'],
-              'b')
-
-    plot_data(plt, pdf, combined_df, [COLUMNS['hot_water_temp_c']], 
-              'Warmwasser', None, ['Temperatur [°C]'],
-              ['orange'], 'tägl. Durchschnitt',
-              ['k'])
+    rain_df = combined_df[combined_df.iloc[:, COLUMNS['rain_mm']] != 0]
+    rain_diff_df = rain_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
+    #rain_diff_df = rain_df[rain_df >= 0]
+    plot_rain(plt, pdf, rain_diff_df, rain_df, COLUMNS['rain_mm'],
+              tr('Rain'), None,
+              [tr('Rain [mm]'), tr('Rain [mm] (Rain Gauge)')],
+              COLORS['rain_mm'])
 
     plot_wind(plt, pdf, combined_df,
               [COLUMNS['wind_avg'], COLUMNS['wind_gust'], COLUMNS['wind_direction']],
-              'Wind', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'],
-              ['g', 'b', 'k'])
+              tr('Wind'), None,
+              [tr('Average [m/s]'), tr('Gusts [m/s]'), tr('Direction [°]')],
+              [COLORS['wind_avg'], COLORS['wind_gust'], COLORS['wind_direction']])
+    
+    plot_data(plt, pdf, combined_df,
+              [COLUMNS['battery_voltage']],
+              tr('Battery Voltage'), None, [tr('Voltage [mV]')],
+              [COLORS['battery_voltage']], tr('Daily Avg.'), [None])
 
-    title_page(plt, pdf, 'Monatsberichte', 18)
+    title_page(plt, pdf, tr('Monthly Reports'), 18)
 
     # Group the data by month
     combined_df['Month'] = combined_df.index.to_period('M')
@@ -273,32 +332,29 @@ with PdfPages(pdf_file) as pdf:
 
         plot_data(plt, pdf, month_df,
                   [COLUMNS['ws_temp_c'], COLUMNS['ws_humidity']],
-                  f'Luftemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'rel. Feuchte [%]'],
-                  ['r', 'b'],
-                  'tägl. Durchschnitt', ['k', 'k'])
-
-        # Filter out rows where soil moisture (column 9) is zero
-        soil_df = month_df[month_df.iloc[:, COLUMNS['soil_moisture']] != 0]
-        plot_data(plt, pdf, soil_df,
-                  [COLUMNS['soil_temp_c'], COLUMNS['soil_moisture']], f'Bodentemperatur und -feuchte {month}', None, ['Temperatur [°C]', 'Feuchte [%]'],
-                  ['m', 'g'],
-                  'tägl. Durchschnitt', ['k', None])
+                  tr('Air Temperature and Humidity') + f' {month}', None,
+                  [tr('Temperature [°C]'), tr('Relative Humidity [%]')],
+                  [COLORS['ws_temp_c'], COLORS['ws_humidity']],
+                  tr('Daily Avg.'), ['k', 'k'])
 
         # Calculate the difference between consecutive values in column "Rain Gauge"
-        rain_df = month_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
-        rain_df = rain_df[rain_df >= 0]
-        plot_rain(plt, pdf, rain_df, month_df, COLUMNS['rain_mm'],
-                  f'Niederschlag {month}', None, ['Niederschlag [mm]', 'Niederschlag [mm] (Regenmesser)'],
-                  'b')
-
-        plot_data(plt, pdf, month_df,
-                  [COLUMNS['hot_water_temp_c']], f'Warmwasser {month}', None, ['Temperatur [°C]'],
-                  ['orange'],
-                  'tägl. Durchschnitt',
-                  ['k'])
+        
+        #rain_df = month_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
+        #rain_df = rain_df[rain_df > 0]
+        rain_df = month_df[month_df.iloc[:, COLUMNS['rain_mm']] != 0]
+        rain_diff_df = rain_df.iloc[:, COLUMNS['rain_mm']].diff().fillna(0)
+        plot_rain(plt, pdf, rain_diff_df, rain_df, COLUMNS['rain_mm'],
+                  tr('Rain') + f' {month}', None,
+                  [tr('Rain [mm]'), tr('Rain [mm] (Rain Gauge)')],
+                  COLORS['rain_mm'])
 
         plot_wind(plt, pdf, month_df,
                   [COLUMNS['wind_avg'], COLUMNS['wind_gust'], COLUMNS['wind_direction']],
-                  f'Wind {month}', None, ['Wind [m/s]', 'Durchschnitt [m/s]', 'Böen [m/s]', 'Richtung [°]'],
-                  ['g', 'b', 'k'])
+                  tr('Wind') +f' {month}', None,
+                  [tr('Average [m/s]'), tr('Gusts [m/s]'), tr('Direction [°]')],
+                  [COLORS['wind_avg'], COLORS['wind_gust'], COLORS['wind_direction']])
 
+        plot_data(plt, pdf, month_df,
+              [COLUMNS['battery_voltage']],
+              tr('Battery Voltage'), None, [tr('Voltage [mV]')],
+              [COLORS['battery_voltage']], tr('Daily Avg.'), [None])
