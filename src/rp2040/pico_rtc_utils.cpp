@@ -42,6 +42,8 @@
 // History:
 //
 // 20231006 Created
+// 20240905 Removed clocks_init() - not available/not required
+//          in pico-sdk v2.0.0
 //
 // ToDo:
 // - 
@@ -155,7 +157,6 @@ void pico_sleep(unsigned duration) {
 
     // back from dormant state
     rosc_enable();
-    clocks_init();
     // --8<-----
 }
 #endif

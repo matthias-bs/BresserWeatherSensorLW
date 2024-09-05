@@ -7,7 +7,7 @@
     "powerfeather": {
         "battery_capacity": 2201,
         "supply_maintain_voltage": 4600,
-        "max_charge_current": 50,
+        "max_charge_current": 1000,
         "temperature_measurement": true,
         "battery_fuel_gauge": true
     }
