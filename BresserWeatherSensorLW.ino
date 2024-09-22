@@ -101,6 +101,7 @@
 // 20240730 PowerFeather: modified setSupplyMaintainVoltage()
 // 20240804 PowerFeather: Added configuration of maximum battery charging current
 // 20240818 Fixed bootCount
+// 20240920 Fixed handling of downlink after any kind of uplink
 //
 // ToDo:
 // -
@@ -235,8 +236,7 @@ struct sPowerFeatherCfg PowerFeatherCfg = {
     .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
     .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
     .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
-    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE
-};
+    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
 #else
 struct sPowerFeatherCfg PowerFeatherCfg = {0};
 #endif
@@ -507,15 +507,16 @@ void setup()
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   delay(2000);
   // Note: Battery capacity / type has to be set for voltage measurement
-  Board.init(PowerFeatherCfg.battery_capacity);                            
-  Board.enable3V3(true);  // Power supply for FeatherWing
-  Board.enableVSQT(true); // Power supply for battery management chip (voltage measurement)
-  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement);   // Enable battery temperature measurement
-  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);        // Enable battery fuel gauge
-  if (PowerFeatherCfg.supply_maintain_voltage) {
-      Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
+  Board.init(PowerFeatherCfg.battery_capacity);
+  Board.enable3V3(true);                                                 // Power supply for FeatherWing
+  Board.enableVSQT(true);                                                // Power supply for battery management chip (voltage measurement)
+  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement); // Enable battery temperature measurement
+  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);      // Enable battery fuel gauge
+  if (PowerFeatherCfg.supply_maintain_voltage)
+  {
+    Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
   }
-  Board.enableBatteryCharging(true); // Enable battery charging
+  Board.enableBatteryCharging(true);                                      // Enable battery charging
   Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
 #endif
 
@@ -633,36 +634,11 @@ void setup()
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
   }
 
-  // Retrieve the last uplink frame counter
-  uint32_t fCntUp = node.getFCntUp();
-
-  // Send a confirmed uplink every 64th frame
-  // and also request the LinkCheck command
-  if (fCntUp % 64 == 0)
-  {
-    log_i("[LoRaWAN] Requesting LinkCheck");
-    node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
-  }
-
-  // Set appStatusUplink flag if required
-  uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
-  if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
-  {
-    appStatusUplinkPending = true;
-  }
-
-  // Set lwStatusUplink flag if required
-  if (prefs.lw_stat_interval && (fCntUp % prefs.lw_stat_interval == 0))
-  {
-    lwStatusUplinkPending = true;
-  }
-
   // get payload immediately before uplink - not used here
   appLayer.getPayloadStage2(port, encoder);
 
   uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
   size_t downlinkSize;                        // To hold the actual payload size rec'd
-  LoRaWANEvent_t uplinkDetails;
   LoRaWANEvent_t downlinkDetails;
 
   uint8_t payloadSize = encoder.getLength();
@@ -673,128 +649,170 @@ void setup()
   }
 
   // ----- and now for the main event -----
-  log_i("Sending uplink; port %u, size %u", port, payloadSize);
 
-  // perform an uplink & optionally receive downlink
-  if (fCntUp % 64 == 0)
+  enum class E_FSM_STAGE : uint8_t
   {
-    state = node.sendReceive(
-        uplinkPayload,
-        payloadSize,
-        port,
-        downlinkPayload,
-        &downlinkSize,
-        true,
-        &uplinkDetails,
-        &downlinkDetails);
-  }
-  else
-  {
-    state = node.sendReceive(
-        uplinkPayload,
-        payloadSize,
-        port,
-        downlinkPayload,
-        &downlinkSize,
-        false,
-        nullptr,
-        &downlinkDetails);
-  }
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
+    E_SENSORDATA = 0x00,
+    E_RESPONSE = 0x01,
+    E_LWSTATUS = 0x02,
+    E_APPSTATUS = 0x03,
+    E_DONE = 0x04
+  };
+
+  E_FSM_STAGE fsmStage = E_FSM_STAGE::E_SENSORDATA;
 
   /// Uplink request - command received via downlink
   uint8_t uplinkReq = 0;
 
-  // Check if downlink was received
-  if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
+  do
   {
-    // Did we get a downlink with data for us
-    if (downlinkSize > 0)
-    {
-      log_i("Downlink port %u, data: ", downlinkDetails.fPort);
-      arrayDump(downlinkPayload, downlinkSize);
+    // Retrieve the last uplink frame counter
+    uint32_t fCntUp = node.getFCntUp();
+    log_d("FcntUp: %u", node.getFCntUp());
 
-      if (downlinkDetails.fPort > 0)
+    bool isConfirmed = false;
+
+    // Send a confirmed uplink every 64th frame
+    // and also request the LinkCheck command
+    if (fCntUp && (fCntUp % 64 == 0))
+    {
+      log_i("[LoRaWAN] Requesting LinkCheck");
+      node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
+      isConfirmed = true;
+    }
+
+    // Set appStatusUplink flag if required
+    uint8_t appStatusUplinkInterval = appLayer.getAppStatusUplinkInterval();
+    if (appStatusUplinkInterval && (fCntUp % appStatusUplinkInterval == 0))
+    {
+      appStatusUplinkPending = true;
+      log_i("App status uplink pending");
+    }
+
+    // Set lwStatusUplink flag if required
+    if (prefs.lw_stat_interval && (fCntUp % prefs.lw_stat_interval == 0))
+    {
+      lwStatusUplinkPending = true;
+      log_i("LoRaWAN node status uplink pending");
+    }
+
+    if (fsmStage == E_FSM_STAGE::E_RESPONSE)
+    {
+      log_d("Sending response uplink.");
+      port = uplinkReq;
+      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+    }
+    else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
+    {
+      log_d("Sending LoRaWAN status uplink.");
+      port = CMD_GET_LW_STATUS;
+      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      lwStatusUplinkPending = false;
+    }
+    else if (fsmStage == E_FSM_STAGE::E_APPSTATUS)
+    {
+      log_d("Sending application status uplink.");
+      port = CMD_GET_SENSORS_STAT;
+      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      appStatusUplinkPending = false;
+    }
+
+    log_i("Sending uplink; port %u, size %u", port, payloadSize);
+
+    state = node.sendReceive(
+        uplinkPayload,
+        payloadSize,
+        port,
+        downlinkPayload,
+        &downlinkSize,
+        isConfirmed,
+        nullptr,
+        &downlinkDetails);
+    debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
+
+    uplinkReq = 0;
+
+    // Check if downlink was received
+    if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
+    {
+      // Did we get a downlink with data for us
+      if (downlinkSize > 0)
       {
-        uplinkReq = decodeDownlink(downlinkDetails.fPort, downlinkPayload, downlinkSize);
+        log_i("Downlink port %u, data: ", downlinkDetails.fPort);
+        arrayDump(downlinkPayload, downlinkSize);
+
+        if (downlinkDetails.fPort > 0)
+        {
+          uplinkReq = decodeDownlink(downlinkDetails.fPort, downlinkPayload, downlinkSize);
+        }
       }
+      else
+      {
+        log_d("<MAC commands only>");
+      }
+
+      // print RSSI (Received Signal Strength Indicator)
+      log_d("[LoRaWAN] RSSI:\t\t%f dBm", radio.getRSSI());
+
+      // print SNR (Signal-to-Noise Ratio)
+      log_d("[LoRaWAN] SNR:\t\t%f dB", radio.getSNR());
+
+      // print frequency error
+      log_d("[LoRaWAN] Frequency error:\t%f Hz", radio.getFrequencyError());
+
+      // print extra information about the event
+      log_d("[LoRaWAN] Event information:");
+      log_d("[LoRaWAN] Confirmed:\t%d", downlinkDetails.confirmed);
+      log_d("[LoRaWAN] Confirming:\t%d", downlinkDetails.confirming);
+      log_d("[LoRaWAN] Datarate:\t%d", downlinkDetails.datarate);
+      log_d("[LoRaWAN] Frequency:\t%7.3f MHz", downlinkDetails.freq);
+      log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
+      log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fCnt);
+      log_d("[LoRaWAN] fPort:\t\t%u", downlinkDetails.fPort);
+    }
+
+    uint32_t networkTime = 0;
+    uint8_t fracSecond = 0;
+    if (node.getMacDeviceTimeAns(&networkTime, &fracSecond, true) == RADIOLIB_ERR_NONE)
+    {
+      log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
+      log_i("[LoRaWAN] DeviceTime second:\t1/%u", fracSecond);
+
+      // Update the system time with the time read from the network
+      rtc.setTime(networkTime);
+
+      // Save clock sync timestamp and clear flag
+      rtcLastClockSync = rtc.getLocalEpoch();
+      rtcTimeSource = E_TIME_SOURCE::E_LORA;
+      log_d("RTC sync completed");
+      printDateTime();
+    }
+
+    uint8_t margin = 0;
+    uint8_t gwCnt = 0;
+    if (node.getMacLinkCheckAns(&margin, &gwCnt) == RADIOLIB_ERR_NONE)
+    {
+      log_d("[LoRaWAN] LinkCheck margin:\t%d", margin);
+      log_d("[LoRaWAN] LinkCheck count:\t%u", gwCnt);
+    }
+
+    if (uplinkReq)
+    {
+      fsmStage = E_FSM_STAGE::E_RESPONSE;
+    }
+    else if (lwStatusUplinkPending)
+    {
+      fsmStage = E_FSM_STAGE::E_LWSTATUS;
+    }
+    else if (appStatusUplinkPending)
+    {
+      fsmStage = E_FSM_STAGE::E_APPSTATUS;
     }
     else
     {
-      log_d("<MAC commands only>");
+      fsmStage = E_FSM_STAGE::E_DONE;
     }
-
-    // print RSSI (Received Signal Strength Indicator)
-    log_d("[LoRaWAN] RSSI:\t\t%f dBm", radio.getRSSI());
-
-    // print SNR (Signal-to-Noise Ratio)
-    log_d("[LoRaWAN] SNR:\t\t%f dB", radio.getSNR());
-
-    // print frequency error
-    log_d("[LoRaWAN] Frequency error:\t%f Hz", radio.getFrequencyError());
-
-    // print extra information about the event
-    log_d("[LoRaWAN] Event information:");
-    log_d("[LoRaWAN] Confirmed:\t%d", downlinkDetails.confirmed);
-    log_d("[LoRaWAN] Confirming:\t%d", downlinkDetails.confirming);
-    log_d("[LoRaWAN] Datarate:\t%d", downlinkDetails.datarate);
-    log_d("[LoRaWAN] Frequency:\t%7.3f MHz", downlinkDetails.freq);
-    log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
-    log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fCnt);
-    log_d("[LoRaWAN] fPort:\t\t%u", downlinkDetails.fPort);
-  }
-
-  uint32_t networkTime = 0;
-  uint8_t fracSecond = 0;
-  if (node.getMacDeviceTimeAns(&networkTime, &fracSecond, true) == RADIOLIB_ERR_NONE)
-  {
-    log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
-    log_i("[LoRaWAN] DeviceTime second:\t1/%u", fracSecond);
-
-    // Update the system time with the time read from the network
-    rtc.setTime(networkTime);
-
-    // Save clock sync timestamp and clear flag
-    rtcLastClockSync = rtc.getLocalEpoch();
-    rtcTimeSource = E_TIME_SOURCE::E_LORA;
-    log_d("RTC sync completed");
-    printDateTime();
-  }
-
-  uint8_t margin = 0;
-  uint8_t gwCnt = 0;
-  if (node.getMacLinkCheckAns(&margin, &gwCnt) == RADIOLIB_ERR_NONE)
-  {
-    log_d("[LoRaWAN] LinkCheck margin:\t%d", margin);
-    log_d("[LoRaWAN] LinkCheck count:\t%u", gwCnt);
-  }
-
-  if (appStatusUplinkPending)
-  {
-    log_i("App status uplink pending");
-  }
-
-  if (lwStatusUplinkPending)
-  {
-    log_i("LoRaWAN node status uplink pending");
-  }
-
-  if (uplinkReq)
-  {
-    sendCfgUplink(uplinkReq, uplinkIntervalSeconds);
-  }
-  else if (lwStatusUplinkPending)
-  {
-    sendCfgUplink(CMD_GET_LW_STATUS, uplinkIntervalSeconds);
-    lwStatusUplinkPending = false;
-  }
-  else if (appStatusUplinkPending)
-  {
-    sendCfgUplink(CMD_GET_SENSORS_STAT, uplinkIntervalSeconds);
-    appStatusUplinkPending = false;
-  }
-
-  log_d("FcntUp: %u", node.getFCntUp());
+  } while (fsmStage != E_FSM_STAGE::E_DONE);
 
   // now save session to RTC memory
   uint8_t *persist = node.getBufferSession();
