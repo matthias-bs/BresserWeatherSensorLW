@@ -1,2 +1,3 @@
-secrets.*
+secrets.h
+secrets.json
 credentials.*
