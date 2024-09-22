@@ -45,6 +45,7 @@
 // 20240716 Added CMD_SCAN_SENSORS
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL, renamed 
 //          CMD_<GET|SET>_STATUS_INTERVAL to CMD_<GET|SET>_APP_STATUS_INTERVAL
+// 20240920 Changed sendCfgUplink() to encodeCfgUplink()
 //
 // ToDo:
 // -
@@ -469,10 +470,13 @@
 uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
 
 /*!
- * \brief Send configuration uplink
+ * \brief Encode configuration uplink
  *
- * \param uplinkRequest command ID of uplink request
+ * \param port uplink request port
+ * \param uplinkPayload uplink payload
+ * \param payloadSize   uplink payload size in bytes
+ * \param uplinkInterval uplink interval in seconds
  */
-void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval);
+void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize, uint32_t uplinkInterval);
 
 #endif
