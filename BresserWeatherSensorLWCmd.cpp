@@ -38,6 +38,7 @@
 // 20240729 Added PowerFeather specific status information
 // 20240818 Replaced delay() with light sleep for ESP32
 // 20240829 Added missing implementation of CMD_SET_LW_STATUS_INTERVAL
+// 20240920 Changed sendCfgUplink() to encodeCfgUplink()
 //
 // ToDo:
 // -
@@ -162,13 +163,12 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 }
 
 
-// Send configuration uplink
-void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval)
+// Encode configuration/status uplink
+void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize, uint32_t uplinkInterval)
 {
   log_d("--- Uplink Configuration/Status ---");
 
-  uint8_t uplinkPayload[48];
-  uint8_t port = uplinkReq;
+  uint8_t uplinkReq = port;
 
   //
   // Encode data as byte array for LoRaWAN transmission
@@ -309,14 +309,15 @@ void sendCfgUplink(uint8_t uplinkReq, uint32_t uplinkInterval)
   uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
   uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
 
-  log_d("Sending configuration uplink in %u s", delayMs / 1000);
+  log_d("Sending uplink in %u s", delayMs / 1000);
   #if defined(ESP32)
   esp_sleep_enable_timer_wakeup(delayMs * 1000);
   esp_light_sleep_start();
   #else
   delay(delayMs);
   #endif
-  log_d("Sending configuration uplink now.");
-  int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-  debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
+  //log_d("Sending configuration uplink now.");
+  payloadSize = encoder.getLength();
+  //int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
+  //debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 }
