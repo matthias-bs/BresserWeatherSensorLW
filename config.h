@@ -40,7 +40,8 @@
 //          (examples/LoRaWAN/LoRaWAN_Reference/config.h)
 // 20240613 Added LORAWAN_NODE (DFRobot FireBeetle ESP32 wiring variant)
 // 20240704 Moved MAX_DOWNLINK_SIZE to BresserWeatherSensorLWCfg.h
-// 20260710 Fixed pragma messages fro Firebeetle ESP32 pin config
+// 20240710 Fixed pragma messages fro Firebeetle ESP32 pin config
+// 20240922 Bumped to RadioLib v7.0.0
 //
 // ToDo:
 // - 
@@ -382,16 +383,16 @@ String stateDecode(const int16_t result) {
     return "RADIOLIB_ERR_DWELL_TIME_EXCEEDED";
   case RADIOLIB_ERR_CHECKSUM_MISMATCH:
     return "RADIOLIB_ERR_CHECKSUM_MISMATCH";
-  case RADIOLIB_LORAWAN_NO_DOWNLINK:
-    return "RADIOLIB_LORAWAN_NO_DOWNLINK";
+  case RADIOLIB_ERR_NO_JOIN_ACCEPT:
+    return "RADIOLIB_ERR_NO_JOIN_ACCEPT";
   case RADIOLIB_LORAWAN_SESSION_RESTORED:
     return "RADIOLIB_LORAWAN_SESSION_RESTORED";
   case RADIOLIB_LORAWAN_NEW_SESSION:
     return "RADIOLIB_LORAWAN_NEW_SESSION";
-  case RADIOLIB_LORAWAN_NONCES_DISCARDED:
-    return "RADIOLIB_LORAWAN_NONCES_DISCARDED";
-  case RADIOLIB_LORAWAN_SESSION_DISCARDED:
-    return "RADIOLIB_LORAWAN_SESSION_DISCARDED";
+  case RADIOLIB_ERR_NONCES_DISCARDED:
+    return "RADIOLIB_ERR_NONCES_DISCARDED";
+  case RADIOLIB_ERR_SESSION_DISCARDED:
+    return "RADIOLIB_ERR_SESSION_DISCARDED";
   }
   return "See TypeDef.h";
 }
