@@ -42,6 +42,7 @@
 // 20240704 Moved MAX_DOWNLINK_SIZE to BresserWeatherSensorLWCfg.h
 // 20240710 Fixed pragma messages fro Firebeetle ESP32 pin config
 // 20240922 Bumped to RadioLib v7.0.0
+// 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 //
 // ToDo:
 // - 
@@ -58,6 +59,9 @@
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
 
+#define LORAWAN_VERSION_1_1
+//#define LORAWAN_VERSION_1_0_4
+
 // JoinEUI - previous versions of LoRaWAN called this AppEUI
 // for development purposes you can use all zeros - see wiki for details
 #define RADIOLIB_LORAWAN_JOIN_EUI  0x0000000000000000
@@ -69,8 +73,10 @@ const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
 #ifndef RADIOLIB_LORAWAN_APP_KEY   // Replace with your App Key 
 #define RADIOLIB_LORAWAN_APP_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x-- 
 #endif
+#ifdef LORAWAN_VERSION_1_1
 #ifndef RADIOLIB_LORAWAN_NWK_KEY   // Put your Nwk Key here
 #define RADIOLIB_LORAWAN_NWK_KEY   0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x-- 
+#endif
 #endif
 
 // For the curious, the #ifndef blocks allow for automated testing &/or you can
@@ -326,7 +332,11 @@ LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_
 uint64_t joinEUI =   RADIOLIB_LORAWAN_JOIN_EUI;
 uint64_t devEUI  =   RADIOLIB_LORAWAN_DEV_EUI;
 uint8_t appKey[] = { RADIOLIB_LORAWAN_APP_KEY };
+#ifdef LORAWAN_VERSION_1_1
 uint8_t nwkKey[] = { RADIOLIB_LORAWAN_NWK_KEY };
+#else
+uint8_t nwkKey[] = { 0 };
+#endif
 
 // Create the LoRaWAN node
 LoRaWANNode node(&radio, &Region, subBand);

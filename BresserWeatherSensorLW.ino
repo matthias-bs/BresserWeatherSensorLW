@@ -103,6 +103,7 @@
 // 20240818 Fixed bootCount
 // 20240920 Fixed handling of downlink after any kind of uplink
 // 20240912 Bumped to RadioLib v7.0.0
+// 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 //
 // ToDo:
 // -
@@ -388,7 +389,14 @@ void printDateTime(void)
 int16_t lwActivate(void)
 {
   // setup the OTAA session information
+#if defined(LORAWAN_VERSION_1_1)
   int16_t state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+#elif defined(LORAWAN_VERSION_1_0_4)
+  int16_t state = node.beginOTAA(joinEUI, devEUI, nullptr, appKey);
+#else
+#error "LoRaWAN version not defined"
+#endif
+
   debug(state != RADIOLIB_ERR_NONE, "Initialise node failed", state, true);
 
   log_d("Recalling LoRaWAN nonces & session");
@@ -561,7 +569,12 @@ void setup()
   printDateTime();
 
   // Try to load LoRaWAN secrets from LittleFS file, if available
-  loadSecrets(joinEUI, devEUI, nwkKey, appKey);
+  #ifdef LORAWAN_VERSION_1_1
+  bool requireNwkKey = true;
+  #else
+  bool requireNwkKey = false;
+  #endif
+  loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
   // Initialize Application Layer
   appLayer.begin();

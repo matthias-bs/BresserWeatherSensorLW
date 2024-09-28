@@ -32,6 +32,7 @@
 // History:
 //
 // 20240723 Created from BresserWeatherSensorLW.ino
+// 20240928 Refactoring & modification for LoRaWAN v1.0.4 (requires no nwkKey)
 //
 // ToDo:
 // -
@@ -51,9 +52,10 @@
  * Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading
  * the file to Flash.
  *
+ * \param requireNwkKey
  * \param joinEUI
  * \param devEUI
  * \param nwkKey
  * \param appKey
  */
-void loadSecrets(uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey);
+void loadSecrets(bool requireNwkKey, uint64_t &joinEUI, uint64_t &devEUI, uint8_t *nwkKey, uint8_t *appKey);
