@@ -102,6 +102,8 @@
 // 20240804 PowerFeather: Added configuration of maximum battery charging current
 // 20240818 Fixed bootCount
 // 20240920 Fixed handling of downlink after any kind of uplink
+// 20240912 Bumped to RadioLib v7.0.0
+// 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 //
 // ToDo:
 // -
@@ -386,10 +388,16 @@ void printDateTime(void)
  */
 int16_t lwActivate(void)
 {
-  int16_t state = RADIOLIB_ERR_UNKNOWN;
-
   // setup the OTAA session information
-  node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+#if defined(LORAWAN_VERSION_1_1)
+  int16_t state = node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+#elif defined(LORAWAN_VERSION_1_0_4)
+  int16_t state = node.beginOTAA(joinEUI, devEUI, nullptr, appKey);
+#else
+#error "LoRaWAN version not defined"
+#endif
+
+  debug(state != RADIOLIB_ERR_NONE, "Initialise node failed", state, true);
 
   log_d("Recalling LoRaWAN nonces & session");
   // ##### setup the flash storage
@@ -561,7 +569,12 @@ void setup()
   printDateTime();
 
   // Try to load LoRaWAN secrets from LittleFS file, if available
-  loadSecrets(joinEUI, devEUI, nwkKey, appKey);
+  #ifdef LORAWAN_VERSION_1_1
+  bool requireNwkKey = true;
+  #else
+  bool requireNwkKey = false;
+  #endif
+  loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
   // Initialize Application Layer
   appLayer.begin();
@@ -587,8 +600,8 @@ void setup()
 
   LoraEncoder encoder(uplinkPayload);
 
-  uint8_t port = 1;
-  appLayer.getPayloadStage1(port, encoder);
+  uint8_t fPort = 1;
+  appLayer.getPayloadStage1(fPort, encoder);
 
   int16_t state = 0; // return value for calls to RadioLib
 
@@ -635,17 +648,19 @@ void setup()
   }
 
   // get payload immediately before uplink - not used here
-  appLayer.getPayloadStage2(port, encoder);
+  appLayer.getPayloadStage2(fPort, encoder);
 
   uint8_t downlinkPayload[MAX_DOWNLINK_SIZE]; // Make sure this fits your plans!
   size_t downlinkSize;                        // To hold the actual payload size rec'd
   LoRaWANEvent_t downlinkDetails;
 
   uint8_t payloadSize = encoder.getLength();
-  if (payloadSize > PAYLOAD_SIZE)
+  uint8_t maxPayloadLen = node.getMaxPayloadLen();
+  log_d("Max payload length: %u", maxPayloadLen);
+  if (payloadSize > maxPayloadLen)
   {
-    log_w("Payload size exceeds maximum of %u bytes - truncating", PAYLOAD_SIZE);
-    payloadSize = PAYLOAD_SIZE;
+    log_w("Payload size exceeds maximum of %u bytes - truncating", maxPayloadLen);
+    payloadSize = maxPayloadLen;
   }
 
   // ----- and now for the main event -----
@@ -699,41 +714,42 @@ void setup()
     if (fsmStage == E_FSM_STAGE::E_RESPONSE)
     {
       log_d("Sending response uplink.");
-      port = uplinkReq;
-      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      fPort = uplinkReq;
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
     }
     else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
     {
       log_d("Sending LoRaWAN status uplink.");
-      port = CMD_GET_LW_STATUS;
-      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      fPort = CMD_GET_LW_STATUS;
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
       lwStatusUplinkPending = false;
     }
     else if (fsmStage == E_FSM_STAGE::E_APPSTATUS)
     {
       log_d("Sending application status uplink.");
-      port = CMD_GET_SENSORS_STAT;
-      encodeCfgUplink(port, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      fPort = CMD_GET_SENSORS_STAT;
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
       appStatusUplinkPending = false;
     }
 
-    log_i("Sending uplink; port %u, size %u", port, payloadSize);
+    log_i("Sending uplink; port %u, size %u", fPort, payloadSize);
 
     state = node.sendReceive(
         uplinkPayload,
         payloadSize,
-        port,
+        fPort,
         downlinkPayload,
         &downlinkSize,
         isConfirmed,
         nullptr,
         &downlinkDetails);
-    debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
+    debug(state < RADIOLIB_ERR_NONE, "Error in sendReceive", state, false);
 
     uplinkReq = 0;
 
     // Check if downlink was received
-    if (state != RADIOLIB_LORAWAN_NO_DOWNLINK)
+    // (state 0 = no downlink, state 1/2 = downlink in window Rx1/Rx2)
+    if (state > 0)
     {
       // Did we get a downlink with data for us
       if (downlinkSize > 0)
@@ -769,6 +785,8 @@ void setup()
       log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
       log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fCnt);
       log_d("[LoRaWAN] fPort:\t\t%u", downlinkDetails.fPort);
+      log_d("[LoRaWAN] Time-on-air: \t%u ms", node.getLastToA());
+      log_d("[LoRaWAN] Rx window: %d", state);
     }
 
     uint32_t networkTime = 0;
