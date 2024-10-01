@@ -23,7 +23,7 @@
   "homepage": "https://github.com/matthias-bs/BresserWeatherSensorLW#README",
   "dependencies": {
     "BresserWeatherSensorReceiver": "matthias-bs/BresserWeatherSensorReceiver#semver:^0.28.9",
-    "RadioLib": "jgromes/RadioLib#semver:^7.0.1",
+    "RadioLib": "jgromes/RadioLib#semver:^7.0.2",
     "lora-serialization": "thesolarnomad/lora-serialization#semver:^3.2.1",
     "ESP32Time": "fbiego/ESP32Time#semver:^2.0.6",
     "OneWireNg": "https://github.com/pstolarz/OneWireNg#semver:^0.13.3",
