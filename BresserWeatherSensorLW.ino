@@ -25,10 +25,10 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.0.2
-// LoRa_Serialization                   3.2.1
+// RadioLib                             7.1.0
+// LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.28.9
+// BresserWeatherSensorReceiver         0.28.10
 // OneWireNg                            0.13.3 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.2 (optional)
