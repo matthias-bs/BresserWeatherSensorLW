@@ -37,6 +37,7 @@
 // 20240725 Created
 // 20240729 Added PowerFeather specific configuration
 // 20240804 Added max_charge_current
+// 20241110 Fixed ArduinoJson deprecation warning
 //
 // ToDo:
 // -
@@ -86,31 +87,31 @@ void loadNodeCfg(
             }
             else
             {
-                if (doc.containsKey("timezone"))
+                if (!doc["timezone"].isNull())
                     tzinfo = doc["timezone"].as<String>();
-                if (doc.containsKey("battery_weak"))
+                if (!doc["battery_weak"].isNull())
                     batt_weak = doc["battery_weak"];
-                if (doc.containsKey("battery_low"))
+                if (!doc["battery_low"].isNull())
                     batt_low = doc["battery_low"];
-                if (doc.containsKey("battery_discharge_lim"))
+                if (!doc["battery_discharge_lim"].isNull())
                     batt_discharge_lim = doc["battery_discharge_lim"];
-                if (doc.containsKey("battery_charge_lim"))
+                if (!doc["battery_charge_lim"].isNull())
                     batt_charge_lim = doc["battery_charge_lim"];
-                if (doc.containsKey("powerfeather")) {
+                if (!doc["powerfeather"].isNull()) {
                     JsonObject pf = doc["powerfeather"];
-                    if (pf.containsKey("battery_capacity")) {
+                    if (!pf["battery_capacity"].isNull()) {
                         powerFeatherCfg.battery_capacity = pf["battery_capacity"];
                     }
-                    if (pf.containsKey("supply_maintain_voltage")) {
+                    if (!pf["supply_maintain_voltage"].isNull()) {
                         powerFeatherCfg.supply_maintain_voltage = pf["supply_maintain_voltage"];
                     }
-                    if (pf.containsKey("max_charge_current")) {
+                    if (!pf["max_charge_current"].isNull()) {
                         powerFeatherCfg.max_charge_current = pf["max_charge_current"];
                     }
-                    if (pf.containsKey("temperature_measurement")) {
+                    if (!pf["temperature_measurement"].isNull()) {
                         powerFeatherCfg.temperature_measurement = pf["temperature_measurement"];
                     }
-                    if (pf.containsKey("battery_fuel_gauge")) {
+                    if (!pf["battery_fuel_gauge"].isNull()) {
                         powerFeatherCfg.battery_fuel_gauge = pf["battery_fuel_gauge"];
                     }
                 }
