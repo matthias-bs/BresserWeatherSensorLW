@@ -52,7 +52,7 @@ void loadSecrets(bool requireNwkKey, uint64_t &joinEUI, uint64_t &devEUI, uint8_
 #endif
           ))
   {
-    log_d("Could not initialize LittleFS.");
+    log_e("Could not initialize LittleFS.");
     return;
   }
 
@@ -73,7 +73,7 @@ void loadSecrets(bool requireNwkKey, uint64_t &joinEUI, uint64_t &devEUI, uint8_
 
   if (error)
   {
-    log_d("Failed to read JSON file, using defaults.");
+    log_e("Failed to read JSON file, using defaults.");
     return;
   }
 

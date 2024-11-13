@@ -439,7 +439,7 @@ int16_t lwActivate(void)
   state = RADIOLIB_ERR_NETWORK_NOT_JOINED;
   while (state != RADIOLIB_LORAWAN_NEW_SESSION)
   {
-    log_d("Join ('login') to the LoRaWAN Network");
+    log_i("Join ('login') to the LoRaWAN Network");
     state = node.activateOTAA();
 
     // ##### save the join counters (nonces) to permanent store
@@ -453,7 +453,7 @@ int16_t lwActivate(void)
 
     if (state != RADIOLIB_LORAWAN_NEW_SESSION)
     {
-      log_d("Join failed: %d", state);
+      log_i("Join failed: %d", state);
 
       // how long to wait before join attempts. This is an interim solution pending
       // implementation of TS001 LoRaWAN Specification section #7 - this doc applies to v1.0.4 & v1.1
@@ -468,7 +468,7 @@ int16_t lwActivate(void)
     } // if activateOTAA state
   } // while join
 
-  log_d("Joined");
+  log_i("Joined");
 
   // reset the failed join count
   bootCountSinceUnsuccessfulJoin = 0;
@@ -581,11 +581,8 @@ void setup()
 
   preferences.begin("BWS-LW", false);
   prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
-  log_d("Preferences: sleep_interval:        %u s", prefs.sleep_interval);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
-  log_d("Preferences: sleep_interval_long:   %u s", prefs.sleep_interval_long);
   prefs.lw_stat_interval = preferences.getUChar("lw_stat_int", LW_STATUS_INTERVAL);
-  log_d("Preferences: lw_stat_interval:      %u cycles", prefs.lw_stat_interval);
   preferences.end();
 
   uint16_t voltage = getBatteryVoltage();
@@ -606,7 +603,7 @@ void setup()
   int16_t state = 0; // return value for calls to RadioLib
 
   // setup the radio based on the pinmap (connections) in config.h
-  log_v("Initalise the radio");
+  log_v("Initalise radio");
   radio.reset();
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);

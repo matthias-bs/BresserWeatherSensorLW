@@ -63,11 +63,11 @@ float PayloadOneWire::getOneWireTemperature(uint8_t index)
     // Check if reading was successful
     if (tempC != DEVICE_DISCONNECTED_C)
     {
-        log_d("Temperature = %.2f°C", tempC);
+        log_i("Temperature = %.2f°C", tempC);
     }
     else
     {
-        log_d("Error: Could not read temperature data");
+        log_i("Error: Could not read temperature data");
     }
 
     return tempC;
@@ -95,12 +95,12 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 // Check if reading was successful
                 if (tempC != DEVICE_DISCONNECTED_C)
                 {
-                    log_d("Temperature[%d] = %.2f°C", index, tempC);
+                    log_i("Temperature[%d] = %.2f°C", index, tempC);
                     encoder.writeTemperature(tempC);
                 }
                 else
                 {
-                    log_d("Error: Could not read temperature[%d] data", index);
+                    log_i("Error: Could not read temperature[%d] data", index);
                     encoder.writeTemperature(INV_TEMP);
                 }
                 

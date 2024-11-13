@@ -64,7 +64,7 @@ void loadNodeCfg(
 #endif
             ))
     {
-        log_d("Could not initialize LittleFS.");
+        log_e("Could not initialize LittleFS.");
     }
     else
     {
@@ -83,7 +83,7 @@ void loadNodeCfg(
             DeserializationError error = deserializeJson(doc, file);
             if (error)
             {
-                log_d("Failed to read JSON file, using defaults.");
+                log_e("Failed to read JSON file, using defaults.");
             }
             else
             {

@@ -94,7 +94,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 {
   if ((port == CMD_GET_DATETIME) && (payload[0] == 0x00) && (size == 1))
   {
-    log_d("Get date/time");
+    log_i("Get date/time");
     return CMD_GET_DATETIME;
   }
 
@@ -111,7 +111,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     localtime_r(&set_time, &timeinfo);
     strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-    log_d("Set date/time: %s", tbuf);
+    log_i("Set date/time: %s", tbuf);
 #endif
     return 0;
   }
@@ -119,7 +119,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
   if ((port == CMD_SET_SLEEP_INTERVAL) && (size == 2))
   {
     prefs.sleep_interval = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval: %u s", prefs.sleep_interval);
+    log_i("Set sleep_interval: %u s", prefs.sleep_interval);
     preferences.begin("BWS-LW", false);
     preferences.putUShort("sleep_int", prefs.sleep_interval);
     preferences.end();
@@ -129,7 +129,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
   if ((port == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 2))
   {
     prefs.sleep_interval_long = (payload[0] << 8) | payload[1];
-    log_d("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
+    log_i("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
     preferences.begin("BWS-LW", false);
     preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
     preferences.end();
@@ -139,7 +139,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
   if ((port == CMD_SET_LW_STATUS_INTERVAL) && (size == 1))
   {
     prefs.lw_stat_interval = payload[0];
-    log_d("Set lw_stat_interval: %u", prefs.lw_stat_interval);
+    log_i("Set lw_stat_interval: %u", prefs.lw_stat_interval);
     preferences.begin("BWS-LW", false);
     preferences.putUChar("lw_stat_int", prefs.lw_stat_interval);
     preferences.end();
@@ -148,13 +148,13 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
   if ((port == CMD_GET_LW_CONFIG) && (payload[0] == 0x00) && (size == 1))
   {
-    log_d("Get config");
+    log_i("Get config");
     return CMD_GET_LW_CONFIG;
   }
 
   if ((port == CMD_GET_LW_STATUS) && (payload[0] == 0x00) && (size == 1))
   {
-    log_d("Get device status");
+    log_i("Get device status");
     return CMD_GET_LW_STATUS;
   }
 
@@ -177,7 +177,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize,
 
   if (uplinkReq == CMD_GET_DATETIME)
   {
-    log_d("Date/Time");
+    log_i("Date/Time");
     time_t t_now = rtc.getLocalEpoch();
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
@@ -188,7 +188,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize,
   }
   else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
-    log_d("LoRaWAN Config");
+    log_i("LoRaWAN Config");
     encoder.writeUint8(prefs.sleep_interval >> 8);
     encoder.writeUint8(prefs.sleep_interval & 0xFF);
     encoder.writeUint8(prefs.sleep_interval_long >> 8);
@@ -198,7 +198,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize,
   else if (uplinkReq == CMD_GET_LW_STATUS)
   {
     uint8_t status = longSleep ? 1 : 0;
-    log_d("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
+    log_i("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
     encoder.writeUint16(getBatteryVoltage());
     encoder.writeUint8(status);
     #if defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -316,8 +316,5 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize,
   #else
   delay(delayMs);
   #endif
-  //log_d("Sending configuration uplink now.");
   payloadSize = encoder.getLength();
-  //int16_t state = node.sendReceive(uplinkPayload, encoder.getLength(), port);
-  //debug((state != RADIOLIB_LORAWAN_NO_DOWNLINK) && (state != RADIOLIB_ERR_NONE), "Error in sendReceive", state, false);
 }

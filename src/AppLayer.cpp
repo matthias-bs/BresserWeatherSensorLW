@@ -144,14 +144,14 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 #ifdef RAINDATA_EN
         if (payload[0] & 0xF)
         {
-            log_d("Reset rain statistics - flags: 0x%X", payload[0]);
+            log_i("Reset rain statistics - flags: 0x%X", payload[0]);
             rainGauge.reset(payload[0] & 0xF);
         }
 #endif
 #ifdef LIGHTNINGSENSOR_EN
         if (payload[0] & 0x10)
         {
-            log_d("Reset lightning statistics");
+            log_i("Reset lightning statistics");
             lightningProc.reset();
         }
 #endif
@@ -160,7 +160,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_SCAN_SENSORS) && (size == 1))
     {
-        log_d("Scan sensors - time: %u s", payload[0]);
+        log_i("Scan sensors - time: %u s", payload[0]);
         // 1. Set flag in Preferences to trigger sensor scan and set scan time
         // 2. If flag is set, perform sensors scan instead of normal operation in 
         //    PayloadBresser::begin(void)
@@ -174,13 +174,13 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_WS_TIMEOUT) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get weathersensor_timeout");
+        log_i("Get weathersensor_timeout");
         return CMD_GET_WS_TIMEOUT;
     }
 
     if ((port == CMD_SET_WS_TIMEOUT) && (size == 1))
     {
-        log_d("Set ws_timeout: %u s", payload[0]);
+        log_i("Set ws_timeout: %u s", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("ws_timeout", payload[0]);
         appPrefs.end();
@@ -189,13 +189,13 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_APP_STATUS_INTERVAL) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get App status interval");
+        log_i("Get App status interval");
         return CMD_GET_APP_STATUS_INTERVAL;
     }
 
     if ((port == CMD_SET_APP_STATUS_INTERVAL) && (size == 1))
     {
-        log_d("Set App status interval: %u frames", payload[0]);
+        log_i("Set App status interval: %u frames", payload[0]);
         appPrefs.begin("BWS-LW-APP", false);
         appPrefs.putUChar("app_stat_int", payload[0]);
         appPrefs.end();
@@ -204,22 +204,22 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_SENSORS_STAT) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get sensors' status");
+        log_i("Get sensors' status");
         return CMD_GET_SENSORS_STAT;
     }
 
     if ((port == CMD_GET_SENSORS_INC) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get sensors include list");
+        log_i("Get sensors include list");
         return CMD_GET_SENSORS_INC;
     }
 
     if ((port == CMD_SET_SENSORS_INC) && (size % 4 == 0))
     {
-        log_d("Set sensors include list");
+        log_i("Set sensors include list");
         for (size_t i = 0; i < size; i += 4)
         {
-            log_d("%08X:",
+            log_i("%08X:",
                   (payload[i] << 24) |
                       (payload[i + 1] << 16) |
                       (payload[i + 2] << 8) |
@@ -231,16 +231,16 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_SENSORS_EXC) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get sensors exclude list");
+        log_i("Get sensors exclude list");
         return CMD_GET_SENSORS_EXC;
     }
 
     if ((port == CMD_SET_SENSORS_EXC) && (size % 4 == 0))
     {
-        log_d("Set sensors exclude list");
+        log_i("Set sensors exclude list");
         for (size_t i = 0; i < size - 1; i += 4)
         {
-            log_d("%08X:",
+            log_i("%08X:",
                   (payload[i] << 24) |
                       (payload[i + 1] << 16) |
                       (payload[i + 2] << 8) |
@@ -252,13 +252,13 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_SENSORS_CFG) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get sensors configuration");
+        log_i("Get sensors configuration");
         return CMD_GET_SENSORS_CFG;
     }
 
     if ((port == CMD_SET_SENSORS_CFG) && (size == 3))
     {
-        log_d("Set sensors configuration - max_sensors: %u, rx_flags: %u, en_decoders: %u",
+        log_i("Set sensors configuration - max_sensors: %u, rx_flags: %u, en_decoders: %u",
               payload[0], payload[1], payload[2]);
         weatherSensor.setSensorsCfg(payload[0], payload[1], payload[2]);
         return 0;
@@ -267,7 +267,7 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     if ((port == CMD_GET_BLE_CONFIG) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get BLE config");
+        log_i("Get BLE config");
         return CMD_GET_BLE_CONFIG;
     }
 
@@ -282,16 +282,16 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_BLE_ADDR) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get BLE sensors MAC addresses");
+        log_i("Get BLE sensors MAC addresses");
         return CMD_GET_BLE_ADDR;
     }
 
     if ((port == CMD_SET_BLE_ADDR) && (size % 6 == 0))
     {
-        log_d("Set BLE sensors MAC addresses");
+        log_i("Set BLE sensors MAC addresses");
         for (size_t i = 0; i < size - 1; i += 6)
         {
-            log_d("%02X:%02X:%02X:%02X:%02X:%02X",
+            log_i("%02X:%02X:%02X:%02X:%02X:%02X",
                   payload[i],
                   payload[i + 1],
                   payload[i + 2],
@@ -308,20 +308,20 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
     if ((port == CMD_GET_APP_PAYLOAD_CFG) && (payload[0] == 0x00) && (size == 1))
     {
-        log_d("Get AppLayer payload configuration");
+        log_i("Get AppLayer payload configuration");
         return CMD_GET_APP_PAYLOAD_CFG;
     }
 
     if ((port == CMD_SET_APP_PAYLOAD_CFG) && (size == 24))
     {
-        log_d("Set AppLayer payload configuration");
+        log_i("Set AppLayer payload configuration");
         for (size_t i = 0; i < 16; i++)
         {
-            log_d("Type%02d: 0x%X", i, payload[i]);
+            log_i("Type%02d: 0x%X", i, payload[i]);
         }
-        log_d("1-Wire:  0x%04X", payload[16] << 8 | payload[17]);
-        log_d("Analog:  0x%04X", (payload[18] << 8) | payload[19]);
-        log_d("Digital: 0x%08X", (payload[20] << 24) | (payload[21] << 16) | (payload[22] << 8) | payload[23]);
+        log_i("1-Wire:  0x%04X", payload[16] << 8 | payload[17]);
+        log_i("Analog:  0x%04X", (payload[18] << 8) | payload[19]);
+        log_i("Digital: 0x%08X", (payload[20] << 24) | (payload[21] << 16) | (payload[22] << 8) | payload[23]);
 
         setAppPayloadCfg(payload, APP_PAYLOAD_CFG_SIZE);
         return 0;
