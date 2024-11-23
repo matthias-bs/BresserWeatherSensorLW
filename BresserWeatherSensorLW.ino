@@ -104,6 +104,7 @@
 // 20240920 Fixed handling of downlink after any kind of uplink
 // 20240912 Bumped to RadioLib v7.0.0
 // 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
+// 20241123 PowerFeather: Fixed inadverted sleep if battery low & supply o.k.
 //
 // ToDo:
 // -
@@ -526,6 +527,11 @@ void setup()
   }
   Board.enableBatteryCharging(true);                                      // Enable battery charging
   Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
+  #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
+  int16_t current;
+  Board.getBatteryCurrent(current);
+  log_d("Battery current: %d mA", current);
+  #endif
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)
@@ -589,7 +595,14 @@ void setup()
   if (voltage && voltage <= battery_low)
   {
     log_i("Battery low!");
-    gotoSleep(sleepDuration(battery_weak));
+    #if defined(ARDUINO_ESP32S3_POWERFEATHER)
+      uint16_t supplyVoltage = getSupplyVoltage();
+      if (supplyVoltage < battery_low) {
+        gotoSleep(sleepDuration(battery_weak));
+      }
+    #else
+      gotoSleep(sleepDuration(battery_weak));
+    #endif
   }
 
   // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
