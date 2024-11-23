@@ -86,7 +86,7 @@ jobs:
             "ATC_MiThermometer@0.4.2"
             "TheengsDecoder@1.8.0"
             "Preferences@2.1.0"
-            "ArduinoJson@7.2.0"
+            "ArduinoJson@7.2.1"
             "M5Unified@0.2.0"
             "M5Core2@0.2.0"
             "powerfeather-sdk@1.0.7")
