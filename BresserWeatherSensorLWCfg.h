@@ -208,6 +208,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // unused
 #define PIN_ADC_IN -1
 #elif defined(LORAWAN_NODE)
+#pragma message("On-board voltage divider must be enabled for supply voltage measurement (see schematic).")
 // External Li-Ion Battery connected to solar charger
 #define PIN_ADC_IN A3
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
