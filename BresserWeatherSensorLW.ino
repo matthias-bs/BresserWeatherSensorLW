@@ -106,6 +106,7 @@
 // 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 // 20241123 PowerFeather: Fixed inadverted sleep if battery low & supply o.k.
 // 20241203 Added supply voltage measurement if PIN_SUPPLY_IN is defined
+//          Moved start of sensor reception after battery voltage check
 //
 // ToDo:
 // -
@@ -583,9 +584,6 @@ void setup()
   #endif
   loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
-  // Initialize Application Layer
-  appLayer.begin();
-
   preferences.begin("BWS-LW", false);
   prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
   prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
@@ -605,6 +603,9 @@ void setup()
       gotoSleep(sleepDuration(battery_weak));
     #endif
   }
+  
+  // Initialize Application Layer - starts sensor reception
+  appLayer.begin();
 
   // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
   uint8_t uplinkPayload[PAYLOAD_SIZE + 8];
