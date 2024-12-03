@@ -107,6 +107,7 @@
 // 20241123 PowerFeather: Fixed inadverted sleep if battery low & supply o.k.
 // 20241203 Added supply voltage measurement if PIN_SUPPLY_IN is defined
 //          Moved start of sensor reception after battery voltage check
+//          Modified sleep duration if battery is low but external power is available
 //
 // ToDo:
 // -
@@ -292,8 +293,17 @@ uint32_t sleepDuration(uint16_t battery_weak)
   // Long sleep interval if battery is weak
   if (voltage && voltage <= battery_weak)
   {
+#if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
+    uint16_t supplyVoltage = getSupplyVoltage();
+    if (supplyVoltage < battery_weak)
+    {
+      sleep_interval = prefs.sleep_interval_long;
+      longSleep = true;
+    }
+#else
     sleep_interval = prefs.sleep_interval_long;
     longSleep = true;
+#endif
   }
 
   // If the real time is available, align the wake-up time to the
@@ -529,11 +539,11 @@ void setup()
   }
   Board.enableBatteryCharging(true);                                      // Enable battery charging
   Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
-  #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
+#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
   int16_t current;
   Board.getBatteryCurrent(current);
   log_d("Battery current: %d mA", current);
-  #endif
+#endif
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)
@@ -576,12 +586,12 @@ void setup()
   setenv("TZ", timeZoneInfo.c_str(), 1);
   printDateTime();
 
-  // Try to load LoRaWAN secrets from LittleFS file, if available
-  #ifdef LORAWAN_VERSION_1_1
+// Try to load LoRaWAN secrets from LittleFS file, if available
+#ifdef LORAWAN_VERSION_1_1
   bool requireNwkKey = true;
-  #else
+#else
   bool requireNwkKey = false;
-  #endif
+#endif
   loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
   preferences.begin("BWS-LW", false);
@@ -594,16 +604,17 @@ void setup()
   if (voltage && voltage <= battery_low)
   {
     log_i("Battery low!");
-    #if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
-      uint16_t supplyVoltage = getSupplyVoltage();
-      if (supplyVoltage < battery_low) {
-        gotoSleep(sleepDuration(battery_weak));
-      }
-    #else
+#if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
+    uint16_t supplyVoltage = getSupplyVoltage();
+    if (supplyVoltage < battery_low)
+    {
       gotoSleep(sleepDuration(battery_weak));
-    #endif
+    }
+#else
+    gotoSleep(sleepDuration(battery_weak));
+#endif
   }
-  
+
   // Initialize Application Layer - starts sensor reception
   appLayer.begin();
 
