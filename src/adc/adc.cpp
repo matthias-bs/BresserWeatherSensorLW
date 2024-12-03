@@ -40,6 +40,7 @@
 // 20240430 Modified getBatteryVoltage()
 // 20240504 Heltec WiFi 32 LoRa V3: Changed ADC input attenuation to get higher accuracy
 // 20240607 Changed ARDUINO_HELTEC_WIFI_LORA_32_V3 to uppercase
+// 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
 //
 // ToDo:
 // -
