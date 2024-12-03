@@ -105,6 +105,7 @@
 // 20240912 Bumped to RadioLib v7.0.0
 // 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 // 20241123 PowerFeather: Fixed inadverted sleep if battery low & supply o.k.
+// 20241203 Added supply voltage measurement if PIN_SUPPLY_IN is defined
 //
 // ToDo:
 // -
@@ -595,7 +596,7 @@ void setup()
   if (voltage && voltage <= battery_low)
   {
     log_i("Battery low!");
-    #if defined(ARDUINO_ESP32S3_POWERFEATHER)
+    #if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
       uint16_t supplyVoltage = getSupplyVoltage();
       if (supplyVoltage < battery_low) {
         gotoSleep(sleepDuration(battery_weak));
