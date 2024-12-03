@@ -40,6 +40,7 @@
 // 20240430 Modified getBatteryVoltage()
 // 20240504 Heltec WiFi 32 LoRa V3: Changed ADC input attenuation to get higher accuracy
 // 20240607 Changed ARDUINO_HELTEC_WIFI_LORA_32_V3 to uppercase
+// 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
 //
 // ToDo:
 // -
@@ -66,14 +67,14 @@ getVoltage(uint8_t pin, uint8_t samples, float div)
   for (uint8_t i = 0; i < UBATT_SAMPLES; i++)
   {
 #if defined(ESP32)
-    voltage_raw += float(analogReadMilliVolts(PIN_ADC_IN));
+    voltage_raw += float(analogReadMilliVolts(pin));
 #else
-    voltage_raw += float(analogRead(PIN_ADC_IN)) / 4095.0 * 3300;
+    voltage_raw += float(analogRead(pin)) / 4095.0 * 3300;
 #endif
   }
   uint16_t voltage = int(voltage_raw / UBATT_SAMPLES / UBATT_DIV);
 
-  log_d("Voltage = %dmV", voltage);
+  log_d("Voltage @GPIO%02d = %dmV", pin, voltage);
 
   return voltage;
 }
