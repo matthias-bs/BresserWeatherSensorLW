@@ -46,6 +46,7 @@
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL, renamed 
 //          CMD_<GET|SET>_STATUS_INTERVAL to CMD_<GET|SET>_APP_STATUS_INTERVAL
 // 20240920 Changed sendCfgUplink() to encodeCfgUplink()
+// 20241227 Removed delay from encodeCfgUplink()
 //
 // ToDo:
 // -
@@ -477,6 +478,6 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size);
  * \param payloadSize   uplink payload size in bytes
  * \param uplinkInterval uplink interval in seconds
  */
-void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize, uint32_t uplinkInterval);
+void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize);
 
 #endif
