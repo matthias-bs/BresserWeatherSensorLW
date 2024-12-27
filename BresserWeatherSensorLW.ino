@@ -757,14 +757,14 @@ void setup()
     {
       log_d("Sending response uplink.");
       fPort = uplinkReq;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
     }
     else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
     {
       log_d("Sending LoRaWAN status uplink.");
       fPort = CMD_GET_LW_STATUS;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       lwStatusUplinkPending = false;
     }
@@ -772,7 +772,7 @@ void setup()
     {
       log_d("Sending application status uplink.");
       fPort = CMD_GET_SENSORS_STAT;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       appStatusUplinkPending = false;
     }

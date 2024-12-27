@@ -163,7 +163,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
 
 // Encode configuration/status uplink
-void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize, uint32_t uplinkInterval)
+void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
 {
   log_d("--- Uplink Configuration/Status ---");
 
