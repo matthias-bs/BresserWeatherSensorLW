@@ -1,12 +1,21 @@
 <map id="AppLayer::getPayloadStage1" name="AppLayer::getPayloadStage1">
-<area shape="rect" id="node1" title="Prepare / get payload at startup." alt="" coords="5,132,213,159"/>
-<area shape="rect" id="node2" href="$class_payload_analog.html#a9e04f0c62f92287539fd53c9c01d7701" title="Encode analog data channels for LoRaWAN transmission." alt="" coords="272,5,491,32"/>
-<area shape="rect" id="node3" href="$class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="293,56,469,83"/>
-<area shape="rect" id="node7" href="$class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="268,107,495,133"/>
-<area shape="rect" id="node8" href="$class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6" title="Encode digital data channels for LoRaWAN transmission." alt="" coords="274,157,489,184"/>
-<area shape="rect" id="node9" href="$class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6" title="Encode 1&#45;Wire temperature sensor values for LoRaWAN transmission." alt="" coords="261,208,501,235"/>
-<area shape="rect" id="node10" href="$class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b" title="Scan for Bresser sensors." alt="" coords="277,259,486,285"/>
-<area shape="rect" id="node4" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="549,5,763,32"/>
-<area shape="rect" id="node5" href="$class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="579,56,733,83"/>
-<area shape="rect" id="node6" href="$class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="573,107,739,133"/>
+<area shape="rect" id="Node000001" title="Prepare / get payload at startup." alt="" coords="5,129,213,155"/>
+<area shape="rect" id="Node000002" href="$class_payload_analog.html#a9e04f0c62f92287539fd53c9c01d7701" title="Encode analog data channels for LoRaWAN transmission." alt="" coords="272,5,491,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,127,181,84,220,60,260,40,282,32,283,37,262,44,222,64,184,88,127,131"/>
+<area shape="rect" id="Node000003" href="$class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="293,55,469,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,127,261,89,296,80,297,86,262,94,145,132"/>
+<area shape="rect" id="Node000007" href="$class_payload_bresser.html#a03643c8507eda1302c7f9026c65fbe15" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="268,104,495,129"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="213,130,254,126,254,131,214,135"/>
+<area shape="rect" id="Node000008" href="$class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6" title="Encode digital data channels for LoRaWAN transmission." alt="" coords="274,153,489,179"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="214,149,261,153,260,158,213,154"/>
+<area shape="rect" id="Node000009" href="$class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6" title="Encode 1&#45;Wire temperature sensor values for LoRaWAN transmission." alt="" coords="261,203,501,228"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="148,152,262,187,302,197,301,202,261,193,147,157"/>
+<area shape="rect" id="Node000010" href="$class_payload_bresser.html#a134c066b8cf0363c761f27e072b4af8b" title="Scan for Bresser sensors." alt="" coords="277,252,486,277"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="127,153,185,195,222,219,262,238,284,246,283,251,260,243,220,223,182,200,124,157"/>
+<area shape="rect" id="Node000004" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="549,5,763,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="452,52,571,31,572,36,453,57"/>
+<area shape="rect" id="Node000005" href="$class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="579,55,733,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="469,65,565,65,565,70,469,70"/>
+<area shape="rect" id="Node000006" href="$class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="573,104,739,129"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="453,77,572,99,571,104,452,83"/>
 </map>

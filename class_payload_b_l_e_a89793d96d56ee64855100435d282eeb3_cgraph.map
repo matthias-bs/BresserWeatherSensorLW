@@ -1,6 +1,9 @@
 <map id="PayloadBLE::encodeBLE" name="PayloadBLE::encodeBLE">
-<area shape="rect" id="node1" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="5,56,181,83"/>
-<area shape="rect" id="node2" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="229,5,443,32"/>
-<area shape="rect" id="node3" href="$class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="259,56,413,83"/>
-<area shape="rect" id="node4" href="$class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="253,107,419,133"/>
+<area shape="rect" id="Node000001" title="Encode BLE temperature/humidity sensor values for LoRaWAN transmission." alt="" coords="5,55,181,80"/>
+<area shape="rect" id="Node000002" href="$class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588" title="Delete results from BLEScan buffer to release memory." alt="" coords="229,5,443,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,52,259,31,260,36,157,57"/>
+<area shape="rect" id="Node000003" href="$class_ble_sensors.html#afbf84629a4b746d732b66141f0387655" title="Get data from sensors by running a BLE scan." alt="" coords="259,55,413,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,65,245,65,245,70,182,70"/>
+<area shape="rect" id="Node000004" href="$class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6" title="Set sensor data invalid." alt="" coords="253,104,419,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="157,77,260,99,259,104,156,83"/>
 </map>
