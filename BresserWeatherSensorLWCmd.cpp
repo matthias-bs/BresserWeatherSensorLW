@@ -39,6 +39,7 @@
 // 20240818 Replaced delay() with light sleep for ESP32
 // 20240829 Added missing implementation of CMD_SET_LW_STATUS_INTERVAL
 // 20240920 Changed sendCfgUplink() to encodeCfgUplink()
+// 20241227 Removed delay from encodeCfgUplink()
 //
 // ToDo:
 // -
@@ -61,8 +62,6 @@ using namespace PowerFeather;
  * From config.h
  */
 void debug(bool isFail, const char* message, int state, bool Freeze);
-extern LoRaWANNode node;
-extern const uint16_t uplinkIntervalSeconds;
 
 
 /*
@@ -304,17 +303,5 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize,
   }
   Serial.println();
 
-  // wait before sending uplink
-  uint32_t minimumDelay = uplinkInterval * 1000UL;
-  uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
-  uint32_t delayMs = max(interval, minimumDelay); // cannot send faster than duty cycle allows
-
-  log_d("Sending uplink in %u s", delayMs / 1000);
-  #if defined(ESP32)
-  esp_sleep_enable_timer_wakeup(delayMs * 1000);
-  esp_light_sleep_start();
-  #else
-  delay(delayMs);
-  #endif
   payloadSize = encoder.getLength();
 }
