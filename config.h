@@ -337,6 +337,8 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #pragma message ("No radio chip selected")
 #endif
 
+LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO);
+
 // Copy over the EUI's & keys in to the something that will not compile if incorrectly formatted
 uint64_t joinEUI =   RADIOLIB_LORAWAN_JOIN_EUI;
 uint64_t devEUI  =   RADIOLIB_LORAWAN_DEV_EUI;
