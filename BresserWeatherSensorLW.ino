@@ -108,6 +108,7 @@
 // 20241203 Added supply voltage measurement if PIN_SUPPLY_IN is defined
 //          Moved start of sensor reception after battery voltage check
 //          Modified sleep duration if battery is low but external power is available
+// 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
 //
 // ToDo:
 // -
@@ -269,6 +270,22 @@ void print_wakeup_reason()
 }
 #endif
 
+void uplinkDelay(uint32_t timeUntilUplink, uint32_t uplinkInterval)
+{
+  // wait before sending uplink
+  uint32_t minimumDelay = uplinkInterval * 1000UL;
+  //uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
+  uint32_t delayMs = max(timeUntilUplink, minimumDelay); // cannot send faster than duty cycle allows
+
+  log_d("Sending uplink in %u s", delayMs / 1000);
+  #if defined(ESP32)
+  esp_sleep_enable_timer_wakeup(delayMs * 1000);
+  esp_light_sleep_start();
+  #else
+  delay(delayMs);
+  #endif
+}
+
 /*!
  * \brief Compute sleep duration
  *
@@ -399,7 +416,7 @@ void printDateTime(void)
  *
  * \return RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
  */
-int16_t lwActivate(void)
+int16_t lwActivate(LoRaWANNode &node)
 {
   // setup the OTAA session information
 #if defined(LORAWAN_VERSION_1_1)
@@ -508,6 +525,7 @@ void setup()
 #endif
 
   Serial.begin(115200);
+  Serial.setDebugOutput(true);
   delay(2000); // give time to switch to the serial monitor
   log_i("Setup");
 
@@ -628,14 +646,15 @@ void setup()
 
   int16_t state = 0; // return value for calls to RadioLib
 
+
   // setup the radio based on the pinmap (connections) in config.h
   log_v("Initalise radio");
-  radio.reset();
+  
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
 
   // activate node by restoring session or otherwise joining the network
-  state = lwActivate();
+  state = lwActivate(node);
   // state is one of RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
 
   // Set battery fill level -
@@ -739,12 +758,14 @@ void setup()
       log_d("Sending response uplink.");
       fPort = uplinkReq;
       encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
     }
     else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
     {
       log_d("Sending LoRaWAN status uplink.");
       fPort = CMD_GET_LW_STATUS;
       encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       lwStatusUplinkPending = false;
     }
     else if (fsmStage == E_FSM_STAGE::E_APPSTATUS)
@@ -752,6 +773,7 @@ void setup()
       log_d("Sending application status uplink.");
       fPort = CMD_GET_SENSORS_STAT;
       encodeCfgUplink(fPort, uplinkPayload, payloadSize, uplinkIntervalSeconds);
+      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       appStatusUplinkPending = false;
     }
 

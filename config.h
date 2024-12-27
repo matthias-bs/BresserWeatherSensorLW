@@ -348,7 +348,7 @@ uint8_t nwkKey[] = { 0 };
 #endif
 
 // Create the LoRaWAN node
-//LoRaWANNode node(&radio, &Region, subBand);
+LoRaWANNode node(&radio, &Region, subBand);
 
 // result code to text ...
 String stateDecode(const int16_t result) {
