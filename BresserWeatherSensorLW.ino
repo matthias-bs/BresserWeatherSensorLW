@@ -648,10 +648,10 @@ void setup()
 
 
   // setup the radio based on the pinmap (connections) in config.h
-  log_v("Initalise radio");
+  log_v("Initialise radio");
   
   state = radio.begin();
-  debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
+  debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);
