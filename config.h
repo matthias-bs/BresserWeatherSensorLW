@@ -44,6 +44,7 @@
 // 20240922 Bumped to RadioLib v7.0.0
 // 20240928 Modified for LoRaWAN v1.0.4 (requires no nwkKey)
 // 20241227 Modified radio chip selection
+//          Removed instances of radio and LoRaWANNode classes
 //
 // ToDo:
 // - 
@@ -56,6 +57,7 @@
 #include <RadioLib.h>
 #include "secrets.h"
 #include "BresserWeatherSensorLWCfg.h"
+#include "WeatherSensorCfg.h"
 
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
@@ -97,7 +99,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 // If you get an error message when compiling, it may be that the 
 // pinmap could not be determined - see the notes for more info
 
-
+#if !defined(RADIO_CHIP)
 // Adafruit
 #if defined(ARDUINO_FEATHER_ESP32) || defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
     #define PIN_LORA_NSS      14
@@ -336,8 +338,10 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
 #else
   #pragma message ("No radio chip selected")
 #endif
-
-LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO);
+#else // RADIO_CHIP is defined in BresserWeatherSensorCfg.h
+  #pragma message("Using radio object from BresserWeatherSensorReceiver")
+  #define LORA_CHIP RADIO_CHIP
+#endif
 
 // Copy over the EUI's & keys in to the something that will not compile if incorrectly formatted
 uint64_t joinEUI =   RADIOLIB_LORAWAN_JOIN_EUI;
@@ -348,9 +352,6 @@ uint8_t nwkKey[] = { RADIOLIB_LORAWAN_NWK_KEY };
 #else
 uint8_t nwkKey[] = { 0 };
 #endif
-
-// Create the LoRaWAN node
-LoRaWANNode node(&radio, &Region, subBand);
 
 // result code to text ...
 String stateDecode(const int16_t result) {

@@ -2,7 +2,7 @@
 // BresserWeatherSensorLW.ino
 //
 // Bresser 868 MHz Weather Sensor Radio Receiver
-// based on ESP32 and RFM95W/SX1276/SX1262 -
+// based on ESP32 and RFM95W/SX1276/SX1262/LR1121 -
 // sends data to a LoRaWAN network (e.g. The Things Network)
 //
 // The radio transceiver is used with RadioLib
@@ -25,10 +25,10 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.1.0
+// RadioLib                             7.1.1
 // LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.28.10
+// BresserWeatherSensorReceiver         0.30.0
 // OneWireNg                            0.13.3 (optional)
 // DallasTemperature                    3.9.0 (optional)
 // NimBLE-Arduino                       1.4.2 (optional)
@@ -109,6 +109,7 @@
 //          Moved start of sensor reception after battery voltage check
 //          Modified sleep duration if battery is low but external power is available
 // 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
+//          Changed to use radio object from BresserWeatherSensorReceiver
 //
 // ToDo:
 // -
@@ -189,6 +190,40 @@ using namespace PowerFeather;
 #include "src/LoadNodeCfg.h"
 #include "src/AppLayer.h"
 #include "src/adc/adc.h"
+
+#if defined(RADIO_CHIP)
+// Use radio object from BresserWeatherSensorReceiver
+extern RADIO_CHIP radio;
+
+#else
+// Create radio object
+LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO);
+
+#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+SPIClass *spi = nullptr;
+#endif
+#endif
+
+
+
+#if defined(ARDUINO_LILYGO_T3S3_LR1121)
+static const uint32_t rfswitch_dio_pins[] = {
+    RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
+    RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
+};
+
+static const Module::RfSwitchMode_t rfswitch_table[] = {
+    // mode                  DIO5  DIO6
+    { LR11x0::MODE_STBY,   { LOW,  LOW  } },
+    { LR11x0::MODE_RX,     { HIGH, LOW  } },
+    { LR11x0::MODE_TX,     { LOW,  HIGH } },
+    { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
+    { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
+    { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
+    { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+    END_OF_MODE_TABLE,
+};
+#endif // ARDUINO_LILYGO_T3S3_LR1121
 
 // Time zone info
 const char *TZ_INFO = TZINFO_STR;
@@ -646,12 +681,32 @@ void setup()
 
   int16_t state = 0; // return value for calls to RadioLib
 
+  #if !defined(RADIO_CHIP)
+    #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+    // Use local radio object with custom SPI configuration
+    spi = new SPIClass(SPI);
+    spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+    radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
+    #endif
+  #endif
+
+  radio.reset();
+  LoRaWANNode node(&radio, &Region, subBand);
 
   // setup the radio based on the pinmap (connections) in config.h
   log_v("Initialise radio");
   
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
+
+  
+    // Using local radio object
+    #if defined(ARDUINO_LILYGO_T3S3_LR1121)
+    radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+
+    // LR1121 TCXO Voltage 2.85~3.15V
+    radio.setTCXO(3.0);
+    #endif
 
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);
