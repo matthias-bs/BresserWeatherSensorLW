@@ -693,11 +693,11 @@ void setup()
   radio.reset();
   LoRaWANNode node(&radio, &Region, subBand);
 
-  // setup the radio for LoRaWAN
-  log_v("Initalise radio");
-
+  // setup the radio based on the pinmap (connections) in config.h
+  log_v("Initialise radio");
+  
   state = radio.begin();
-  debug(state != RADIOLIB_ERR_NONE, "Initalise radio failed", state, true);
+  debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
   
     // Using local radio object
