@@ -12,12 +12,11 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 ## Important Notes
 
-* Helium Network is not supported (requires LoRaWAN v1.0.x)
 * This should not be the first Arduino sketch you are ever trying to flash to your board - try something simple first (e.g. `blink.ino`) to get familiar with the tools and workflow.
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You currently need [RadioLib v7.1.0](https://github.com/jgromes/RadioLib/releases/tag/7.1.0)
+* You need [RadioLib v7.1.2](https://github.com/jgromes/RadioLib/releases/tag/7.1.2) or later
 * You need [espressif/arduino-esp32 v3.0.X](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
@@ -30,8 +29,12 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 ## Features
 
 * Single 868 MHz Radio Transceiver for both Sensor Data Reception and LoRaWAN Connection
-* Compatible to LoRaWAN Specification 1.1.0 / RP001 Regional Parameters 1.1 revision A
-* Tested with [The Things Network](https://www.thethingsnetwork.org/) and [ChirpStack](https://www.chirpstack.io/)
+* Protocols supported by RadioLib
+  * LoRaWAN Specification 1.1.0
+  * LoRaWAN Specification 1.0.4
+  * RP001 Regional Parameters 1.1 revision B
+  * RP002 Regional Parameters 1.0.4
+* Tested with [The Things Network](https://www.thethingsnetwork.org/), [ChirpStack](https://www.chirpstack.io/) and [Helium IoT](https://www.helium.com/)
 * Supports multiple 868 MHz Sensors (e.g. Weather Sensor and Soil Moisture Sensor or Indoor Thermometer/Hygrometer)
 * See [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) for supported sensors
 * Low Power Design (using ESP32 Deep Sleep Mode / RP2040 Sleep State)
