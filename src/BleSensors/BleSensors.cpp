@@ -166,7 +166,10 @@ void BleSensors::resetData(void)
  */
 unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
 {
+  #if !defined(ESP32_S3)
+  // see https://github.com/h2zero/NimBLE-Arduino/issues/826
   NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
+  #endif
 
   NimBLEDevice::init("ble-scan");
   _pBLEScan = NimBLEDevice::getScan();
