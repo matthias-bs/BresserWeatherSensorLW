@@ -106,9 +106,7 @@ class BleSensors {
         /*!
          * \brief Delete results from BLEScan buffer to release memory.
          */        
-        void clearScanResults(void) {
-            _pBLEScan->clearResults();
-        };
+        void clearScanResults(void);
         
         /*!
          * \brief Get data from sensors by running a BLE scan.

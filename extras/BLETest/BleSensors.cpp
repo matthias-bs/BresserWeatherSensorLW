@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// BleSensors.cpp
+// BleSensors.h
 //
 // Wrapper class for Theeengs Decoder (https://github.com/theengs/decoder)
 //
@@ -36,6 +36,7 @@
 //
 // 20230211 Created
 // 20240427 Added paramter activeScan to getData()
+// 20250121 Updated for NimBLE-Arduino v2.x
 //
 // ToDo:
 // -
@@ -46,31 +47,33 @@
 
 #include "BleSensors.h"
 
-/*!
- * \brief Callbacks for advertised BLE devices
- */
 class ScanCallbacks : public NimBLEScanCallbacks
 {
 public:
-  NimBLEScan *m_pBLEScan;                       /// NimBLEScan object
   std::vector<std::string> m_knownBLEAddresses; /// MAC addresses of known sensors
   std::vector<ble_sensors_t> *m_sensorData;     /// Sensor data
+  NimBLEScan *m_pBLEScan;
 
 private:
   int m_devices_found = 0; /// Number of known devices found
 
+  void onDiscovered(const NimBLEAdvertisedDevice *advertisedDevice) override
+  {
+    log_v("Discovered Advertised Device: %s", advertisedDevice->toString().c_str());
+  }
+
   void onResult(const NimBLEAdvertisedDevice *advertisedDevice) override
   {
     TheengsDecoder decoder;
-    bool device_found = false;
     unsigned idx;
+    bool device_found = false;
     JsonDocument doc;
 
-    log_v("Advertised Device: %s", advertisedDevice->toString().c_str());
-
+    log_v("Advertised Device Result: %s", advertisedDevice->toString().c_str());
     JsonObject BLEdata = doc.to<JsonObject>();
     String mac_adress = advertisedDevice->getAddress().toString().c_str();
 
+    BLEdata["id"] = (char *)mac_adress.c_str();
     for (idx = 0; idx < m_knownBLEAddresses.size(); idx++)
     {
       if (mac_adress == m_knownBLEAddresses[idx].c_str())
@@ -78,7 +81,6 @@ private:
         log_v("BLE device found at index %d", idx);
         device_found = true;
         m_devices_found++;
-        log_d("BLE devices found: %d", m_devices_found);
         break;
       }
     }
@@ -138,7 +140,17 @@ private:
       m_pBLEScan->stop();
     }
   }
-};
+
+  void onScanEnd(const NimBLEScanResults &results, int reason) override
+  {
+    log_v("Scan Ended; reason = %d", reason);
+  }
+} scanCallbacks;
+
+void BleSensors::clearScanResults(void)
+{
+  _pBLEScan->clearResults();
+}
 
 // Set all array members invalid
 void BleSensors::resetData(void)
@@ -152,28 +164,23 @@ void BleSensors::resetData(void)
 /**
  * \brief Get BLE sensor data
  */
-unsigned BleSensors::getData(uint32_t duration, bool activeScan)
+unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
 {
-  NimBLEDevice::init("");
+  NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
+  NimBLEDevice::setScanDuplicateCacheSize(200);
 
-  _pBLEScan = NimBLEDevice::getScan(); // create new scan
-
-  // Set the callback for when devices are discovered, no duplicates.
-  ScanCallbacks *myCb = new ScanCallbacks();
-
-  // Copy some data required by the Callback
-  myCb->m_pBLEScan = _pBLEScan;
-  myCb->m_knownBLEAddresses = _known_sensors;
-  myCb->m_sensorData = &data;
-
-  //_pBLEScan->setAdvertisedDeviceCallbacks(myCb);
-  _pBLEScan->setScanCallbacks(myCb);
-  _pBLEScan->setFilterPolicy(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
-  _pBLEScan->setActiveScan(activeScan); // Set active scanning, this will get more data from the advertiser.
-  _pBLEScan->setInterval(97);           // How often the scan occurs / switches channels; in milliseconds,
-  _pBLEScan->setWindow(37);             // How long to scan during the interval; in milliseconds.
-  _pBLEScan->setMaxResults(0);          // do not store the scan results, use callback only.
-  NimBLEScanResults results = _pBLEScan->getResults(duration * 1000, false);
+  NimBLEDevice::init("ble-scan");
+  _pBLEScan = NimBLEDevice::getScan();
+  _pBLEScan->setScanCallbacks(&scanCallbacks);
+  _pBLEScan->setActiveScan(activeScan);
+  _pBLEScan->setInterval(97);
+  _pBLEScan->setWindow(37);
+  scanCallbacks.m_knownBLEAddresses = _known_sensors;
+  scanCallbacks.m_sensorData = &data;
+  scanCallbacks.m_pBLEScan = _pBLEScan;
+  // Start scanning
+  // Blocks until all known devices are found or scanTime is expired
+  _pBLEScan->getResults(scanTime * 1000, false);
 
   return 0;
 }
