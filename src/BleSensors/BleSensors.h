@@ -37,6 +37,7 @@
 // 20230211 Created
 // 20240417 Added additional constructor and method setAddresses()
 // 20240427 Added paramter activeScan to getData()
+// 20250121 Updated for NimBLE-Arduino v2.x
 //
 // ToDo:
 // - 
@@ -104,10 +105,8 @@ class BleSensors {
         
         /*!
          * \brief Delete results from BLEScan buffer to release memory.
-         */        
-        void clearScanResults(void) {
-            _pBLEScan->clearResults();
-        };
+         */
+        void clearScanResults(void);
         
         /*!
          * \brief Get data from sensors by running a BLE scan.
