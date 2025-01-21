@@ -167,7 +167,6 @@ void BleSensors::resetData(void)
 unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
 {
   NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
-  NimBLEDevice::setScanDuplicateCacheSize(200);
 
   NimBLEDevice::init("ble-scan");
   _pBLEScan = NimBLEDevice::getScan();
