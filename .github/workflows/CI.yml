@@ -82,7 +82,7 @@ jobs:
             "LoRa Serialization@3.3.1"
             "ESP32Time@2.0.6"
             "OneWireNg@0.13.3"
-            "DallasTemperature@3.9.0"
+            "DallasTemperature@4.0.2"
             "NimBLE-Arduino@2.2.0"
             "ATC_MiThermometer@0.4.2"
             "TheengsDecoder@1.8.4"
