@@ -56,6 +56,7 @@
  * \brief BLE sensor data
  */
 struct BleDataS {
+      bool     found;              //!< device found
       bool     valid;              //!< data valid
       float    temperature;        //!< temperature in degC
       float    humidity;           //!< humidity in %

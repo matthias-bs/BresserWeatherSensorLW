@@ -80,7 +80,15 @@ private:
       {
         log_v("BLE device found at index %d", idx);
         device_found = true;
-        m_devices_found++;
+
+        // Only count the device as found once
+        // Workaround for
+        // https://github.com/h2zero/NimBLE-Arduino/issues/826
+        if (!(*m_sensorData)[idx].found)
+        {
+          (*m_sensorData)[idx].found = true;
+          m_devices_found++;
+        }
         break;
       }
     }
@@ -158,6 +166,7 @@ void BleSensors::resetData(void)
   for (int i = 0; i < _known_sensors.size(); i++)
   {
     data[i].valid = false;
+    data[i].found = false;
   }
 }
 
@@ -166,10 +175,9 @@ void BleSensors::resetData(void)
  */
 unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
 {
-  #if !defined(ESP32_S3)
+  // setScanFilterMode() is not available for ESP32-S3
   // see https://github.com/h2zero/NimBLE-Arduino/issues/826
-  NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
-  #endif
+  //NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DATA_DEVICE);
 
   NimBLEDevice::init("ble-scan");
   _pBLEScan = NimBLEDevice::getScan();
@@ -180,6 +188,7 @@ unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
   scanCallbacks.m_knownBLEAddresses = _known_sensors;
   scanCallbacks.m_sensorData = &data;
   scanCallbacks.m_pBLEScan = _pBLEScan;
+  
   // Start scanning
   // Blocks until all known devices are found or scanTime is expired
   _pBLEScan->getResults(scanTime * 1000, false);
