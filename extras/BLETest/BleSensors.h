@@ -37,7 +37,6 @@
 // 20230211 Created
 // 20240417 Added additional constructor and method setAddresses()
 // 20240427 Added paramter activeScan to getData()
-// 20250121 Updated for NimBLE-Arduino v2.x
 //
 // ToDo:
 // - 
@@ -51,12 +50,12 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>       //!< https://github.com/h2zero/NimBLE-Arduino
 #include <decoder.h>            //!< https://github.com/theengs/decoder
+#include <ArduinoJson.h>        //!< https://arduinojson.org/
 
 /*!
  * \brief BLE sensor data
  */
 struct BleDataS {
-      bool     found;              //!< device found
       bool     valid;              //!< data valid
       float    temperature;        //!< temperature in degC
       float    humidity;           //!< humidity in %
@@ -106,7 +105,7 @@ class BleSensors {
         
         /*!
          * \brief Delete results from BLEScan buffer to release memory.
-         */
+         */        
         void clearScanResults(void);
         
         /*!

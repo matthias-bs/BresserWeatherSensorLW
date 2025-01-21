@@ -12,12 +12,11 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 
 ## Important Notes
 
-* Helium Network is not supported (requires LoRaWAN v1.0.x)
 * This should not be the first Arduino sketch you are ever trying to flash to your board - try something simple first (e.g. `blink.ino`) to get familiar with the tools and workflow.
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You currently need [RadioLib v7.1.0](https://github.com/jgromes/RadioLib/releases/tag/7.1.0)
+* You need [RadioLib v7.1.2](https://github.com/jgromes/RadioLib/releases/tag/7.1.2) or later
 * You need [espressif/arduino-esp32 v3.0.X](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
@@ -30,8 +29,12 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 ## Features
 
 * Single 868 MHz Radio Transceiver for both Sensor Data Reception and LoRaWAN Connection
-* Compatible to LoRaWAN Specification 1.1.0 / RP001 Regional Parameters 1.1 revision A
-* Tested with [The Things Network](https://www.thethingsnetwork.org/) and [ChirpStack](https://www.chirpstack.io/)
+* Protocols supported by RadioLib
+  * LoRaWAN Specification 1.1.0
+  * LoRaWAN Specification 1.0.4
+  * RP001 Regional Parameters 1.1 revision B
+  * RP002 Regional Parameters 1.0.4
+* Tested with [The Things Network](https://www.thethingsnetwork.org/), [ChirpStack](https://www.chirpstack.io/) and [Helium IoT](https://www.helium.com/)
 * Supports multiple 868 MHz Sensors (e.g. Weather Sensor and Soil Moisture Sensor or Indoor Thermometer/Hygrometer)
 * See [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) for supported sensors
 * Low Power Design (using ESP32 Deep Sleep Mode / RP2040 Sleep State)
@@ -142,6 +145,8 @@ See [Parameters](#parameters) for more details.
   |  :hourglass:  | [LILYGO®TTGO-LORA32 V1](https://github.com/Xinyuan-LilyGo/TTGO-LoRa-Series) | TTGO LoRa32-OLED /<br>TTGO LoRa32 V1 (No TFCard) | TTGO_LORA32_V1 | SX1276 (HPD13A) | -   |
   |  :hourglass:  | [LILYGO®TTGO-LORA32 V2](https://github.com/LilyGO/TTGO-LORA32) | TTGO LoRa32-OLED /<br>TTGO LoRa32 V2             | TTGO_LoRa32_V2 | SX1276 (HPD13A) | For LMIC only: Wire DIO1 to GPIO33 |
   |  :white_check_mark:  |  [LILYGO®TTGO-LORA32 V2.1](https://www.lilygo.cc/products/lora3?variant=42272562282677)    | TTGO LoRa32-OLED /<br>TTGO LoRa32 V2.1 (1.6.1) | TTGO_LoRa32_v21new |  SX1276 (HPD13A) | - |
+  |  :white_check_mark:  |  [LILYGO®T3 S3 SX1262](https://lilygo.cc/products/t3s3-v1-0?variant=42586879721653)        | "LilyGo T3-S3" / "Radio-SX1262" | LILYGO_T3S3_SX1262 |  SX1262  | - |
+  |  :white_check_mark:  |  [LILYGO®T3 S3 LR1121](https://lilygo.cc/products/t3-s3-lr1121)                            | "LilyGo T3-S3" / "Radio-LR1121" | LILYGO_T3S3_LR1121 |  LR1121  | - |
   |  :hourglass:  | [Heltec Wireless Stick](https://heltec.org/project/wireless-stick/)   | Heltec Wireless Stick     | HELTEC_WIRELESS_STICK  |  SX1276  | - |
   |  :hourglass:  | [Heltec WiFi LoRa 32 V2](https://heltec.org/project/wifi-lora-32/)    | Heltec WiFi LoRa 32(V2)   | HELTEC_WIFI_LORA_32_V2 |  SX1276  | - |
   |  :white_check_mark:  | [Heltec WiFi LoRa 32 V3](https://heltec.org/project/wifi-lora-32-v3/) | Heltec WiFi LoRa 32(V3)   | HELTEC_WIFI_LORA_32_V3 |  SX1262  | - |

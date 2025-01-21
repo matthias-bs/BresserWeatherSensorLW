@@ -19,11 +19,12 @@ jobs:
           #- esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_V1
           #- esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_V2
           - esp32:esp32:ttgo-lora32:Revision=TTGO_LoRa32_v21new
+          - esp32:esp32:lilygo_t3s3:Revision=Radio_LR1121
           #- esp32:esp32:heltec_wireless_stick:PSRAM=disabled
           #- esp32:esp32:heltec_wifi_lora_32_V2
           - esp32:esp32:heltec_wifi_lora_32_V3
           #- esp32:esp32:featheresp32
-          - esp32:esp32:m5stack_core2
+          #- esp32:esp32:m5stack_core2
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
           - rp2040:rp2040:adafruit_feather:dbgport=Serial
@@ -57,7 +58,7 @@ jobs:
         run:
           |
           # common settings - no extra options, skip nothing, all warnings
-          echo "skip-pattern=''" >> $GITHUB_OUTPUT
+          echo "skip-pattern='extras/'" >> $GITHUB_OUTPUT
           echo "warnings='all'" >> $GITHUB_OUTPUT
 
           # platform-dependent settings - extra board options, board index URLs, skip patterns etc.
@@ -76,18 +77,18 @@ jobs:
           |
           #declare -a required_libs=("https://github.com/matthias-bs/BresserWeatherSensorReceiver.git"
           declare -a required_libs=(
-            "BresserWeatherSensorReceiver@0.28.10"
-            "RadioLib@7.1.0"
+            "BresserWeatherSensorReceiver@0.30.0"
+            "RadioLib@7.1.2"
             "LoRa Serialization@3.3.1"
             "ESP32Time@2.0.6"
             "OneWireNg@0.13.3"
             "DallasTemperature@3.9.0"
-            "NimBLE-Arduino@1.4.3"
+            "NimBLE-Arduino@2.2.0"
             "ATC_MiThermometer@0.4.2"
-            "TheengsDecoder@1.8.2"
+            "TheengsDecoder@1.8.4"
             "Preferences@2.1.0"
-            "ArduinoJson@7.2.1"
-            "M5Unified@0.2.1"
+            "ArduinoJson@7.3.0"
+            "M5Unified@0.2.2"
             "M5Core2@0.2.0"
             "powerfeather-sdk@1.0.7")
           for i in "${required_libs[@]}"
@@ -110,13 +111,6 @@ jobs:
       - name: Checkout repository
         if: ${{ env.run-build == 'true' }}
         uses: actions/checkout@v4
-
-      # - name: Copy WeatherSensorCfg.h
-      #   if: ${{ env.run-build == 'true' }}
-      #   run:
-      #     |
-      #     cp /home/runner/work/BresserWeatherSensorTTN/BresserWeatherSensorTTN/WeatherSensorCfg.h.template \
-      #        /home/runner/Arduino/libraries/BresserWeatherSensorReceiver/src/WeatherSensorCfg.h
 
       - name: Build sketch
         if: ${{ env.run-build == 'true' }}
