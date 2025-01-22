@@ -97,9 +97,6 @@ jobs:
           done
           gh repo clone matthias-bs/DistanceSensor_A02YYUW
           cp -r DistanceSensor_A02YYUW /home/runner/Arduino/libraries/
-          # OneWire is installed due to dependency in DallasTemperature, but OneWireNg shall be used instead
-          echo "Removing Arduino/libraries/OneWire (installed automatically, but shall be replaced by OneWireNg)"
-          rm -r /home/runner/Arduino/libraries/OneWire
 
       - name: Install platform
         if: ${{ env.run-build == 'true' }}
