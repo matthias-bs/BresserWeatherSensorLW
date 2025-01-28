@@ -81,10 +81,9 @@ var NAVTREEINDEX0 =
 "pico__rtc__utils_8h_source.html":[1,0,0,2,1],
 "pico__sleep_8h_source.html":[1,0,0,2,2],
 "struct_ble_data_s.html":[0,0,1],
-"struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44":[0,0,1,3],
-"struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1":[0,0,1,4],
-"struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358":[0,0,1,5],
+"struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44":[0,0,1,2],
+"struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1":[0,0,1,3],
+"struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358":[0,0,1,4],
 "struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff":[0,0,1,0],
-"struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780":[0,0,1,2],
-"struct_ble_data_s.html#aea01557d000a33556fd53b68a7dd932e":[0,0,1,1]
+"struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780":[0,0,1,1]
 };

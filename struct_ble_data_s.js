@@ -1,7 +1,6 @@
 var struct_ble_data_s =
 [
     [ "batt_level", "struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff", null ],
-    [ "found", "struct_ble_data_s.html#aea01557d000a33556fd53b68a7dd932e", null ],
     [ "humidity", "struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780", null ],
     [ "rssi", "struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44", null ],
     [ "temperature", "struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1", null ],
