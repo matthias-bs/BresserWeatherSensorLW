@@ -146,6 +146,7 @@
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 // 20240729 Added PowerFeather specific status information
 // 20250209 Changed flags in found_sensors() from 8 to 16 bits
+//          Added ws_tglobe_c
 //
 // ToDo:
 // -  
@@ -665,9 +666,11 @@ function decoder(bytes, port) {
                     uint8,
                     rawfloat,
                     uint16fp1, uint16fp1, uint16fp1,
-                    uint8fp1,
+                    //uint32,
+                    //uint8fp1,
                     rawfloat,
                     rawfloat, rawfloat, rawfloat,
+                    //temperature,
                     temperature, uint8,
                     temperature, uint8,
                     unixtime,
@@ -683,9 +686,11 @@ function decoder(bytes, port) {
                     'ws_humidity',
                     'ws_rain_mm',
                     'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
-                    'ws_uv',
+                    //'ws_light_lux',
+                    //'ws_uv',
                     'ws_rain_hourly_mm',
                     'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
+                    //'ws_tglobe_c',
                     'th1_temp_c', 'th1_humidity',
                     'soil1_temp_c', 'soil1_moisture',
                     'lgt_ev_time',
@@ -707,9 +712,11 @@ function decoder(bytes, port) {
                     uint8,
                     rawfloat,
                     uint16fp1, uint16fp1, uint16fp1,
-                    uint8fp1,
+                    //uint32,
+                    //uint8fp1,
                     rawfloat,
                     rawfloat, rawfloat, rawfloat,
+                    //temperature,
                     temperature, uint8,
                     temperature, uint8,
                     unixtime,
@@ -726,9 +733,11 @@ function decoder(bytes, port) {
                     'humidity',
                     'rain_mm',
                     'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'ws_uv', // new
+                    //'ws_light_lux',
+                    //'ws_uv', // new
                     'rain_hr',
                     'rain_day', 'rain_week', 'rain_month',
+                    //'ws_tglobe_c',
                     'th1_temp_c', 'th1_humidity', //new
                     'soil_temp_c', 'soil_moisture',
                     'lightning_time',
