@@ -559,9 +559,11 @@ void setup()
   M5.begin(cfg);
 #endif
 
+#if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
   Serial.begin(115200);
   Serial.setDebugOutput(true);
   delay(2000); // give time to switch to the serial monitor
+#endif
   log_i("Setup");
 
   String timeZoneInfo(TZ_INFO);
