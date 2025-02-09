@@ -49,6 +49,7 @@
 // 20240718 Fixed premature return from begin() leading to empty payload
 // 20240719 Fixed enabling of all decoders in scanBresser()
 // 20240821 Fixed validation of rain statistics
+// 20250209 Added Weather Station 8-in-1
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -119,9 +120,10 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
                 break;
             }
         }
-        uint8_t flags = 0;
+        uint16_t flags = 0;
         if ((weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER0) ||
-            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER1))
+            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER1) ||
+            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER2))
         {
             if (weatherSensor.sensor[i].w.temp_ok)
                 flags |= 0x1;
@@ -135,6 +137,8 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
                 flags |= 0x10;
             if (weatherSensor.sensor[i].w.light_ok)
                 flags |= 0x20;
+            if (weatherSensor.sensor[i].w.tglobe_ok)
+                flags |= 0x100;
         }
 
         encoder.writeUint8(weatherSensor.sensor[i].sensor_id >> 24);
@@ -143,7 +147,7 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
         encoder.writeUint8(weatherSensor.sensor[i].sensor_id & 0xFF);
         encoder.writeUint8((decoder << 4) | weatherSensor.sensor[i].s_type);
         encoder.writeUint8(weatherSensor.sensor[i].chan);
-        encoder.writeUint8(flags);
+        encoder.writeUint16(flags);
         encoder.writeUint8(static_cast<uint8_t>(-weatherSensor.sensor[i].rssi));
     }
 
@@ -158,9 +162,11 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
     if (weatherSensor.sensor.size() == 0)
         return;
 
-    // Handle weather sensors - which only have one channel (0) - first.
+    // Handle weather sensors - which only have one channel (ch 0) - first.
     // Configuration for SENSOR_TYPE_WEATHER0 is integrated into SENSOR_TYPE_WEATHER1.
-    uint8_t flags = appPayloadCfg[1];
+    // Configuration for SENSOR_TYPE_WEATHER2 uses flags in appPayloadCFG[1] and
+    // appPayloadCfg[13].
+    uint16_t flags = (appPayloadCfg[13] << 8) | appPayloadCfg[1];
     if (flags & 1)
     {
         // Try to find SENSOR_TYPE_WEATHER1
@@ -171,9 +177,18 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         }
         else
         {
-            // Try to find SENSOR_TYPE_WEATHER0
-            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
-            rainGauge.set_max(1000);
+            // Try to find SENSOR_TYPE_WEATHER2
+            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER2);
+            if (idx > -1)
+            {
+                rainGauge.set_max(100000);
+            }
+            else
+            {
+                // Try to find SENSOR_TYPE_WEATHER0
+                idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
+                rainGauge.set_max(1000);
+            }
         }
 
 #ifdef RAINDATA_EN
@@ -203,6 +218,10 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
     {
         // Skip if bitmap is zero
         if (appPayloadCfg[type] == 0)
+            continue;
+
+        // Skip Weather Sensor 8-in-1 (handled above)
+        if (type == SENSOR_TYPE_WEATHER2)
             continue;
 
 #ifdef LIGHTNINGSENSOR_EN
@@ -290,18 +309,19 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
     }
 }
 
-// Payload size: 2...17 bytes (ENCODE_AS_FLOAT == false) / 2...23 bytes (ENCODE_AS_FLOAT == true)
-void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder)
+// Payload size: 2...19 bytes (ENCODE_AS_FLOAT == false) / 2...25 bytes (ENCODE_AS_FLOAT == true)
+void PayloadBresser::encodeWeatherSensor(int idx, uint16_t flags, LoraEncoder &encoder)
 {
-    //                    Weather Stations     Professional  3-in-1 Professional
-    //                 5-in-1  6-in-1  7-in-1   Rain Gauge       Wind Gauge
+    //                    Weather Stations                  Professional  3-in-1 Professional
+    //                 5-in-1  6-in-1  7-in-1  8-in-1        Rain Gauge       Wind Gauge
     //
-    // Temperature       X       X       X         X                 X
-    // Humidity          X       X       X                           X
-    // Wind              X       X       X                           X
-    // Rain              X       X       X         X
-    // UV                        X       X
-    // Light Intensity                   X
+    // Temperature       X       X       X       X              X                 X
+    // Humidity          X       X       X       X                                X
+    // Wind              X       X       X       X                                X
+    // Rain              X       X       X       X              X
+    // UV                        X       X       X
+    // Light Intensity                   X       X
+    // Globe Thermometer                         X
 
     if (idx == -1)
     {
@@ -471,6 +491,29 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &en
         }
     }
 #endif
+
+    // Additional sensor (8-in-1)
+    if (idx == -1)
+    {
+        if (flags & PAYLOAD_WS_TGLOBE)
+            encoder.writeTemperature(INV_TEMP); // Globe Thermometer
+    }
+    else
+    {
+        if (flags & PAYLOAD_WS_TGLOBE)
+        {
+            if (weatherSensor.sensor[idx].w.tglobe_ok)
+            {
+                log_i("Globe Thermometer:   %3.1f °C", weatherSensor.sensor[idx].w.tglobe_c);
+                encoder.writeTemperature(weatherSensor.sensor[idx].w.tglobe_c);
+            }
+            else
+            {
+                log_i("Globe Thermometer:    --.- °C");
+                encoder.writeTemperature(INV_TEMP);
+            }
+        }
+    }
 }
 
 void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)

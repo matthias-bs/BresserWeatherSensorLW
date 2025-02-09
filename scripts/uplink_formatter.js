@@ -145,6 +145,8 @@
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL, modified CMD_GET_LW_CONFIG,
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 // 20240729 Added PowerFeather specific status information
+// 20250209 Changed flags in found_sensors() from 8 to 16 bits
+//          Added ws_tglobe_c
 //
 // ToDo:
 // -  
@@ -199,7 +201,7 @@ function decoder(bytes, port) {
         10: "CO2 Sensor",
         11: "Air Quality Sensor (HCHO and VOC)",
         12: "undefined",
-        13: "undefined",
+        13: "Weather Sensor (8-in-1)",
         14: "undefined",
         15: "undefined"
     };
@@ -539,8 +541,8 @@ function decoder(bytes, port) {
             const decoded_type = sensor_types[tmp & 0x0F];
             const decoded_decoder = sensor_decoders[tmp >> 4];
             const decoded_channel = uint8(bytes.slice(i + 5, i + 6));
-            const decoded_flags = "0x" + byte2hex(bytes[i + 6]);
-            const decoded_rssi = -uint8(bytes.slice(i + 7, i + 8));
+            const decoded_flags = "0x" + byte2hex(bytes[i + 7]) + byte2hex(bytes[i + 6]);
+            const decoded_rssi = -uint8(bytes.slice(i + 8, i + 9));
             res.push({
                 'id': decoded_id,
                 'type': decoded_type,
@@ -664,9 +666,11 @@ function decoder(bytes, port) {
                     uint8,
                     rawfloat,
                     uint16fp1, uint16fp1, uint16fp1,
-                    uint8fp1,
+                    //uint32,
+                    //uint8fp1,
                     rawfloat,
                     rawfloat, rawfloat, rawfloat,
+                    //temperature,
                     temperature, uint8,
                     temperature, uint8,
                     unixtime,
@@ -682,9 +686,11 @@ function decoder(bytes, port) {
                     'ws_humidity',
                     'ws_rain_mm',
                     'ws_wind_gust_ms', 'ws_wind_avg_ms', 'ws_wind_dir_deg',
-                    'ws_uv',
+                    //'ws_light_lux',
+                    //'ws_uv',
                     'ws_rain_hourly_mm',
                     'ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm',
+                    //'ws_tglobe_c',
                     'th1_temp_c', 'th1_humidity',
                     'soil1_temp_c', 'soil1_moisture',
                     'lgt_ev_time',
@@ -706,9 +712,11 @@ function decoder(bytes, port) {
                     uint8,
                     rawfloat,
                     uint16fp1, uint16fp1, uint16fp1,
-                    uint8fp1,
+                    //uint32,
+                    //uint8fp1,
                     rawfloat,
                     rawfloat, rawfloat, rawfloat,
+                    //temperature,
                     temperature, uint8,
                     temperature, uint8,
                     unixtime,
@@ -725,9 +733,11 @@ function decoder(bytes, port) {
                     'humidity',
                     'rain_mm',
                     'wind_gust_meter_sec', 'wind_avg_meter_sec', 'wind_direction_deg',
-                    'ws_uv', // new
+                    //'ws_light_lux',
+                    //'ws_uv', // new
                     'rain_hr',
                     'rain_day', 'rain_week', 'rain_month',
+                    //'ws_tglobe_c',
                     'th1_temp_c', 'th1_humidity', //new
                     'soil_temp_c', 'soil_moisture',
                     'lightning_time',

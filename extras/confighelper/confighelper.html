@@ -55,6 +55,8 @@
 // 20240721 Added tooltips and visual feedback for empty input fields
 // 20240725 Added saving of form values to localStorage, added reset to default values
 //          Added saving/loading of configuration to/from JSON file
+// 20250209 Added Globe Thermometer Temperature to Weather Sensor configuration 
+//          (8-in-1 Weather Sensor)
 //
 // ToDo:
 // -
@@ -100,6 +102,7 @@
             weatherWind: true,
             weatherUV: true,
             weatherLight: false,
+            weatherTGlobe: false,
             weatherRainHourly: true,
             weatherRainDWM: true,
             multiChannel: true,
@@ -172,6 +175,8 @@
                 document.getElementById('weatherUV').style.display = this.checked ? 'inline' : 'none';
                 document.getElementById('labelWeatherLight').style.display = this.checked ? 'inline' : 'none';
                 document.getElementById('weatherLight').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('labelWeatherTGlobe').style.display = this.checked ? 'inline' : 'none';
+                document.getElementById('weatherTGlobe').style.display = this.checked ? 'inline' : 'none';
                 document.getElementById('labelWeatherRainHourly').style.display = this.checked ? 'inline' : 'none';
                 document.getElementById('weatherRainHourly').style.display = this.checked ? 'inline' : 'none';
                 document.getElementById('labelWeatherRainDWM').style.display = this.checked ? 'inline' : 'none';
@@ -521,6 +526,7 @@
             }
             let size = 0;
             let result = 1;
+            let result2 = 0;
             const weatherConfig = [
                 ['weatherTemperature', 2, 'ws_temp_c', 'temperature'],
                 ['weatherHumidity', 1, 'ws_humidity', 'uint8'],
@@ -529,7 +535,8 @@
                 ['weatherLight', 4, 'ws_light_lux', 'uint32'],
                 ['weatherUV', 1, 'ws_uv', 'uint8fp1'],
                 ['weatherRainHourly', 4, 'ws_rain_hourly_mm', 'rawfloat'],
-                ['weatherRainDWM', 12, ['ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm'], ['rawfloat', 'rawfloat', 'rawfloat']]
+                ['weatherRainDWM', 12, ['ws_rain_daily_mm', 'ws_rain_weekly_mm', 'ws_rain_monthly_mm'], ['rawfloat', 'rawfloat', 'rawfloat']],
+                ['weatherTGlobe', 2, 'ws_tglobe_c', 'temperature']
             ];
             size += weatherConfig[0][1];
             configDecoder.signals.push("'" + weatherConfig[0][2] + "'");
@@ -537,7 +544,6 @@
             for (var i = 1; i < weatherConfig.length; i++) {
                 var checkbox = document.getElementById(weatherConfig[i][0]);
                 if (checkbox.checked) {
-                    result |= (1 << i);
                     size += weatherConfig[i][1];
                     signals = weatherConfig[i][2];
                     var _signals = [];
@@ -546,11 +552,17 @@
                     } else {
                         _signals = "'" + signals + "'";
                     }
+                    if (i == 8) {
+                        // Globe Thermometer Temperature
+                        result2 |= 1;
+                    } else {
+                        result |= (1 << i);
+                    }
                     configDecoder.signals.push(_signals);
                     configDecoder.types.push(weatherConfig[i][3]);
                 }
             }
-            return [size, result];
+            return [size, result, result2];
         }
 
         // Get [size, bitmap] from the Lightning Sensor configuration selected with checkboxes
@@ -635,7 +647,7 @@
             };
 
             // Add Bresser weather sensor
-            [size, weatherValue] = getWeatherconfig(configDecoder);
+            [size, weatherValue, weatherValue2] = getWeatherconfig(configDecoder);
             totalSize += size;
 
             // Add multi-channel Bresser sensors
@@ -710,6 +722,7 @@
             document.getElementById('size').value = totalSize;
 
             configArray[1] = weatherValue;
+            configArray[13] = weatherValue2;
 
             // Get the current JSON output
             let jsonOutput = JSON.parse(document.getElementById('jsonOutput').value);
@@ -806,6 +819,8 @@
         <input type="checkbox" id="weatherUV" name="weatherUV">
         <label for="weatherLight" id="labelWeatherLight">Light:</label>
         <input type="checkbox" id="weatherLight" name="weatherLight">
+        <label for="weatherTGlobe" id="labelWeatherTGlobe">Globe Thermometer:</label>
+        <input type="checkbox" id="weatherTGlobe" name="weatherTGlobe">
         <label for="weatherRainHourly" id="labelWeatherRainHourly">Hourly Rain:</label>
         <input type="checkbox" id="weatherRainHourly" name="weatherRainHourly">
         <label for="weatherRainDWM" id="labelWeatherRainDWM">Daily/Weekly/Monthly Rain:</label>
@@ -884,7 +899,7 @@
     <br>
     <br>
     <p style="font-size: smaller;">
-        Copyright &copy; 2024 Matthias Prinke, MIT License
+        Copyright &copy; 2025 Matthias Prinke, MIT License
     </p>
 </body>
 
