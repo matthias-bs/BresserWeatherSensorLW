@@ -348,8 +348,6 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint16_t flags, LoraEncoder &e
             encoder.writeUint8(INV_UINT8); // UV
         if (flags & PAYLOAD_WS_LIGHT)
             encoder.writeRawFloat(INV_UINT32); // Light
-        if (flags & PAYLOAD_WS_TGLOBE)
-            encoder.writeTemperature(INV_TEMP); // Globe Thermometer
     }
     else
     {
@@ -436,19 +434,6 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint16_t flags, LoraEncoder &e
                 encoder.writeUint32(INV_UINT32);
             }
         }
-        if (flags & PAYLOAD_WS_TGLOBE)
-        {
-            if (weatherSensor.sensor[idx].w.tglobe_ok)
-            {
-                log_i("Globe Thermometer:   %3.1f °C", weatherSensor.sensor[idx].w.tglobe_c);
-                encoder.writeTemperature(weatherSensor.sensor[idx].w.tglobe_c);
-            }
-            else
-            {
-                log_i("Globe Thermometer:    --.- °C");
-                encoder.writeTemperature(INV_TEMP);
-            }
-        }
     }
 
     // Rain data statistics
@@ -506,6 +491,29 @@ void PayloadBresser::encodeWeatherSensor(int idx, uint16_t flags, LoraEncoder &e
         }
     }
 #endif
+
+    // Additional sensor (8-in-1)
+    if (idx == -1)
+    {
+        if (flags & PAYLOAD_WS_TGLOBE)
+            encoder.writeTemperature(INV_TEMP); // Globe Thermometer
+    }
+    else
+    {
+        if (flags & PAYLOAD_WS_TGLOBE)
+        {
+            if (weatherSensor.sensor[idx].w.tglobe_ok)
+            {
+                log_i("Globe Thermometer:   %3.1f °C", weatherSensor.sensor[idx].w.tglobe_c);
+                encoder.writeTemperature(weatherSensor.sensor[idx].w.tglobe_c);
+            }
+            else
+            {
+                log_i("Globe Thermometer:    --.- °C");
+                encoder.writeTemperature(INV_TEMP);
+            }
+        }
+    }
 }
 
 void PayloadBresser::encodeThermoHygroSensor(int idx, LoraEncoder &encoder)
