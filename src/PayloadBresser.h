@@ -41,6 +41,7 @@
 // 20240530 Added missing entries in sensorTypes[]
 // 20240603 encodeBresser(): added appStatus parameter
 // 20240716 Added ws_scantime and scanBresser()
+// 20250209 Added Weather Station 8-in-1
 //
 // ToDo:
 // -
@@ -78,7 +79,7 @@ public:
     // Payload size in bytes
     const uint8_t payloadSize[16] = {
         0,
-        23, // SENSOR_TYPE_WEATHER1 (max.)
+        25, // SENSOR_TYPE_WEATHER<0|1|2> (max.)
         3, // SENSOR_TYPE_THERMO_HYGRO
         2, // SENSOR_TYPE_POOL_THERMO
         3, // SENSOR_TYPE_SOIL
@@ -90,7 +91,7 @@ public:
         2, // SENSOR_TYPE_CO2
         3, // SENSOR_TYPE_HCHO_VOC
         0, // reserved
-        0, // reserved
+        0, // (Weather Station 8-in-1, included in [1])
         0, // reserved
         0 // reserved
     };
@@ -110,7 +111,7 @@ public:
         "CO2",
         "Air Quality (HCHO/VOC)",
         "reserved",
-        "reserved",
+        "Weather", // Weather Station 8-in-1
         "reserved",
         "reserved"
     };
@@ -173,7 +174,7 @@ public:
     void encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder);
 
 private:
-    void encodeWeatherSensor(int idx, uint8_t flags, LoraEncoder &encoder);
+    void encodeWeatherSensor(int idx, uint16_t flags, LoraEncoder &encoder);
     void encodeThermoHygroSensor(int idx, LoraEncoder &encoder);
     void encodePoolThermometer(int idx, LoraEncoder &encoder);
     void encodeSoilSensor(int idx, LoraEncoder &encoder);

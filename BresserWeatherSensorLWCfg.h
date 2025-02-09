@@ -65,6 +65,7 @@
 // 20240729 Added PowerFeather specific configuration
 // 20240730 Modified PF_SUPPLY_MAINTAIN_VOLTAGE
 // 20240804 PowerFeather: Added configuration of max. battery charging current
+// 20250209 Added Weather Station 8-in-1
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -372,6 +373,7 @@ const uint8_t UBATT_SAMPLES = 10;
 #define PAYLOAD_WS_UV           0b00100000
 #define PAYLOAD_WS_RAIN_H       0b01000000 // Rain post-processing; hourly rainfall
 #define PAYLOAD_WS_RAIN_DWM     0b10000000 // Rain post-processing; daily, weekly, monthly
+#define PAYLOAD_WS_TGLOBE       0b0000000100000000
 
 // Lightning sensor
 #define PAYLOAD_LIGHTNING_RAW   0b00010000 // Sensor raw data

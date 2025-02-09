@@ -145,6 +145,7 @@
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL, modified CMD_GET_LW_CONFIG,
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 // 20240729 Added PowerFeather specific status information
+// 20250209 Changed flags in found_sensors() from 8 to 16 bits
 //
 // ToDo:
 // -  
@@ -199,7 +200,7 @@ function decoder(bytes, port) {
         10: "CO2 Sensor",
         11: "Air Quality Sensor (HCHO and VOC)",
         12: "undefined",
-        13: "undefined",
+        13: "Weather Sensor (8-in-1)",
         14: "undefined",
         15: "undefined"
     };
@@ -539,8 +540,8 @@ function decoder(bytes, port) {
             const decoded_type = sensor_types[tmp & 0x0F];
             const decoded_decoder = sensor_decoders[tmp >> 4];
             const decoded_channel = uint8(bytes.slice(i + 5, i + 6));
-            const decoded_flags = "0x" + byte2hex(bytes[i + 6]);
-            const decoded_rssi = -uint8(bytes.slice(i + 7, i + 8));
+            const decoded_flags = "0x" + byte2hex(bytes[i + 7]) + byte2hex(bytes[i + 6]);
+            const decoded_rssi = -uint8(bytes.slice(i + 8, i + 9));
             res.push({
                 'id': decoded_id,
                 'type': decoded_type,
