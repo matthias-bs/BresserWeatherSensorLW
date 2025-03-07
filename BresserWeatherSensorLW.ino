@@ -128,7 +128,7 @@
 // - If joining the network or transmitting uplink data fails,
 //   the controller will go into deep sleep
 // - For LoRaWAN Specification 1.1.0, a small set of data (the "nonces") have to be stored persistently -
-//   this implementation uses Flash (via Preferences library
+//   this implementation uses Flash (via Preferences library)
 // - Storing LoRaWAN network session information speeds up the connection (join) after a restart -
 //   this implementation uses the ESP32's RTC RAM or a variable located in the RP2040's RAM, respectively.
 //   In the latter case, an uninitialzed linker section is used for this purpose.
