@@ -25,15 +25,15 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.1.1
+// RadioLib                             7.1.2
 // LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.30.0
-// OneWireNg                            0.13.3 (optional)
-// DallasTemperature                    3.9.0 (optional)
-// NimBLE-Arduino                       1.4.2 (optional)
-// ATC MiThermometer                    0.4.2 (optional)
-// Theengs Decoder                      1.7.8 (optional)
+// BresserWeatherSensorReceiver         0.32.0
+// OneWireNg                            0.14.3 (optional)
+// DallasTemperature                    4.0.3 (optional)
+// NimBLE-Arduino                       2.2.3 (optional)
+// ATC MiThermometer                    0.5.0 (optional)
+// Theengs Decoder                      1.8.5 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -110,6 +110,7 @@
 //          Modified sleep duration if battery is low but external power is available
 // 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
 //          Changed to use radio object from BresserWeatherSensorReceiver
+// 20250307 Added custom sleep function (ESP32; requires RadioLib 8c2c7b6 or later!!!)
 //
 // ToDo:
 // -
@@ -702,14 +703,19 @@ void setup()
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
   
-    // Using local radio object
-    #if defined(ARDUINO_LILYGO_T3S3_LR1121)
-    radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+  // Using local radio object
+  #if defined(ARDUINO_LILYGO_T3S3_LR1121)
+  radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
 
-    // LR1121 TCXO Voltage 2.85~3.15V
-    radio.setTCXO(3.0);
-    #endif
+  // LR1121 TCXO Voltage 2.85~3.15V
+  radio.setTCXO(3.0);
+  #endif
 
+  #if defined(ESP32)
+  // Optionally provide a custom sleep function - see config.h
+  node.setSleepFunction(customDelay);
+  #endif
+  
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);
   // state is one of RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
