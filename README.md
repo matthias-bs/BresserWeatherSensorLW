@@ -449,11 +449,11 @@ Change `address` as required. The bridge works in both directions, i.e. you can 
 
 #### Home Assistant Configuration
 
-Customize  and add it to your `/homeassistant/configuration.yaml`:
+Customize [scripts/home_assistant_configuration.yaml](scripts/home_assistant_configuration.yaml) and add it to your `/homeassistant/configuration.yaml`:
 
 ```yaml
 #
-# BresserWeatherSensorLW Configuration
+#  Home Assistant Configuration for BresserWeatherSensorLW
 #
 
 # YAML anchors which can be used as aliases
@@ -463,11 +463,13 @@ ws_model: &ws_model "6-in-1"
 ws_topic: &ws_topic "v3/YOUR_APPLICATION@ttn/devices/YOUR_DEVICE_EUI/up"
 ws_expiry: &ws_expiry 1200
 ```
-**WS_name**: Visible name for grouping all sensor values\
-**ws_device_id**: Anything suitable as a unique ID, e.g. a string containing part of the Dev_EUI\
-**ws_model**: Device model (could be anything)\
-**ws_topic**: TTN LoRaWAN uplink data topic\
-**ws_expiry**: The sensor value is set to 'Unavailable' `<ws_expiry>` seconds after the last update
+`ws_name`: Visible name for grouping the sensor values\
+`ws_device_id`: Anything suitable as a unique ID, e.g. a string containing part of the Dev_EUI\
+`ws_model`: Device model (could be anything)\
+`ws_topic`: TTN LoRaWAN uplink data topic\
+`ws_expiry`: The sensor value is set to 'unavailable' `<ws_expiry>` seconds after the last update
+
+![Home_Assistant-1](https://github.com/user-attachments/assets/e34b04f2-a11b-470a-9b53-6ab52b083b67)
 
 ### ChirpStack and InfluxDB Integration
 
