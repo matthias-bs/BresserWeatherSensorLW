@@ -71,6 +71,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [MQTT Integration](#mqtt-integration)
   * [The Things Network MQTT Integration](#the-things-network-mqtt-integration)
+  * [Home Assistant Integration](#home-assistant-integration)
   * [ChirpStack and InfluxDB Integration](#chirpstack-and-influxdb-integration)
 * [Datacake Integration](#datacake-integration)
   * [Datacake / The Things Network Setup](#datacake--the-things-network-setup)
@@ -422,6 +423,53 @@ v3 message key field jsonpaths:
 JSON-Path with Uplink-Decoder (see [scripts/uplink_formatter.js](scripts/uplink_formatter.js))
 
 `.uplink_message.decoded_payload.bytes.<variable>`
+
+### Home Assistant Integration
+
+This solution builds on top of the The Things Network MQTT Integration, but should work is a similar way for other LoRaWAN Network Services.
+
+#### Create a Bridge between TTN MQTT Broker and your Mosquitto MQTT Broker
+
+> [!NOTE]
+> This might not be necessary if it is possible to integrate the TTN MQTT Broker in Home Assistant.
+
+Customize and add the following configurations to your `/etc/mosquitto/conf.d/local.conf`:
+
+```
+connection bridge-01
+address eu1.cloud.thethings.network:8883
+remote_username YOUR_TTN_USERNAME
+remote_password YOUR_TTN_PASSWORD
+try_private false
+bridge_cafile /etc/ssl/certs/ISRG_Root_X1.pem
+topic # in 1
+```
+
+Change `address` as required. The bridge works in both directions, i.e. you can publish and subscribe messages to/from your LoRaWAN node using your local MQTT broker.
+
+#### Home Assistant Configuration
+
+Customize [scripts/home_assistant_configuration.yaml](scripts/home_assistant_configuration.yaml) and add it to your `/homeassistant/configuration.yaml`:
+
+```yaml
+#
+#  Home Assistant Configuration for BresserWeatherSensorLW
+#
+
+# YAML anchors which can be used as aliases
+ws_name: &ws_name "BresserWeatherSensorLW"
+ws_device_id: &ws_device_id "ws-11c941"
+ws_model: &ws_model "6-in-1"
+ws_topic: &ws_topic "v3/YOUR_APPLICATION@ttn/devices/YOUR_DEVICE_EUI/up"
+ws_expiry: &ws_expiry 1200
+```
+`ws_name`: Visible name for grouping the sensor values\
+`ws_device_id`: Anything suitable as a unique ID, e.g. a string containing part of the Dev_EUI\
+`ws_model`: Device model (could be anything)\
+`ws_topic`: TTN LoRaWAN uplink data topic\
+`ws_expiry`: The sensor value is set to 'unavailable' `<ws_expiry>` seconds after the last update
+
+![Home_Assistant-1](https://github.com/user-attachments/assets/e34b04f2-a11b-470a-9b53-6ab52b083b67)
 
 ### ChirpStack and InfluxDB Integration
 
