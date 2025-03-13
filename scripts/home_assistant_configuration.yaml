@@ -15,7 +15,7 @@ mqtt:
       unique_id: "{{ ws_device_id }}_voltage"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.a0_voltage_mv }}"
-      device_class: "battery"
+      device_class: "voltage"
       icon: "mdi:battery"
       unit_of_measurement: "mV"
       expire_after: *ws_expiry
