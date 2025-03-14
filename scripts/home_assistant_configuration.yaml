@@ -2,294 +2,250 @@
 # Home Assistant Configuration for BresserWeatherSensorLW
 #
 
-# YAML anchors which can be used as aliases
-ws_name: &ws_name "BresserWeatherSensorLW"
-ws_device_id: &ws_device_id "ws-11c941"
-ws_model: &ws_model "6-in-1"
-ws_topic: &ws_topic "v3/YOUR_APPLICATION@ttn/devices/YOUR_DEVICE_EUI/up"
-ws_expiry: &ws_expiry 1200
+# Replace unique_id prefix "11c940" by your value of choice
 
 mqtt:    
   sensor:
+    #
+    # Weather Sensor
+    #
     - name: "LoRaWAN Device Battery Voltage"
-      unique_id: "{{ ws_device_id }}_voltage"
-      state_topic: *ws_topic
+      unique_id: "11c941_a0_voltage_mv"
+      state_topic: &ws_topic "v3/flora-lora@ttn/devices/eui-9876b6000011c941/up"
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.a0_voltage_mv }}"
       device_class: "voltage"
       icon: "mdi:battery"
       unit_of_measurement: "mV"
-      expire_after: *ws_expiry
-      device:
-        name: *ws_name
+      expire_after: &ws_expiry 1200
+      device: &ws_device
+        name: "BresserWeatherSensorLW"
         identifiers: "Bresser"
         manufacturer: "Bresser"
-        model: *ws_model
+        model: "6-in-1"
         
-    # Weather Sensor
     - name: "Weather Sensor Battery o.k."
-      unique_id: "{{ ws_device_id }}_battery"
+      unique_id: "11c941_ws_batt_ok"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.status.ws_batt_ok }}"
       device_class: "enum"
       icon: "mdi:battery"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+    
     - name: "Temperature"
-      unique_id: "{{ ws_device_id }}_temp"
+      unique_id: "11c941_ws_temp_c"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_temp_c }}"
       device_class: "temperature"
       unit_of_measurement: "°C"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+    
     - name: "Humidity"
-      unique_id: "{{ ws_device_id }}_humidity"
+      unique_id: "11c941_ws_humidity"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_humidity }}"
       device_class: "humidity"
       unit_of_measurement: "%"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Wind Speed Gusts"
-      unique_id: "{{ ws_device_id }}_wind_gusts"
+      unique_id: "11c941_ws_wind_gust_ms"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_wind_gust_ms }}"
       device_class: "wind_speed"
       unit_of_measurement: "m/s"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+    
     - name: "Wind Speed Avg"
-      unique_id: "{{ ws_device_id }}_wind_avg"
+      unique_id: "11c941_ws_wind_avg_ms"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_wind_avg_ms }}"
       device_class: "wind_speed"
       unit_of_measurement: "m/s"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Wind Direction"
-      unique_id: "{{ ws_device_id }}_wind_dir"
+      unique_id: "11c941_ws_wind_dir_deg"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_wind_dir_deg }}"
       unit_of_measurement: "°"
       icon: "mdi:compass"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Light"
-      unique_id: "{{ ws_device_id }}_light"
+      unique_id: "11c941_ws_light_lx"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_light_lx }}"
       unit_of_measurement: "lx"
       device_class: "illuminance"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "UV Index"
-      unique_id: "{{ ws_device_id }}_uv"
+      unique_id: "11c941_ws_uv"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_uv }}"
       unit_of_measurement: "UV Index"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Rain"
-      unique_id: "{{ ws_device_id }}_rain"
+      unique_id: "11c941_ws_rain_mm"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_mm }}"
       device_class: "precipitation"
       unit_of_measurement: "mm"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Rain Daily"
-      unique_id: "{{ ws_device_id }}_rain_daily"
+      unique_id: "11c941_ws_rain_daily_mm"
       state_topic: *ws_topic
-      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_daily_mm }}"
+      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_daily_mm | default('unavailable') }}"
       device_class: "precipitation"
       unit_of_measurement: "mm"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Rain Weekly"
-      unique_id: "{{ ws_device_id }}_rain_weekly"
+      unique_id: "11c941_ws_rain_weekly_mm"
       state_topic: *ws_topic
-      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_weekly_mm }}"
+      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_weekly_mm | default('unavailable') }}"
       device_class: "precipitation"
       unit_of_measurement: "mm"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Rain Monthly"
-      unique_id: "{{ ws_device_id }}_rain_monthly"
+      unique_id: "11c941_ws_rain_monthly_mm"
       state_topic: *ws_topic
-      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_monthly_mm }}"
+      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_monthly_mm | default('unavailable') }}"
       device_class: "precipitation"
       unit_of_measurement: "mm"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Rain 60min"
-      unique_id: "{{ ws_device_id }}_rain_hourly"
+      unique_id: "11c941_ws_rain_hourly_mm"
       state_topic: *ws_topic
-      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_hourly_mm }}"
+      value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ws_rain_hourly_mm | default('unavailable') }}"
       device_class: "precipitation"
       unit_of_measurement: "mm"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
     
+    #
     # Soil Sensor
+    #
     - name: "Soil Temperature"
-      unique_id: "{{ ws_device_id }}_s1_temp"
+      unique_id: "11c941_s1_temp_c"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.soil1_temp_c }}"
       device_class: "temperature"
       unit_of_measurement: "°C"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Soil Moisture"
-      unique_id: "{{ ws_device_id }}_s1_humidity"
+      unique_id: "11c941_s1_moisture"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.soil1_moisture }}"
       device_class: "moisture"
       unit_of_measurement: "%"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Soil Sensor Battery o.k."
-      unique_id: "{{ ws_device_id }}_s1_battery"
+      unique_id: "11c941_s1_batt_ok"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.status.s1_batt_ok }}"
       device_class: "enum"
       icon: "mdi:battery"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
     
+    #
     # Lightning Sensor
+    #
     - name: "Lightning Distance"
-      unique_id: "{{ ws_device_id }}_lgt_distance"
+      unique_id: "11c941_lgt_ev_dist_km"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.lgt_ev_dist_km }}"
       device_class: "distance"
       unit_of_measurement: "km"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Lightning Events"
-      unique_id: "{{ ws_device_id }}_lgt_ev_events"
+      unique_id: "11c941_lgt_ev_events"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.lgt_ev_events }}"
       icon: "mdi:counter"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Lightning Event Time"
-      unique_id: "{{ ws_device_id }}_lgt_ev_time"
+      unique_id: "11c941_lgt_ev_time"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.lgt_ev_time.time }}"
       device_class: "date"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Lightning Sensor Battery o.k."
-      unique_id: "{{ ws_device_id }}_ls_battery"
+      unique_id: "11c941_ls_batt_ok"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.status.ls_batt_ok }}"
       device_class: "enum"
       icon: "mdi:battery"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
-        
+        <<: *ws_device
+    
+    #
     # BLE Temperature/Humidity Sensor
+    #
     - name: "Indoor Temperature"
-      unique_id: "{{ ws_device_id }}_ble0_temp"
+      unique_id: "11c941_ble0_temp_c"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ble0_temp_c }}"
       device_class: "temperature"
       unit_of_measurement: "°C"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+        
     - name: "Indoor Humidity"
-      unique_id: "{{ ws_device_id }}_ble0_humidity"
+      unique_id: "11c941_ble0_humidity"
       state_topic: *ws_topic
       value_template: "{{ value_json.uplink_message.decoded_payload.bytes.ble0_humidity }}"
       device_class: "moisture"
       unit_of_measurement: "%"
       expire_after: *ws_expiry
       device:
-        name: *ws_name
-        identifiers: "Bresser"
-        manufacturer: "Bresser"
-        model: *ws_model
+        <<: *ws_device
+
