@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// adc.h
+// adc.cpp
 //
 // Analog/Digital Converter wrapper/convenience functions
 //
@@ -41,6 +41,7 @@
 // 20240504 Heltec WiFi 32 LoRa V3: Changed ADC input attenuation to get higher accuracy
 // 20240607 Changed ARDUINO_HELTEC_WIFI_LORA_32_V3 to uppercase
 // 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
+// 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3
 //
 // ToDo:
 // -
@@ -87,7 +88,7 @@ uint16_t getBatteryVoltage(void)
   // Here come the good guys...
   return getVoltage();
 
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
      // Enable ADC input switch, measure voltage and disable ADC input switch
     uint16_t voltage;
     pinMode(ADC_CTRL, OUTPUT);
