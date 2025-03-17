@@ -25,15 +25,15 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.1.1
+// RadioLib                             7.1.2
 // LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.30.0
-// OneWireNg                            0.13.3 (optional)
-// DallasTemperature                    3.9.0 (optional)
-// NimBLE-Arduino                       1.4.2 (optional)
-// ATC MiThermometer                    0.4.2 (optional)
-// Theengs Decoder                      1.7.8 (optional)
+// BresserWeatherSensorReceiver         0.32.1
+// OneWireNg                            0.14.0 (optional)
+// DallasTemperature                    4.0.3 (optional)
+// NimBLE-Arduino                       2.2.3 (optional)
+// ATC MiThermometer                    0.5.0 (optional)
+// Theengs Decoder                      1.8.5 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -110,6 +110,7 @@
 //          Modified sleep duration if battery is low but external power is available
 // 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
 //          Changed to use radio object from BresserWeatherSensorReceiver
+// 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
 //
 // ToDo:
 // -
@@ -168,7 +169,7 @@ struct sPrefs
 #include <hardware/rtc.h>
 #endif
 
-#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#if defined(ARDUINO_M5STACK_CORE2)
 #include <M5Unified.h>
 #endif
 
@@ -548,7 +549,7 @@ int16_t lwActivate(LoRaWANNode &node)
 // setup & execute all device functions ...
 void setup()
 {
-#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#if defined(ARDUINO_M5STACK_CORE2)
   auto cfg = M5.config();
   cfg.clear_display = true; // default=true. clear the screen when begin.
   cfg.output_power = true;  // default=true. use external port 5V output.
