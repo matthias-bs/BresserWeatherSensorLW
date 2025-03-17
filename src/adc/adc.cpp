@@ -41,7 +41,7 @@
 // 20240504 Heltec WiFi 32 LoRa V3: Changed ADC input attenuation to get higher accuracy
 // 20240607 Changed ARDUINO_HELTEC_WIFI_LORA_32_V3 to uppercase
 // 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
-// 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3
+// 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2 (now all uppercase)
 //
 // ToDo:
 // -
@@ -51,7 +51,7 @@
 #include "adc.h"
 #include "../logging.h"
 
-#if defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#if defined(ARDUINO_M5STACK_CORE2)
 #include <M5Unified.h>
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
 #include <PowerFeather.h>
@@ -107,7 +107,7 @@ uint16_t getBatteryVoltage(void)
   // Not implemented - no default VBAT input circuit (connect external divider to A0)
   return 0;
 
-#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#elif defined(ARDUINO_M5STACK_CORE2)
   // battery monitoring chip
   uint16_t voltage = M5.Power.getBatteryVoltage();
   log_d("Voltage = %dmV", voltage);
