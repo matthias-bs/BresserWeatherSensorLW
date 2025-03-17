@@ -66,6 +66,8 @@
 // 20240730 Modified PF_SUPPLY_MAINTAIN_VOLTAGE
 // 20240804 PowerFeather: Added configuration of max. battery charging current
 // 20250209 Added Weather Station 8-in-1
+// 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2
+//          (now all uppercase)
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -217,7 +219,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
 // On-board VB
 #define PIN_ADC_IN A0
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -232,7 +234,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #endif
 // unused
 #define PIN_ADC_IN -1
-#elif defined(ARDUINO_M5STACK_Core2) || defined(ARDUINO_M5STACK_CORE2)
+#elif defined(ARDUINO_M5STACK_CORE2)
 // Unused
 #define PIN_ADC_IN -1
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
@@ -310,7 +312,7 @@ const uint8_t ADC3_SAMPLES = 10;
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 #if defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 const float UBATT_DIV = 0.6812;
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(ARDUINO_heltec_wifi_lora_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
 #define ADC_CTRL 37
 // R17=100k, R14=390k => 100k / (100k + 390 k)
 const float UBATT_DIV = 0.2041;
