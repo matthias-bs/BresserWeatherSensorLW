@@ -42,6 +42,7 @@
 // 20240603 encodeBresser(): added appStatus parameter
 // 20240716 Added ws_scantime and scanBresser()
 // 20250209 Added Weather Station 8-in-1
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -188,7 +189,7 @@ private:
 
     bool isSpaceLeft(LoraEncoder &encoder, uint8_t type)
     {
-        return (encoder.getLength() + payloadSize[type] <= PAYLOAD_SIZE); 
+        return (encoder.getLength() + payloadSize[type] <= MAX_UPLINK_SIZE); 
     };
 };
 #endif //_PAYLOAD_BRESSER
