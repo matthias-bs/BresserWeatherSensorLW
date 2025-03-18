@@ -111,6 +111,7 @@
 // 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
 //          Changed to use radio object from BresserWeatherSensorReceiver
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -675,7 +676,7 @@ void setup()
   appLayer.begin();
 
   // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
-  uint8_t uplinkPayload[PAYLOAD_SIZE + 8];
+  uint8_t uplinkPayload[MAX_UPLINK_SIZE + 8];
 
   LoraEncoder encoder(uplinkPayload);
 
