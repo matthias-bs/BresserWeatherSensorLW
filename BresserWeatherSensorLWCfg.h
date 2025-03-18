@@ -68,6 +68,7 @@
 // 20250209 Added Weather Station 8-in-1
 // 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2
 //          (now all uppercase)
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -115,7 +116,7 @@ struct sPowerFeatherCfg {
 
 // Uplink message payload size
 // The maximum allowed for all data rates is 51 bytes.
-const uint8_t PAYLOAD_SIZE = 51;
+const uint8_t MAX_UPLINK_SIZE = 51;
 
 // Maximum downlink payload size (bytes)
 const uint8_t MAX_DOWNLINK_SIZE = 51;
