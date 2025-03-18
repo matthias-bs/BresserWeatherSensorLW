@@ -35,6 +35,7 @@
 // 20240603 Added BLE sensor battery status
 // 20240610 Fixed exception with empty list of BLE addresses
 // 20240613 Fixed using BLE addresses from preferences
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -160,7 +161,7 @@ void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncod
     float div = 1.0;
 #endif
 
-    if (encoder.getLength() <= PAYLOAD_SIZE - 3)
+    if (encoder.getLength() <= MAX_UPLINK_SIZE - 3)
     {
         if (bleSensors.data[0].valid)
         {
