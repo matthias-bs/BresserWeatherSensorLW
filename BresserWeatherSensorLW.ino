@@ -111,7 +111,7 @@
 // 20241227 Moved uplinkDelay() from BresserWeatherSensorLWCmd.cpp
 //          Changed to use radio object from BresserWeatherSensorReceiver
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
-// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
 //
 // ToDo:
 // -
@@ -755,13 +755,13 @@ void setup()
   size_t downlinkSize;                        // To hold the actual payload size rec'd
   LoRaWANEvent_t downlinkDetails;
 
-  uint8_t payloadSize = encoder.getLength();
+  uint8_t uplinkSize = encoder.getLength();
   uint8_t maxPayloadLen = node.getMaxPayloadLen();
   log_d("Max payload length: %u", maxPayloadLen);
-  if (payloadSize > maxPayloadLen)
+  if (uplinkSize > maxPayloadLen)
   {
     log_w("Payload size exceeds maximum of %u bytes - truncating", maxPayloadLen);
-    payloadSize = maxPayloadLen;
+    uplinkSize = maxPayloadLen;
   }
 
   // ----- and now for the main event -----
@@ -816,14 +816,14 @@ void setup()
     {
       log_d("Sending response uplink.");
       fPort = uplinkReq;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
+      encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
     }
     else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
     {
       log_d("Sending LoRaWAN status uplink.");
       fPort = CMD_GET_LW_STATUS;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
+      encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       lwStatusUplinkPending = false;
     }
@@ -831,16 +831,16 @@ void setup()
     {
       log_d("Sending application status uplink.");
       fPort = CMD_GET_SENSORS_STAT;
-      encodeCfgUplink(fPort, uplinkPayload, payloadSize);
+      encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
       uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       appStatusUplinkPending = false;
     }
 
-    log_i("Sending uplink; port %u, size %u", fPort, payloadSize);
+    log_i("Sending uplink; port %u, size %u", fPort, uplinkSize);
 
     state = node.sendReceive(
         uplinkPayload,
-        payloadSize,
+        uplinkSize,
         fPort,
         downlinkPayload,
         &downlinkSize,
