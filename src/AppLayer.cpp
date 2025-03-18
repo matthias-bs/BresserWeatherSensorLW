@@ -64,6 +64,7 @@
 // 20240701 Fixed CMD_GET_BLE_ADDR (get default if Preferences are empty/zero)
 // 20240716 Added CMD_SCAN_SENSORS
 // 20240722 Renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -115,7 +116,7 @@ void AppLayer::getPayloadStage1(uint8_t &port, LoraEncoder &encoder)
 
     // FIXME: To be removed later
     // Battery status flags for compatibility with BresserWeatherSensorTTN and ESP32-e-Paper-Weather-Display
-    if ((appPayloadCfg[0] & 1) && (encoder.getLength() <= PAYLOAD_SIZE - 1))
+    if ((appPayloadCfg[0] & 1) && (encoder.getLength() <= MAX_UPLINK_SIZE - 1))
     {
         log_i("Battery status flags: ws=%u, soil=%u, lgt=%u", appStatus[SENSOR_TYPE_WEATHER1] & 1,
               (appStatus[SENSOR_TYPE_SOIL] & 2) >> 1, appStatus[SENSOR_TYPE_LIGHTNING] & 1);
