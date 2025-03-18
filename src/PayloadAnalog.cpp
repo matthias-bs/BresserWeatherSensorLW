@@ -34,6 +34,7 @@
 // 20240521 Created
 // 20240524 Added payload size check, changed bitmap order
 // 20240528 Changesd order of channels, fixed log messages
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -57,14 +58,14 @@ void PayloadAnalog::encodeAnalog(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         {
             // Check if channel is enabled
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_ANALOG + i] >> bit) & 0x1) {
-                if ((ch == UBATT_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
+                if ((ch == UBATT_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
                 {
                     uint16_t uBatt = getBatteryVoltage();
                     log_i("ch %02u: U_batt: %04u mv", ch, uBatt);
                     encoder.writeUint16(uBatt);
                 }
 
-                if ((ch == USUPPLY_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
+                if ((ch == USUPPLY_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
                 {
                     uint16_t uSupply = getSupplyVoltage();
                     log_i("ch %02u: U_supply: %04u mv", ch, uSupply);
