@@ -33,6 +33,7 @@
 //
 // 20240520 Created
 // 20240524 Added payload size check, changed bitmap order
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -69,7 +70,7 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             {
 #ifdef DISTANCESENSOR_EN
                 // Check if channel is enabled
-                if ((ch == DISTANCESENSOR_CH) && (encoder.getLength() <= PAYLOAD_SIZE - 2))
+                if ((ch == DISTANCESENSOR_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
                 {
                     uint16_t distance_mm = readDistanceSensor();
                     if (distance_mm > 0)
