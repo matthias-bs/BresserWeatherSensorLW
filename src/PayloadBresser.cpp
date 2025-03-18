@@ -50,6 +50,7 @@
 // 20240719 Fixed enabling of all decoders in scanBresser()
 // 20240821 Fixed validation of rain statistics
 // 20250209 Added Weather Station 8-in-1
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -71,7 +72,7 @@ void PayloadBresser::begin(void)
     if (ws_scantime > 0)
     {
         log_d("ws_scantime: %u s", ws_scantime);
-        weatherSensor.begin(PAYLOAD_SIZE / 8, false);
+        weatherSensor.begin(MAX_UPLINK_SIZE / 8, false);
         return;
     }
 
