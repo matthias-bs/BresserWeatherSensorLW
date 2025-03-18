@@ -34,6 +34,7 @@
 // 20240520 Created
 // 20240524 Added payload size check, changed bitmap order
 // 20240528 Changed index count direction, fixed signalling of invalid data
+// 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 //
 // ToDo:
 // -
@@ -83,7 +84,7 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         for (uint8_t ch = 0; ch <= 7; ch++)
         {
             // Check if enough space is left in payload buffer
-            if (encoder.getLength() > PAYLOAD_SIZE - 2)
+            if (encoder.getLength() > MAX_UPLINK_SIZE - 2)
                 return;
             
             // Check if sensor with given index is enabled
