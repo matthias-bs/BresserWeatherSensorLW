@@ -87,7 +87,7 @@ jobs:
             "ATC_MiThermometer@0.5.0"
             "TheengsDecoder@1.8.5"
             "Preferences@2.1.0"
-            "ArduinoJson@7.3.0"
+            "ArduinoJson@7.3.1"
             "M5Unified@0.2.5"
             "powerfeather-sdk@1.1.0")
           for i in "${required_libs[@]}"
