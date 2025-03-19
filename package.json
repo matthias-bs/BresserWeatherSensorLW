@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/matthias-bs/BresserWeatherSensorLW#README",
   "dependencies": {
-    "BresserWeatherSensorReceiver": "matthias-bs/BresserWeatherSensorReceiver#semver:^0.32.0",
+    "BresserWeatherSensorReceiver": "matthias-bs/BresserWeatherSensorReceiver#semver:^0.32.1",
     "RadioLib": "jgromes/RadioLib#semver:^7.1.2",
     "lora-serialization": "thesolarnomad/lora-serialization#semver:^3.3.1",
     "ESP32Time": "fbiego/ESP32Time#semver:^2.0.6",
@@ -32,6 +32,6 @@
     "ATC_MiThermometer": "matthias-bs/ATC_MiThermometer#semver:^0.5.0",
     "TheengsDecoder": "theengs/decoder#semver:^1.8.5",
     "Preferences": "vshymanskyy/Preferences#semver:^2.1.0",
-    "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.3.0"
+    "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.3.1"
   }
 }
