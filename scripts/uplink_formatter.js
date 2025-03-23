@@ -535,7 +535,7 @@ function decoder(bytes, port) {
 
     function found_sensors(bytes) {
         let res = [];
-        for (let i = 0; i < bytes.length; i += 8) {
+        for (let i = 0; i < bytes.length; i += 9) {
             const decoded_id = hex32(bytes.slice(i, i + 4));
             const tmp = uint8(bytes.slice(i + 4, i + 5));
             const decoded_type = sensor_types[tmp & 0x0F];
