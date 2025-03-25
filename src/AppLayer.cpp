@@ -397,7 +397,7 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
     }
     else if (cmd == CMD_GET_SENSORS_CFG)
     {
-        uint8_t maxSensors;
+        uint8_t maxSensors = MAX_NUM_868MHZ_SENSORS;
         uint8_t rxFlags;
         uint8_t enDecoders;
         weatherSensor.getSensorsCfg(maxSensors, rxFlags, enDecoders);
