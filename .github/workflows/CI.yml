@@ -85,7 +85,7 @@ jobs:
             "DallasTemperature@4.0.3"
             "NimBLE-Arduino@2.2.3"
             "ATC_MiThermometer@0.5.0"
-            "TheengsDecoder@1.8.5"
+            "TheengsDecoder@1.9.1"
             "Preferences@2.1.0"
             "ArduinoJson@7.3.1"
             "M5Unified@0.2.5"
