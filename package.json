@@ -32,6 +32,6 @@
     "ATC_MiThermometer": "matthias-bs/ATC_MiThermometer#semver:^0.5.0",
     "TheengsDecoder": "theengs/decoder#semver:^1.9.1",
     "Preferences": "vshymanskyy/Preferences#semver:^2.1.0",
-    "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.3.1"
+    "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.4.1"
   }
 }
