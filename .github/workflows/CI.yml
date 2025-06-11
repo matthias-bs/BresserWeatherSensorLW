@@ -83,7 +83,7 @@ jobs:
             "ESP32Time@2.0.6"
             "OneWireNg@0.14.0"
             "DallasTemperature@4.0.3"
-            "NimBLE-Arduino@2.3.0"
+            "NimBLE-Arduino@2.3.1"
             "ATC_MiThermometer@0.5.0"
             "TheengsDecoder@1.9.6"
             "Preferences@2.1.0"
