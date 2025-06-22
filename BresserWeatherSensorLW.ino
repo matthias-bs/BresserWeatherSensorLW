@@ -25,15 +25,15 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.1.2
+// RadioLib                             7.2.0
 // LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
-// BresserWeatherSensorReceiver         0.32.1
+// BresserWeatherSensorReceiver         0.33.0
 // OneWireNg                            0.14.0 (optional)
 // DallasTemperature                    4.0.3 (optional)
-// NimBLE-Arduino                       2.2.3 (optional)
+// NimBLE-Arduino                       2.3.1 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
-// Theengs Decoder                      1.8.5 (optional)
+// Theengs Decoder                      1.9.8 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -112,6 +112,7 @@
 //          Changed to use radio object from BresserWeatherSensorReceiver
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
+// 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
 //
 // ToDo:
 // -
@@ -129,7 +130,7 @@
 // - If joining the network or transmitting uplink data fails,
 //   the controller will go into deep sleep
 // - For LoRaWAN Specification 1.1.0, a small set of data (the "nonces") have to be stored persistently -
-//   this implementation uses Flash (via Preferences library
+//   this implementation uses Flash (via Preferences library)
 // - Storing LoRaWAN network session information speeds up the connection (join) after a restart -
 //   this implementation uses the ESP32's RTC RAM or a variable located in the RP2040's RAM, respectively.
 //   In the latter case, an uninitialzed linker section is used for this purpose.
@@ -704,13 +705,18 @@ void setup()
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
   
-    // Using local radio object
-    #if defined(ARDUINO_LILYGO_T3S3_LR1121)
-    radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
+  // Using local radio object
+  #if defined(ARDUINO_LILYGO_T3S3_LR1121)
+  radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
 
-    // LR1121 TCXO Voltage 2.85~3.15V
-    radio.setTCXO(3.0);
-    #endif
+  // LR1121 TCXO Voltage 2.85~3.15V
+  radio.setTCXO(3.0);
+  #endif
+
+  #if defined(ESP32)
+  // Optionally provide a custom sleep function - see config.h
+  node.setSleepFunction(customDelay);
+  #endif
 
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);

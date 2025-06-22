@@ -46,6 +46,7 @@
 // 20241227 Modified radio chip selection
 //          Removed instances of radio and LoRaWANNode classes
 // 20250622 Updated to RadioLib v7.2.0
+//          Added customDelay()
 //
 // ToDo:
 // - 
@@ -352,6 +353,29 @@ uint8_t appKey[] = { RADIOLIB_LORAWAN_APP_KEY };
 uint8_t nwkKey[] = { RADIOLIB_LORAWAN_NWK_KEY };
 #else
 uint8_t nwkKey[] = { 0 };
+#endif
+
+// Custom delay function:
+// Communication over LoRaWAN includes a lot of delays.
+// By default, RadioLib will use the Arduino delay() function,
+// which will waste a lot of power. However, you can put your
+// microcontroller to sleep instead by customizing the function below,
+// and providing it to RadioLib via "node.setSleepFunction".
+// Note:
+// Implementation from
+// https://github.com/jgromes/RadioLib/discussions/1401#discussioncomment-12080631
+#if defined(ESP32)
+void customDelay(RadioLibTime_t ms) {
+    uint64_t start = millis();
+    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+    esp_sleep_enable_timer_wakeup((ms-2)*(uint64_t)1000);
+    esp_light_sleep_start();
+
+    if(millis() < start + ms) {
+	    // if there's still some time left, do normal delay for remainder
+      vTaskDelay((start + ms - millis())/portTICK_PERIOD_MS);
+    }
+}
 #endif
 
 // result code to text ...
