@@ -35,6 +35,8 @@
 // 20240524 Added payload size check, changed bitmap order
 // 20240528 Changed index count direction, fixed signalling of invalid data
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250625 Added missing call to owTempSensors.begin() 
+//          for DallasTemperature v4.0.3
 //
 // ToDo:
 // -
@@ -77,6 +79,8 @@ float PayloadOneWire::getOneWireTemperature(uint8_t index)
 // Encode 1-Wire temperature sensor values for LoRaWAN transmission
 void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
 {
+    // Initialize the Dallas Temperature library
+    owTempSensors.begin();
 
     unsigned index = 0;
     for (int i = APP_PAYLOAD_BYTES_ONEWIRE - 1; i >= 0; i--)
