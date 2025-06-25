@@ -1,6 +1,6 @@
 {
   "name": "BresserWeatherSensorLW",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Bresser 868 MHz Weather Sensor Radio Receiver; provides data via LoRaWAN",
   "main": "BresserWeatherSensorLW.ino",
   "frameworks": "arduino",
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/matthias-bs/BresserWeatherSensorLW#README",
   "dependencies": {
-    "BresserWeatherSensorReceiver": "matthias-bs/BresserWeatherSensorReceiver#semver:^0.32.1",
+    "BresserWeatherSensorReceiver": "matthias-bs/BresserWeatherSensorReceiver#semver:^0.33.0",
     "RadioLib": "jgromes/RadioLib#semver:^7.2.0",
     "lora-serialization": "thesolarnomad/lora-serialization#semver:^3.3.1",
     "ESP32Time": "fbiego/ESP32Time#semver:^2.0.6",
