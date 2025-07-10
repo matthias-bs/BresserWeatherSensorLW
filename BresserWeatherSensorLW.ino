@@ -25,15 +25,15 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.2.0
+// RadioLib                             7.2.1
 // LoRa_Serialization                   3.3.1
 // ESP32Time                            2.0.6
 // BresserWeatherSensorReceiver         0.33.0
 // OneWireNg                            0.14.0 (optional)
 // DallasTemperature                    4.0.3 (optional)
-// NimBLE-Arduino                       2.3.1 (optional)
+// NimBLE-Arduino                       2.3.2 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
-// Theengs Decoder                      1.9.8 (optional)
+// Theengs Decoder                      1.9.9 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
