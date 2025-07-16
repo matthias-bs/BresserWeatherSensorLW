@@ -69,7 +69,7 @@ const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
 
 // JoinEUI (or AppEUI in previous versions of LoRaWAN (e.g. 1.0.4))
 // for development purposes you can use all zeros - see RadioLib wiki for details
-#ifndef RADIOLIB_LORAWAN_JOIN_EUI   // Replace with your JoinEUI/AppEUI
+#ifndef RADIOLIB_LORAWAN_JOIN_EUI  // Replace with your JoinEUI/AppEUI
 #define RADIOLIB_LORAWAN_JOIN_EUI  0x---------------
 #endif
 
