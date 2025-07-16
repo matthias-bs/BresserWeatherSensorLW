@@ -1,5 +1,5 @@
-// JoinEUI - previous versions of LoRaWAN called this AppEUI
-// for development purposes you can use all zeros - see wiki for details
+// JoinEUI (LoRaWAN  v1.1.0) or AppEUI (LoRaWAN v1.0.4)
+// for development purposes you can use all zeros - see RadioLib wiki for details
 #define RADIOLIB_LORAWAN_JOIN_EUI  0x0000000000000000
 
 // The Device EUI & two keys can be generated on the TTN console (or any other LoRaWAN Network Service Provider's console)
