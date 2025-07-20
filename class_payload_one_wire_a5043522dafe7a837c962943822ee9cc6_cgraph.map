@@ -1,0 +1,5 @@
+<map id="PayloadOneWire::encodeOneWire" name="PayloadOneWire::encodeOneWire">
+<area shape="rect" id="Node000001" title="Encode 1&#45;Wire temperature sensor values for LoRaWAN transmission." alt="" coords="5,13,245,38"/>
+<area shape="rect" id="Node000002" href="$class_payload_one_wire.html#ab81e478ce922fe2bfc31d4dd9a3ec6d6" title="Get temperature from Maxim OneWire Sensor." alt="" coords="293,5,508,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="245,23,279,23,279,28,245,28"/>
+</map>
