@@ -37,6 +37,7 @@
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250625 Added missing call to owTempSensors.begin() 
 //          for DallasTemperature v4.0.3
+// 20250720 Fixed missing function call for temperature conversion
 //
 // ToDo:
 // -
@@ -95,7 +96,7 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_ONEWIRE + i] >> ch) & 0x1)
             {
                 // Get temperature by index
-                float tempC = owTempSensors.getTempCByIndex(index);
+                float tempC = getOneWireTemperature(index);
 
                 // Check if reading was successful
                 if (tempC != DEVICE_DISCONNECTED_C)
