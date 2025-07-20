@@ -96,7 +96,7 @@ void PayloadOneWire::encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &encoder)
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_ONEWIRE + i] >> ch) & 0x1)
             {
                 // Get temperature by index
-                float tempC = getOneWireTemperature((index);
+                float tempC = getOneWireTemperature(index);
 
                 // Check if reading was successful
                 if (tempC != DEVICE_DISCONNECTED_C)
