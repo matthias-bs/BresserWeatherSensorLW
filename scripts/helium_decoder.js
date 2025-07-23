@@ -118,7 +118,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Bresser Weather Sensor Decoder
-function bws_decoder(bytes) {
+function bws_decoder(bytes, port) {
     var bytesToInt = function (bytes) {
         var i = 0;
         for (var x = 0; x < bytes.length; x++) {
@@ -167,6 +167,68 @@ function bws_decoder(bytes) {
         return bytesToInt(bytes);
     };
     uint32.BYTES = 4;
+
+    var uint16BE = function (bytes) {
+        if (bytes.length !== uint16BE.BYTES) {
+            throw new Error('int must have exactly 2 bytes');
+        }
+        return bytesToIntBE(bytes);
+    };
+    uint16BE.BYTES = 2;
+
+    var uint32BE = function (bytes) {
+        if (bytes.length !== uint32BE.BYTES) {
+            throw new Error('int must have exactly 4 bytes');
+        }
+        return bytesToIntBE(bytes);
+    };
+    uint32BE.BYTES = 4;
+
+    function byte2hex(byte) {
+        return ('0' + byte.toString(16)).slice(-2);
+    }
+
+    var mac48 = function (bytes) {
+        var res = [];
+        var j = 0;
+        for (var i = 0; i < bytes.length; i += 6) {
+            res[j++] = byte2hex(bytes[i]) + ":" + byte2hex(bytes[i + 1]) + ":" + byte2hex(bytes[i + 2]) + ":" +
+                byte2hex(bytes[i + 3]) + ":" + byte2hex(bytes[i + 4]) + ":" + byte2hex(bytes[i + 5]);
+        }
+        return res;
+    };
+    mac48.BYTES = 6;
+
+    var bresser_bitmaps = function (bytes) {
+        var res = [];
+        for (var i = 0; i < 16; i++) {
+            res[i] = "0x" + byte2hex(bytes[i]);
+        }
+        return res;
+    };
+    bresser_bitmaps.BYTES = 16;
+
+    var hex16 = function (bytes) {
+        var res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]);
+        return res;
+    };
+    hex16.BYTES = 2;
+
+    var hex32 = function (bytes) {
+        var res = "0x" + byte2hex(bytes[0]) + byte2hex(bytes[1]) + byte2hex(bytes[2]) + byte2hex(bytes[3]);
+        return res;
+    };
+    hex32.BYTES = 4;
+
+    var id32 = function (bytes) {
+        var res = [];
+        var j = 0;
+        for (var i = 0; i < bytes.length; i += 4) {
+            res[j++] = "0x" + byte2hex(bytes[i]) + byte2hex(bytes[i + 1]) + byte2hex(bytes[i + 2]) + byte2hex(bytes[i + 3]);
+        }
+        return res;
+    };
+    id32.BYTES = 4;
 
     var latLng = function (bytes) {
         if (bytes.length !== latLng.BYTES) {
@@ -290,69 +352,180 @@ function bws_decoder(bytes) {
     };
 
 
-    // see assignment to 'bitmap' variable for status bit names 
-    //    return decode(
-    //    bytes,
-    //    [bitmap,   temperature,  uint8,       uint16,       uint16      ], // types
-    //    ['status', 'air_temp_c', 'humidity',  'supply_v',   'battery_v' ]  // JSON elements
-    //  );
-    return decode(
-        bytes,
-        [ 
-          temperature,
-          uint8,
-          rawfloat,
-          uint16fp1,
-          uint16fp1,
-          uint16fp1,
-          rawfloat,
-          rawfloat,
-          rawfloat,
-          rawfloat,
-          //temperature,
-          //uint8,
-          temperature,
-          uint8,
-          //unixtime,
-          //uint16,
-          //uint8,
-          temperature,
-          uint16,
-          temperature,
-          uint8
-        ],
-        [ 
-          'ws_temp_c',
-          'ws_humidity',
-          'ws_rain_mm',
-          'ws_wind_gust_ms',
-          'ws_wind_avg_ms',
-          'ws_wind_dir_deg',
-          'ws_rain_hourly_mm',
-          'ws_rain_daily_mm',
-          'ws_rain_weekly_mm',
-          'ws_rain_monthly_mm',
-          //'th1_temp_c',
-          //'th1_humidity',
-          'soil1_temp_c',
-          'soil1_moisture',
-          //'lgt_ev_time',
-          //'lgt_ev_events',
-          //'lgt_ev_dist_km',
-          'ow0_temp_c',
-          'a0_voltage_mv',
-          'ble0_temp_c',
-          'ble0_humidity'
-        ]
-    );
-
+    if (port === 1) {
+        // see assignment to 'bitmap' variable for status bit names 
+        //    return decode(
+        //    bytes,
+        //    [bitmap,   temperature,  uint8,       uint16,       uint16      ], // types
+        //    ['status', 'air_temp_c', 'humidity',  'supply_v',   'battery_v' ]  // JSON elements
+        //  );
+        return decode(
+            bytes,
+            [ 
+            temperature,
+            uint8,
+            rawfloat,
+            uint16fp1,
+            uint16fp1,
+            uint16fp1,
+            rawfloat,
+            rawfloat,
+            rawfloat,
+            rawfloat,
+            //temperature,
+            //uint8,
+            temperature,
+            uint8,
+            //unixtime,
+            //uint16,
+            //uint8,
+            temperature,
+            uint16,
+            temperature,
+            uint8
+            ],
+            [ 
+            'ws_temp_c',
+            'ws_humidity',
+            'ws_rain_mm',
+            'ws_wind_gust_ms',
+            'ws_wind_avg_ms',
+            'ws_wind_dir_deg',
+            'ws_rain_hourly_mm',
+            'ws_rain_daily_mm',
+            'ws_rain_weekly_mm',
+            'ws_rain_monthly_mm',
+            //'th1_temp_c',
+            //'th1_humidity',
+            'soil1_temp_c',
+            'soil1_moisture',
+            //'lgt_ev_time',
+            //'lgt_ev_events',
+            //'lgt_ev_dist_km',
+            'ow0_temp_c',
+            'a0_voltage_mv',
+            'ble0_temp_c',
+            'ble0_humidity'
+            ]
+        );
+    } else if (port === CMD_GET_DATETIME) {
+        return decode(
+            port,
+            bytes,
+            [uint32BE, rtc_source
+            ],
+            ['unixtime', 'rtc_source'
+            ]
+        );
+    } else if (port === CMD_GET_LW_CONFIG) {
+        return decode(
+            port,
+            bytes,
+            [uint16BE, uint16BE
+            ],
+            ['sleep_interval', 'sleep_interval_long'
+            ]
+        );
+    } else if (port === CMD_GET_LW_STATUS) {
+        return decode(
+            port,
+            bytes,
+            [uint16, uint8
+            ],
+            ['ubatt_mv', 'long_sleep'
+            ]
+        );
+    } else if (port === CMD_GET_WS_TIMEOUT) {
+        return decode(
+            port,
+            bytes,
+            [uint8
+            ],
+            ['ws_timeout'
+            ]
+        );
+    } else if (port === CMD_GET_SENSORS_INC) {
+        return decode(
+            port,
+            bytes,
+            [id32
+            ],
+            ['sensors_inc'
+            ]
+        );
+    } else if (port === CMD_GET_SENSORS_EXC) {
+        return decode(
+            port,
+            bytes,
+            [id32
+            ],
+            ['sensors_exc'
+            ]
+        );
+    } else if (port === CMD_GET_SENSORS_CFG) {
+        return decode(
+            port,
+            bytes,
+            [bits8, bits8, bits8
+            ],
+            ['max_sensors', 'rx_flags', 'en_decoders'
+            ]
+        );
+    } else if (port === CMD_GET_BLE_ADDR) {
+        return decode(
+            port,
+            bytes,
+            [mac48
+            ],
+            ['ble_addr'
+            ]
+        );
+    } else if (port === CMD_GET_BLE_CONFIG) {
+        return decode(
+            port,
+            bytes,
+            [bits8, bits8
+            ],
+            ['ble_active', 'ble_scantime']
+        );
+    } else if (port === CMD_GET_APP_PAYLOAD_CFG) {
+        return decode(
+            port,
+            bytes,
+            [bresser_bitmaps, hex16, hex16, hex32
+            ],
+            ['bresser', 'onewire', 'analog', 'digital']
+        );
+    } else if (port === CMD_GET_STATUS_INTERVAL) {
+        return decode(
+            port,
+            bytes,
+            [bits8
+            ],
+            ['status_interval'
+            ]
+        );
+    } else if (port === CMD_GET_SENSORS_STAT) {
+        return decode(
+            port,
+            bytes,
+            [sensor_status
+            ],
+            ['sensor_status'
+            ]
+        );
+    }
 }
 
 
 function Decoder(bytes, port, uplink_info) {
     var decoded = {};
 
-    decoded = bws_decoder(bytes);
+    if (port != 1) {
+      return {};
+    }
+
+    decoded = bws_decoder(bytes, port);
 
     /*
       The uplink_info variable is an OPTIONAL third parameter that provides the following:
@@ -378,5 +551,7 @@ function Decoder(bytes, port, uplink_info) {
         // do something with uplink_info fields
     }
 
-    return decoded;
+    return {
+      decoded
+    };
 }
