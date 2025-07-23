@@ -1,0 +1,45 @@
+{
+  "uplink_message": {
+      "decoded_payload": {
+          "bytes": {
+              "a0_voltage_mv": "{{decoded.payload.uplink_message.decoded_payload.bytes.a0_voltage_mv}}",
+              "ble0_humidity": "{{decoded.payload.uplink_message.decoded_payload.bytes.ble0_humidity}}",
+              "ble0_temp_c": "{{decoded.payload.uplink_message.decoded_payload.bytes.ble0_temp_c}}",
+              "ow0_temp_c": "{{decoded.payload.uplink_message.decoded_payload.bytes.ow0_temp_c}}",
+              "soil1_moisture": "{{decoded.payload.uplink_message.decoded_payload.bytes.soil1_moisture}}",
+              "soil1_temp_c": "{{decoded.payload.uplink_message.decoded_payload.bytes.soil1_temp_c}}",
+              "ws_humidity": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_humidity}}",
+              "ws_rain_daily_mm": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_rain_daily_mm}}",
+              "ws_rain_hourly_mm": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_rain_hourly_mm}}",
+              "ws_rain_mm": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_rain_mm}}",
+              "ws_rain_monthly_mm": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_rain_monthly_mm}}",
+              "ws_rain_weekly_mm": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_rain_weekly_mm}}",
+              "ws_temp_c": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_temp_c}}",
+              "ws_wind_avg_ms": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_wind_avg_ms}}",
+              "ws_wind_dir_deg": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_wind_dir_deg}}",
+              "ws_wind_gust_ms": "{{decoded.payload.uplink_message.decoded_payload.bytes.ws_wind_gust_ms}}"
+          },
+          "status": "{{decoded.payload.uplink_message.decoded_payload.status}}"
+      },
+      "f_port": "{{port}}"
+  },
+  "dev_eui": "{{dev_eui}}",
+  "devaddr": "{{devaddr}}",
+  "fcnt": "{{fcnt}}",
+  "hotspots": [
+      {
+          "channel": "{{hotspots.0.channel}}",
+          "frequency": "{{hotspots.0.frequency}}",
+          "hold_time": "{{hotspots.0.hold_time}}",
+          "id": "{{hotspots.0.id}}",
+          "lat": "{{hotspots.0.lat}}",
+          "long": "{{hotspots.0.long}}",
+          "name": "{{hotspots.0.name}}",
+          "reported_at": "{{hotspots.0.reported_at}}",
+          "rssi": "{{hotspots.0.rssi}}",
+          "snr": "{{hotspots.0.snr}}",
+          "spreading": "{{hotspots.0.spreading}}",
+          "status": "{{hotspots.0.status}}"
+      }
+  ]
+}
