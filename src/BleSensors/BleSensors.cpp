@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// BleSensors.h
+// BleSensors.cpp
 //
 // Wrapper class for Theeengs Decoder (https://github.com/theengs/decoder)
 //
@@ -11,7 +11,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@
 // 20230211 Created
 // 20240427 Added paramter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
+// 20250725 Fixed potential buffer overflow
 //
 // ToDo:
 // -
@@ -112,8 +113,9 @@ private:
     {
       if (CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG)
       {
-        char buf[512];
-        serializeJson(BLEdata, buf);
+        const size_t buf_sz = 512;
+        char buf[buf_sz];
+        serializeJson(BLEdata, buf, buf_sz);
         log_d("TheengsDecoder found device: %s", buf);
       }
 
