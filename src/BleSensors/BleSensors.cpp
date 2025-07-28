@@ -38,7 +38,7 @@
 // 20240427 Added paramter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250725 Fixed potential buffer overflow
-// 20250728 Fixed maming collision with ATC_MiThermometer
+// 20250728 Fixed naming collision with ATC_MiThermometer
 //
 // ToDo:
 // -
