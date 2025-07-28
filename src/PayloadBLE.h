@@ -33,6 +33,7 @@
 //
 // 20240531 Moved from AppLayer.h
 // 20240603 encodeBLE(): added appStatus parameter
+// 20250728 Fixed using ATC_MiThermometer library
 //
 // ToDo:
 // -
@@ -65,10 +66,6 @@ private:
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
 
-#ifdef MITHERMOMETER_EN
-    /// BLE Temperature/Humidity Sensors
-    ATC_MiThermometer bleSensors; //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
-#endif
 #ifdef THEENGSDECODER_EN
     /// Bluetooth Low Energy sensors
     BleSensors bleSensors;
