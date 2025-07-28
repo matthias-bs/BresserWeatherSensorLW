@@ -36,6 +36,7 @@
 // 20240610 Fixed exception with empty list of BLE addresses
 // 20240613 Fixed using BLE addresses from preferences
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250728 Fixed using ATC_MiThermometer library
 //
 // ToDo:
 // -
@@ -122,7 +123,9 @@ void PayloadBLE::bleAddrInit(void)
     {
         log_d("No BLE addresses specified.");
     }
+#if defined(THEENGSDECODER_EN)
     bleSensors = BleSensors(knownBLEAddresses);
+#endif
 
     for (const std::string &s : knownBLEAddresses)
     {
@@ -136,23 +139,11 @@ void PayloadBLE::bleAddrInit(void)
  */
 void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
 {
-    if (bleSensors.data.size() == 0)
+    if ((knownBLEAddresses.size() == 0) && (encoder.getLength() > MAX_UPLINK_SIZE - 3))
         return;
 
     float indoor_temp_c;
     float indoor_humidity;
-
-    // Set sensor data invalid
-    bleSensors.resetData();
-
-    appPrefs.begin("BWS-LW-APP", false);
-    uint8_t ble_active = appPrefs.getUChar("ble_active", BLE_SCAN_MODE);
-    uint8_t ble_scantime = appPrefs.getUChar("ble_scantime", BLE_SCAN_TIME);
-    log_d("Preferences: ble_active: %u", ble_active);
-    log_d("Preferences: ble_scantime: %u s", ble_scantime);
-    appPrefs.end();
-    // Get sensor data - run BLE scan for <bleScanTime>
-    bleSensors.getData(ble_scantime, ble_active);
 
     // BLE Temperature/Humidity Sensors
 #if defined(MITHERMOMETER_EN)
@@ -161,31 +152,78 @@ void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncod
     float div = 1.0;
 #endif
 
-    if (encoder.getLength() <= MAX_UPLINK_SIZE - 3)
+    appPrefs.begin("BWS-LW-APP", false);
+    uint8_t ble_active = appPrefs.getUChar("ble_active", BLE_SCAN_MODE);
+    uint8_t ble_scantime = appPrefs.getUChar("ble_scantime", BLE_SCAN_TIME);
+    log_d("Preferences: ble_active: %u", ble_active);
+    log_d("Preferences: ble_scantime: %u s", ble_scantime);
+    appPrefs.end();
+
+#if defined(THEENGSDECODER_EN)
+    // Set sensor data invalid
+    bleSensors.resetData();
+
+    // Get sensor data - run BLE scan for <bleScanTime>
+    bleSensors.getData(ble_scantime, ble_active);
+
+    if (bleSensors.data[0].valid)
     {
-        if (bleSensors.data[0].valid)
+        indoor_temp_c = bleSensors.data[0].temperature / div;
+        indoor_humidity = bleSensors.data[0].humidity / div;
+        log_i("Indoor Air Temp.:   % 3.1f °C", indoor_temp_c);
+        log_i("Indoor Humidity:     %3.1f %%", indoor_humidity);
+        encoder.writeTemperature(indoor_temp_c);
+        encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
+        if (bleSensors.data[0].batt_level > BLE_BATT_OK)
         {
-            indoor_temp_c = bleSensors.data[0].temperature / div;
-            indoor_humidity = bleSensors.data[0].humidity / div;
-            log_i("Indoor Air Temp.:   % 3.1f °C", bleSensors.data[0].temperature / div);
-            log_i("Indoor Humidity:     %3.1f %%", bleSensors.data[0].humidity / div);
-            encoder.writeTemperature(indoor_temp_c);
-            encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
-            if (bleSensors.data[0].batt_level > BLE_BATT_OK)
-            {
-                appStatus[APP_PAYLOAD_OFFS_BLE + APP_PAYLOAD_BYTES_BLE - 1] |= 1;
-            }
+            appStatus[APP_PAYLOAD_OFFS_BLE + APP_PAYLOAD_BYTES_BLE - 1] |= 1;
         }
-        else
-        {
-            log_i("Indoor Air Temp.:    --.- °C");
-            log_i("Indoor Humidity:     --   %%");
-            encoder.writeTemperature(INV_TEMP);
-            encoder.writeUint8(INV_UINT8);
-        }
-        // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
-        bleSensors.clearScanResults();
     }
+    else
+    {
+        log_i("Indoor Air Temp.:    --.- °C");
+        log_i("Indoor Humidity:     --   %%");
+        encoder.writeTemperature(INV_TEMP);
+        encoder.writeUint8(INV_UINT8);
+    }
+    // BLE Temperature/Humidity Sensors: delete results fromBLEScan buffer to release memory
+    bleSensors.clearScanResults();
+#elif defined(MITHERMOMETER_EN)
+    // Setup BLE Temperature/Humidity Sensors
+    ATC_MiThermometer miThermometer(knownBLEAddresses); //!< Mijia Bluetooth Low Energy Thermo-/Hygrometer
+
+    miThermometer.begin(ble_active);
+
+    // Set sensor data invalid
+    miThermometer.resetData();
+
+    // Get sensor data - run BLE scan for <ble_scantime>
+    miThermometer.getData(ble_scantime);
+
+    if (miThermometer.data[0].valid)
+    {
+        indoor_temp_c = miThermometer.data[0].temperature / div;
+        indoor_humidity = miThermometer.data[0].humidity / div;
+        log_i("Indoor Air Temp.:   % 3.1f °C", indoor_temp_c);
+        log_i("Indoor Humidity:     %3.1f %%", indoor_humidity);
+        encoder.writeTemperature(indoor_temp_c);
+        encoder.writeUint8(static_cast<uint8_t>(indoor_humidity + 0.5));
+        if (miThermometer.data[0].batt_level > BLE_BATT_OK)
+        {
+            appStatus[APP_PAYLOAD_OFFS_BLE + APP_PAYLOAD_BYTES_BLE - 1] |= 1;
+        }
+    }
+    else
+    {
+        log_i("Indoor Air Temp.:    --.- °C");
+        log_i("Indoor Humidity:     --   %%");
+        encoder.writeTemperature(INV_TEMP);
+        encoder.writeUint8(INV_UINT8);
+    }
+
+    // BLE Temperature/Humidity Sensors: delete results from BLEScan buffer to release memory
+    miThermometer.clearScanResults();
+#endif
 }
 
 #endif
