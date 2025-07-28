@@ -133,81 +133,79 @@ $(document).ready(function(){initNavTree('_payload_b_l_e_8h_source.html',''); in
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span><span class="comment">//</span></div>
 <div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="comment">// 20240531 Moved from AppLayer.h</span></div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="comment">// 20240603 encodeBLE(): added appStatus parameter</span></div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment">//</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">// ToDo:</span></div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">// -</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">//</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span> </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#if !defined(_PAYLOAD_BLE)</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#define _PAYLOAD_BLE</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#if defined(MITHERMOMETER_EN)</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">// BLE Temperature/Humidity Sensor</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &lt;ATC_MiThermometer.h&gt;</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#if defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &quot;BleSensors/BleSensors.h&quot;</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="foldopen" id="foldopen00062" data-start="{" data-end="};">
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html">   62</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_b_l_e.html">PayloadBLE</a></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>{</div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    Preferences appPrefs;</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#ifdef MITHERMOMETER_EN</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    ATC_MiThermometer bleSensors; </div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#ifdef THEENGSDECODER_EN</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <a class="code hl_class" href="class_ble_sensors.html">BleSensors</a> bleSensors;</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="comment">// 20250728 Fixed using ATC_MiThermometer library</span></div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">//</span></div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">// ToDo:</span></div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">// -</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">//</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#if !defined(_PAYLOAD_BLE)</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#define _PAYLOAD_BLE</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;Preferences.h&gt;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#if defined(MITHERMOMETER_EN)</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="comment">// BLE Temperature/Humidity Sensor</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#include &lt;ATC_MiThermometer.h&gt;</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#if defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &quot;BleSensors/BleSensors.h&quot;</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="foldopen" id="foldopen00063" data-start="{" data-end="};">
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html">   63</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_b_l_e.html">PayloadBLE</a></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>{</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    Preferences appPrefs;</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">#ifdef THEENGSDECODER_EN</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <a class="code hl_class" href="class_ble_sensors.html">BleSensors</a> bleSensors;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    std::vector&lt;std::string&gt; knownBLEAddressesDef;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    std::vector&lt;std::string&gt; knownBLEAddressesDef;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">   82</a></span>    std::vector&lt;std::string&gt; <a class="code hl_variable" href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">knownBLEAddresses</a>;</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">   88</a></span>    <a class="code hl_function" href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">PayloadBLE</a>(){};</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span> </div>
-<div class="foldopen" id="foldopen00093" data-start="{" data-end="}">
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">   93</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">begin</a>(<span class="keywordtype">void</span>)</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    {</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <a class="code hl_function" href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">bleAddrInit</a>();</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    };</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">   79</a></span>    std::vector&lt;std::string&gt; <a class="code hl_variable" href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">knownBLEAddresses</a>;</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">   85</a></span>    <a class="code hl_function" href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">PayloadBLE</a>(){};</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
+<div class="foldopen" id="foldopen00090" data-start="{" data-end="}">
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">   90</a></span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">begin</a>(<span class="keywordtype">void</span>)</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>        <a class="code hl_function" href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">bleAddrInit</a>();</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    };</div>
 </div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#ac55579175f958ba7cbf809cae0c47aae">setBleAddr</a>(uint8_t *bytes, uint8_t size);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>    uint8_t <a class="code hl_function" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">getBleAddr</a>(uint8_t *bytes);</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span> </div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    std::vector&lt;std::string&gt; <a class="code hl_function" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">getBleAddr</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">bleAddrInit</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span> </div>
-<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">encodeBLE</a>(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &amp;encoder);</div>
-<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>};</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#ac55579175f958ba7cbf809cae0c47aae">setBleAddr</a>(uint8_t *bytes, uint8_t size);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>    uint8_t <a class="code hl_function" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">getBleAddr</a>(uint8_t *bytes);</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    std::vector&lt;std::string&gt; <a class="code hl_function" href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">getBleAddr</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">bleAddrInit</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">encodeBLE</a>(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &amp;encoder);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>};</div>
 </div>
-<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span><span class="preprocessor">#endif </span><span class="comment">// defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
-<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_BLE</span></div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span><span class="preprocessor">#endif </span><span class="comment">// defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)</span></div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_BLE</span></div>
 <div class="ttc" id="aclass_ble_sensors_html"><div class="ttname"><a href="class_ble_sensors.html">BleSensors</a></div><div class="ttdoc">BLE Sensor (e.g. thermometer/hygrometer) client.</div><div class="ttdef"><b>Definition</b> BleSensors.h:72</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html"><div class="ttname"><a href="class_payload_b_l_e.html">PayloadBLE</a></div><div class="ttdef"><b>Definition</b> PayloadBLE.h:63</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_a0d3896f610ae065f685dec5cf41c060f"><div class="ttname"><a href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">PayloadBLE::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">BLE startup code.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:93</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_a37a8b17de19034803480562be7cab88e"><div class="ttname"><a href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">PayloadBLE::bleAddrInit</a></div><div class="ttdeci">void bleAddrInit(void)</div><div class="ttdoc">Initialize list of known BLE addresses from defaults or Preferences.</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:107</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_a89793d96d56ee64855100435d282eeb3"><div class="ttname"><a href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">PayloadBLE::encodeBLE</a></div><div class="ttdeci">void encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode BLE temperature/humidity sensor values for LoRaWAN transmission.</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:137</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_aae9f7a881ec9d7ca05b5c1f9071448fa"><div class="ttname"><a href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">PayloadBLE::PayloadBLE</a></div><div class="ttdeci">PayloadBLE()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:88</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_ab6a8165239fc3c5d2557a3f5c582960c"><div class="ttname"><a href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">PayloadBLE::knownBLEAddresses</a></div><div class="ttdeci">std::vector&lt; std::string &gt; knownBLEAddresses</div><div class="ttdoc">Actual BLE MAC addresses; either from Preferences or from defaults.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:82</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_ac55579175f958ba7cbf809cae0c47aae"><div class="ttname"><a href="class_payload_b_l_e.html#ac55579175f958ba7cbf809cae0c47aae">PayloadBLE::setBleAddr</a></div><div class="ttdeci">void setBleAddr(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:49</div></div>
-<div class="ttc" id="aclass_payload_b_l_e_html_ac8699db1f37c3a216237e6ab8f969a80"><div class="ttname"><a href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">PayloadBLE::getBleAddr</a></div><div class="ttdeci">std::vector&lt; std::string &gt; getBleAddr(void)</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:66</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html"><div class="ttname"><a href="class_payload_b_l_e.html">PayloadBLE</a></div><div class="ttdef"><b>Definition</b> PayloadBLE.h:64</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_a0d3896f610ae065f685dec5cf41c060f"><div class="ttname"><a href="class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f">PayloadBLE::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">BLE startup code.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:90</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_a37a8b17de19034803480562be7cab88e"><div class="ttname"><a href="class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e">PayloadBLE::bleAddrInit</a></div><div class="ttdeci">void bleAddrInit(void)</div><div class="ttdoc">Initialize list of known BLE addresses from defaults or Preferences.</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:108</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_a89793d96d56ee64855100435d282eeb3"><div class="ttname"><a href="class_payload_b_l_e.html#a89793d96d56ee64855100435d282eeb3">PayloadBLE::encodeBLE</a></div><div class="ttdeci">void encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode BLE temperature/humidity sensor values for LoRaWAN transmission.</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:140</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_aae9f7a881ec9d7ca05b5c1f9071448fa"><div class="ttname"><a href="class_payload_b_l_e.html#aae9f7a881ec9d7ca05b5c1f9071448fa">PayloadBLE::PayloadBLE</a></div><div class="ttdeci">PayloadBLE()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:85</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_ab6a8165239fc3c5d2557a3f5c582960c"><div class="ttname"><a href="class_payload_b_l_e.html#ab6a8165239fc3c5d2557a3f5c582960c">PayloadBLE::knownBLEAddresses</a></div><div class="ttdeci">std::vector&lt; std::string &gt; knownBLEAddresses</div><div class="ttdoc">Actual BLE MAC addresses; either from Preferences or from defaults.</div><div class="ttdef"><b>Definition</b> PayloadBLE.h:79</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_ac55579175f958ba7cbf809cae0c47aae"><div class="ttname"><a href="class_payload_b_l_e.html#ac55579175f958ba7cbf809cae0c47aae">PayloadBLE::setBleAddr</a></div><div class="ttdeci">void setBleAddr(uint8_t *bytes, uint8_t size)</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:50</div></div>
+<div class="ttc" id="aclass_payload_b_l_e_html_ac8699db1f37c3a216237e6ab8f969a80"><div class="ttname"><a href="class_payload_b_l_e.html#ac8699db1f37c3a216237e6ab8f969a80">PayloadBLE::getBleAddr</a></div><div class="ttdeci">std::vector&lt; std::string &gt; getBleAddr(void)</div><div class="ttdef"><b>Definition</b> PayloadBLE.cpp:67</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
