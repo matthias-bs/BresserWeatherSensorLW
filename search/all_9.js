@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['m_5fpblescan_0',['m_pBLEScan',['../class_scan_callbacks.html#ab911e5aec4b807376d81051d8d3559a3',1,'ScanCallbacks']]],
-  ['m_5fsensordata_1',['m_sensorData',['../class_scan_callbacks.html#ae74ba2977b6e78e1b94c7c7f478c9267',1,'ScanCallbacks']]]
+  ['m_5fpblescan_0',['m_pBLEScan',['../class_ble_sensors_callbacks_1_1_scan_callbacks.html#aac4b4cd236064b196de2d66c9c29cacc',1,'BleSensorsCallbacks::ScanCallbacks']]],
+  ['m_5fsensordata_1',['m_sensorData',['../class_ble_sensors_callbacks_1_1_scan_callbacks.html#a6fc2cacf6fb18c6d6be45dbdb163b054',1,'BleSensorsCallbacks::ScanCallbacks']]]
 ];

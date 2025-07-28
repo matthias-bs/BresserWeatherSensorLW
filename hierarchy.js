@@ -3,7 +3,7 @@ var hierarchy =
     [ "BleDataS", "struct_ble_data_s.html", null ],
     [ "BleSensors", "class_ble_sensors.html", null ],
     [ "NimBLEScanCallbacks", null, [
-      [ "ScanCallbacks", "class_scan_callbacks.html", null ]
+      [ "BleSensorsCallbacks::ScanCallbacks", "class_ble_sensors_callbacks_1_1_scan_callbacks.html", null ]
     ] ],
     [ "PayloadAnalog", "class_payload_analog.html", [
       [ "AppLayer", "class_app_layer.html", null ]
