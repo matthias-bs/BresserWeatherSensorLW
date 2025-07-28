@@ -139,7 +139,8 @@ void PayloadBLE::bleAddrInit(void)
  */
 void PayloadBLE::encodeBLE(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder)
 {
-    if ((knownBLEAddresses.size() == 0) && (encoder.getLength() > MAX_UPLINK_SIZE - 3))
+    // No BLE sensor defined or not enough space left in uplink payload?
+    if ((knownBLEAddresses.size() == 0) || (encoder.getLength() > MAX_UPLINK_SIZE - 3))
         return;
 
     float indoor_temp_c;
