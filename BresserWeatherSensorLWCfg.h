@@ -69,6 +69,7 @@
 // 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2
 //          (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250802 Added BATTERY_RECOVERED
 //
 // Note:
 // Depending on board package file date, some defines are written either
@@ -131,6 +132,10 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // Battery voltage limits in mV (usable range for the device) for battery state calculation
 #define BATTERY_DISCHARGE_LIM 3200
 #define BATTERY_CHARGE_LIM 4200
+
+// Battery voltage limit for switching rain gauge/lightning sensor from long to normal interval
+// Related to BATTERY_WEAK, adds a hysteresis to prevent frequent switching
+#define BATTERY_RECOVERED 3580
 
 // Minimum sleep interval (in seconds)
 #define SLEEP_INTERVAL_MIN 60
