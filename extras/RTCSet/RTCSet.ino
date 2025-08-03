@@ -73,8 +73,6 @@ void syncESP32RTCWithExtRTC(void)
     // Set the ESP32 internal RTC
     struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
     settimeofday(&tv, nullptr);
-
-    Serial.println("ESP32 internal RTC synchronized with DS3231");
 }
 #endif
 #if defined(ARDUINO_ARCH_RP2040)
@@ -119,13 +117,14 @@ void setup()
     }
 
     Serial.println("Input date and time in format YYYY-MM-DD HH:MM:SS (e.g. 2023-10-01 12:00:00),");
-    Serial.println("<c> to use compile time, or just press <Enter> to skip setting the RTC.");
-    String input_str;
-    if (Serial.available())
+    Serial.println("send <c> to use compile time, or <s> to skip setting the RTC.");
+
+    while (!Serial.available())
     {
-        input_str = Serial.readStringUntil('\n');
+        delay(10); // Wait for input
     }
-    bool sync_rtc = false;
+
+    String input_str = Serial.readStringUntil('\n');
     if (input_str.length() > 0)
     {
         if (input_str == "c" || input_str == "C")
@@ -133,7 +132,10 @@ void setup()
             Serial.println("Using compile time for RTC.");
             rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
             Serial.println("RTC set to compile time.");
-            sync_rtc = true;
+        }
+        if (input_str == "s" || input_str == "S")
+        {
+            Serial.println("Skipping RTC setting.");
         }
         else
         {
@@ -143,7 +145,6 @@ void setup()
             {
                 rtc.adjust(DateTime(year, month, day, hour, minute, second));
                 Serial.println("RTC set to user-defined date and time.");
-                sync_rtc = true;
             }
             else
             {
@@ -152,19 +153,20 @@ void setup()
         }
     }
 
-    // Sync the ESP32 internal RTC with the external RTC if set
-    if (sync_rtc)
-    {
+    // Sync the ESP32 internal RTC with the external RTC
 #if defined(ESP32)
-        syncESP32RTCWithExtRTC();
+    syncESP32RTCWithExtRTC();
 #elif defined(ARDUINO_ARCH_RP2040)
-        syncRP2040RTCWithExtRTC();
+    syncRP2040RTCWithExtRTC();
 #endif
-    }
 }
 
 void loop()
 {
+    Serial.print("Temperature: ");
+    Serial.print(rtc.getTemperature());
+    Serial.println(" C");
+
     DateTime now = rtc.now();
 
     Serial.print(now.year(), DEC);
@@ -180,12 +182,6 @@ void loop()
     Serial.print(now.minute(), DEC);
     Serial.print(':');
     Serial.print(now.second(), DEC);
-    Serial.println();
-
-    Serial.print("Temperature: ");
-    Serial.print(rtc.getTemperature());
-    Serial.println(" C");
-
     Serial.println();
 
     time_t now_t = time(nullptr);
@@ -205,7 +201,8 @@ void loop()
     strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", tm_info);
     Serial.print("ISO 8601 format: ");
     Serial.println(buffer);
+    Serial.println();
 
     // Wait for a while before the next loop iteration
-    delay(3000);
+    delay(5000);
 }
