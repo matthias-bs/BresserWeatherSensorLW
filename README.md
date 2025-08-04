@@ -990,6 +990,7 @@ Based on
 * [Theengs Decoder](https://github.com/theengs/decoder) by [Theengs Project](https://github.com/theengs)
 * [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
 * [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
+* [RTClib](https://github.com/adafruit/RTClib) by Adafruit 
 
 ## Legal
 
