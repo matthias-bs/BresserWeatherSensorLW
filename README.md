@@ -49,7 +49,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
-* External RTC (with Backup Battery) Integration
+* External RTC (with Backup Battery) Integration (optional)
 
 ## Contents
 
