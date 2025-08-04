@@ -311,8 +311,8 @@ The internal RTC retains operation while the MCU is in sleep mode. It can be set
 
    A module with an RTC chip supported by the [Adafruit RTClib](https://github.com/adafruit/RTClib) is connected to the 3.3V power supply and to the MCU's I²C bus pins.
 
-   > [!IMPORTANT]
-   > Check if the I²C interface requires additional pull-up resistors.
+> [!IMPORTANT]
+> Check if the I²C interface requires additional pull-up resistors.
 
    If enabled by setting `EXT_RTC` in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h), the external RTC takes precedence over the LoRaWAN Network Time.
 
