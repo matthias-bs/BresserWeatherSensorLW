@@ -10,12 +10,12 @@
 AppLayer	KEYWORD1
 BleDataS	KEYWORD1
 BleSensors	KEYWORD1
-MyAdvertisedDeviceCallbacks	KEYWORD1
 PayloadAnalog	KEYWORD1
 PayloadBLE	KEYWORD1
 PayloadBresser	KEYWORD1
 PayloadDigital	KEYWORD1
 PayloadOneWire	KEYWORD1
+BleSensorsCallbacks::ScanCallbacks	KEYWORD1
 
 #######################################
 # Methods (KEYWORD2)
@@ -28,6 +28,7 @@ genPayload	KEYWORD2
 getPayloadStage1	KEYWORD2
 getPayloadStage2	KEYWORD2
 getConfigPayload	KEYWORD2
+getAppStatusUplinkInterval	KEYWORD2
 setAppPayloadCfg	KEYWORD2
 getAppPayloadCfg	KEYWORD2
 BleSensors	KEYWORD2
@@ -37,8 +38,6 @@ begin	KEYWORD2
 clearScanResults	KEYWORD2
 getData	KEYWORD2
 resetData	KEYWORD2
-convertServiceData	KEYWORD2
-onResult	KEYWORD2
 PayloadAnalog	KEYWORD2
 begin	KEYWORD2
 encodeAnalog	KEYWORD2
@@ -51,6 +50,7 @@ bleAddrInit	KEYWORD2
 encodeBLE	KEYWORD2
 PayloadBresser	KEYWORD2
 begin	KEYWORD2
+scanBresser	KEYWORD2
 encodeBresser	KEYWORD2
 encodeWeatherSensor	KEYWORD2
 encodeThermoHygroSensor	KEYWORD2
@@ -68,12 +68,19 @@ encodeDigital	KEYWORD2
 PayloadOneWire	KEYWORD2
 getOneWireTemperature	KEYWORD2
 encodeOneWire	KEYWORD2
+onDiscovered	KEYWORD2
+onResult	KEYWORD2
+onScanEnd	KEYWORD2
 getVoltage	KEYWORD2
 getBatteryVoltage	KEYWORD2
 getSupplyVoltage	KEYWORD2
 getVoltage	KEYWORD2
 getBatteryVoltage	KEYWORD2
 getSupplyVoltage	KEYWORD2
+loadNodeCfg	KEYWORD2
+loadNodeCfg	KEYWORD2
+loadSecrets	KEYWORD2
+loadSecrets	KEYWORD2
 oneWire	KEYWORD2
 
 #######################################
