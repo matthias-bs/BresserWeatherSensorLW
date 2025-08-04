@@ -39,9 +39,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <Arduino.h>
-#if defined(ARDUINO_ARCH_RP2040)
-#include <hardware/rtc.h>
-#endif
 #include <time.h>
 #include "RTClib.h" // https://github.com/adafruit/RTClib
 
@@ -54,8 +51,10 @@ RTC_DS3231 rtc;
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-#if defined(ESP32)
-void syncESP32RTCWithExtRTC(void)
+// Sync the MCU's internal RTC with the external RTC
+// NOTE:
+// For RP2040, this syncs only the SW RTC, not the HW RTC which retains operation during sleep mode!
+void syncRTCWithExtRTC(void)
 {
     // Get the current time from the DS3231
     DateTime now = rtc.now();
@@ -71,48 +70,10 @@ void syncESP32RTCWithExtRTC(void)
 
     time_t t = mktime(&timeinfo);
 
-    // Set the ESP32 internal RTC
+    // Set the internal RTC
     struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
     settimeofday(&tv, nullptr);
 }
-#endif
-
-#if defined(ARDUINO_ARCH_RP2040)
-void syncRP2040RTCWithExtRTC(void)
-{
-    DateTime now = rtc.now();
-
-    // Convert DateTime to datetime_t
-    datetime_t dt;
-    dt.year = now.year();
-    dt.month = now.month();
-    dt.day = now.day();
-    dt.hour = now.hour();
-    dt.min = now.minute();
-    dt.sec = now.second();
-
-    // Initialize the RP2040 RTC
-    rtc_init();
-    delay(100);
-
-    // Set the RP2040 internal RTC
-    rtc_set_datetime(&dt);
-
-    struct tm timeinfo;
-    timeinfo.tm_year = now.year() - 1900;
-    timeinfo.tm_mon = now.month() - 1;
-    timeinfo.tm_mday = now.day();
-    timeinfo.tm_hour = now.hour();
-    timeinfo.tm_min = now.minute();
-    timeinfo.tm_sec = now.second();
-
-    time_t t = mktime(&timeinfo);
-
-    // Set the SW RTC
-    struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
-    settimeofday(&tv, nullptr);
-}
-#endif
 
 void setup()
 {
@@ -173,12 +134,8 @@ void setup()
         }
     }
 
-    // Sync the ESP32 internal RTC with the external RTC
-#if defined(ESP32)
-    syncESP32RTCWithExtRTC();
-#elif defined(ARDUINO_ARCH_RP2040)
-    syncRP2040RTCWithExtRTC();
-#endif
+    // Sync the MCU's internal RTC with the external RTC
+    syncRTCWithExtRTC();
 }
 
 void loop()
