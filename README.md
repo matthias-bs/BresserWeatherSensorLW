@@ -303,7 +303,7 @@ The internal RTC retains operation while the MCU is in sleep mode. It can be set
 
    The command `CMD_SET_DATETIME` (see [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)) allows to set the RTC manually.
 
-   The time between queuing `CMD_SET_DATETIME` and the RTC actually being set is rather unpredictable due to the LNS's downlink scheduling. Furthermore, a loss of power (in case of a battery/solar powered node) will reset the MCU's integrated RTC.
+   The time between queuing `CMD_SET_DATETIME` and the RTC actually being set is rather unpredictable due to the LNS's downlink scheduling. Furthermore, a loss of power (e.g. in case of a battery/solar powered node) will reset the MCU's integrated RTC.
 
 3. External RTC
 
