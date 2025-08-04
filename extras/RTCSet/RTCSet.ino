@@ -34,6 +34,7 @@
 // History:
 //
 // 20250803 Created
+// 20250804 Fixed and tested RP2040 implementation
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -75,6 +76,7 @@ void syncESP32RTCWithExtRTC(void)
     settimeofday(&tv, nullptr);
 }
 #endif
+
 #if defined(ARDUINO_ARCH_RP2040)
 void syncRP2040RTCWithExtRTC(void)
 {
@@ -89,8 +91,26 @@ void syncRP2040RTCWithExtRTC(void)
     dt.min = now.minute();
     dt.sec = now.second();
 
+    // Initialize the RP2040 RTC
+    rtc_init();
+    delay(100);
+
     // Set the RP2040 internal RTC
     rtc_set_datetime(&dt);
+
+    struct tm timeinfo;
+    timeinfo.tm_year = now.year() - 1900;
+    timeinfo.tm_mon = now.month() - 1;
+    timeinfo.tm_mday = now.day();
+    timeinfo.tm_hour = now.hour();
+    timeinfo.tm_min = now.minute();
+    timeinfo.tm_sec = now.second();
+
+    time_t t = mktime(&timeinfo);
+
+    // Set the SW RTC
+    struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
+    settimeofday(&tv, nullptr);
 }
 #endif
 
