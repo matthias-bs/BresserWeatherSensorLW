@@ -78,8 +78,6 @@ getVoltage	KEYWORD2
 getBatteryVoltage	KEYWORD2
 getSupplyVoltage	KEYWORD2
 loadNodeCfg	KEYWORD2
-loadNodeCfg	KEYWORD2
-loadSecrets	KEYWORD2
 loadSecrets	KEYWORD2
 oneWire	KEYWORD2
 
