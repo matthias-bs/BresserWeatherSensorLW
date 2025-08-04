@@ -448,8 +448,8 @@ void gotoSleep(uint32_t seconds)
 #endif
 
 #if defined(EXT_RTC)
-#if defined(ESP32)
-void syncESP32RTCWithExtRTC(void)
+// Synchronize the internal RTC with the external RTC
+void syncRTCWithExtRTC(void)
 {
   DateTime now = ext_rtc.now();
 
@@ -464,28 +464,10 @@ void syncESP32RTCWithExtRTC(void)
 
   time_t t = mktime(&timeinfo);
 
-  // Set the ESP32 internal RTC
+  // Set the MCU's internal RTC (ESP32) or SW RTC (RP2040)
   struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
   settimeofday(&tv, nullptr);
 }
-#elif defined(ARDUINO_ARCH_RP2040)
-void syncRP2040RTCWithExtRTC(void)
-{
-  DateTime now = ext_rtc.now();
-
-  // Convert DateTime to datetime_t
-  datetime_t dt;
-  dt.year = now.year();
-  dt.month = now.month();
-  dt.day = now.day();
-  dt.hour = now.hour();
-  dt.min = now.minute();
-  dt.sec = now.second();
-
-  // Set the RP2040 internal RTC
-  rtc_set_datetime(&dt);
-}
-#endif
 #endif // EXT_RTC
 
 /// Print date and time (i.e. local time)
@@ -704,13 +686,10 @@ void setup()
     }
     else
     {
-#if defined(ESP32)
-      syncESP32RTCWithExtRTC();
-#elif defined(ARDUINO_ARCH_RP2040)
-      syncRP2040RTCWithExtRTC();
-#endif
+      syncRTCWithExtRTC();
       rtcLastClockSync = rtc.getLocalEpoch();
       rtcTimeSource = E_TIME_SOURCE::E_RTC;
+      log_i("Set time and date from external RTC");
     }
   }
 #endif
