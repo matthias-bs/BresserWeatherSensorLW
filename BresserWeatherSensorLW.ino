@@ -34,6 +34,7 @@
 // NimBLE-Arduino                       2.3.2 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
 // Theengs Decoder                      1.9.9 (optional)
+// RTClib (Adafruit)                    2.1.4 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -113,6 +114,7 @@
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
 // 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
+// 20250803 Added support for external RTC chips
 //
 // ToDo:
 // -
@@ -189,6 +191,12 @@ using namespace PowerFeather;
 #include <ArduinoJson.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
+
+#if defined(EXT_RTC)
+// Adafruit RTClib - https://github.com/adafruit/RTClib
+#include <RTClib.h>
+#endif
+
 #include "src/LoadSecrets.h"
 #include "src/LoadNodeCfg.h"
 #include "src/AppLayer.h"
@@ -207,23 +215,20 @@ SPIClass *spi = nullptr;
 #endif
 #endif
 
-
-
 #if defined(ARDUINO_LILYGO_T3S3_LR1121)
 static const uint32_t rfswitch_dio_pins[] = {
     RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
-    RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
-};
+    RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC};
 
 static const Module::RfSwitchMode_t rfswitch_table[] = {
     // mode                  DIO5  DIO6
-    { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-    { LR11x0::MODE_RX,     { HIGH, LOW  } },
-    { LR11x0::MODE_TX,     { LOW,  HIGH } },
-    { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
-    { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-    { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-    { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+    {LR11x0::MODE_STBY, {LOW, LOW}},
+    {LR11x0::MODE_RX, {HIGH, LOW}},
+    {LR11x0::MODE_TX, {LOW, HIGH}},
+    {LR11x0::MODE_TX_HP, {LOW, HIGH}},
+    {LR11x0::MODE_TX_HF, {LOW, LOW}},
+    {LR11x0::MODE_GNSS, {LOW, LOW}},
+    {LR11x0::MODE_WIFI, {LOW, LOW}},
     END_OF_MODE_TABLE,
 };
 #endif // ARDUINO_LILYGO_T3S3_LR1121
@@ -272,6 +277,11 @@ bool lwStatusUplinkPending __attribute__((section(".uninitialized_data")));
 /// Real time clock
 ESP32Time rtc;
 
+#if defined(EXT_RTC)
+// Create an instance of the external RTC class
+EXT_RTC ext_rtc;
+#endif
+
 /// Application layer
 AppLayer appLayer(&rtc, &rtcLastClockSync);
 
@@ -312,16 +322,16 @@ void uplinkDelay(uint32_t timeUntilUplink, uint32_t uplinkInterval)
 {
   // wait before sending uplink
   uint32_t minimumDelay = uplinkInterval * 1000UL;
-  //uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
+  // uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
   uint32_t delayMs = max(timeUntilUplink, minimumDelay); // cannot send faster than duty cycle allows
 
   log_d("Sending uplink in %u s", delayMs / 1000);
-  #if defined(ESP32)
+#if defined(ESP32)
   esp_sleep_enable_timer_wakeup(delayMs * 1000);
   esp_light_sleep_start();
-  #else
+#else
   delay(delayMs);
-  #endif
+#endif
 }
 
 /*!
@@ -436,6 +446,29 @@ void gotoSleep(uint32_t seconds)
   rp2040.restart();
 }
 #endif
+
+#if defined(EXT_RTC)
+// Synchronize the internal RTC with the external RTC
+void syncRTCWithExtRTC(void)
+{
+  DateTime now = ext_rtc.now();
+
+  // Convert DateTime to time_t
+  struct tm timeinfo;
+  timeinfo.tm_year = now.year() - 1900;
+  timeinfo.tm_mon = now.month() - 1;
+  timeinfo.tm_mday = now.day();
+  timeinfo.tm_hour = now.hour();
+  timeinfo.tm_min = now.minute();
+  timeinfo.tm_sec = now.second();
+
+  time_t t = mktime(&timeinfo);
+
+  // Set the MCU's internal RTC (ESP32) or SW RTC (RP2040)
+  struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
+  settimeofday(&tv, nullptr);
+}
+#endif // EXT_RTC
 
 /// Print date and time (i.e. local time)
 void printDateTime(void)
@@ -640,6 +673,27 @@ void setup()
   }
   bootCount++;
 
+#if defined(EXT_RTC)
+  if ((rtcLastClockSync == 0) || ((rtc.getLocalEpoch() - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60)))
+  {
+    if (!ext_rtc.begin())
+    {
+      log_w("External RTC not available");
+    }
+    else if (ext_rtc.lostPower())
+    {
+      log_w("External RTC lost power");
+    }
+    else
+    {
+      syncRTCWithExtRTC();
+      rtcLastClockSync = rtc.getLocalEpoch();
+      rtcTimeSource = E_TIME_SOURCE::E_RTC;
+      log_i("Set time and date from external RTC");
+    }
+  }
+#endif
+
   // Set time zone
   setenv("TZ", timeZoneInfo.c_str(), 1);
   printDateTime();
@@ -686,37 +740,36 @@ void setup()
 
   int16_t state = 0; // return value for calls to RadioLib
 
-  #if !defined(RADIO_CHIP)
-    #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
-    // Use local radio object with custom SPI configuration
-    spi = new SPIClass(SPI);
-    spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-    radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
-    #endif
-  #endif
+#if !defined(RADIO_CHIP)
+#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+                     // Use local radio object with custom SPI configuration
+  spi = new SPIClass(SPI);
+  spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+  radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
+#endif
+#endif
 
   radio.reset();
   LoRaWANNode node(&radio, &Region, subBand);
 
   // setup the radio based on the pinmap (connections) in config.h
   log_v("Initialise radio");
-  
+
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
-  
-  // Using local radio object
-  #if defined(ARDUINO_LILYGO_T3S3_LR1121)
+// Using local radio object
+#if defined(ARDUINO_LILYGO_T3S3_LR1121)
   radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
 
   // LR1121 TCXO Voltage 2.85~3.15V
   radio.setTCXO(3.0);
-  #endif
+#endif
 
-  #if defined(ESP32)
+#if defined(ESP32)
   // Optionally provide a custom sleep function - see config.h
   node.setSleepFunction(customDelay);
-  #endif
+#endif
 
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);
