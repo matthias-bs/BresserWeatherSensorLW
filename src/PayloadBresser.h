@@ -55,7 +55,8 @@
 #include "../BresserWeatherSensorLWCfg.h"
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
-#include <ESP32Time.h>
+//#include <ESP32Time.h>
+#include <time.h>
 #include <Preferences.h>
 
 #ifdef RAINDATA_EN
@@ -66,6 +67,7 @@
 #endif
 
 #include <LoraMessage.h>
+#include "SystemContext.h"
 #include "logging.h"
 
 class PayloadBresser
@@ -119,8 +121,9 @@ public:
 #endif
 
 private:
-    ESP32Time *_rtc;
-    time_t *_rtcLastClockSync;
+    //ESP32Time *_rtc;
+    //time_t *_rtcLastClockSync;
+    SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
@@ -147,10 +150,12 @@ public:
     /*!
      * \brief Constructor
      */
-    PayloadBresser(ESP32Time *rtc, time_t *clocksync)
+    //PayloadBresser(ESP32Time *rtc, time_t *clocksync)
+    PayloadBresser(SystemContext* sysCtx)
     {
-        _rtc = rtc;
-        _rtcLastClockSync = clocksync;
+        _sysCtx = sysCtx;
+        //_rtc = sysCtx->getRtc();
+        //_rtcLastClockSync = sysCtx->getRtcLastClockSync();
     };
 
     /*!

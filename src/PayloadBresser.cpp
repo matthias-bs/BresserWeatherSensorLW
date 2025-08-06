@@ -194,11 +194,12 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
 
 #ifdef RAINDATA_EN
         // Check if time is valid
-        if (*_rtcLastClockSync > 0)
+        if (_sysCtx->isRtcSynched())
         {
             // Get local date and time
             struct tm timeinfo;
-            time_t tnow = _rtc->getLocalEpoch();
+            //time_t tnow = _rtc->getLocalEpoch();
+            time_t tnow = time(nullptr);
             localtime_r(&tnow, &timeinfo);
 
             // If weather sensor has be found and rain data is valid, update statistics
@@ -236,10 +237,11 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
             }
 
             // Check if time is valid
-            if (*_rtcLastClockSync > 0)
+            if (_sysCtx->isRtcSynched())
             {
                 // Get local date and time
-                time_t tnow = _rtc->getLocalEpoch();
+                //time_t tnow = _rtc->getLocalEpoch();
+                time_t tnow = time(nullptr);
 
                 // If lightning sensor has be found and data is valid, run post-processing
                 if ((idx > -1) && weatherSensor.sensor[idx].valid)

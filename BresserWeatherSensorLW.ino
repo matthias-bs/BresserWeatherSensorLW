@@ -149,50 +149,22 @@
 // LoRa_Serialization
 #include <LoraMessage.h>
 
-// ##### load the ESP32 preferences facilites
+// ESP32/RP2040 Preferences
 #include <Preferences.h>
 static Preferences store;
 
-/// Preferences (stored in flash memory)
-Preferences preferences;
-
-struct sPrefs
-{
-  uint16_t sleep_interval;      //!< preferences: sleep interval
-  uint16_t sleep_interval_long; //!< preferences: sleep interval long
-  uint8_t lw_stat_interval;     //!< preferences: LoRaWAN node status uplink interval
-} prefs;
-
 // Logging macros for RP2040
 #include "src/logging.h"
-
-#if defined(ARDUINO_ARCH_RP2040)
-#include "src/rp2040/pico_rtc_utils.h"
-#include <hardware/rtc.h>
-#endif
-
-#if defined(ARDUINO_M5STACK_CORE2)
-#include <M5Unified.h>
-#endif
-
-#if defined(ARDUINO_ESP32S3_POWERFEATHER)
-#include <PowerFeather.h>
-using namespace PowerFeather;
-#endif
 
 // LoRaWAN config, credentials & pinmap
 #include "config.h"
 
 #include <RadioLib.h>
-#include <ESP32Time.h>
-#include <LittleFS.h>
-#include <ArduinoJson.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
 #include "src/LoadSecrets.h"
-#include "src/LoadNodeCfg.h"
 #include "src/AppLayer.h"
-#include "src/adc/adc.h"
+#include "src/SystemContext.h"
 
 #if defined(RADIO_CHIP)
 // Use radio object from BresserWeatherSensorReceiver
@@ -207,60 +179,42 @@ SPIClass *spi = nullptr;
 #endif
 #endif
 
-
-
 #if defined(ARDUINO_LILYGO_T3S3_LR1121)
 static const uint32_t rfswitch_dio_pins[] = {
     RADIOLIB_LR11X0_DIO5, RADIOLIB_LR11X0_DIO6,
-    RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC
-};
+    RADIOLIB_NC, RADIOLIB_NC, RADIOLIB_NC};
 
 static const Module::RfSwitchMode_t rfswitch_table[] = {
     // mode                  DIO5  DIO6
-    { LR11x0::MODE_STBY,   { LOW,  LOW  } },
-    { LR11x0::MODE_RX,     { HIGH, LOW  } },
-    { LR11x0::MODE_TX,     { LOW,  HIGH } },
-    { LR11x0::MODE_TX_HP,  { LOW,  HIGH } },
-    { LR11x0::MODE_TX_HF,  { LOW,  LOW  } },
-    { LR11x0::MODE_GNSS,   { LOW,  LOW  } },
-    { LR11x0::MODE_WIFI,   { LOW,  LOW  } },
+    {LR11x0::MODE_STBY, {LOW, LOW}},
+    {LR11x0::MODE_RX, {HIGH, LOW}},
+    {LR11x0::MODE_TX, {LOW, HIGH}},
+    {LR11x0::MODE_TX_HP, {LOW, HIGH}},
+    {LR11x0::MODE_TX_HF, {LOW, LOW}},
+    {LR11x0::MODE_GNSS, {LOW, LOW}},
+    {LR11x0::MODE_WIFI, {LOW, LOW}},
     END_OF_MODE_TABLE,
 };
 #endif // ARDUINO_LILYGO_T3S3_LR1121
 
-// Time zone info
-const char *TZ_INFO = TZINFO_STR;
 
-// Variables which must retain their values after deep sleep
+/// System context
+SystemContext sysCtx;
+
+/// Application layer
+AppLayer appLayer(&sysCtx);
+
+
+// LoRaWAN specific variables which must retain their values after deep sleep
 #if defined(ESP32)
 // Stored in RTC RAM
-RTC_DATA_ATTR bool longSleep;              //!< last sleep interval; 0 - normal / 1 - long
-RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchonization to network time
-
-// utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
-// puts these in to the RTC memory which is preserved during deep-sleep
-RTC_DATA_ATTR uint16_t bootCount = 1;
-RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
-RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource;
 RTC_DATA_ATTR bool appStatusUplinkPending = false;
 RTC_DATA_ATTR bool lwStatusUplinkPending = false;
 RTC_DATA_ATTR uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
 
 #else
-// Saved to/restored from Watchdog SCRATCH registers
-bool longSleep;          //!< last sleep interval; 0 - normal / 1 - long
-time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network time
-
-// utilities & vars to support deep-sleep
-// Saved to/restored from Watchdog SCRATCH registers
-uint16_t bootCount;
-uint16_t bootCountSinceUnsuccessfulJoin;
-
 /// RP2040 RAM is preserved during sleep; we just have to ensure that it is not initialized at startup (after reset)
 uint8_t LWsession[RADIOLIB_LORAWAN_SESSION_BUF_SIZE] __attribute__((section(".uninitialized_data")));
-
-/// RTC time source
-E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
 
 /// AppLayer status uplink pending
 bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
@@ -269,185 +223,6 @@ bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
 bool lwStatusUplinkPending __attribute__((section(".uninitialized_data")));
 #endif
 
-/// Real time clock
-ESP32Time rtc;
-
-/// Application layer
-AppLayer appLayer(&rtc, &rtcLastClockSync);
-
-#if defined(ARDUINO_ESP32S3_POWERFEATHER)
-struct sPowerFeatherCfg PowerFeatherCfg = {
-    .battery_capacity = BATTERY_CAPACITY_MAH,
-    .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
-    .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
-    .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
-    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
-#else
-struct sPowerFeatherCfg PowerFeatherCfg = {0};
-#endif
-
-#if defined(ESP32)
-/*!
- * \brief Print wakeup reason (ESP32 only)
- *
- * Abbreviated version from the Arduino-ESP32 package, see
- * https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
- * for the complete set of options.
- */
-void print_wakeup_reason()
-{
-  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-  if (wakeup_reason == ESP_SLEEP_WAKEUP_TIMER)
-  {
-    log_i("Wake from sleep");
-  }
-  else
-  {
-    log_i("Wake not caused by deep sleep: %u", wakeup_reason);
-  }
-}
-#endif
-
-void uplinkDelay(uint32_t timeUntilUplink, uint32_t uplinkInterval)
-{
-  // wait before sending uplink
-  uint32_t minimumDelay = uplinkInterval * 1000UL;
-  //uint32_t interval = node.timeUntilUplink();     // calculate minimum duty cycle delay (per FUP & law!)
-  uint32_t delayMs = max(timeUntilUplink, minimumDelay); // cannot send faster than duty cycle allows
-
-  log_d("Sending uplink in %u s", delayMs / 1000);
-  #if defined(ESP32)
-  esp_sleep_enable_timer_wakeup(delayMs * 1000);
-  esp_light_sleep_start();
-  #else
-  delay(delayMs);
-  #endif
-}
-
-/*!
- * \brief Compute sleep duration
- *
- * Minimum duration: SLEEP_INTERVAL_MIN
- * If battery voltage is available and <= BATTERY_WEAK:
- *   sleep_interval_long
- * else
- *   sleep_interval
- *
- * Additionally, the sleep interval is reduced from the
- * default value to achieve a wake-up time alinged to
- * an integer multiple of the interval after a full hour.
- *
- * \returns sleep duration in seconds
- */
-uint32_t sleepDuration(uint16_t battery_weak)
-{
-  uint32_t sleep_interval = prefs.sleep_interval;
-  longSleep = false;
-
-  uint16_t voltage = getBatteryVoltage();
-  // Long sleep interval if battery is weak
-  if (voltage && voltage <= battery_weak)
-  {
-#if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
-    uint16_t supplyVoltage = getSupplyVoltage();
-    if (supplyVoltage < battery_weak)
-    {
-      sleep_interval = prefs.sleep_interval_long;
-      longSleep = true;
-    }
-#else
-    sleep_interval = prefs.sleep_interval_long;
-    longSleep = true;
-#endif
-  }
-
-  // If the real time is available, align the wake-up time to the
-  // to next non-fractional multiple of sleep_interval past the hour
-  if (rtcLastClockSync)
-  {
-    struct tm timeinfo;
-    time_t t_now = rtc.getLocalEpoch();
-    localtime_r(&t_now, &timeinfo);
-
-    sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
-  }
-
-  sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
-  return sleep_interval;
-}
-
-#if defined(ESP32)
-/*!
- * \brief Enter sleep mode (ESP32 variant)
- *
- *  ESP32 deep sleep mode
- *
- * \param seconds sleep duration in seconds
- */
-void gotoSleep(uint32_t seconds)
-{
-  esp_sleep_enable_timer_wakeup(seconds * 1000UL * 1000UL); // function uses uS
-  log_i("Sleeping for %lu s", seconds);
-  Serial.flush();
-
-  esp_deep_sleep_start();
-
-  // if this appears in the serial debug, we didn't go to sleep!
-  // so take defensive action so we don't continually uplink
-  log_w("\n\n### Sleep failed ###");
-  delay(5UL * 60UL * 1000UL);
-  ESP.restart();
-}
-
-#else
-/*!
- * \brief Enter sleep mode (RP2040 variant)
- *
- * \param seconds sleep duration in seconds
- */
-void gotoSleep(uint32_t seconds)
-{
-  log_i("Sleeping for %lu s", seconds);
-  time_t t_now = rtc.getLocalEpoch();
-  datetime_t dt;
-  epoch_to_datetime(&t_now, &dt);
-  rtc_set_datetime(&dt);
-  sleep_us(64);
-  pico_sleep(seconds);
-
-  // Save variables to be retained after reset
-  watchdog_hw->scratch[3] = (bootCountSinceUnsuccessfulJoin << 16) | bootCount;
-  watchdog_hw->scratch[2] = rtcLastClockSync;
-
-  if (longSleep)
-  {
-    watchdog_hw->scratch[1] |= 2;
-  }
-  else
-  {
-    watchdog_hw->scratch[1] &= ~2;
-  }
-  // Save the current time, because RTC will be reset (SIC!)
-  rtc_get_datetime(&dt);
-  time_t now = datetime_to_epoch(&dt, NULL);
-  watchdog_hw->scratch[0] = now;
-  log_i("Now: %llu", now);
-
-  rp2040.restart();
-}
-#endif
-
-/// Print date and time (i.e. local time)
-void printDateTime(void)
-{
-  struct tm timeinfo;
-  char tbuf[25];
-
-  time_t tnow = rtc.getLocalEpoch();
-  localtime_r(&tnow, &timeinfo);
-  strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
-  log_i("%s", tbuf);
-}
 
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
@@ -483,7 +258,7 @@ int16_t lwActivate(LoRaWANNode &node)
 
     // if we have booted more than once we should have a session to restore, so report any failure
     // otherwise no point saying there's been a failure when it was bound to fail with an empty LWsession var.
-    debug((state != RADIOLIB_ERR_NONE) && (bootCount > 1), "Restoring session buffer failed", state, false);
+    debug((state != RADIOLIB_ERR_NONE) && !sysCtx.isFirstBoot(), "Restoring session buffer failed", state, false);
 
     // if Nonces and Session restored successfully, activation is just a formality
     // moreover, Nonces didn't change so no need to re-save them
@@ -522,16 +297,7 @@ int16_t lwActivate(LoRaWANNode &node)
     if (state != RADIOLIB_LORAWAN_NEW_SESSION)
     {
       log_i("Join failed: %d", state);
-
-      // how long to wait before join attempts. This is an interim solution pending
-      // implementation of TS001 LoRaWAN Specification section #7 - this doc applies to v1.0.4 & v1.1
-      // it sleeps for longer & longer durations to give time for any gateway issues to resolve
-      // or whatever is interfering with the device <-> gateway airwaves.
-      uint32_t sleepForSeconds = min((bootCountSinceUnsuccessfulJoin++ + 1UL) * 60UL, 3UL * 60UL);
-      log_i("Boots since unsuccessful join: %u", bootCountSinceUnsuccessfulJoin);
-      log_i("Retrying join in %u seconds", sleepForSeconds);
-
-      gotoSleep(sleepForSeconds);
+      sysCtx.sleepAfterFailedJoin();
 
     } // if activateOTAA state
   } // while join
@@ -539,7 +305,8 @@ int16_t lwActivate(LoRaWANNode &node)
   log_i("Joined");
 
   // reset the failed join count
-  bootCountSinceUnsuccessfulJoin = 0;
+  //bootCountSinceUnsuccessfulJoin = 0;
+  sysCtx.resetFailedJoinCount();
 
   delay(1000); // hold off off hitting the airwaves again too soon - an issue in the US
 
@@ -552,14 +319,7 @@ int16_t lwActivate(LoRaWANNode &node)
 void setup()
 {
 #if defined(ARDUINO_M5STACK_CORE2)
-  auto cfg = M5.config();
-  cfg.clear_display = true; // default=true. clear the screen when begin.
-  cfg.output_power = true;  // default=true. use external port 5V output.
-  cfg.internal_imu = false; // default=true. use internal IMU.
-  cfg.internal_rtc = true;  // default=true. use internal RTC.
-  cfg.internal_spk = false; // default=true. use internal speaker.
-  cfg.internal_mic = false; // default=true. use internal microphone.
-  M5.begin(cfg);
+  sysCtx.setupM5StackCore2();
 #endif
 
 #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
@@ -569,80 +329,13 @@ void setup()
 #endif
   log_i("Setup");
 
-  String timeZoneInfo(TZ_INFO);
-  uint16_t battery_weak = BATTERY_WEAK;
-  uint16_t battery_low = BATTERY_LOW;
-  uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
-  uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
+  sysCtx.begin();
 
-  loadNodeCfg(
-      timeZoneInfo,
-      battery_weak,
-      battery_low,
-      battery_discharge_lim,
-      battery_charge_lim,
-      PowerFeatherCfg);
-
-#if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  delay(2000);
-  // Note: Battery capacity / type has to be set for voltage measurement
-  Board.init(PowerFeatherCfg.battery_capacity);
-  Board.enable3V3(true);                                                 // Power supply for FeatherWing
-  Board.enableVSQT(true);                                                // Power supply for battery management chip (voltage measurement)
-  Board.enableBatteryTempSense(PowerFeatherCfg.temperature_measurement); // Enable battery temperature measurement
-  Board.enableBatteryFuelGauge(PowerFeatherCfg.battery_fuel_gauge);      // Enable battery fuel gauge
-  if (PowerFeatherCfg.supply_maintain_voltage)
+  if (sysCtx.isFirstBoot())
   {
-    Board.setSupplyMaintainVoltage(PowerFeatherCfg.supply_maintain_voltage); // Set supply maintain voltage
-  }
-  Board.enableBatteryCharging(true);                                      // Enable battery charging
-  Board.setBatteryChargingMaxCurrent(PowerFeatherCfg.max_charge_current); // Set max charging current
-#if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-  int16_t current;
-  Board.getBatteryCurrent(current);
-  log_d("Battery current: %d mA", current);
-#endif
-#endif
-
-#if defined(ARDUINO_ARCH_RP2040)
-  // see pico-sdk/src/rp2_common/hardware_rtc/rtc.c
-  rtc_init();
-
-  // Restore variables and RTC after reset
-  time_t time_saved = watchdog_hw->scratch[0];
-  datetime_t dt;
-  epoch_to_datetime(&time_saved, &dt);
-
-  // Set HW clock (only used in sleep mode)
-  rtc_set_datetime(&dt);
-
-  // Set SW clock
-  rtc.setTime(time_saved);
-
-  longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
-  rtcLastClockSync = watchdog_hw->scratch[2];
-  bootCount = watchdog_hw->scratch[3] & 0xFFFF;
-  if (bootCount == 0)
-  {
-    bootCount = 1;
-  }
-  bootCountSinceUnsuccessfulJoin = watchdog_hw->scratch[3] >> 16;
-#else
-  print_wakeup_reason();
-#endif
-  log_i("Boot count: %u", bootCount);
-
-  if (bootCount == 1)
-  {
-    rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
     appStatusUplinkPending = false;
     lwStatusUplinkPending = false;
   }
-  bootCount++;
-
-  // Set time zone
-  setenv("TZ", timeZoneInfo.c_str(), 1);
-  printDateTime();
 
 // Try to load LoRaWAN secrets from LittleFS file, if available
 #ifdef LORAWAN_VERSION_1_1
@@ -652,26 +345,7 @@ void setup()
 #endif
   loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
-  preferences.begin("BWS-LW", false);
-  prefs.sleep_interval = preferences.getUShort("sleep_int", SLEEP_INTERVAL);
-  prefs.sleep_interval_long = preferences.getUShort("sleep_int_long", SLEEP_INTERVAL_LONG);
-  prefs.lw_stat_interval = preferences.getUChar("lw_stat_int", LW_STATUS_INTERVAL);
-  preferences.end();
-
-  uint16_t voltage = getBatteryVoltage();
-  if (voltage && voltage <= battery_low)
-  {
-    log_i("Battery low!");
-#if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
-    uint16_t supplyVoltage = getSupplyVoltage();
-    if (supplyVoltage < battery_low)
-    {
-      gotoSleep(sleepDuration(battery_weak));
-    }
-#else
-    gotoSleep(sleepDuration(battery_weak));
-#endif
-  }
+  sysCtx.sleepIfSupplyLow();
 
   // Initialize Application Layer - starts sensor reception
   appLayer.begin();
@@ -686,37 +360,36 @@ void setup()
 
   int16_t state = 0; // return value for calls to RadioLib
 
-  #if !defined(RADIO_CHIP)
-    #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
-    // Use local radio object with custom SPI configuration
-    spi = new SPIClass(SPI);
-    spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-    radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
-    #endif
-  #endif
+#if !defined(RADIO_CHIP)
+#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+                     // Use local radio object with custom SPI configuration
+  spi = new SPIClass(SPI);
+  spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+  radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
+#endif
+#endif
 
   radio.reset();
   LoRaWANNode node(&radio, &Region, subBand);
 
   // setup the radio based on the pinmap (connections) in config.h
   log_v("Initialise radio");
-  
+
   state = radio.begin();
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
-  
-  // Using local radio object
-  #if defined(ARDUINO_LILYGO_T3S3_LR1121)
+// Using local radio object
+#if defined(ARDUINO_LILYGO_T3S3_LR1121)
   radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
 
   // LR1121 TCXO Voltage 2.85~3.15V
   radio.setTCXO(3.0);
-  #endif
+#endif
 
-  #if defined(ESP32)
+#if defined(ESP32)
   // Optionally provide a custom sleep function - see config.h
   node.setSleepFunction(customDelay);
-  #endif
+#endif
 
   // activate node by restoring session or otherwise joining the network
   state = lwActivate(node);
@@ -728,19 +401,25 @@ void setup()
   // 1 = lowest (empty battery)
   // 254 = highest (full battery)
   // 255 = unable to measure
+  uint16_t voltage = sysCtx.batteryVoltage;
+  uint16_t limit_low = sysCtx.battery_discharge_lim;
+  uint16_t limit_high = sysCtx.battery_charge_lim;
   uint8_t battLevel;
+  
   if (voltage == 0)
   {
+    // Unable to measure battery voltage
     battLevel = 255;
   }
-  else if (voltage > battery_charge_lim)
+  else if (voltage > limit_high)
   {
+    // External power source
     battLevel = 0;
   }
   else
   {
     battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - battery_discharge_lim) / static_cast<float>(battery_charge_lim - battery_discharge_lim) * 255);
+        static_cast<float>(voltage - limit_low) / static_cast<float>(limit_high - limit_low) * 255);
     battLevel = (battLevel == 0) ? 1 : battLevel;
     battLevel = (battLevel == 255) ? 254 : battLevel;
   }
@@ -748,7 +427,7 @@ void setup()
   node.setDeviceStatus(battLevel);
 
   // Check if clock was never synchronized or sync interval has expired
-  if ((rtcLastClockSync == 0) || ((rtc.getLocalEpoch() - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60)))
+  if (sysCtx.rtcNeedsSync())
   {
     log_i("RTC sync required");
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
@@ -812,7 +491,7 @@ void setup()
     }
 
     // Set lwStatusUplink flag if required
-    if (prefs.lw_stat_interval && (fCntUp % prefs.lw_stat_interval == 0))
+    if (sysCtx.lw_stat_interval && (fCntUp % sysCtx.lw_stat_interval == 0))
     {
       lwStatusUplinkPending = true;
       log_i("LoRaWAN node status uplink pending");
@@ -823,14 +502,14 @@ void setup()
       log_d("Sending response uplink.");
       fPort = uplinkReq;
       encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
-      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
+      sysCtx.uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
     }
     else if (fsmStage == E_FSM_STAGE::E_LWSTATUS)
     {
       log_d("Sending LoRaWAN status uplink.");
       fPort = CMD_GET_LW_STATUS;
       encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
-      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
+      sysCtx.uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       lwStatusUplinkPending = false;
     }
     else if (fsmStage == E_FSM_STAGE::E_APPSTATUS)
@@ -838,7 +517,7 @@ void setup()
       log_d("Sending application status uplink.");
       fPort = CMD_GET_SENSORS_STAT;
       encodeCfgUplink(fPort, uplinkPayload, uplinkSize);
-      uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
+      sysCtx.uplinkDelay(node.timeUntilUplink(), uplinkIntervalSeconds);
       appStatusUplinkPending = false;
     }
 
@@ -905,15 +584,10 @@ void setup()
     {
       log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
       log_i("[LoRaWAN] DeviceTime second:\t1/%u", fracSecond);
-
-      // Update the system time with the time read from the network
-      rtc.setTime(networkTime);
-
-      // Save clock sync timestamp and clear flag
-      rtcLastClockSync = rtc.getLocalEpoch();
-      rtcTimeSource = E_TIME_SOURCE::E_LORA;
+      
+      sysCtx.setTime(networkTime, E_TIME_SOURCE::E_LORA);
       log_d("RTC sync completed");
-      printDateTime();
+      sysCtx.printDateTime();
     }
 
     uint8_t margin = 0;
@@ -947,7 +621,7 @@ void setup()
   memcpy(LWsession, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
 
   // wait until next uplink - observing legal & TTN Fair Use Policy constraints
-  gotoSleep(sleepDuration(battery_weak));
+  sysCtx.gotoSleep(sysCtx.sleepDuration());
 }
 
 // The ESP32 wakes from deep-sleep and starts from the very beginning.

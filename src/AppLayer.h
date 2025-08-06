@@ -59,7 +59,7 @@
 
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
-#include <ESP32Time.h>
+//#include <ESP32Time.h>
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "../BresserWeatherSensorLWCmd.h"
@@ -68,6 +68,7 @@
 #include "PayloadAnalog.h"
 #include "PayloadDigital.h"
 #include "PayloadBLE.h"
+#include "SystemContext.h"
 #include <LoraMessage.h>
 
 /// Default AppLayer payload configuration
@@ -114,8 +115,9 @@ class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
 #endif
 {
 private:
-    ESP32Time *_rtc;
-    time_t *_rtcLastClockSync;
+    //ESP32Time *_rtc;
+    //time_t *_rtcLastClockSync;
+    SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
     Preferences appPrefs;
@@ -133,7 +135,7 @@ public:
      * \param rtc Real time clock object
      * \param clocksync Timestamp of last clock synchronization
      */
-    AppLayer(ESP32Time *rtc, time_t *clocksync) : PayloadBresser(rtc, clocksync), PayloadAnalog(), PayloadDigital()
+    AppLayer(SystemContext* sysCtx) : PayloadBresser(sysCtx), PayloadAnalog(), PayloadDigital()
 #ifdef ONEWIRE_EN
                                                   ,
                                                   PayloadOneWire()
@@ -143,8 +145,9 @@ public:
                                                   PayloadBLE()
 #endif
     {
-        _rtc = rtc;
-        _rtcLastClockSync = clocksync;
+        //_rtc = rtc;
+        //_rtcLastClockSync = clocksync;
+        _sysCtx = sysCtx;
         for (int i = 0; i < APP_STATUS_SIZE; i++)
         {
             appStatus[i] = 0;

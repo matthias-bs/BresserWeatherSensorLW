@@ -50,9 +50,9 @@
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
 #include <RadioLib.h>
-#include <ESP32Time.h>
+//#include <ESP32Time.h>
 #include "src/AppLayer.h"
-
+#include "src/SystemContext.h"
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
 #include <PowerFeather.h>
 using namespace PowerFeather;
@@ -63,29 +63,21 @@ using namespace PowerFeather;
  */
 void debug(bool isFail, const char* message, int state, bool Freeze);
 
-
-/*
- * External variables (declared in BresserWeatherSensorLW.ino)
- */
-extern struct sPrefs
-{
-  uint16_t sleep_interval;      //!< preferences: sleep interval
-  uint16_t sleep_interval_long; //!< preferences: sleep interval long
-  uint8_t lw_stat_interval;     //!< preferences: LoRaWAN node status uplink interval
-} prefs;
-
 /// Preferences (stored in flash memory)
-extern Preferences preferences;
+//extern Preferences preferences;
 
 /// Real time clock
-extern ESP32Time rtc;
+//extern ESP32Time rtc;
 
 /// Application layer
 extern AppLayer appLayer;
 
-extern bool longSleep;
-extern time_t rtcLastClockSync;
-extern E_TIME_SOURCE rtcTimeSource;
+/// System context
+extern SystemContext sysCtx;
+
+// FIXME
+//extern bool longSleep;
+//extern E_TIME_SOURCE rtcTimeSource;
 
 
 // Decode downlink
@@ -100,9 +92,7 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
   if ((port == CMD_SET_DATETIME) && (size == 4))
   {
     time_t set_time = (payload[0] << 24) | (payload[1] << 16) | (payload[2] << 8) | payload[3];
-    rtc.setTime(set_time);
-    rtcLastClockSync = rtc.getLocalEpoch();
-    rtcTimeSource = E_TIME_SOURCE::E_SET;
+    sysCtx.setTime(set_time, E_TIME_SOURCE::E_SET);
 
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
     char tbuf[25];
@@ -117,31 +107,25 @@ uint8_t decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
 
   if ((port == CMD_SET_SLEEP_INTERVAL) && (size == 2))
   {
-    prefs.sleep_interval = (payload[0] << 8) | payload[1];
-    log_i("Set sleep_interval: %u s", prefs.sleep_interval);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int", prefs.sleep_interval);
-    preferences.end();
+    sysCtx.sleep_interval = (payload[0] << 8) | payload[1];
+    sysCtx.savePreferences();
+    log_i("Set sleep_interval: %u s", sysCtx.sleep_interval);
     return 0;
   }
 
   if ((port == CMD_SET_SLEEP_INTERVAL_LONG) && (size == 2))
   {
-    prefs.sleep_interval_long = (payload[0] << 8) | payload[1];
-    log_i("Set sleep_interval_long: %u s", prefs.sleep_interval_long);
-    preferences.begin("BWS-LW", false);
-    preferences.putUShort("sleep_int_long", prefs.sleep_interval_long);
-    preferences.end();
+    sysCtx.sleep_interval_long = (payload[0] << 8) | payload[1];
+    sysCtx.savePreferences();
+    log_i("Set sleep_interval_long: %u s", sysCtx.sleep_interval_long);
     return 0;
   }
 
   if ((port == CMD_SET_LW_STATUS_INTERVAL) && (size == 1))
   {
-    prefs.lw_stat_interval = payload[0];
-    log_i("Set lw_stat_interval: %u", prefs.lw_stat_interval);
-    preferences.begin("BWS-LW", false);
-    preferences.putUChar("lw_stat_int", prefs.lw_stat_interval);
-    preferences.end();
+    sysCtx.lw_stat_interval = payload[0];
+    sysCtx.savePreferences();
+    log_i("Set lw_stat_interval: %u", sysCtx.lw_stat_interval);
     return 0;
   }
 
@@ -177,26 +161,27 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
   if (uplinkReq == CMD_GET_DATETIME)
   {
     log_i("Date/Time");
-    time_t t_now = rtc.getLocalEpoch();
+    //time_t t_now = rtc.getLocalEpoch();
+    time_t t_now = time(nullptr);
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
     encoder.writeUint8((t_now >> 8) & 0xff);
     encoder.writeUint8(t_now & 0xff);
 
-    encoder.writeUint8(static_cast<uint8_t>(rtcTimeSource));
+    encoder.writeUint8(static_cast<uint8_t>(sysCtx.getRtcTimeSource()));
   }
   else if (uplinkReq == CMD_GET_LW_CONFIG)
   {
     log_i("LoRaWAN Config");
-    encoder.writeUint8(prefs.sleep_interval >> 8);
-    encoder.writeUint8(prefs.sleep_interval & 0xFF);
-    encoder.writeUint8(prefs.sleep_interval_long >> 8);
-    encoder.writeUint8(prefs.sleep_interval_long & 0xFF);
-    encoder.writeUint8(prefs.lw_stat_interval);
+    encoder.writeUint8(sysCtx.sleep_interval >> 8);
+    encoder.writeUint8(sysCtx.sleep_interval & 0xFF);
+    encoder.writeUint8(sysCtx.sleep_interval_long >> 8);
+    encoder.writeUint8(sysCtx.sleep_interval_long & 0xFF);
+    encoder.writeUint8(sysCtx.lw_stat_interval);
   }
   else if (uplinkReq == CMD_GET_LW_STATUS)
   {
-    uint8_t status = longSleep ? 1 : 0;
+    uint8_t status = sysCtx.longSleepActive() ? 1 : 0;
     log_i("Device Status: U_batt=%u mV, longSleep=%u", getBatteryVoltage(), status);
     encoder.writeUint16(getBatteryVoltage());
     encoder.writeUint8(status);
