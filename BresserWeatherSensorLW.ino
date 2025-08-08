@@ -113,6 +113,8 @@
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
 // 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
+// 20250806 Refactored by adding SystemContext class, 
+//          moved system code from BresserWeatherSensorLW.ino
 //
 // ToDo:
 // -
@@ -362,7 +364,7 @@ void setup()
 
 #if !defined(RADIO_CHIP)
 #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
-                     // Use local radio object with custom SPI configuration
+  // Use local radio object with custom SPI configuration
   spi = new SPIClass(SPI);
   spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
   radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
