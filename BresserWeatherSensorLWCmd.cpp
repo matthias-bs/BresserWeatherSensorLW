@@ -40,6 +40,8 @@
 // 20240829 Added missing implementation of CMD_SET_LW_STATUS_INTERVAL
 // 20240920 Changed sendCfgUplink() to encodeCfgUplink()
 // 20241227 Removed delay from encodeCfgUplink()
+// 20250806 Refactored by adding SystemContext class,
+//          replaced getLocalEpoch() (ESP32Time) with time() (POSIX)
 //
 // ToDo:
 // -
