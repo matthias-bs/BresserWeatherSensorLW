@@ -92,13 +92,31 @@ public:
      * - Load node configuration from JSON file
      * - Load preferences from flash memory
      * - Initialize RTC and time zone
-     * -
      *
      */
     void begin(void);
 
+    /**
+     * \brief Check if this is the first boot of the system after power-on/HW reset
+     * 
+     * \return true     First boot after power-on/HW reset
+     * \return false    Not the first boot
+     */
     bool isFirstBoot(void);
+
+    /**
+     * \brief Reset the failed join count
+     * 
+     * The failed join count is reset to 0 after a successful join.
+     */
     void resetFailedJoinCount(void);
+
+    /**
+     * \brief Sleep after a failed join attempt.
+     * 
+     * The sleep duration after a failed join is determined by the
+     * failed join count.
+     */
     void sleepAfterFailedJoin(void);
 
     /**
@@ -131,6 +149,8 @@ public:
 
     /**
      * \brief Get the voltages from ADC / Power Management Chip
+     * 
+     * The MCU voltage is evaluated to determine the state of the power supply.
      *
      * \param batteryVoltage    Battery voltage in mV
      * \param supplyVoltage     Supply voltage in mV
@@ -141,52 +161,63 @@ public:
         batteryVoltage = getBatteryVoltage();
         supplyVoltage = getSupplyVoltage();
 
-        // ToDo: mcuVoltage
-    };
-
-    // FIXME
-    void sleepIfSupplyLow(void)
-    {
-        uint16_t voltage = getBatteryVoltage();
-        if (voltage && voltage <= battery_low)
-        {
-            log_i("Battery low!");
-#if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
-            uint16_t supplyVoltage = getSupplyVoltage();
-            if (supplyVoltage < battery_low)
-            {
-                gotoSleep(sleepDuration());
-            }
-#else
-            gotoSleep(sleepDuration());
-#endif
+        if (batteryVoltage != 0) {
+            mcuVoltage = batteryVoltage; // Default: MCU voltage is the same as battery voltage
+        } else if (supplyVoltage != 0) {
+            mcuVoltage = supplyVoltage; // Supply voltage is available, use it as MCU voltage
+        } else {
+            mcuVoltage = 0; // No battery or supply voltage available, cannot determine MCU
         }
     };
 
     /**
-     * \brief
+     * \brief Sleep if battery voltage is low to prevent deep-discharging
+     * 
+     * Checks if the MCU voltage has reached the shut-off threshold and
+     * enters sleep mode for battery deep-discharge protection.
+     * 
+     */
+    void sleepIfSupplyLow(void)
+    {
+        if (mcuVoltage > 0 && mcuVoltage <= battery_low)
+        {
+            log_i("Battery low!");
+            gotoSleep(sleepDuration());
+        }
+    };
+
+    /**
+     * \brief Determine the sleep interval from the MCU voltage level
      *
+     * If the MCU voltage is available and below the battery_weak threshold,
+     * the long sleep interval is used to retain operation as long as possible.
+     *
+     * Otherwise, the normal sleep interval is used.
      */
     uint32_t sleepInterval(void)
     {
-        // uint32_t sleep_interval = prefs.sleep_interval;
-        // longSleep = false;
-
-        // ToDo
-        // If battery voltage is available and <= BATTERY_WEAK:
-        //   sleep_interval_long
-        // else
-        //   sleep_interval
-        if (batteryVoltage && batteryVoltage <= battery_weak)
+        if (mcuVoltage > 0 && mcuVoltage <= battery_weak)
         {
+            return sleep_interval_long;
         }
-        return 0;
+        else
+        {
+            return sleep_interval;
+        }
     };
 
-    // FIXME
+    /**
+     * \brief Check if long sleep is active
+     * 
+     * Check if the sleep interval is set to the long sleep interval.
+     * This flag is sent in a LoRaWAN uplink message.
+     * 
+     * \return true if long sleep is active
+     * \return false if long sleep is not active
+     */
     bool longSleepActive(void)
     {
-        return (sleep_interval == sleep_interval_long);
+        return (sleepInterval() == sleep_interval_long);
     };
 
 #if defined(EXT_RTC)
