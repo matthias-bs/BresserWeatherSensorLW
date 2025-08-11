@@ -837,10 +837,9 @@ The following constructor must be implemented by the AppLayer class:
 /*!
  * \brief Constructor
  *
- * \param rtc Real time clock object
- * \param clocksync Timestamp of last clock synchronization
+ * \param sysCtx System Context object
  */
-AppLayer(ESP32Time *rtc, time_t *clocksync);
+AppLayer(SystemContext* sysCtx);
 ```
 #### begin()
 
@@ -954,7 +953,6 @@ Based on
 * [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) by Matthias Prinke
 * [RadioLib](https://github.com/jgromes/RadioLib) by Jan Gromeš
 * [Lora-Serialization](https://github.com/thesolarnomad/lora-serialization) by Joscha Feth
-* [ESP32Time](https://github.com/fbiego/ESP32Time) by Felix Biego
 * [OneWireNg](https://github.com/pstolarz/OneWireNg) by Piotr Stolarz
 * [DallasTemperature / Arduino-Temperature-Control-Library](https://github.com/milesburton/Arduino-Temperature-Control-Library) by Miles Burton
 * [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) by h2zero
