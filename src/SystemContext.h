@@ -37,6 +37,7 @@
 // History:
 //
 // 20250806 Created from BresserWeatherSensorLW.ino
+// 20250811 Replaced ESP32Time by POSIX functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +45,6 @@
 
 #include <Arduino.h>
 #include <time.h>
-#include <ESP32Time.h>
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "LoadNodeCfg.h"
@@ -120,7 +120,9 @@ public:
     void sleepAfterFailedJoin(void);
 
     /**
-     * \brief Set the Time object
+     * \brief Set RTC to epoch
+     * 
+     * Set RTC to epoch and store source and RTC sync timestamp
      *
      * \param epoch     time in seconds since epoch
      * \param source    time source

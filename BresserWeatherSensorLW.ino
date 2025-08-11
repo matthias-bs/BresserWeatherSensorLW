@@ -18,7 +18,6 @@
 // rtl_433 (https://github.com/merbanan/rtl_433)
 // BresserWeatherSensorTTN by Matthias Prinke (https://github.com/matthias-bs/BresserWeatherSensorTTN)
 // Lora-Serialization by Joscha Feth (https://github.com/thesolarnomad/lora-serialization)
-// ESP32Time by Felix Biego (https://github.com/fbiego/ESP32Time)
 // OneWireNg by Piotr Stolarz (https://github.com/pstolarz/OneWireNg)
 // DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library)
 //
@@ -27,7 +26,6 @@
 // (install via normal Arduino Library installer:)
 // RadioLib                             7.2.1
 // LoRa_Serialization                   3.3.1
-// ESP32Time                            2.0.6
 // BresserWeatherSensorReceiver         0.33.0
 // OneWireNg                            0.14.0 (optional)
 // DallasTemperature                    4.0.3 (optional)

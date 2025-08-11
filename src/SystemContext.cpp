@@ -37,13 +37,13 @@
 // History:
 //
 // 20250806 Created from BresserWeatherSensorLW.ino
+// 20250811 Replaced ESP32Time by POSIX functions
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "SystemContext.h"
 #include <Arduino.h>
 #include <time.h>
-#include <ESP32Time.h>
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "LoadNodeCfg.h"
@@ -72,9 +72,6 @@ using namespace PowerFeather;
 
 /// Preferences (stored in flash memory)
 Preferences preferences;
-
-/// Real time clock class
-ESP32Time rtc;
 
 #if defined(EXT_RTC)
 // Create an instance of the external RTC class
@@ -178,15 +175,15 @@ void SystemContext::sleepAfterFailedJoin(void)
   gotoSleep(sleepForSeconds);
 }
 
-/**
- * \brief Set the Time object
- *
- * \param epoch     time in seconds since epoch
- * \param source    time source
- */
+// Set RTC from epoch and store source & sync timestamp
 void SystemContext::setTime(time_t epoch, E_TIME_SOURCE source)
 {
-  rtc.setTime(epoch);
+  timeval epoch_tv = {epoch, 0};
+  const timeval *tv = &epoch_tv;
+  timezone utc = {0, 0};
+  const timezone *tz = &utc;
+  settimeofday(tv, tz);
+
   rtcTimeSource = source;
   rtcLastClockSync = epoch;
 }
@@ -241,7 +238,7 @@ void SystemContext::getTimeFromExtRTC(void)
   else
   {
     syncRTCWithExtRTC();
-    rtcLastClockSync = rtc.getLocalEpoch();
+    rtcLastClockSync = time(nullptr);
     rtcTimeSource = E_TIME_SOURCE::E_RTC;
     log_i("Set time and date from external RTC");
   }
@@ -270,7 +267,7 @@ bool SystemContext::rtcNeedsSync(void)
   // Check if the RTC is synchronized to a time source
   // and if the last clock sync is older than CLOCK_SYNC_INTERVAL
   return (rtcTimeSource != E_TIME_SOURCE::E_UNSYNCHED) ||
-         ((rtc.getLocalEpoch() - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60));
+         ((time(nullptr) - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60));
 }
 
 #if defined(ESP32)
@@ -297,7 +294,7 @@ void SystemContext::gotoSleepESP32(uint32_t seconds)
 void SystemContext::gotoSleepRP2040(uint32_t seconds)
 {
   log_i("Sleeping for %lu s", seconds);
-  time_t t_now = rtc.getLocalEpoch();
+  time_t t_now = time(nullptr);
   datetime_t dt;
   epoch_to_datetime(&t_now, &dt);
   rtc_set_datetime(&dt);
@@ -339,8 +336,12 @@ void SystemContext::restoreRP2040(void)
   // Set HW clock (only used in sleep mode)
   rtc_set_datetime(&dt);
 
-  // Set SW clock
-  rtc.setTime(time_saved);
+  // Restore SW clock after reset
+  timeval epoch = {time_saved, 0};
+  const timeval *tv = &epoch;
+  timezone utc = {0, 0};
+  const timezone *tz = &utc;
+  settimeofday(tv, tz);
 
   longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
   rtcLastClockSync = watchdog_hw->scratch[2];
