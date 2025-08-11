@@ -132,8 +132,7 @@ public:
     /*!
      * \brief Constructor
      *
-     * \param rtc Real time clock object
-     * \param clocksync Timestamp of last clock synchronization
+     * \param sysCtx System Context object
      */
     AppLayer(SystemContext* sysCtx) : PayloadBresser(sysCtx), PayloadAnalog(), PayloadDigital()
 #ifdef ONEWIRE_EN
