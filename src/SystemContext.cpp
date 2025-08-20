@@ -38,6 +38,7 @@
 //
 // 20250806 Created from BresserWeatherSensorLW.ino
 // 20250811 Replaced ESP32Time by POSIX functions
+// 20250820 Fixed rtcNeedsSync()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -264,9 +265,9 @@ E_TIME_SOURCE SystemContext::getRtcTimeSource(void)
 // Check if the RTC needs to be synchronized to a time source
 bool SystemContext::rtcNeedsSync(void)
 {
-  // Check if the RTC is synchronized to a time source
-  // and if the last clock sync is older than CLOCK_SYNC_INTERVAL
-  return (rtcTimeSource != E_TIME_SOURCE::E_UNSYNCHED) ||
+  // Check if the RTC is not synchronized to a time source
+  // or the last clock sync is older than CLOCK_SYNC_INTERVAL
+  return (rtcTimeSource == E_TIME_SOURCE::E_UNSYNCHED) ||
          ((time(nullptr) - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60));
 }
 
@@ -289,7 +290,6 @@ void SystemContext::gotoSleepESP32(uint32_t seconds)
 #endif // defined(ESP32)
 
 #if defined(ARDUINO_ARCH_RP2040)
-
 // Enter sleep mode (RP2040 variant)
 void SystemContext::gotoSleepRP2040(uint32_t seconds)
 {
