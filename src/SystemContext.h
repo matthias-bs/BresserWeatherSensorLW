@@ -38,6 +38,7 @@
 //
 // 20250806 Created from BresserWeatherSensorLW.ino
 // 20250811 Replaced ESP32Time by POSIX functions
+// 20250820 Added getBattlevel()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -98,7 +99,7 @@ public:
 
     /**
      * \brief Check if this is the first boot of the system after power-on/HW reset
-     * 
+     *
      * \return true     First boot after power-on/HW reset
      * \return false    Not the first boot
      */
@@ -106,14 +107,14 @@ public:
 
     /**
      * \brief Reset the failed join count
-     * 
+     *
      * The failed join count is reset to 0 after a successful join.
      */
     void resetFailedJoinCount(void);
 
     /**
      * \brief Sleep after a failed join attempt.
-     * 
+     *
      * The sleep duration after a failed join is determined by the
      * failed join count.
      */
@@ -121,7 +122,7 @@ public:
 
     /**
      * \brief Set RTC to epoch
-     * 
+     *
      * Set RTC to epoch and store source and RTC sync timestamp
      *
      * \param epoch     time in seconds since epoch
@@ -137,7 +138,6 @@ public:
         struct tm timeinfo;
         char tbuf[25];
 
-        // time_t tnow = rtc.getLocalEpoch();
         time_t tnow = time(nullptr);
         localtime_r(&tnow, &timeinfo);
         strftime(tbuf, 25, "%Y-%m-%d %H:%M:%S", &timeinfo);
@@ -151,33 +151,34 @@ public:
 
     /**
      * \brief Get the voltages from ADC / Power Management Chip
-     * 
-     * The MCU voltage is evaluated to determine the state of the power supply.
      *
-     * \param batteryVoltage    Battery voltage in mV
-     * \param supplyVoltage     Supply voltage in mV
-     * \param mcuVoltage        actual MCU supply voltage in mV (depending on the circuit)
+     * The MCU voltage is evaluated to determine the state of the power supply.
      */
-    void getVoltages(uint16_t &batteryVoltage, uint16_t &supplyVoltage, uint16_t &mcuVoltage)
+    void getVoltages(void)
     {
         batteryVoltage = getBatteryVoltage();
         supplyVoltage = getSupplyVoltage();
 
-        if (batteryVoltage != 0) {
+        if (batteryVoltage != 0)
+        {
             mcuVoltage = batteryVoltage; // Default: MCU voltage is the same as battery voltage
-        } else if (supplyVoltage != 0) {
+        }
+        else if (supplyVoltage != 0)
+        {
             mcuVoltage = supplyVoltage; // Supply voltage is available, use it as MCU voltage
-        } else {
+        }
+        else
+        {
             mcuVoltage = 0; // No battery or supply voltage available, cannot determine MCU
         }
     };
 
     /**
      * \brief Sleep if battery voltage is low to prevent deep-discharging
-     * 
+     *
      * Checks if the MCU voltage has reached the shut-off threshold and
      * enters sleep mode for battery deep-discharge protection.
-     * 
+     *
      */
     void sleepIfSupplyLow(void)
     {
@@ -186,6 +187,44 @@ public:
             log_i("Battery low!");
             gotoSleep(sleepDuration());
         }
+    };
+
+    /**
+     * \brief Get the battery fill level
+     * 
+     * Get the battery fill level for LoRaWAN device status uplink.
+     * The LoRaWAN network server may periodically request this information.
+     * 
+     * 0 = external power source
+     * 1 = lowest (empty battery)
+     * 254 = highest (full battery)
+     * 255 = unable to measure
+     */
+    uint8_t getBattlevel(void)
+    {
+        uint16_t voltage = batteryVoltage;
+        uint16_t limit_low = battery_discharge_lim;
+        uint16_t limit_high = battery_charge_lim;
+        uint8_t battLevel;
+
+        if (voltage == 0)
+        {
+            // Unable to measure battery voltage
+            battLevel = 255;
+        }
+        else if (voltage > limit_high)
+        {
+            // External power source
+            battLevel = 0;
+        }
+        else
+        {
+            battLevel = static_cast<uint8_t>(
+                static_cast<float>(voltage - limit_low) / static_cast<float>(limit_high - limit_low) * 255);
+            battLevel = (battLevel == 0) ? 1 : battLevel;
+            battLevel = (battLevel == 255) ? 254 : battLevel;
+        }
+        return battLevel;
     };
 
     /**
@@ -210,10 +249,10 @@ public:
 
     /**
      * \brief Check if long sleep is active
-     * 
+     *
      * Check if the sleep interval is set to the long sleep interval.
      * This flag is sent in a LoRaWAN uplink message.
-     * 
+     *
      * \return true if long sleep is active
      * \return false if long sleep is not active
      */
@@ -276,7 +315,6 @@ public:
         if (isRtcSynched())
         {
             struct tm timeinfo;
-            // time_t t_now = rtc.getLocalEpoch();
             time_t t_now = time(nullptr);
             localtime_r(&t_now, &timeinfo);
 
@@ -286,58 +324,6 @@ public:
         sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
         return sleep_interval;
     };
-
-    //     /*!
-    //      * \brief Compute sleep duration
-    //      *
-    //      * Minimum duration: SLEEP_INTERVAL_MIN
-    //      * If battery voltage is available and <= BATTERY_WEAK:
-    //      *   sleep_interval_long
-    //      * else
-    //      *   sleep_interval
-    //      *
-    //      * Additionally, the sleep interval is reduced from the
-    //      * default value to achieve a wake-up time alinged to
-    //      * an integer multiple of the interval after a full hour.
-    //      *
-    //      * \returns sleep duration in seconds
-    //      */
-    //     uint32_t sleepDuration(uint16_t battery_weak)
-    //     {
-    //         uint32_t sleep_interval = prefs.sleep_interval;
-    //         longSleep = false;
-
-    //         uint16_t voltage = getBatteryVoltage();
-    //         // Long sleep interval if battery is weak
-    //         if (voltage && voltage <= battery_weak)
-    //         {
-    // #if defined(ARDUINO_ESP32S3_POWERFEATHER) || defined(PIN_SUPPLY_IN)
-    //             uint16_t supplyVoltage = getSupplyVoltage();
-    //             if (supplyVoltage < battery_weak)
-    //             {
-    //                 sleep_interval = prefs.sleep_interval_long;
-    //                 longSleep = true;
-    //             }
-    // #else
-    //             sleep_interval = prefs.sleep_interval_long;
-    //             longSleep = true;
-    // #endif
-    //         }
-
-    //         // If the real time is available, align the wake-up time to the
-    //         // to next non-fractional multiple of sleep_interval past the hour
-    //         if (rtcLastClockSync)
-    //         {
-    //             struct tm timeinfo;
-    //             time_t t_now = rtc.getLocalEpoch();
-    //             localtime_r(&t_now, &timeinfo);
-
-    //             sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
-    //         }
-
-    //         sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
-    //         return sleep_interval;
-    //     };
 
     /**
      * \brief LoRaWAN uplink delay
