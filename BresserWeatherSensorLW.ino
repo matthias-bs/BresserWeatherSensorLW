@@ -41,7 +41,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,6 +113,8 @@
 // 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
 // 20250806 Refactored by adding SystemContext class, 
 //          moved system code from BresserWeatherSensorLW.ino
+// 20250820 Added initial sysCtx.getVoltages() call
+//          Moved battery level calculation to SystemContext
 //
 // ToDo:
 // -
@@ -345,6 +347,7 @@ void setup()
 #endif
   loadSecrets(requireNwkKey, joinEUI, devEUI, nwkKey, appKey);
 
+  sysCtx.getVoltages();
   sysCtx.sleepIfSupplyLow();
 
   // Initialize Application Layer - starts sensor reception
@@ -395,34 +398,7 @@ void setup()
   state = lwActivate(node);
   // state is one of RADIOLIB_LORAWAN_NEW_SESSION or RADIOLIB_LORAWAN_SESSION_RESTORED
 
-  // Set battery fill level -
-  // the LoRaWAN network server may periodically request this information
-  // 0 = external power source
-  // 1 = lowest (empty battery)
-  // 254 = highest (full battery)
-  // 255 = unable to measure
-  uint16_t voltage = sysCtx.batteryVoltage;
-  uint16_t limit_low = sysCtx.battery_discharge_lim;
-  uint16_t limit_high = sysCtx.battery_charge_lim;
-  uint8_t battLevel;
-  
-  if (voltage == 0)
-  {
-    // Unable to measure battery voltage
-    battLevel = 255;
-  }
-  else if (voltage > limit_high)
-  {
-    // External power source
-    battLevel = 0;
-  }
-  else
-  {
-    battLevel = static_cast<uint8_t>(
-        static_cast<float>(voltage - limit_low) / static_cast<float>(limit_high - limit_low) * 255);
-    battLevel = (battLevel == 0) ? 1 : battLevel;
-    battLevel = (battLevel == 255) ? 254 : battLevel;
-  }
+  uint8_t battLevel = sysCtx.getBattlevel();
   log_d("Battery level: %u", battLevel);
   node.setDeviceStatus(battLevel);
 
@@ -624,7 +600,7 @@ void setup()
   sysCtx.gotoSleep(sysCtx.sleepDuration());
 }
 
-// The ESP32 wakes from deep-sleep and starts from the very beginning.
+// The MCU wakes from deep-sleep and starts from the very beginning.
 // It then goes back to sleep, so loop() is never called and which is
 // why it is empty.
 
