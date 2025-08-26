@@ -39,6 +39,8 @@
 // 20250806 Created from BresserWeatherSensorLW.ino
 // 20250811 Replaced ESP32Time by POSIX functions
 // 20250820 Fixed rtcNeedsSync()
+// 20250826 Removed persistent variable LongSleep
+//          RP2040: changed persistent storage of rtcLastClockSync to 64 bits
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -68,9 +70,6 @@ using namespace PowerFeather;
 #include <RTClib.h>
 #endif
 
-// Time zone info
-// const char *TZ_INFO = TZINFO_STR;
-
 /// Preferences (stored in flash memory)
 Preferences preferences;
 
@@ -82,7 +81,6 @@ EXT_RTC ext_rtc;
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
 // Stored in RTC RAM
-RTC_DATA_ATTR bool longSleep;              //!< last sleep interval; 0 - normal / 1 - long
 RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchonization to network time
 
 // utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
@@ -93,7 +91,6 @@ RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
-bool longSleep;          //!< last sleep interval; 0 - normal / 1 - long
 time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network time
 
 // utilities & vars to support deep-sleep
@@ -303,16 +300,9 @@ void SystemContext::gotoSleepRP2040(uint32_t seconds)
 
   // Save variables to be retained after reset
   watchdog_hw->scratch[3] = (bootCountSinceUnsuccessfulJoin << 16) | bootCount;
-  watchdog_hw->scratch[2] = rtcLastClockSync;
+  watchdog_hw->scratch[2] = rtcLastClockSync & 0xFFFFFFFF;
+  watchdog_hw->scratch[1] = rtcLastClockSync >> 32;
 
-  if (longSleep)
-  {
-    watchdog_hw->scratch[1] |= 2;
-  }
-  else
-  {
-    watchdog_hw->scratch[1] &= ~2;
-  }
   // Save the current time, because RTC will be reset (SIC!)
   rtc_get_datetime(&dt);
   time_t now = datetime_to_epoch(&dt, NULL);
@@ -343,8 +333,7 @@ void SystemContext::restoreRP2040(void)
   const timezone *tz = &utc;
   settimeofday(tv, tz);
 
-  longSleep = ((watchdog_hw->scratch[1] & 2) == 2);
-  rtcLastClockSync = watchdog_hw->scratch[2];
+  rtcLastClockSync = watchdog_hw->scratch[1] << 32 | watchdog_hw->scratch[2];
   bootCount = watchdog_hw->scratch[3] & 0xFFFF;
   if (bootCount == 0)
   {
