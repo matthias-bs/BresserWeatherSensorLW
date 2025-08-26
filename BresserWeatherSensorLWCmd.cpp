@@ -52,7 +52,6 @@
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
 #include <RadioLib.h>
-//#include <ESP32Time.h>
 #include "src/AppLayer.h"
 #include "src/SystemContext.h"
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -65,21 +64,11 @@ using namespace PowerFeather;
  */
 void debug(bool isFail, const char* message, int state, bool Freeze);
 
-/// Preferences (stored in flash memory)
-//extern Preferences preferences;
-
-/// Real time clock
-//extern ESP32Time rtc;
-
 /// Application layer
 extern AppLayer appLayer;
 
 /// System context
 extern SystemContext sysCtx;
-
-// FIXME
-//extern bool longSleep;
-//extern E_TIME_SOURCE rtcTimeSource;
 
 
 // Decode downlink
