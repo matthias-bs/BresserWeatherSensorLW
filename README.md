@@ -971,7 +971,85 @@ uint8_t getAppStatusUplinkInterval(void);
 
 ### Class Diagram
 
-![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg)
+```mermaid
+classDiagram
+    class BresserWeatherSensorLW {
+        /* BresserWeatherSensorLW.ino */
+        +LORA_CHIP radio
+        +LoRaWANNode node
+        -Preferences store // LoRaWAN preferences
+        -Preferences preferences // Device preferences
+        -LoraEncoder encoder
+        -AppLayer appLayer
+        -setup()
+        -loop()
+        -loadSecrets()
+        -decodeDownlink()
+        -sendCfgUplink()
+    }
+    BresserWeatherSensorLW <-- AppLayer
+    class AppLayer {
+        -Preferences appPrefs
+        -appPayloadCfg[]
+        -appStatus[]
+        +begin()
+        +decodeDownlink()
+        +genPayload()
+        +getPayloadStage1()
+        +getPayloadStage2()
+        +getConfigPayload()
+        +getAppStatusUplinkInterval()
+        +setAppPayloadCfg()
+        +getAppPayloadCfg()
+    }
+    AppLayer <|-- PayloadBresser
+    AppLayer <|-- PayloadOneWire
+    AppLayer <|-- PayloadAnalog
+    AppLayer <|-- PayloadDigital
+    AppLayer <|-- PayloadBLE
+
+    class PayloadBresser{
+        +WeatherSensor weatherSensor
+        +RainGauge rainGauge
+        -Lightning lightningProc
+        -Preferences appPrefs
+        +begin()
+        +encodeBresser()
+        -encodeWeatherSensor()
+        -encodeThermoHygroSensor()
+        -encodePoolThermometer()
+        -encodeSoilSensorint()
+        -encodeLeakageSensor()
+        -encodeAirPmSensor()
+        -encodeLightningSensor()
+        -encodeCo2Sensor()
+        -encodeHchoVocSensor()
+        -isSpaceLeft()
+    }
+    class PayloadOneWire{
+        +getOneWireTemperature()
+        +encodeOneWire()
+    }
+    class PayloadAnalog{
+        +begin()
+        +encodeAnalog()
+    }
+    class PayloadDigital {
+        +begin()
+        +encodeDigital()
+    }
+    class PayloadBLE {
+        -Preferences appPrefs
+        -BleSensors bleSensors
+        +begin()
+        +setBleAddr()
+        +getBLEAddr()
+        +bleAddrInit()
+        +encodeBLE()
+    }
+```
+<!-- ![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg) -->
+
 
 ## Doxygen Generated Source Code Documentation
 
