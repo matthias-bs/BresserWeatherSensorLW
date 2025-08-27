@@ -120,8 +120,9 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
-// If battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
-// Go to sleep mode immediately after start if battery voltage <= BATTERY_LOW [mV]
+// MCU voltage <= VOLTAGE_ECO_ENTER [mV] -> MCU will sleep for SLEEP_INTERVAL_LONG (eco mode)
+// MCU voltage > VOLTAGE_ECO_EXIT [mV]   -> MCU will sleep for SLEEP_INTERVAL (normal mode)
+// MCU voltage <= BATTERY_CRITICAL [mV]  -> MCU enters sleep mode immediately (battery protection)
 #define VOLTAGE_ECO_EXIT 3580
 #define VOLTAGE_ECO_ENTER 3500
 #define VOLTAGE_CRITICAL 3200
