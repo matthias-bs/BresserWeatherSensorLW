@@ -39,6 +39,7 @@
 // 20250806 Created from BresserWeatherSensorLW.ino
 // 20250811 Replaced ESP32Time by POSIX functions
 // 20250820 Added getBattlevel()
+// 20250827 Added hysteresis for sleep interval switching
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -71,8 +72,9 @@ using namespace PowerFeather;
 class SystemContext
 {
 public:
-    uint16_t battery_weak = BATTERY_WEAK;
-    uint16_t battery_low = BATTERY_LOW;
+    uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
+    uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
+    uint16_t voltage_critical = VOLTAGE_CRITICAL;
     uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
     uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
     uint16_t batteryVoltage = 0;  // Battery voltage in mV
@@ -182,7 +184,7 @@ public:
      */
     void sleepIfSupplyLow(void)
     {
-        if (mcuVoltage > 0 && mcuVoltage <= battery_low)
+        if (mcuVoltage > 0 && mcuVoltage <= voltage_critical)
         {
             log_i("Battery low!");
             gotoSleep(sleepDuration());
@@ -228,24 +230,17 @@ public:
     };
 
     /**
-     * \brief Determine the sleep interval from the MCU voltage level
+     * \brief Switch between normal and long sleep interval
      *
-     * If the MCU voltage is available and below the battery_weak threshold,
-     * the long sleep interval is used to retain operation as long as possible.
+     * Switch between normal and long sleep interval depending on the
+     * MCU voltage. The long sleep interval is used to save energy (eco mode).
+     * A hysteresis is implemented by using two voltage thresholds -
+     * voltage_eco_exit and voltage_eco_enter.
      *
-     * Otherwise, the normal sleep interval is used.
+     * The normal sleep interval is used as default, e.g. if the MCU voltage
+     * is not available.
      */
-    uint32_t sleepInterval(void)
-    {
-        if (mcuVoltage > 0 && mcuVoltage <= battery_weak)
-        {
-            return sleep_interval_long;
-        }
-        else
-        {
-            return sleep_interval;
-        }
-    };
+    uint32_t sleepInterval(void);
 
     /**
      * \brief Check if long sleep is active

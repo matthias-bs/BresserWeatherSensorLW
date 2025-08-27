@@ -39,8 +39,9 @@
 // 20250806 Created from BresserWeatherSensorLW.ino
 // 20250811 Replaced ESP32Time by POSIX functions
 // 20250820 Fixed rtcNeedsSync()
-// 20250826 Removed persistent variable LongSleep
+// 20250826 Removed persistent variable longSleep
 //          RP2040: changed persistent storage of rtcLastClockSync to 64 bits
+// 20250827 Added hysteresis for sleep interval switching
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -88,6 +89,7 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchoniza
 RTC_DATA_ATTR uint16_t bootCount = 1;
 RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
 RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
+RTC_DATA_ATTR bool longSleepModeActive = false;
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
@@ -100,6 +102,8 @@ uint16_t bootCountSinceUnsuccessfulJoin;
 
 /// RTC time source
 E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
+
+bool longSleepModeActive __attribute__((section(".uninitialized_data")));
 #endif
 
 void SystemContext::begin(void)
@@ -112,8 +116,9 @@ void SystemContext::begin(void)
   // Load the node configuration from JSON file
   loadNodeCfg(
       timeZoneInfo,
-      battery_weak,
-      battery_low,
+      voltage_eco_exit,
+      voltage_eco_enter,
+      voltage_critical,
       battery_discharge_lim,
       battery_charge_lim,
       PowerFeatherCfg);
@@ -134,6 +139,7 @@ void SystemContext::begin(void)
   if (bootCount == 1)
   {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
+    longSleepModeActive = false;
   }
   bootCount++;
 
@@ -196,6 +202,24 @@ void SystemContext::savePreferences(void)
   preferences.putUShort("sleep_int_long", sleep_interval_long);
   preferences.putUChar("lw_stat_int", lw_stat_interval);
   preferences.end();
+}
+
+// Switch between normal and long sleep interval depending on the MCU voltage
+uint32_t SystemContext::sleepInterval(void)
+{
+  if (mcuVoltage > 0)
+  {
+    if (!longSleepModeActive && mcuVoltage <= voltage_eco_enter)
+    {
+      longSleepModeActive = true;
+    }
+    else if (longSleepModeActive && mcuVoltage > voltage_eco_exit)
+    {
+      longSleepModeActive = false;
+    }
+  }
+
+  return longSleepModeActive ? sleep_interval_long : sleep_interval;
 }
 
 #if defined(EXT_RTC)
