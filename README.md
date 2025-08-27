@@ -257,7 +257,7 @@ While the battery voltage measurement is not crutial for operation, it is still 
 
 The battery voltage is used for:
 * Providing battery status to the LoRaWAN network server on request
-* Battery deep-discharge protection and energy saving mode
+* Battery deep-discharge protection and energy saving (eco) mode
 * Monitoring battery status via uplink (e.g. for optimization of transmission interval)
 
 > [!CAUTION]
@@ -340,7 +340,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `KNOWN_BLE_ADDRESSES`  | BLE Sensor MAC Addresses                                   |    X   |     X    |      |
 | `SLEEP_INTERVAL`<br>`SLEEP_INTERVAL_LONG`<br>`LW_STATUS_INTERVAL`<br>`APP_STATUS_INTERVAL`<br>`WEATHERSENSOR_TIMEOUT` | Timing parameters                                                                            |    X   |     X    |      |
 | `en_decoders`          | Enabled sensor decoders<br>(disabling unused decoders saves CPU cycles / energy)        |        |     X    |      |
-| `BATTERY_WEAK`<br>`BATTERY_LOW`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
+| `VOLTAGE_CRITICAL`<br>`VOLTAGE_ECO_EXIT`<br>`VOLTAGE_ECO_ENTER`<br>`BATTERY_DISCHARGE_LIM`<br>`BATTERY_CHARGE_LIM` | Battery voltage levels in mV                                                                                    |    X   |          |   X  |
 | see header file        | ADC's input pins, dividers and oversampling                |    X   |          |      |
 | **PowerFeather specific Configuration**                                                                        |
 | `BATTERY_CAPACITY_MAH` /<br>`powerfeather/battery_capacity` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
@@ -742,8 +742,9 @@ The following parameters are available:
 | Parameter             | Description | Default Value |
 | --------------------- | ----------------------------------------------------------------------- | -------------:|
 | timezone              | Time Zone<br>see [Time Zone Abbreviations](https://remotemonitoringsystems.ca/time-zone-abbreviations.php) | `"CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"` |
-| battery_weak          | Voltage threshold in mV for power saving mode<br>(long sleep interval)  | `3500` |
-| battery_low           | Voltage threshold in mV for deep-discharge protection<br>(power off)    | `3200` |
+| voltage_eco_exit      | Voltage threshold in mV for leaving eco mode<br>(long sleep interval)  | `3580` |
+| voltage_eco_enter     | Voltage threshold in mV for entering eco mode<br>(long sleep interval)  | `3500` |
+| voltage_critical      | Voltage threshold in mV for deep-discharge protection<br>(power off)    | `3200` |
 | battery_discharge_lim | Discharging voltage limit in mV<br>for battery level estimation         | `3200` |
 | battery_charge_lim    | Charging voltage limit in mV<br>for battery level estimation            | `4200` |
 | powerfeather/         | PowerFeather specific (see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)) |   |
