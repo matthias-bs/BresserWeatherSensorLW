@@ -70,13 +70,9 @@
 //          (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250802 Added BATTERY_RECOVERED
-//
-// Note:
-// Depending on board package file date, some defines are written either
-// in mixed-case or upper-case letters, for example,
-// ARDUINO_M5STACK_Core2 or ARDUINO_M5STACK_CORE2 -
-// see https://github.com/espressif/arduino-esp32/issues/9423!
-// Consequently both variants have to be checked!!!
+// 20250827 Changed BATTERY_LOW to VOLTAGE_CRITICAL
+//          Changed BATTERY_WEAK to VOLTAGE_ECO_ENTER/EXIT
+//          Removed BATTERY_RECOVERED
 //
 // ToDo:
 // -
@@ -126,16 +122,13 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // If battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
 // Go to sleep mode immediately after start if battery voltage <= BATTERY_LOW [mV]
-#define BATTERY_WEAK 3500
-#define BATTERY_LOW 3200
+#define VOLTAGE_ECO_EXIT 3580
+#define VOLTAGE_ECO_ENTER 3500
+#define VOLTAGE_CRITICAL 3200
 
 // Battery voltage limits in mV (usable range for the device) for battery state calculation
 #define BATTERY_DISCHARGE_LIM 3200
 #define BATTERY_CHARGE_LIM 4200
-
-// Battery voltage limit for switching rain gauge/lightning sensor from long to normal interval
-// Related to BATTERY_WEAK, adds a hysteresis to prevent frequent switching
-#define BATTERY_RECOVERED 3580
 
 // Minimum sleep interval (in seconds)
 #define SLEEP_INTERVAL_MIN 60
