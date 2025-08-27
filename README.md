@@ -971,6 +971,8 @@ uint8_t getAppStatusUplinkInterval(void);
 
 ### Class Diagram
 
+⚠️ **Needs updating!**
+
 ```mermaid
 classDiagram
     class BresserWeatherSensorLW {
