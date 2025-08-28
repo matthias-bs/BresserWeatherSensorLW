@@ -1,0 +1,5 @@
+<map id="PayloadBresser::encodeBresser" name="PayloadBresser::encodeBresser">
+<area shape="rect" id="Node000001" title="Encode Bresser sensor data for LoRaWAN transmission." alt="" coords="5,5,232,31"/>
+<area shape="rect" id="Node000002" href="$class_system_context.html#a525c50b9ae13e4a7d7922ee291599d80" title="Check if the RTC is synchronized to a time source." alt="" coords="280,5,497,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="232,15,266,15,266,21,232,21"/>
+</map>

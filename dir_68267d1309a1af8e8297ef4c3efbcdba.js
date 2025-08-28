@@ -11,5 +11,6 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "PayloadBLE.h", "_payload_b_l_e_8h_source.html", null ],
     [ "PayloadBresser.h", "_payload_bresser_8h_source.html", null ],
     [ "PayloadDigital.h", "_payload_digital_8h_source.html", null ],
-    [ "PayloadOneWire.h", "_payload_one_wire_8h_source.html", null ]
+    [ "PayloadOneWire.h", "_payload_one_wire_8h_source.html", null ],
+    [ "SystemContext.h", "_system_context_8h_source.html", null ]
 ];

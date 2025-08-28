@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['resetdata_0',['resetData',['../class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6',1,'BleSensors']]]
+  ['longsleepactive_0',['longSleepActive',['../class_system_context.html#a9246014e5a279bb03b2ad3b9752ba9f4',1,'SystemContext']]]
 ];

@@ -1,0 +1,7 @@
+<map id="SystemContext::sleepDuration" name="SystemContext::sleepDuration">
+<area shape="rect" id="Node000001" title="Compute sleep duration in seconds." alt="" coords="5,31,227,56"/>
+<area shape="rect" id="Node000002" href="$class_system_context.html#a525c50b9ae13e4a7d7922ee291599d80" title="Check if the RTC is synchronized to a time source." alt="" coords="275,5,492,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,30,261,27,262,32,227,36"/>
+<area shape="rect" id="Node000003" href="$class_system_context.html#adab68d5365b6b041da52686434ce5510" title="Switch between normal and long sleep interval." alt="" coords="276,55,491,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="227,51,263,54,262,59,227,56"/>
+</map>

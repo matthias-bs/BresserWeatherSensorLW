@@ -137,24 +137,27 @@ $(document).ready(function(){initNavTree('_load_node_cfg_8h_source.html',''); in
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">// 20240725 Created</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">// 20240729 Added PowerFeather specific configuration</span></div>
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="comment">// 20240804 Added max_charge_current</span></div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">//</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">// ToDo:</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// -</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">//</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &lt;LittleFS.h&gt;</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;ArduinoJson.h&gt;</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="keywordtype">void</span> loadNodeCfg(</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    String &amp;tzinfo,</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    uint16_t &amp;batt_weak,</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    uint16_t &amp;batt_low,</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    uint16_t &amp;batt_discharge_lim,</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    uint16_t &amp;batt_charge_lim,</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keyword">struct</span> sPowerFeatherCfg &amp;powerFeatherCfg);</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">// 20250827 Changed battery_low to voltage_critical</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">//          Changed battery_weak to voltage_eco_enter/exit</span></div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">//</span></div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">// ToDo:</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">// -</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">//</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;LittleFS.h&gt;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;ArduinoJson.h&gt;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keywordtype">void</span> loadNodeCfg(</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    String &amp;tzinfo,</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    uint16_t &amp;voltage_eco_exit,</div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    uint16_t &amp;voltage_eco_enter,</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    uint16_t &amp;voltage_critical,</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    uint16_t &amp;batt_discharge_lim,</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    uint16_t &amp;batt_charge_lim,</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keyword">struct</span> sPowerFeatherCfg &amp;powerFeatherCfg);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -19,5 +19,6 @@ var hierarchy =
     ] ],
     [ "PayloadOneWire", "class_payload_one_wire.html", [
       [ "AppLayer", "class_app_layer.html", null ]
-    ] ]
+    ] ],
+    [ "SystemContext", "class_system_context.html", null ]
 ];

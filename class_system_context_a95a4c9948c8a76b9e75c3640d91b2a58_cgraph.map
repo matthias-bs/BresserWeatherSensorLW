@@ -1,0 +1,11 @@
+<map id="SystemContext::sleepIfSupplyLow" name="SystemContext::sleepIfSupplyLow">
+<area shape="rect" id="Node000001" title="Sleep if battery voltage is low to prevent deep&#45;discharging." alt="" coords="5,31,249,56"/>
+<area shape="rect" id="Node000002" href="$class_system_context.html#ab93448ce50f353f3dd4dce14da5b0d8a" title="Enter sleep mode." alt="" coords="311,5,505,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="249,30,297,25,297,31,250,35"/>
+<area shape="rect" id="Node000003" href="$class_system_context.html#a1da4f8297ff9978488c0fa8dd988dda4" title="Compute sleep duration in seconds." alt="" coords="297,55,519,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="250,51,284,54,283,59,249,56"/>
+<area shape="rect" id="Node000004" href="$class_system_context.html#a525c50b9ae13e4a7d7922ee291599d80" title="Check if the RTC is synchronized to a time source." alt="" coords="567,29,784,55"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="519,54,553,51,554,56,519,60"/>
+<area shape="rect" id="Node000005" href="$class_system_context.html#adab68d5365b6b041da52686434ce5510" title="Switch between normal and long sleep interval." alt="" coords="568,79,783,104"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="519,75,555,78,554,83,519,80"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="SystemContext::begin" name="SystemContext::begin">
+<area shape="rect" id="Node000001" title="Initialize the system context." alt="" coords="5,31,172,56"/>
+<area shape="rect" id="Node000002" href="$class_system_context.html#a314855a65abf689765e94b0a34dddcbd" title=" " alt="" coords="220,5,444,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,32,206,28,207,34,172,37"/>
+<area shape="rect" id="Node000003" href="$class_system_context.html#abd70559c86f099e43b92bc6fb302a8e1" title="Check if the RTC needs to be synchronized to a time source." alt="" coords="223,55,441,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,49,209,53,209,58,172,54"/>
+</map>

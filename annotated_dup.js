@@ -10,5 +10,6 @@ var annotated_dup =
     [ "PayloadBLE", "class_payload_b_l_e.html", "class_payload_b_l_e" ],
     [ "PayloadBresser", "class_payload_bresser.html", "class_payload_bresser" ],
     [ "PayloadDigital", "class_payload_digital.html", "class_payload_digital" ],
-    [ "PayloadOneWire", "class_payload_one_wire.html", "class_payload_one_wire" ]
+    [ "PayloadOneWire", "class_payload_one_wire.html", "class_payload_one_wire" ],
+    [ "SystemContext", "class_system_context.html", "class_system_context" ]
 ];
