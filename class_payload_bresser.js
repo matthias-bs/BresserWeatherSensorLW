@@ -7,5 +7,6 @@ var class_payload_bresser =
     [ "lightningProc", "class_payload_bresser.html#a97759b740a7bfb2dd585a7e529ee0d89", null ],
     [ "rainGauge", "class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899", null ],
     [ "weatherSensor", "class_payload_bresser.html#a7262003f3dc4341ed826fdb64ba0ac5a", null ],
+    [ "ws_postproc_int", "class_payload_bresser.html#ad01935bacffe7a665f7630a3b4120676", null ],
     [ "ws_scantime", "class_payload_bresser.html#a450c9313611e82b01486a2c1279a7fca", null ]
 ];
