@@ -16,8 +16,8 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You need [RadioLib v7.1.2](https://github.com/jgromes/RadioLib/releases/tag/7.1.2) or later
-* You need [espressif/arduino-esp32 v3.0.X](https://github.com/espressif/arduino-esp32)
+* You need [RadioLib v7.2.1](https://github.com/jgromes/RadioLib/releases/tag/7.2.1) or later
+* You need [espressif/arduino-esp32 v3.X.Y](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
    * The default payload configuration is different
@@ -49,6 +49,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
+* External RTC (with Backup Battery) Integration (optional)
 
 ## Contents
 
@@ -60,6 +61,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [Predefined Board Configurations](#predefined-board-configurations)
   * [User-Defined Pinout and Radio Chip Configurations](#user-defined-pinout-and-radio-chip-configurations)
   * [User-Defined Battery Voltage Measurement](#user-defined-battery-voltage-measurement)
+  * [Real-Time Clock (RTC)](#real-time-clock-rtc)
 * [LoRaWAN Network Service Configuration](#lorawan-network-service-configuration)
 * [Software Build Configuration](#software-build-configuration)
   * [Required Configuration](#required-configuration)
@@ -286,6 +288,33 @@ In `BresserWeatherSensorLWCfg.h`:
 * Define `UBATT_DIV` with your voltage divider ratio if it differs from the default value of `0.5`.
 
 The function `getBatteryVoltage()` in [adc.cpp](https://github.com/matthias-bs/BresserWeatherSensorLW/src/adc.cpp) provides the battery voltage. Any board specific implementation should be placed there. `getBatteryVoltage()` returns `0` for any unknown board or a known board with out a default ADC input circuit to indicate that the battery voltage cannot be measured.
+
+#### Real-Time Clock (RTC)
+
+The MCU's built-in RTC provides time and date for scheduling wake-up from sleep mode and for algorithms like rain gauge or lightning counter post-processing.
+
+The internal RTC retains operation while the MCU is in sleep mode. It can be set from different sources:
+
+1. LoRaWAN Network Time
+
+   The `Device_Time_Req` MAC command allows to request the time from the LoRaWAN network service. This is not supported by all LNS (e.g. not available with Helium Network).
+
+2. LoRaWAN Downlink Command
+
+   The command `CMD_SET_DATETIME` (see [Remote Configuration Commands / Status Requests via LoRaWAN](#remote-configuration-commands--status-requests-via-lorawan)) allows to set the RTC manually.
+
+   The time between queuing `CMD_SET_DATETIME` and the RTC actually being set is rather unpredictable due to the LNS's downlink scheduling. Furthermore, a loss of power (e.g. in case of a battery/solar powered node) will reset the MCU's integrated RTC.
+
+3. External RTC
+
+   An external RTC chip with backup battery retains operation independently of the node's power supply. It is initially set when the LoRaWAN node is built (see [RTCSet.ino](extras/RTCSet/RTCSet.ino)).
+
+   A module with an RTC chip supported by the [Adafruit RTClib](https://github.com/adafruit/RTClib) is connected to the 3.3V power supply and to the MCU's I²C bus pins.
+
+> [!IMPORTANT]
+> Check if the I²C interface requires additional pull-up resistors.
+
+   If enabled by setting `EXT_RTC` in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h), the external RTC takes precedence over the LoRaWAN Network Time.
 
 ### LoRaWAN Network Service Configuration
 
@@ -942,7 +971,87 @@ uint8_t getAppStatusUplinkInterval(void);
 
 ### Class Diagram
 
-![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg)
+⚠️ **Needs updating!**
+
+```mermaid
+classDiagram
+    class BresserWeatherSensorLW {
+        /* BresserWeatherSensorLW.ino */
+        +LORA_CHIP radio
+        +LoRaWANNode node
+        -Preferences store // LoRaWAN preferences
+        -Preferences preferences // Device preferences
+        -LoraEncoder encoder
+        -AppLayer appLayer
+        -setup()
+        -loop()
+        -loadSecrets()
+        -decodeDownlink()
+        -sendCfgUplink()
+    }
+    BresserWeatherSensorLW <-- AppLayer
+    class AppLayer {
+        -Preferences appPrefs
+        -appPayloadCfg[]
+        -appStatus[]
+        +begin()
+        +decodeDownlink()
+        +genPayload()
+        +getPayloadStage1()
+        +getPayloadStage2()
+        +getConfigPayload()
+        +getAppStatusUplinkInterval()
+        +setAppPayloadCfg()
+        +getAppPayloadCfg()
+    }
+    AppLayer <|-- PayloadBresser
+    AppLayer <|-- PayloadOneWire
+    AppLayer <|-- PayloadAnalog
+    AppLayer <|-- PayloadDigital
+    AppLayer <|-- PayloadBLE
+
+    class PayloadBresser{
+        +WeatherSensor weatherSensor
+        +RainGauge rainGauge
+        -Lightning lightningProc
+        -Preferences appPrefs
+        +begin()
+        +encodeBresser()
+        -encodeWeatherSensor()
+        -encodeThermoHygroSensor()
+        -encodePoolThermometer()
+        -encodeSoilSensorint()
+        -encodeLeakageSensor()
+        -encodeAirPmSensor()
+        -encodeLightningSensor()
+        -encodeCo2Sensor()
+        -encodeHchoVocSensor()
+        -isSpaceLeft()
+    }
+    class PayloadOneWire{
+        +getOneWireTemperature()
+        +encodeOneWire()
+    }
+    class PayloadAnalog{
+        +begin()
+        +encodeAnalog()
+    }
+    class PayloadDigital {
+        +begin()
+        +encodeDigital()
+    }
+    class PayloadBLE {
+        -Preferences appPrefs
+        -BleSensors bleSensors
+        +begin()
+        +setBleAddr()
+        +getBLEAddr()
+        +bleAddrInit()
+        +encodeBLE()
+    }
+```
+<!-- ![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg) -->
+
 
 ## Doxygen Generated Source Code Documentation
 
@@ -960,6 +1069,7 @@ Based on
 * [Theengs Decoder](https://github.com/theengs/decoder) by [Theengs Project](https://github.com/theengs)
 * [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
 * [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
+* [RTClib](https://github.com/adafruit/RTClib) by Adafruit 
 
 ## Legal
 

@@ -32,6 +32,7 @@
 // NimBLE-Arduino                       2.3.2 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
 // Theengs Decoder                      1.9.9 (optional)
+// RTClib (Adafruit)                    2.1.4 (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
@@ -111,6 +112,7 @@
 // 20250317 Removed ARDUINO_M5STACK_Core2 (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
 // 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
+// 20250803 Added support for external RTC chips
 // 20250806 Refactored by adding SystemContext class, 
 //          moved system code from BresserWeatherSensorLW.ino
 // 20250820 Added initial sysCtx.getVoltages() call
@@ -164,6 +166,12 @@ static Preferences store;
 #include <RadioLib.h>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
+
+#if defined(EXT_RTC)
+// Adafruit RTClib - https://github.com/adafruit/RTClib
+#include <RTClib.h>
+#endif
+
 #include "src/LoadSecrets.h"
 #include "src/AppLayer.h"
 #include "src/SystemContext.h"

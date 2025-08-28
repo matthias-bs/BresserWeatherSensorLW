@@ -38,6 +38,7 @@
 // 20240417 Added additional constructor and method setAddresses()
 // 20240427 Added paramter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
+// 20250808 Added specific logging macros in scan callback to avoid WDT reset
 //
 // ToDo:
 // - 
@@ -51,6 +52,26 @@
 #include <Arduino.h>
 #include <NimBLEDevice.h>       //!< https://github.com/h2zero/NimBLE-Arduino
 #include <decoder.h>            //!< https://github.com/theengs/decoder
+
+// Extensive logging in the callback may lead to a watchdog reset
+// see 
+// https://github.com/h2zero/NimBLE-Arduino/issues/329
+// https://github.com/h2zero/NimBLE-Arduino/issues/351
+
+//#define CB_LOGGING
+#if defined(CB_LOGGING)
+#define cb_log_i log_i
+#define cb_log_w log_w
+#define cb_log_d log_d
+#define cb_log_e log_e
+#define cb_log_v log_v
+#else
+#define cb_log_i {}
+#define cb_log_w {}
+#define cb_log_d {}
+#define cb_log_e {}
+#define cb_log_v {}
+#endif
 
 /*!
  * \brief BLE sensor data

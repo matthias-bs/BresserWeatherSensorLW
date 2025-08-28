@@ -39,6 +39,7 @@
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250725 Fixed potential buffer overflow
 // 20250728 Fixed naming collision with ATC_MiThermometer
+// 20250808 Added specific logging macros in scan callback to avoid WDT reset
 //
 // ToDo:
 // -
@@ -64,7 +65,7 @@ namespace BleSensorsCallbacks
 
     void onDiscovered(const NimBLEAdvertisedDevice *advertisedDevice) override
     {
-      log_v("Discovered Advertised Device: %s", advertisedDevice->toString().c_str());
+      cb_log_v("Discovered Advertised Device: %s", advertisedDevice->toString().c_str());
     }
 
     void onResult(const NimBLEAdvertisedDevice *advertisedDevice) override
@@ -74,7 +75,7 @@ namespace BleSensorsCallbacks
       bool device_found = false;
       JsonDocument doc;
 
-      log_v("Advertised Device Result: %s", advertisedDevice->toString().c_str());
+      cb_log_v("Advertised Device Result: %s", advertisedDevice->toString().c_str());
       JsonObject BLEdata = doc.to<JsonObject>();
       String mac_adress = advertisedDevice->getAddress().toString().c_str();
 
@@ -83,7 +84,7 @@ namespace BleSensorsCallbacks
       {
         if (mac_adress == m_knownBLEAddresses[idx].c_str())
         {
-          log_v("BLE device found at index %d", idx);
+          cb_log_v("BLE device found at index %d", idx);
           device_found = true;
           m_devices_found++;
           break;
@@ -117,10 +118,10 @@ namespace BleSensorsCallbacks
       {
         if (CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG)
         {
-        const size_t buf_sz = 512;
-        char buf[buf_sz];
-        serializeJson(BLEdata, buf, buf_sz);
-          log_d("TheengsDecoder found device: %s", buf);
+          const size_t buf_sz = 512;
+          char buf[buf_sz];
+          serializeJson(BLEdata, buf, buf_sz);
+          cb_log_d("TheengsDecoder found device: %s", buf);
         }
 
         // see https://stackoverflow.com/questions/5348089/passing-a-vector-between-functions-via-pointers
@@ -129,11 +130,11 @@ namespace BleSensorsCallbacks
         (*m_sensorData)[idx].batt_level = (uint8_t)BLEdata["batt"];
         (*m_sensorData)[idx].rssi = (int)BLEdata["rssi"];
         (*m_sensorData)[idx].valid = ((*m_sensorData)[idx].batt_level > 0);
-        log_i("Temperature:       %.1f°C", (*m_sensorData)[idx].temperature);
-        log_i("Humidity:          %.1f%%", (*m_sensorData)[idx].humidity);
-        log_i("Battery level:     %d%%", (*m_sensorData)[idx].batt_level);
-        log_i("RSSI:             %ddBm", (*m_sensorData)[idx].rssi = (int)BLEdata["rssi"]);
-        log_d("BLE devices found: %d", m_devices_found);
+        cb_log_i("Temperature:       %.1f°C", (*m_sensorData)[idx].temperature);
+        cb_log_i("Humidity:          %.1f%%", (*m_sensorData)[idx].humidity);
+        cb_log_i("Battery level:     %d%%", (*m_sensorData)[idx].batt_level);
+        cb_log_i("RSSI:             %ddBm", (*m_sensorData)[idx].rssi = (int)BLEdata["rssi"]);
+        cb_log_d("BLE devices found: %d", m_devices_found);
 
         BLEdata.remove("manufacturerdata");
         BLEdata.remove("servicedata");
@@ -142,14 +143,14 @@ namespace BleSensorsCallbacks
       // Abort scanning because all known devices have been found
       if (m_devices_found == m_knownBLEAddresses.size())
       {
-        log_i("All devices found.");
+        cb_log_i("All devices found.");
         m_pBLEScan->stop();
       }
     }
 
     void onScanEnd(const NimBLEScanResults &results, int reason) override
     {
-      log_v("Scan Ended; reason = %d", reason);
+      cb_log_v("Scan Ended; reason = %d", reason);
     }
   } scanCallbacks;
 

@@ -70,6 +70,7 @@
 //          (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250802 Added BATTERY_RECOVERED
+// 20250803 Added support for external RTC chips
 // 20250827 Changed BATTERY_LOW to VOLTAGE_CRITICAL
 //          Changed BATTERY_WEAK to VOLTAGE_ECO_ENTER/EXIT
 //          Removed BATTERY_RECOVERED
@@ -163,6 +164,13 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // Enable battery / supply voltage uplink
 #define ADC_EN
+
+// Select one of the external RTC chips supported by Adafruit RTClib (optional)
+// https://github.com/adafruit/RTClib
+//#define EXT_RTC RTC_DS3231
+//#define EXT_RTC RTC_DS1307
+//#define EXT_RTC RTC_PCF8523
+//#define EXT_RTC RTC_PCF8563
 
 // Enable OneWire temperature measurement
 #define ONEWIRE_EN
