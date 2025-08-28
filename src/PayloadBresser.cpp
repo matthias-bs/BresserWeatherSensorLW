@@ -51,6 +51,7 @@
 // 20240821 Fixed validation of rain statistics
 // 20250209 Added Weather Station 8-in-1
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250828 Changed time functions to POSIX, added sysCtx
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -198,7 +199,6 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         {
             // Get local date and time
             struct tm timeinfo;
-            //time_t tnow = _rtc->getLocalEpoch();
             time_t tnow = time(nullptr);
             localtime_r(&tnow, &timeinfo);
 
@@ -240,7 +240,6 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
             if (_sysCtx->isRtcSynched())
             {
                 // Get local date and time
-                //time_t tnow = _rtc->getLocalEpoch();
                 time_t tnow = time(nullptr);
 
                 // If lightning sensor has be found and data is valid, run post-processing
