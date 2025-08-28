@@ -8,7 +8,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@
 // 20240716 Added ws_scantime and scanBresser()
 // 20250209 Added Weather Station 8-in-1
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250828 Changed time functions to POSIX, added SystemContext
 //
 // ToDo:
 // -
@@ -55,7 +56,6 @@
 #include "../BresserWeatherSensorLWCfg.h"
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
-//#include <ESP32Time.h>
 #include <time.h>
 #include <Preferences.h>
 
@@ -121,8 +121,6 @@ public:
 #endif
 
 private:
-    //ESP32Time *_rtc;
-    //time_t *_rtcLastClockSync;
     SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
@@ -150,12 +148,9 @@ public:
     /*!
      * \brief Constructor
      */
-    //PayloadBresser(ESP32Time *rtc, time_t *clocksync)
     PayloadBresser(SystemContext* sysCtx)
     {
         _sysCtx = sysCtx;
-        //_rtc = sysCtx->getRtc();
-        //_rtcLastClockSync = sysCtx->getRtcLastClockSync();
     };
 
     /*!
