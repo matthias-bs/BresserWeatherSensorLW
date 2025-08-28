@@ -80,8 +80,8 @@ public:
     /// Weather Sensor Scan Request
     uint8_t ws_scantime = 0;
 
-    /// Weather Sensor Post-Processing Interval (0: auto, 1..255: minutes)
-    uint8_t ws_postproc_int = 0;
+    /// Weather Sensor Post-Processing Update Rate (0: auto, 1..255: minutes)
+    uint8_t ws_postproc_interval = 0;
 
     // Payload size in bytes
     const uint8_t payloadSize[16] = {
