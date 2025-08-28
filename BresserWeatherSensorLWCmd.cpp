@@ -152,7 +152,6 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
   if (uplinkReq == CMD_GET_DATETIME)
   {
     log_i("Date/Time");
-    //time_t t_now = rtc.getLocalEpoch();
     time_t t_now = time(nullptr);
     encoder.writeUint8((t_now >> 24) & 0xff);
     encoder.writeUint8((t_now >> 16) & 0xff);
