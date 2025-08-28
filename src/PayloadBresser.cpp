@@ -86,6 +86,7 @@ void PayloadBresser::begin(void)
     appPrefs.begin("BWS-LW-APP", false);
     uint8_t ws_timeout = appPrefs.getUChar("ws_timeout", WEATHERSENSOR_TIMEOUT);
     log_d("Preferences: weathersensor_timeout: %u s", ws_timeout);
+    ws_postproc_int = appPrefs.getUChar("ws_postproc_int", 0);
     appPrefs.end();
 
     log_i("Waiting for Weather Sensor Data; timeout %u s", ws_timeout);
@@ -194,6 +195,14 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         }
 
 #ifdef RAINDATA_EN
+        // Set raingauge post-processing update rate
+        if (ws_postproc_int == 0) {
+            // auto update rate
+            rainGauge.setUpdateRate(_sysCtx->sleepInterval());
+        } else {
+            rainGauge.setUpdateRate(ws_postproc_int);
+        }
+
         // Check if time is valid
         if (_sysCtx->isRtcSynched())
         {
@@ -227,6 +236,14 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
             continue;
 
 #ifdef LIGHTNINGSENSOR_EN
+        // Set lightning counter post-processing update rate
+        if (ws_postproc_int == 0) {
+            // auto update rate
+            lightningProc.setUpdateRate(_sysCtx->sleepInterval());
+        } else {
+            lightningProc.setUpdateRate(ws_postproc_int);
+        }
+        
         // Lightning sensor has fixed channel (0)
         if (type == SENSOR_TYPE_LIGHTNING)
         {
