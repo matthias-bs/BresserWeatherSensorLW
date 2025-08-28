@@ -15,7 +15,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -429,17 +429,6 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         appPrefs.end();
         encoder.writeUint8(ws_postproc_int);
         port = CMD_GET_WS_POSTPROC;
-    }
-    else if (cmd == CMD_GET_SENSORS_CFG)
-    {
-        uint8_t maxSensors = MAX_NUM_868MHZ_SENSORS;
-        uint8_t rxFlags;
-        uint8_t enDecoders;
-        weatherSensor.getSensorsCfg(maxSensors, rxFlags, enDecoders);
-        encoder.writeUint8(maxSensors);
-        encoder.writeUint8(rxFlags);
-        encoder.writeUint8(enDecoders);
-        port = CMD_GET_SENSORS_CFG;
     }
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)
