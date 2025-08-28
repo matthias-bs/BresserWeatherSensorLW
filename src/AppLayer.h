@@ -115,8 +115,6 @@ class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
 #endif
 {
 private:
-    //ESP32Time *_rtc;
-    //time_t *_rtcLastClockSync;
     SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
