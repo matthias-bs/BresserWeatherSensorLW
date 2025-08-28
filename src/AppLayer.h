@@ -8,7 +8,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,6 +48,7 @@
 // 20240607 Added getAppStatusUplinkInterval()
 // 20240716 Added CMD_SCAN_SENSORS
 // 20240722 Renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
+// 20250728 Replaced rtc/clocksync by sysCtx
 //
 // ToDo:
 // -
@@ -59,7 +60,6 @@
 
 #include "WeatherSensorCfg.h"
 #include <WeatherSensor.h>
-//#include <ESP32Time.h>
 #include <Preferences.h>
 #include "../BresserWeatherSensorLWCfg.h"
 #include "../BresserWeatherSensorLWCmd.h"
@@ -144,8 +144,6 @@ public:
                                                   PayloadBLE()
 #endif
     {
-        //_rtc = rtc;
-        //_rtcLastClockSync = clocksync;
         _sysCtx = sysCtx;
         for (int i = 0; i < APP_STATUS_SIZE; i++)
         {
