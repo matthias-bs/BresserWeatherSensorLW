@@ -44,6 +44,7 @@
 // 20250209 Added Weather Station 8-in-1
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250828 Changed time functions to POSIX, added SystemContext
+//          Added ws_postproc_int
 //
 // ToDo:
 // -
@@ -78,6 +79,9 @@ public:
 
     /// Weather Sensor Scan Request
     uint8_t ws_scantime = 0;
+
+    /// Weather Sensor Post-Processing Interval (0: auto, 1..255: minutes)
+    uint8_t ws_postproc_int = 0;
 
     // Payload size in bytes
     const uint8_t payloadSize[16] = {
