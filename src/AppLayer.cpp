@@ -15,7 +15,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,7 @@
 // 20240716 Added CMD_SCAN_SENSORS
 // 20240722 Renamed STATUS_INTERVAL to APP_STATUS_INTERVAL
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250731 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
 //
 // ToDo:
 // -
@@ -156,6 +157,21 @@ AppLayer::decodeDownlink(uint8_t port, uint8_t *payload, size_t size)
             lightningProc.reset();
         }
 #endif
+        return 0;
+    }
+
+    if ((port == CMD_GET_WS_POSTPROC) && (payload[0] == 0x00) && (size == 1))
+    {
+        log_i("Get weather sensor post-processing update interval");
+        return CMD_GET_WS_POSTPROC;
+    }
+
+    if ((port == CMD_SET_WS_POSTPROC) && (size == 1))
+    {
+        log_i("Set weather sensor post-processing update interval: %u min", payload[0]);
+        appPrefs.begin("BWS-LW-APP", false);
+        appPrefs.putUChar("ws_postproc_int", payload[0]);
+        appPrefs.end();
         return 0;
     }
 
@@ -405,6 +421,14 @@ void AppLayer::getConfigPayload(uint8_t cmd, uint8_t &port, LoraEncoder &encoder
         encoder.writeUint8(rxFlags);
         encoder.writeUint8(enDecoders);
         port = CMD_GET_SENSORS_CFG;
+    }
+    else if (cmd == CMD_GET_WS_POSTPROC)
+    {
+        appPrefs.begin("BWS-LW-APP", false);
+        uint8_t ws_postproc_int = appPrefs.getUChar("ws_postproc_int", 0);
+        appPrefs.end();
+        encoder.writeUint8(ws_postproc_int);
+        port = CMD_GET_WS_POSTPROC;
     }
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
     else if (cmd == CMD_GET_BLE_ADDR)

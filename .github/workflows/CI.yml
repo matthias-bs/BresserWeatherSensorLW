@@ -80,7 +80,6 @@ jobs:
             "BresserWeatherSensorReceiver@0.33.1"
             "RadioLib@7.2.1"
             "LoRa Serialization@3.3.1"
-            "ESP32Time@2.0.6"
             "OneWireNg@0.14.0"
             "DallasTemperature@4.0.3"
             "NimBLE-Arduino@2.3.2"

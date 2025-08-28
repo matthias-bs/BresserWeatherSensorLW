@@ -18,6 +18,8 @@
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
 // port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
+// port = CMD_GET_WS_POSTPROC, {"cmd": "CMD_GET_WS_POSTPROC"} / payload = 0x00
+// port = CMD_SET_WS_POSTPROC, {"update_interval": <update_interval>}
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
@@ -45,6 +47,8 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
+// CMD_GET_WS_POSTPROC {"update_interval": <update_interval>}
+//
 // CMD_GET_STATUS_INTERVAL {"status_interval": <status_interval>}
 //
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
@@ -66,6 +70,7 @@
 // <sleep_interval>     : 0...65535
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
+// <update_interval>    : Rain gauge / lightning counter post processing interval in minutes (1...255, 0: auto)
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <status_interval>    : Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
@@ -92,7 +97,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -131,6 +136,7 @@
 // 20240615 Added CMD_SCAN_SENSORS
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL,
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
+// 20250828 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
 //
 // ToDo:
 // -  
@@ -153,6 +159,8 @@ const CMD_SET_APP_PAYLOAD_CFG = 0x47;
 const CMD_GET_WS_TIMEOUT = 0xC0;
 const CMD_SET_WS_TIMEOUT = 0xC1;
 const CMD_RESET_WS_POSTPROC = 0xC3;
+const CMD_GET_WS_POSTPROC = 0xCC;
+const CMD_SET_WS_POSTPROC = 0xCD;
 const CMD_SCAN_SENSORS = 0xC4;
 const CMD_GET_SENSORS_INC = 0xC6;
 const CMD_SET_SENSORS_INC = 0xC7;
@@ -295,6 +303,14 @@ function encodeDownlink(input) {
                 errors: []
             };
         }
+        else if (input.data.cmd == "CMD_GET_WS_POSTPROC") {
+            return {
+                bytes: [0],
+                fPort: CMD_GET_WS_POSTPROC,
+                warnings: [],
+                errors: []
+            };
+        }
         else if (input.data.cmd == "CMD_GET_APP_STATUS_INTERVAL") {
             return {
                 bytes: [0],
@@ -419,6 +435,13 @@ function encodeDownlink(input) {
         return {
             bytes: [input.data.ws_timeout],
             fPort: CMD_SET_WS_TIMEOUT,
+            warnings: [],
+            errors: []
+        };
+    } else if (input.data.hasOwnProperty('update_interval')) {
+        return {
+            bytes: [input.data.update_interval],
+            fPort: CMD_SET_WS_POSTPROC,
             warnings: [],
             errors: []
         };
@@ -593,6 +616,7 @@ function decodeDownlink(input) {
         case CMD_GET_LW_CONFIG:
         case CMD_GET_LW_STATUS:
         case CMD_GET_WS_TIMEOUT:
+        case CMD_GET_WS_POSTPROC:
         case CMD_GET_APP_STATUS_INTERVAL:
         case CMD_GET_SENSORS_STAT:
         case CMD_GET_SENSORS_INC:
@@ -634,6 +658,12 @@ function decodeDownlink(input) {
             return {
                 data: {
                     ws_timeout: uint8(input.bytes)
+                }
+            };
+        case CMD_SET_WS_POSTPROC:
+            return {
+                data: {
+                    update_interval: uint8(input.bytes)
                 }
             };
         case CMD_RESET_WS_POSTPROC:

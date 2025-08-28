@@ -19,6 +19,8 @@
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
 // port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
+// port = CMD_GET_WS_POSTPROC, {"cmd": "CMD_GET_WS_POSTPROC"} / payload = 0x00
+// port = CMD_SET_WS_POSTPROC, {"update_interval": <update_interval>}
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
@@ -45,6 +47,8 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
+// CMD_GET_WS_POSTPROC {"update_interval": <update_interval>}
+//
 // CMD_GET_APP_STATUS_INTERVAL {"app_status_interval": <app_status_interval>}
 //
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
@@ -67,6 +71,7 @@
 // <lw_status_interval> : LoRaWAN node status message uplink interval in no. of frames (0...255, 0: disabled)
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
+// <update_interval>    : Rain gauge / lightning counter post processing interval in minutes (1...255, 0: auto)
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <app_status_interval>: Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
@@ -111,11 +116,42 @@
 //
 // History:
 // 20250624 Created from datacake_decoder.js
+// 20250828 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
 //
 // ToDo:
 // -  
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+// Commands
+var CMD_GET_DATETIME = 0x20;
+var CMD_SET_DATETIME = 0x21;
+var CMD_SET_SLEEP_INTERVAL = 0x31;
+var CMD_SET_SLEEP_INTERVAL_LONG = 0x33;
+var CMD_SET_LW_STATUS_INTERVAL = 0x35;
+var CMD_GET_LW_CONFIG = 0x36;
+var CMD_GET_LW_STATUS = 0x38;
+var CMD_GET_APP_STATUS_INTERVAL = 0x40;
+var CMD_SET_APP_STATUS_INTERVAL = 0x41;
+var CMD_GET_SENSORS_STAT = 0x42;
+var CMD_GET_APP_PAYLOAD_CFG = 0x46;
+var CMD_SET_APP_PAYLOAD_CFG = 0x47;
+var CMD_GET_WS_TIMEOUT = 0xC0;
+var CMD_SET_WS_TIMEOUT = 0xC1;
+var CMD_RESET_WS_POSTPROC = 0xC3;
+var CMD_GET_WS_POSTPROC = 0xCC;
+var CMD_SET_WS_POSTPROC = 0xCD;
+var CMD_SCAN_SENSORS = 0xC4;
+var CMD_GET_SENSORS_INC = 0xC6;
+var CMD_SET_SENSORS_INC = 0xC7;
+var CMD_GET_SENSORS_EXC = 0xC8;
+var CMD_SET_SENSORS_EXC = 0xC9;
+var CMD_GET_SENSORS_CFG = 0xCA;
+var CMD_SET_SENSORS_CFG = 0xCB;
+var CMD_GET_BLE_CONFIG = 0xD0;
+var CMD_SET_BLE_CONFIG = 0xD1;
+var CMD_GET_BLE_ADDR = 0xD2;
+var CMD_SET_BLE_ADDR = 0xD3;
 
 // Bresser Weather Sensor Decoder
 function bws_decoder(bytes, port) {
@@ -514,7 +550,16 @@ function bws_decoder(bytes, port) {
             ['sensor_status'
             ]
         );
-    }
+    } else if (port === CMD_GET_WS_POSTPROC) {
+        return decode(
+            port,
+            bytes,
+            [bits8
+            ],
+            ['update_interval'
+            ]
+        );
+    } 
 }
 
 

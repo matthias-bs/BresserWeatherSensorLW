@@ -38,6 +38,8 @@
 // 20240729 Added PowerFeather specific configuration
 // 20240804 Added max_charge_current
 // 20241110 Fixed ArduinoJson deprecation warning
+// 20250827 Changed battery_low to voltage_critical
+//          Changed battery_weak to voltage_eco_enter/exit
 //
 // ToDo:
 // -
@@ -49,8 +51,9 @@
 // Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available
 void loadNodeCfg(
     String &tzinfo,
-    uint16_t &batt_weak,
-    uint16_t &batt_low,
+    uint16_t &voltage_eco_exit,
+    uint16_t &voltage_eco_enter,
+    uint16_t &voltage_critical,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
     struct sPowerFeatherCfg &powerFeatherCfg)
@@ -89,10 +92,12 @@ void loadNodeCfg(
             {
                 if (!doc["timezone"].isNull())
                     tzinfo = doc["timezone"].as<String>();
-                if (!doc["battery_weak"].isNull())
-                    batt_weak = doc["battery_weak"];
-                if (!doc["battery_low"].isNull())
-                    batt_low = doc["battery_low"];
+                if (!doc["voltage_eco_exit"].isNull())
+                    voltage_eco_exit = doc["voltage_eco_exit"];
+                if (!doc["voltage_eco_enter"].isNull())
+                    voltage_eco_enter = doc["voltage_eco_enter"];
+                if (!doc["voltage_critical"].isNull())
+                    voltage_critical = doc["voltage_critical"];
                 if (!doc["battery_discharge_lim"].isNull())
                     batt_discharge_lim = doc["battery_discharge_lim"];
                 if (!doc["battery_charge_lim"].isNull())
@@ -121,8 +126,9 @@ void loadNodeCfg(
     } // LittleFS o.k.
 
     log_d("Timezone: %s", tzinfo.c_str());
-    log_d("Battery weak:            %4d mV", batt_weak);
-    log_d("Battery low:             %4d mV", batt_low);
+    log_d("Voltage eco exit:        %4d mV", voltage_eco_exit);
+    log_d("Voltage eco enter:       %4d mV", voltage_eco_enter);
+    log_d("Voltage critical:        %4d mV", voltage_critical);
     log_d("Battery discharge limit: %4d mV", batt_discharge_lim);
     log_d("Battery charge limit:    %4d mV", batt_charge_lim);
     log_d("PowerFeather");

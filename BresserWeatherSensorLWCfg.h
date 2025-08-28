@@ -69,14 +69,11 @@
 // 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2
 //          (now all uppercase)
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20250802 Added BATTERY_RECOVERED
 // 20250803 Added support for external RTC chips
-//
-// Note:
-// Depending on board package file date, some defines are written either
-// in mixed-case or upper-case letters, for example,
-// ARDUINO_M5STACK_Core2 or ARDUINO_M5STACK_CORE2 -
-// see https://github.com/espressif/arduino-esp32/issues/9423!
-// Consequently both variants have to be checked!!!
+// 20250827 Changed BATTERY_LOW to VOLTAGE_CRITICAL
+//          Changed BATTERY_WEAK to VOLTAGE_ECO_ENTER/EXIT
+//          Removed BATTERY_RECOVERED
 //
 // ToDo:
 // -
@@ -124,10 +121,12 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // Battery voltage thresholds for energy saving & deep-discharge prevention
 
-// If battery voltage <= BATTERY_WEAK [mV], MCU will sleep for SLEEP_INTERVAL_LONG
-// Go to sleep mode immediately after start if battery voltage <= BATTERY_LOW [mV]
-#define BATTERY_WEAK 3500
-#define BATTERY_LOW 3200
+// MCU voltage <= VOLTAGE_ECO_ENTER [mV] -> MCU will sleep for SLEEP_INTERVAL_LONG (eco mode)
+// MCU voltage > VOLTAGE_ECO_EXIT [mV]   -> MCU will sleep for SLEEP_INTERVAL (normal mode)
+// MCU voltage <= BATTERY_CRITICAL [mV]  -> MCU enters sleep mode immediately (battery protection)
+#define VOLTAGE_ECO_EXIT 3580
+#define VOLTAGE_ECO_ENTER 3500
+#define VOLTAGE_CRITICAL 3200
 
 // Battery voltage limits in mV (usable range for the device) for battery state calculation
 #define BATTERY_DISCHARGE_LIM 3200

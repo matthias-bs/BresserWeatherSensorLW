@@ -37,6 +37,8 @@
 // 20240725 Created
 // 20240729 Added PowerFeather specific configuration
 // 20240804 Added max_charge_current
+// 20250827 Changed battery_low to voltage_critical
+//          Changed battery_weak to voltage_eco_enter/exit
 //
 // ToDo:
 // -
@@ -58,8 +60,9 @@
  * JSON file format:
  * {
  *   "timezone": "CET-1CEST,M3.5.0,M10.5.0/3",
- *   "battery_weak": 3300,
- *   "battery_low": 3400,
+ *   "voltage_eco_exit": 3580,
+ *   "voltage_eco_enter": 3500,
+ *   "voltage_critical": 3300,
  *   "battery_discharge_lim": 3200,
  *   "battery_charge_lim": 4200,
  *   "powerfeather": {
@@ -73,8 +76,9 @@
  */
 void loadNodeCfg(
     String &tzinfo,
-    uint16_t &batt_weak,
-    uint16_t &batt_low,
+    uint16_t &voltage_eco_exit,
+    uint16_t &voltage_eco_enter,
+    uint16_t &voltage_critical,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
     struct sPowerFeatherCfg &powerFeatherCfg);

@@ -47,6 +47,7 @@
 //          CMD_<GET|SET>_STATUS_INTERVAL to CMD_<GET|SET>_APP_STATUS_INTERVAL
 // 20240920 Changed sendCfgUplink() to encodeCfgUplink()
 // 20241227 Removed delay from encodeCfgUplink()
+// 20250731 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
 //
 // ToDo:
 // -
@@ -287,6 +288,31 @@
 
 // Downlink (command):
 // byte0: flags[ 7: 0]
+
+// Uplink: n.a.
+
+// CMD_GET_WS_POSTPROC
+// --------------------
+// Port: CMD_GET_WS_POSTPROC
+// Note: Update interval in minutes for weather sensor post-processing;
+//       0x00 = automatic (sleep_interval/sleep_interval_long)
+#define CMD_GET_WS_POSTPROC 0xCC
+
+// Downlink (command)
+// byte0: 0x00
+
+// Uplink (response):
+// byte0: update_interval[ 7: 0]
+
+// CMD_SET_WS_POSTPROC
+// --------------------
+// Port: CMD_SET_WS_POSTPROC
+// Note: Update interval in minutes for weather sensor post-processing;
+//       0x00 = automatic (sleep_interval/sleep_interval_long)
+#define CMD_SET_WS_POSTPROC 0xCD
+
+// Downlink (command):
+// byte0: update_interval[ 7: 0]
 
 // Uplink: n.a.
 

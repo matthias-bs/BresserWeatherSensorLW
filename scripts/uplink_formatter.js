@@ -19,6 +19,8 @@
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
 // port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
+// port = CMD_GET_WS_POSTPROC, {"cmd": "CMD_GET_WS_POSTPROC"} / payload = 0x00
+// port = CMD_SET_WS_POSTPROC, {"update_interval": <update_interval>}
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
@@ -45,6 +47,8 @@
 //
 // CMD_GET_WS_TIMEOUT {"ws_timeout": <ws_timeout>}
 //
+// CMD_GET_WS_POSTPROC {"update_interval": <update_interval>}
+//
 // CMD_GET_APP_STATUS_INTERVAL {"app_status_interval": <app_status_interval>}
 //
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
@@ -67,6 +71,7 @@
 // <lw_status_interval> : LoRaWAN node status message uplink interval in no. of frames (0...255, 0: disabled)
 // <epoch>              : unix epoch time, see https://www.epochconverter.com/ (<integer> / "0x....")
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
+// <update_interval>    : Rain gauge / lightning counter post processing interval in minutes (1...255, 0: auto)
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
 // <app_status_interval>: Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
@@ -92,7 +97,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -147,6 +152,7 @@
 // 20240729 Added PowerFeather specific status information
 // 20250209 Changed flags in found_sensors() from 8 to 16 bits
 //          Added ws_tglobe_c
+// 20250828 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
 //
 // ToDo:
 // -  
@@ -172,6 +178,7 @@ function decoder(bytes, port) {
     const CMD_GET_SENSORS_STAT = 0x42;
     const CMD_GET_APP_PAYLOAD_CFG = 0x46;
     const CMD_GET_WS_TIMEOUT = 0xC0;
+    const CMD_GET_WS_POSTPROC = 0xCC;
     const CMD_SCAN_SENSORS = 0xC4;
     const CMD_GET_SENSORS_INC = 0xC6;
     const CMD_GET_SENSORS_EXC = 0xC8;
@@ -798,6 +805,15 @@ function decoder(bytes, port) {
             [uint8
             ],
             ['ws_timeout'
+            ]
+        );
+    } else if (port === CMD_GET_WS_POSTPROC) {
+        return decode(
+            port,
+            bytes,
+            [uint8
+            ],
+            ['update_interval'
             ]
         );
     } else if (port === CMD_GET_SENSORS_INC) {
