@@ -859,7 +859,7 @@ Use [extras/customization/AppLayerMinimal.h](extras/customization/AppLayerMinima
 In [BresserWeatherSensorLW.ino](blob/main/BresserWeatherSensorLW.ino), the `appLayer` object is created:
 ```
 /// Application layer
-AppLayer appLayer(&rtc, &rtcLastClockSync);
+AppLayer appLayer(&sysCtx);
 ```
 
 The following constructor must be implemented by the AppLayer class:
