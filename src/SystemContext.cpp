@@ -42,6 +42,7 @@
 // 20250826 Removed persistent variable longSleep
 //          RP2040: changed persistent storage of rtcLastClockSync to 64 bits
 // 20250827 Added hysteresis for sleep interval switching
+// 20250829 Changed longSleepModeActive default to true
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +90,7 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchoniza
 RTC_DATA_ATTR uint16_t bootCount = 1;
 RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
 RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
-RTC_DATA_ATTR bool longSleepModeActive = false;
+RTC_DATA_ATTR bool longSleepModeActive = true;
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
@@ -139,7 +140,7 @@ void SystemContext::begin(void)
   if (bootCount == 1)
   {
     rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
-    longSleepModeActive = false;
+    longSleepModeActive = true;
   }
   bootCount++;
 
