@@ -98,7 +98,7 @@
 //#define LORAWAN_NODE
 
 // Use pinning for Firebeetle Cover LoRa
-#define DFROBOT_COVER_LORA
+#define FIREBEETLE_ESP32_COVER_LORA
 #endif
 
 // PowerFeather specific configuration
