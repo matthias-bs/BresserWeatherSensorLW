@@ -47,6 +47,7 @@
 //          Removed instances of radio and LoRaWANNode classes
 // 20250622 Updated to RadioLib v7.2.0
 //          Added customDelay()
+// 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
 //
 // ToDo:
 // - 
@@ -297,7 +298,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #define PIN_LORA_GPIO     16
     #define PIN_LORA_DIO2     RADIOLIB_NC
     #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 & LORAWAN_NODE defined; assuming this is the LoRaWAN_Node board (DFRobot Firebeetle32 + Adafruit RFM95W LoRa Radio)")
-  #elif defined(DFROBOT_COVER_LORA)
+  #elif defined(FIREBEETLE_ESP32_COVER_LORA)
     // https://wiki.dfrobot.com/FireBeetle_ESP32_IOT_Microcontroller(V3.0)__Supports_Wi-Fi_&_Bluetooth__SKU__DFR0478
     // https://wiki.dfrobot.com/FireBeetle_Covers_LoRa_Radio_868MHz_SKU_TEL0125
     #define PIN_LORA_NSS      27 // D4
@@ -305,7 +306,7 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
     #define PIN_LORA_IRQ      26 // D3
     #define PIN_LORA_GPIO      9 // D5
     #define PIN_LORA_DIO2     RADIOLIB_NC
-    #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 & DFROBOT_COVER_LORA defined; assuming this is a FireBeetle ESP32 with FireBeetle Cover LoRa")
+    #pragma message("ARDUINO_DFROBOT_FIREBEETLE_ESP32 & FIREBEETLE_ESP32_COVER_LORA defined; assuming this is a FireBeetle ESP32 with FireBeetle Cover LoRa")
     #pragma message("Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1")
   #else 
     #pragma message("Either LORAWAN_NODE or DFROBOT_COVER_LORA must be defined")
