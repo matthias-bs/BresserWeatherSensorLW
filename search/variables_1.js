@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['data_0',['data',['../class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c',1,'BleSensors']]]
+  ['batt_5flevel_0',['batt_level',['../struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff',1,'BleDataS']]]
 ];

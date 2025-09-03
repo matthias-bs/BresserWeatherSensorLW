@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('_payload_one_wire_8h_source.html','');
   <div class="headertitle"><div class="title">PayloadOneWire.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="_payload_one_wire_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// PayloadOneWire.h</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// Get 1-Wire temperature sensor values and encode as LoRaWAN payload</span></div>
@@ -137,42 +137,43 @@ $(document).ready(function(){initNavTree('_payload_one_wire_8h_source.html','');
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">// -</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">//</span></div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#if !defined(_PAYLOAD_ONE_WIRE)</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#define _PAYLOAD_ONE_WIRE</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#ifdef ONEWIRE_EN</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if !defined(_PAYLOAD_ONE_WIRE)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#define _PAYLOAD_ONE_WIRE</span></div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="comment">// Dallas/Maxim OneWire Temperature Sensor</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;DallasTemperature.h&gt;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="foldopen" id="foldopen00054" data-start="{" data-end="};">
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="class_payload_one_wire.html">   54</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_one_wire.html">PayloadOneWire</a></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>{</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">   60</a></span>    <a class="code hl_function" href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">PayloadOneWire</a>(){};</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">float</span> <a class="code hl_function" href="class_payload_one_wire.html#ab81e478ce922fe2bfc31d4dd9a3ec6d6">getOneWireTemperature</a>(uint8_t index);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#ifdef ONEWIRE_EN</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="comment">// Dallas/Maxim OneWire Temperature Sensor</span></div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#include &lt;DallasTemperature.h&gt;</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &quot;<a class="code" href="logging_8h.html">logging.h</a>&quot;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="foldopen" id="foldopen00063" data-start="{" data-end="};">
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="class_payload_one_wire.html">   63</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_one_wire.html">PayloadOneWire</a></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>{</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">   69</a></span>    <a class="code hl_function" href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">PayloadOneWire</a>(){};</div>
 <div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6">encodeOneWire</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>};</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keywordtype">float</span> <a class="code hl_function" href="class_payload_one_wire.html#ab81e478ce922fe2bfc31d4dd9a3ec6d6">getOneWireTemperature</a>(uint8_t index);</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6">encodeOneWire</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>};</div>
 </div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#endif </span><span class="comment">// ONEWIRE_EN</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_ONE_WIRE</span></div>
-<div class="ttc" id="aclass_payload_one_wire_html"><div class="ttname"><a href="class_payload_one_wire.html">PayloadOneWire</a></div><div class="ttdef"><b>Definition</b> PayloadOneWire.h:55</div></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="preprocessor">#endif </span><span class="comment">// ONEWIRE_EN</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_ONE_WIRE</span></div>
+<div class="ttc" id="aclass_payload_one_wire_html"><div class="ttname"><a href="class_payload_one_wire.html">PayloadOneWire</a></div><div class="ttdoc">LoRaWAN node application layer - 1-Wire sensors.</div><div class="ttdef"><b>Definition</b> PayloadOneWire.h:64</div></div>
 <div class="ttc" id="aclass_payload_one_wire_html_a5043522dafe7a837c962943822ee9cc6"><div class="ttname"><a href="class_payload_one_wire.html#a5043522dafe7a837c962943822ee9cc6">PayloadOneWire::encodeOneWire</a></div><div class="ttdeci">void encodeOneWire(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode 1-Wire temperature sensor values for LoRaWAN transmission.</div><div class="ttdef"><b>Definition</b> PayloadOneWire.cpp:81</div></div>
 <div class="ttc" id="aclass_payload_one_wire_html_ab81e478ce922fe2bfc31d4dd9a3ec6d6"><div class="ttname"><a href="class_payload_one_wire.html#ab81e478ce922fe2bfc31d4dd9a3ec6d6">PayloadOneWire::getOneWireTemperature</a></div><div class="ttdeci">float getOneWireTemperature(uint8_t index)</div><div class="ttdoc">Get temperature from Maxim OneWire Sensor.</div><div class="ttdef"><b>Definition</b> PayloadOneWire.cpp:58</div></div>
-<div class="ttc" id="aclass_payload_one_wire_html_ad08088de2a9d564c8a973ec4e5c00100"><div class="ttname"><a href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">PayloadOneWire::PayloadOneWire</a></div><div class="ttdeci">PayloadOneWire()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadOneWire.h:60</div></div>
+<div class="ttc" id="aclass_payload_one_wire_html_ad08088de2a9d564c8a973ec4e5c00100"><div class="ttname"><a href="class_payload_one_wire.html#ad08088de2a9d564c8a973ec4e5c00100">PayloadOneWire::PayloadOneWire</a></div><div class="ttdeci">PayloadOneWire()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadOneWire.h:69</div></div>
+<div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Replacement for esp32-hal-log.h on RP20240.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>PayloadOneWire.h</b></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="_payload_one_wire_8h.html">PayloadOneWire.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

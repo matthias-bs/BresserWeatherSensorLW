@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['humidity_0',['humidity',['../struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780',1,'BleDataS']]]
+  ['data_0',['data',['../class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c',1,'BleSensors']]]
 ];

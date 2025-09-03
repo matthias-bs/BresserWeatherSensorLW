@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['temperature_0',['temperature',['../struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1',1,'BleDataS']]]
+  ['sleep_5finterval_0',['sleep_interval',['../class_system_context.html#adb4ee51f9813b60f7a4af17ed4667044',1,'SystemContext']]],
+  ['sleep_5finterval_5flong_1',['sleep_interval_long',['../class_system_context.html#afeb900dff5d0ce5eee34f55dc02068a5',1,'SystemContext']]]
 ];

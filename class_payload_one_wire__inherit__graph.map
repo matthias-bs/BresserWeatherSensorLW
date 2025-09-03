@@ -1,5 +1,5 @@
 <map id="PayloadOneWire" name="PayloadOneWire">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,135,31"/>
+<area shape="rect" id="Node000001" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="5,5,135,31"/>
 <area shape="rect" id="Node000002" href="$class_app_layer.html" title="LoRaWAN node application layer." alt="" coords="29,79,111,104"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,44,73,79,67,79,67,44"/>
 </map>

@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('adc_8h_source.html',''); initResizable
   <div class="headertitle"><div class="title">adc.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="adc_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// adc.h</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// Analog/Digital Converter wrapper/convenience functions</span></div>
@@ -137,27 +137,30 @@ $(document).ready(function(){initNavTree('adc_8h_source.html',''); initResizable
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">// -</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">//</span></div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#if !defined(_ADC_H)</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#define _ADC_H</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#include &quot;../../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if !defined(_ADC_H)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#define _ADC_H</span></div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>uint16_t getVoltage(uint8_t pin = PIN_ADC_IN, uint8_t samples = UBATT_SAMPLES, <span class="keywordtype">float</span> divider = UBATT_DIV);</div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>uint16_t getBatteryVoltage(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>uint16_t getSupplyVoltage(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="preprocessor">#endif </span><span class="comment">// _ADC_H</span></div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &quot;../../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>uint16_t <a class="code hl_function" href="adc_8h.html#a26d0a6d00610f3551403158166c24f26">getVoltage</a>(uint8_t pin = PIN_ADC_IN, uint8_t samples = UBATT_SAMPLES, <span class="keywordtype">float</span> divider = UBATT_DIV);</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>uint16_t <a class="code hl_function" href="adc_8h.html#af061f9227da53b913518a7719997c0e9">getBatteryVoltage</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>uint16_t <a class="code hl_function" href="adc_8h.html#a4a4d84c3e5cd589b99100c472fbcdc29">getSupplyVoltage</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="preprocessor">#endif </span><span class="comment">// _ADC_H</span></div>
+<div class="ttc" id="aadc_8h_html_a26d0a6d00610f3551403158166c24f26"><div class="ttname"><a href="adc_8h.html#a26d0a6d00610f3551403158166c24f26">getVoltage</a></div><div class="ttdeci">uint16_t getVoltage(uint8_t pin=PIN_ADC_IN, uint8_t samples=UBATT_SAMPLES, float divider=UBATT_DIV)</div><div class="ttdoc">Get supply / battery voltage.</div><div class="ttdef"><b>Definition</b> adc.cpp:65</div></div>
+<div class="ttc" id="aadc_8h_html_a4a4d84c3e5cd589b99100c472fbcdc29"><div class="ttname"><a href="adc_8h.html#a4a4d84c3e5cd589b99100c472fbcdc29">getSupplyVoltage</a></div><div class="ttdeci">uint16_t getSupplyVoltage(void)</div><div class="ttdoc">Get supply voltage.</div><div class="ttdef"><b>Definition</b> adc.cpp:137</div></div>
+<div class="ttc" id="aadc_8h_html_af061f9227da53b913518a7719997c0e9"><div class="ttname"><a href="adc_8h.html#af061f9227da53b913518a7719997c0e9">getBatteryVoltage</a></div><div class="ttdeci">uint16_t getBatteryVoltage(void)</div><div class="ttdoc">Get battery voltage.</div><div class="ttdef"><b>Definition</b> adc.cpp:83</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_d42cd31cad36dcf7f292dad5354fce4d.html">adc</a></li><li class="navelem"><b>adc.h</b></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_d42cd31cad36dcf7f292dad5354fce4d.html">adc</a></li><li class="navelem"><a class="el" href="adc_8h.html">adc.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

@@ -98,13 +98,13 @@ $(document).ready(function(){initNavTree('_load_node_cfg_8h_source.html',''); in
   <div class="headertitle"><div class="title">LoadNodeCfg.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="_load_node_cfg_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// LoadNodeCfg.cpp</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="comment">//</span></div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="comment">// This configuration file is intended for hardware/deployment environment</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// specific settings (e.g. battery voltage levels, timezone)</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="comment">// specific settings (e.g. battery voltage thresholds, timezone)</span></div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="comment">//</span></div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// created: 07/2024</span></div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">//</span></div>
@@ -144,26 +144,28 @@ $(document).ready(function(){initNavTree('_load_node_cfg_8h_source.html',''); in
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">// -</span></div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">//</span></div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#include &lt;LittleFS.h&gt;</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;ArduinoJson.h&gt;</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="keywordtype">void</span> loadNodeCfg(</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    String &amp;tzinfo,</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    uint16_t &amp;voltage_eco_exit,</div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    uint16_t &amp;voltage_eco_enter,</div>
-<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    uint16_t &amp;voltage_critical,</div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    uint16_t &amp;batt_discharge_lim,</div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    uint16_t &amp;batt_charge_lim,</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keyword">struct</span> sPowerFeatherCfg &amp;powerFeatherCfg);</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &lt;LittleFS.h&gt;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &lt;ArduinoJson.h&gt;</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &quot;<a class="code" href="logging_8h.html">logging.h</a>&quot;</span></div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keywordtype">void</span> <a class="code hl_function" href="_load_node_cfg_8h.html#af8c08f2213a129d22f9d987b017bf50f">loadNodeCfg</a>(</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    String &amp;tzinfo,</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    uint16_t &amp;voltage_eco_exit,</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    uint16_t &amp;voltage_eco_enter,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    uint16_t &amp;voltage_critical,</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    uint16_t &amp;batt_discharge_lim,</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>    uint16_t &amp;batt_charge_lim,</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keyword">struct</span> sPowerFeatherCfg &amp;powerFeatherCfg);</div>
+<div class="ttc" id="a_load_node_cfg_8h_html_af8c08f2213a129d22f9d987b017bf50f"><div class="ttname"><a href="_load_node_cfg_8h.html#af8c08f2213a129d22f9d987b017bf50f">loadNodeCfg</a></div><div class="ttdeci">void loadNodeCfg(String &amp;tzinfo, uint16_t &amp;voltage_eco_exit, uint16_t &amp;voltage_eco_enter, uint16_t &amp;voltage_critical, uint16_t &amp;batt_discharge_lim, uint16_t &amp;batt_charge_lim, struct sPowerFeatherCfg &amp;powerFeatherCfg)</div><div class="ttdoc">Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available.</div><div class="ttdef"><b>Definition</b> LoadNodeCfg.cpp:52</div></div>
+<div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Replacement for esp32-hal-log.h on RP20240.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>LoadNodeCfg.h</b></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="_load_node_cfg_8h.html">LoadNodeCfg.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

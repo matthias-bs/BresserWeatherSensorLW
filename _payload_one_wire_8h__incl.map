@@ -1,0 +1,11 @@
+<map id="src/PayloadOneWire.h" name="src/PayloadOneWire.h">
+<area shape="rect" id="Node000001" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="342,5,506,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,240,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="376,33,185,78,184,73,375,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="264,79,421,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="413,33,368,72,364,68,409,29"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="445,79,565,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="439,29,484,68,480,72,435,33"/>
+<area shape="rect" id="Node000005" href="$logging_8h.html" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="589,79,672,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="458,28,585,72,583,77,456,33"/>
+</map>

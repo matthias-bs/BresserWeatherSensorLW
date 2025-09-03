@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['raingauge_0',['rainGauge',['../class_payload_bresser.html#a817a2cfaa3942071014a6fccab423899',1,'PayloadBresser']]],
-  ['rssi_1',['rssi',['../struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44',1,'BleDataS']]]
+  ['m_5fpblescan_0',['m_pBLEScan',['../class_ble_sensors_callbacks_1_1_scan_callbacks.html#aac4b4cd236064b196de2d66c9c29cacc',1,'BleSensorsCallbacks::ScanCallbacks']]],
+  ['m_5fsensordata_1',['m_sensorData',['../class_ble_sensors_callbacks_1_1_scan_callbacks.html#a6fc2cacf6fb18c6d6be45dbdb163b054',1,'BleSensorsCallbacks::ScanCallbacks']]]
 ];

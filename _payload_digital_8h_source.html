@@ -98,7 +98,7 @@ $(document).ready(function(){initNavTree('_payload_digital_8h_source.html',''); 
   <div class="headertitle"><div class="title">PayloadDigital.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<a href="_payload_digital_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="comment">// PayloadDigital.h</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="comment">//</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="comment">// Read digital input channels and encode as LoRaWAN payload</span></div>
@@ -137,48 +137,49 @@ $(document).ready(function(){initNavTree('_payload_digital_8h_source.html',''); 
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><span class="comment">// -</span></div>
 <div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="comment">//</span></div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#if !defined(_PAYLOAD_DIGITAL)</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="preprocessor">#define _PAYLOAD_DIGITAL</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="preprocessor">#include &quot;logging.h&quot;</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#ifdef DISTANCESENSOR_EN</span></div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="comment">// A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor</span></div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &lt;DistanceSensor_A02YYUW.h&gt;</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="foldopen" id="foldopen00054" data-start="{" data-end="};">
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="class_payload_digital.html">   54</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_digital.html">PayloadDigital</a></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>{</div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">   60</a></span>    <a class="code hl_function" href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">PayloadDigital</a>(){};</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">begin</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6">encodeDigital</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#ifdef DISTANCESENSOR_EN</span></div>
-<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordtype">void</span> initDistanceSensor(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#if !defined(_PAYLOAD_DIGITAL)</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="preprocessor">#define _PAYLOAD_DIGITAL</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span><span class="preprocessor">#include &quot;../BresserWeatherSensorLWCfg.h&quot;</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span><span class="preprocessor">#include &lt;LoraMessage.h&gt;</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="preprocessor">#include &quot;<a class="code" href="logging_8h.html">logging.h</a>&quot;</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#ifdef DISTANCESENSOR_EN</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment">// A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &lt;DistanceSensor_A02YYUW.h&gt;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="foldopen" id="foldopen00063" data-start="{" data-end="};">
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno"><a class="line" href="class_payload_digital.html">   63</a></span><span class="keyword">class </span><a class="code hl_class" href="class_payload_digital.html">PayloadDigital</a></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>{</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno"><a class="line" href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">   69</a></span>    <a class="code hl_function" href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">PayloadDigital</a>(){};</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">begin</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6">encodeDigital</a>(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder);</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span> </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    uint16_t readDistanceSensor(<span class="keywordtype">void</span>)</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>};</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="preprocessor">#ifdef DISTANCESENSOR_EN</span></div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keywordtype">void</span> initDistanceSensor(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    uint16_t readDistanceSensor(<span class="keywordtype">void</span>)</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>};</div>
 </div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_DIGITAL</span></div>
-<div class="ttc" id="aclass_payload_digital_html"><div class="ttname"><a href="class_payload_digital.html">PayloadDigital</a></div><div class="ttdef"><b>Definition</b> PayloadDigital.h:55</div></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#endif </span><span class="comment">//_PAYLOAD_DIGITAL</span></div>
+<div class="ttc" id="aclass_payload_digital_html"><div class="ttname"><a href="class_payload_digital.html">PayloadDigital</a></div><div class="ttdoc">LoRaWAN node application layer - digital channels.</div><div class="ttdef"><b>Definition</b> PayloadDigital.h:64</div></div>
 <div class="ttc" id="aclass_payload_digital_html_a0aa5d6f61ce07e16da6241f1234faec6"><div class="ttname"><a href="class_payload_digital.html#a0aa5d6f61ce07e16da6241f1234faec6">PayloadDigital::encodeDigital</a></div><div class="ttdeci">void encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &amp;encoder)</div><div class="ttdoc">Encode digital data channels for LoRaWAN transmission.</div><div class="ttdef"><b>Definition</b> PayloadDigital.cpp:62</div></div>
 <div class="ttc" id="aclass_payload_digital_html_a5e5f5fc4ee9833f2f2900870e7556b86"><div class="ttname"><a href="class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86">PayloadDigital::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Digital channel startup code.</div><div class="ttdef"><b>Definition</b> PayloadDigital.cpp:55</div></div>
-<div class="ttc" id="aclass_payload_digital_html_aac581d276d7465c46fce8dcddb0c4531"><div class="ttname"><a href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">PayloadDigital::PayloadDigital</a></div><div class="ttdeci">PayloadDigital()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadDigital.h:60</div></div>
+<div class="ttc" id="aclass_payload_digital_html_aac581d276d7465c46fce8dcddb0c4531"><div class="ttname"><a href="class_payload_digital.html#aac581d276d7465c46fce8dcddb0c4531">PayloadDigital::PayloadDigital</a></div><div class="ttdeci">PayloadDigital()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> PayloadDigital.h:69</div></div>
+<div class="ttc" id="alogging_8h_html"><div class="ttname"><a href="logging_8h.html">logging.h</a></div><div class="ttdoc">Replacement for esp32-hal-log.h on RP20240.</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><b>PayloadDigital.h</b></li>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="_payload_digital_8h.html">PayloadDigital.h</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

@@ -1,0 +1,9 @@
+<map id="src/PayloadDigital.h" name="src/PayloadDigital.h">
+<area shape="rect" id="Node000001" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="249,5,399,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,240,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="293,33,169,77,167,71,291,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="264,79,384,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="327,31,327,65,321,65,321,31"/>
+<area shape="rect" id="Node000004" href="$logging_8h.html" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="408,79,491,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="345,28,418,69,416,74,343,33"/>
+</map>

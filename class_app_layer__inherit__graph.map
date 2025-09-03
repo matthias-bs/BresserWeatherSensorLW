@@ -1,13 +1,13 @@
 <map id="AppLayer" name="AppLayer">
 <area shape="rect" id="Node000001" title="LoRaWAN node application layer." alt="" coords="312,79,395,104"/>
-<area shape="rect" id="Node000002" href="$class_payload_bresser.html" title=" " alt="" coords="5,5,128,31"/>
+<area shape="rect" id="Node000002" href="$class_payload_bresser.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="5,5,128,31"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,31,312,77,311,82,125,37"/>
-<area shape="rect" id="Node000003" href="$class_payload_analog.html" title=" " alt="" coords="153,5,271,31"/>
+<area shape="rect" id="Node000003" href="$class_payload_analog.html" title="LoRaWAN node application layer &#45; analog channels." alt="" coords="153,5,271,31"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="248,34,331,76,329,81,245,39"/>
-<area shape="rect" id="Node000004" href="$class_payload_digital.html" title=" " alt="" coords="295,5,411,31"/>
+<area shape="rect" id="Node000004" href="$class_payload_digital.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="295,5,411,31"/>
 <area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="356,44,356,79,351,79,351,44"/>
-<area shape="rect" id="Node000005" href="$class_payload_one_wire.html" title=" " alt="" coords="435,5,565,31"/>
+<area shape="rect" id="Node000005" href="$class_payload_one_wire.html" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="435,5,565,31"/>
 <area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="466,39,378,81,376,76,463,34"/>
-<area shape="rect" id="Node000006" href="$class_payload_b_l_e.html" title=" " alt="" coords="589,5,686,31"/>
+<area shape="rect" id="Node000006" href="$class_payload_b_l_e.html" title="LoRaWAN node application layer &#45; BLE sensors." alt="" coords="589,5,686,31"/>
 <area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="579,37,395,82,394,77,578,31"/>
 </map>

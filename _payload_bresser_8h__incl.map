@@ -1,0 +1,43 @@
+<map id="src/PayloadBresser.h" name="src/PayloadBresser.h">
+<area shape="rect" id="Node000001" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="459,5,615,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,233,240,258"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="460,30,329,50,271,64,231,81,196,112,168,150,148,188,134,221,129,219,143,186,164,147,192,108,228,76,269,59,328,45,459,25"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="517,79,672,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="549,29,579,66,575,70,545,33"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="696,79,827,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="574,28,713,72,711,77,573,33"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="223,152,287,177"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="460,24,419,30,376,40,334,57,296,81,275,108,263,139,258,137,270,106,293,77,331,52,374,35,418,25,459,19"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="718,152,829,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="529,32,506,67,502,85,507,102,529,110,579,122,705,148,704,153,578,127,527,115,503,106,496,86,501,65,524,29"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="851,79,957,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="597,28,838,75,837,80,596,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="981,79,1075,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="616,26,774,47,968,76,967,81,773,52,615,31"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="1100,79,1220,104"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="616,24,824,45,1086,76,1086,81,824,50,615,29"/>
+<area shape="rect" id="Node000010" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="307,79,442,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="512,33,415,75,413,71,510,28"/>
+<area shape="rect" id="Node000015" href="$logging_8h.html" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="264,233,347,258"/>
+<area shape="poly" id="edge24_Node000001_Node000015" title=" " alt="" coords="460,26,415,32,366,43,317,58,272,81,241,101,217,123,210,134,207,147,207,161,213,176,236,204,266,224,263,229,232,208,208,179,202,162,201,146,205,132,213,119,238,97,269,76,315,54,365,37,414,27,459,21"/>
+<area shape="poly" id="edge13_Node000010_Node000002" title=" " alt="" coords="369,106,341,142,300,180,242,210,184,231,183,226,240,206,297,175,338,138,365,102"/>
+<area shape="poly" id="edge11_Node000010_Node000005" title=" " alt="" coords="357,106,288,147,285,142,354,102"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="439,101,705,148,704,154,438,107"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="614,233,698,258"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="422,102,483,121,547,150,597,185,637,221,633,225,594,189,544,154,481,126,421,107"/>
+<area shape="rect" id="Node000012" href="$_load_node_cfg_8h.html" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="413,152,534,177"/>
+<area shape="poly" id="edge14_Node000010_Node000012" title=" " alt="" coords="392,102,448,142,445,146,389,106"/>
+<area shape="poly" id="edge23_Node000010_Node000015" title=" " alt="" coords="373,105,345,178,322,222,317,219,340,176,368,103"/>
+<area shape="rect" id="Node000016" href="$adc_8h.html" title="ADC wrapper/convenience functions." alt="" coords="610,152,694,177"/>
+<area shape="poly" id="edge20_Node000010_Node000016" title=" " alt="" coords="420,101,597,147,596,152,419,107"/>
+<area shape="poly" id="edge18_Node000012_Node000002" title=" " alt="" coords="423,180,187,232,186,227,422,175"/>
+<area shape="poly" id="edge15_Node000012_Node000011" title=" " alt="" coords="501,175,618,225,616,230,499,180"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="507,233,589,258"/>
+<area shape="poly" id="edge16_Node000012_Node000013" title=" " alt="" coords="486,176,530,221,526,225,482,179"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="371,233,482,258"/>
+<area shape="poly" id="edge17_Node000012_Node000014" title=" " alt="" coords="469,179,443,222,438,219,464,176"/>
+<area shape="poly" id="edge19_Node000012_Node000015" title=" " alt="" coords="450,180,343,229,341,225,448,175"/>
+<area shape="poly" id="edge21_Node000016_Node000011" title=" " alt="" coords="655,177,657,219,652,219,650,178"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="722,225,915,265"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="677,175,767,217,765,222,675,180"/>
+</map>

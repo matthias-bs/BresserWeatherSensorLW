@@ -1,0 +1,8 @@
+<map id="src/SystemContext.h" name="src/SystemContext.h">
+<area shape="rect" id="Node000001" title="System context for BresserWeatherSensorLW." alt="" coords="5,5,163,31"/>
+<area shape="rect" id="Node000002" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="25,152,143,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,43,55,79,54,99,59,118,77,150,72,153,54,120,48,99,49,78,66,41"/>
+<area shape="rect" id="Node000003" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="65,79,221,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="104,40,135,77,131,80,100,43"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="126,116,96,154,91,150,122,113"/>
+</map>

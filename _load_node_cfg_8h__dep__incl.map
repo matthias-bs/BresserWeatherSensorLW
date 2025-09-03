@@ -1,0 +1,10 @@
+<map id="src/LoadNodeCfg.h" name="src/LoadNodeCfg.h">
+<area shape="rect" id="Node000001" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="12,5,156,31"/>
+<area shape="rect" id="Node000002" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="5,79,163,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,44,87,79,81,79,81,44"/>
+<area shape="rect" id="Node000003" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="25,225,143,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,117,55,153,54,172,59,191,77,224,72,226,54,193,48,173,49,151,66,115"/>
+<area shape="rect" id="Node000004" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="65,152,221,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,113,135,150,131,154,100,116"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="126,190,96,227,91,224,122,186"/>
+</map>
