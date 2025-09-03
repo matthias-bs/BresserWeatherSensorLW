@@ -52,7 +52,9 @@
 
 namespace BleSensorsCallbacks
 {
-
+  /*!
+   * \brief BLE scan calback class
+   */
   class ScanCallbacks : public NimBLEScanCallbacks
   {
   public:
