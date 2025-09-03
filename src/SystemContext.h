@@ -72,14 +72,6 @@ using namespace PowerFeather;
 class SystemContext
 {
 public:
-    uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
-    uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
-    uint16_t voltage_critical = VOLTAGE_CRITICAL;
-    uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
-    uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
-    uint16_t batteryVoltage = 0;  // Battery voltage in mV
-    uint16_t supplyVoltage = 0;   // Supply voltage in mV
-    uint16_t mcuVoltage = 0;      // MCU supply voltage in mV (depending on the circuit)
     uint16_t sleep_interval;      //!< preferences: sleep interval
     uint16_t sleep_interval_long; //!< preferences: sleep interval long
     uint8_t lw_stat_interval;     //!< preferences: LoRaWAN node status uplink interval
@@ -442,4 +434,13 @@ private:
 #else
     struct sPowerFeatherCfg PowerFeatherCfg = {0};
 #endif
+
+uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
+uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
+uint16_t voltage_critical = VOLTAGE_CRITICAL;
+uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
+uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
+uint16_t batteryVoltage = 0;  // Battery voltage in mV
+uint16_t supplyVoltage = 0;   // Supply voltage in mV
+uint16_t mcuVoltage = 0;      // MCU supply voltage in mV (depending on the circuit)
 };
