@@ -248,13 +248,6 @@ public:
         return (sleepInterval() == sleep_interval_long);
     };
 
-#if defined(EXT_RTC)
-    /**
-     * \brief Get the Time from external RTC
-     */
-    void getTimeFromExtRTC(void);
-#endif
-
     /**
      * \brief Check if the RTC is synchronized to a time source
      *
@@ -350,6 +343,25 @@ public:
 #endif
     };
 
+#if defined(ARDUINO_M5STACK_CORE2)
+    void setupM5StackCore2(void);
+#endif
+
+private:
+#if defined(EXT_RTC)
+    /**
+     * \brief Get the Time from external RTC
+     */
+    void getTimeFromExtRTC(void);
+#endif
+
+#if defined(EXT_RTC)
+    /**
+     * \brief Synchronize the internal RTC with the external RTC
+     */
+    void syncRTCWithExtRTC(void);
+#endif
+
 #if defined(ESP32)
     /**
      * \brief Enter sleep mode (ESP32 variant)
@@ -405,18 +417,6 @@ public:
             log_i("Wake not caused by deep sleep: %u", wakeup_reason);
         }
     };
-#endif
-
-#if defined(ARDUINO_M5STACK_CORE2)
-    void setupM5StackCore2(void);
-#endif
-
-private:
-#if defined(EXT_RTC)
-    /**
-     * \brief Synchronize the internal RTC with the external RTC
-     */
-    void syncRTCWithExtRTC(void);
 #endif
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
