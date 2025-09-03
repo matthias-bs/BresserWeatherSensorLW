@@ -16,6 +16,7 @@ PayloadBresser	KEYWORD1
 PayloadDigital	KEYWORD1
 PayloadOneWire	KEYWORD1
 BleSensorsCallbacks::ScanCallbacks	KEYWORD1
+SystemContext	KEYWORD1
 
 #######################################
 # Methods (KEYWORD2)
@@ -71,6 +72,25 @@ encodeOneWire	KEYWORD2
 onDiscovered	KEYWORD2
 onResult	KEYWORD2
 onScanEnd	KEYWORD2
+SystemContext	KEYWORD2
+begin	KEYWORD2
+isFirstBoot	KEYWORD2
+resetFailedJoinCount	KEYWORD2
+sleepAfterFailedJoin	KEYWORD2
+setTime	KEYWORD2
+printDateTime	KEYWORD2
+savePreferences	KEYWORD2
+getVoltages	KEYWORD2
+sleepIfSupplyLow	KEYWORD2
+getBattlevel	KEYWORD2
+sleepInterval	KEYWORD2
+longSleepActive	KEYWORD2
+isRtcSynched	KEYWORD2
+getRtcTimeSource	KEYWORD2
+rtcNeedsSync	KEYWORD2
+sleepDuration	KEYWORD2
+uplinkDelay	KEYWORD2
+gotoSleep	KEYWORD2
 getVoltage	KEYWORD2
 getBatteryVoltage	KEYWORD2
 getSupplyVoltage	KEYWORD2
@@ -78,11 +98,19 @@ getVoltage	KEYWORD2
 getBatteryVoltage	KEYWORD2
 getSupplyVoltage	KEYWORD2
 loadNodeCfg	KEYWORD2
+loadNodeCfg	KEYWORD2
+loadSecrets	KEYWORD2
 loadSecrets	KEYWORD2
 oneWire	KEYWORD2
+__attribute__	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 
 BLE_SENSORS	LITERAL1
+cb_log_i	LITERAL1
+cb_log_w	LITERAL1
+cb_log_d	LITERAL1
+cb_log_e	LITERAL1
+cb_log_v	LITERAL1
