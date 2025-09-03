@@ -51,6 +51,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadBresser.h
+ *  \brief LoRaWAN node application layer - Bresser sensors
+ */
+
 #if !defined(_PAYLOAD_BRESSER)
 #define _PAYLOAD_BRESSER
 

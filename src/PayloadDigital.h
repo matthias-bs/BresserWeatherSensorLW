@@ -38,6 +38,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadDigital.h
+ *  \brief LoRaWAN node application layer - digital channels
+ */
+
 #if !defined(_PAYLOAD_DIGITAL)
 #define _PAYLOAD_DIGITAL
 

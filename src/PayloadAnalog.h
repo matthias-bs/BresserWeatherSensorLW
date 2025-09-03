@@ -38,6 +38,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadAnalog.h
+ *  \brief LoRaWAN node application layer - analog channels
+ */
+
 #if !defined(_PAYLOAD_ANALOG)
 #define _PAYLOAD_ANALOG
 

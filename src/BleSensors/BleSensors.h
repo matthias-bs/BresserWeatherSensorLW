@@ -45,6 +45,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file BleSensors.h
+ *  \brief Wrapper class for Theeengs Decoder (https://github.com/theengs/decoder)
+ */
+
 #if !defined(BLE_SENSORS) && !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) \
                           && !defined(ARDUINO_ARCH_RP2040)
 #define BLE_SENSORS

@@ -38,6 +38,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadOneWire.h
+ *  \brief LoRaWAN node application layer - 1-Wire sensors
+ */
+
 #if !defined(_PAYLOAD_ONE_WIRE)
 #define _PAYLOAD_ONE_WIRE
 

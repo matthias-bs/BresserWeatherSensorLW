@@ -40,6 +40,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadBLE.h
+ *  \brief LoRaWAN node application layer - BLE sensors
+ */
+
 #if !defined(_PAYLOAD_BLE)
 #define _PAYLOAD_BLE
 

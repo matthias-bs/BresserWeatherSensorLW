@@ -4,7 +4,7 @@
 // Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available
 //
 // This configuration file is intended for hardware/deployment environment
-// specific settings (e.g. battery voltage levels, timezone)
+// specific settings (e.g. battery voltage thresholds, timezone)
 //
 // created: 07/2024
 //
@@ -44,6 +44,13 @@
 // -
 //
 ///////////////////////////////////////////////////////////////////////////////
+
+/*! \file LoadNodeCfg.h
+ *  \brief Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available
+ *
+ * This configuration file is intended for hardware/deployment environment
+ * specific settings (e.g. battery voltage thresholds, timezone).
+ */
 
 #include <Arduino.h>
 #include <LittleFS.h>
