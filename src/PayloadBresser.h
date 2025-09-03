@@ -93,7 +93,7 @@ public:
     /// Weather Sensor Post-Processing Update Rate (0: auto, 1..255: minutes)
     uint8_t ws_postproc_interval = 0;
 
-    // Payload size in bytes
+    /// Payload size in bytes
     const uint8_t payloadSize[16] = {
         0,
         25, // SENSOR_TYPE_WEATHER<0|1|2> (max.)
@@ -114,6 +114,7 @@ public:
     };
 
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+    /// Map sensor type ID to name
     const char * sensorTypes[16] = {
         "Weather",
         "Weather",
@@ -135,6 +136,7 @@ public:
 #endif
 
 private:
+    /// System context
     SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
