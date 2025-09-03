@@ -971,14 +971,11 @@ uint8_t getAppStatusUplinkInterval(void);
 
 ### Class Diagram
 
-⚠️ **Needs updating!**
-
 ```mermaid
 classDiagram
     class BresserWeatherSensorLW {
         /* BresserWeatherSensorLW.ino */
         +LORA_CHIP radio
-        +LoRaWANNode node
         -Preferences store // LoRaWAN nonces
         -AppLayer appLayer
         -SystemContext sysCtx
