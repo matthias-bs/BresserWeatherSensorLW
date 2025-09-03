@@ -93,7 +93,7 @@ public:
     /// Weather Sensor Post-Processing Update Rate (0: auto, 1..255: minutes)
     uint8_t ws_postproc_interval = 0;
 
-    /// Payload size in bytes
+    /// Payload size in bytes per sensor type
     const uint8_t payloadSize[16] = {
         0,
         25, // SENSOR_TYPE_WEATHER<0|1|2> (max.)
