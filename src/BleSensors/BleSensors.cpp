@@ -52,16 +52,18 @@
 
 namespace BleSensorsCallbacks
 {
-
+  /*!
+   * \brief BLE scan calback class
+   */
   class ScanCallbacks : public NimBLEScanCallbacks
   {
   public:
-    std::vector<std::string> m_knownBLEAddresses; /// MAC addresses of known sensors
-    std::vector<ble_sensors_t> *m_sensorData;     /// Sensor data
-    NimBLEScan *m_pBLEScan;
+    std::vector<std::string> m_knownBLEAddresses; //!< MAC addresses of known sensors
+    std::vector<ble_sensors_t> *m_sensorData;     //!< Sensor data
+    NimBLEScan *m_pBLEScan;                       //!< Pointer to the BLE scan object
 
   private:
-    int m_devices_found = 0; /// Number of known devices found
+    int m_devices_found = 0; //!< Number of known devices found
 
     void onDiscovered(const NimBLEAdvertisedDevice *advertisedDevice) override
     {

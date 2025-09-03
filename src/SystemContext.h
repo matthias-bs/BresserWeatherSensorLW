@@ -43,6 +43,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file SystemContext.h
+ *  \brief System context for BresserWeatherSensorLW
+ *
+ * - Hardware (MCU or board) specific initialization
+ * - Real time clock (RTC) initialization
+ * - Sleep interval handling (energy saving/battery discharge protection)
+ * - Sleep mode/wake-up handling
+ */
 #pragma once
 
 #include <Arduino.h>
@@ -69,6 +77,13 @@ using namespace PowerFeather;
 #include <RTClib.h>
 #endif
 
+/*!
+ * \brief System context for BresserWeatherSensorLW
+ *
+ * Handles system initialization and management for the LoRaWAN node.
+ * This includes hardware-specific setup, RTC management, and power-saving features.
+ * 
+ */
 class SystemContext
 {
 public:
@@ -256,6 +271,11 @@ public:
      */
     bool isRtcSynched(void);
 
+    /**
+     * \brief Get the RTC time source
+     *
+     * \return E_TIME_SOURCE  current RTC time source
+     */
     E_TIME_SOURCE getRtcTimeSource(void);
 
     /**

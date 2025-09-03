@@ -38,6 +38,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadDigital.h
+ *  \brief LoRaWAN node application layer - digital channels
+ */
+
 #if !defined(_PAYLOAD_DIGITAL)
 #define _PAYLOAD_DIGITAL
 
@@ -51,6 +55,11 @@
 #include <DistanceSensor_A02YYUW.h>
 #endif
 
+/*!
+ * \brief LoRaWAN node application layer - digital channels
+ *
+ * Encodes data from digital input channels as LoRaWAN payload
+ */
 class PayloadDigital
 {
 public:

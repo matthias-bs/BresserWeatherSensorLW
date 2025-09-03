@@ -40,6 +40,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadBLE.h
+ *  \brief LoRaWAN node application layer - BLE sensors
+ */
+
 #if !defined(_PAYLOAD_BLE)
 #define _PAYLOAD_BLE
 
@@ -60,6 +64,12 @@
 #include <LoraMessage.h>
 #include "logging.h"
 
+
+/*!
+ * \brief LoRaWAN node application layer - BLE sensors
+ *
+ * Encodes data from Bluetooth Low Energy sensors as LoRaWAN payload
+ */
 class PayloadBLE
 {
 private:
@@ -132,6 +142,7 @@ public:
      * \brief Encode BLE temperature/humidity sensor values for LoRaWAN transmission
      *
      * \param appPayloadCfg LoRaWAN payload configuration bitmaps
+     * \param appStatus Application layer status (i.e. sensor battery status bits)
      * \param encoder LoRaWAN payload encoder object
      */
     void encodeBLE(uint8_t *appPayloadCfg, uint8_t * appStatus, LoraEncoder &encoder);

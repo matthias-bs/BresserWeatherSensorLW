@@ -47,6 +47,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file SystemContext.cpp
+ *  \brief System context for BresserWeatherSensorLW
+ *
+ * - Hardware (MCU or board) specific initialization
+ * - Real time clock (RTC) initialization
+ * - Sleep interval handling (energy saving/battery discharge protection)
+ * - Sleep mode/wake-up handling
+ */
+
 #include "SystemContext.h"
 #include <Arduino.h>
 #include <time.h>
@@ -78,7 +87,7 @@ Preferences preferences;
 
 #if defined(EXT_RTC)
 // Create an instance of the external RTC class
-EXT_RTC ext_rtc;
+EXT_RTC ext_rtc; //<! External RTC instance
 #endif
 
 // Variables which must retain their values after deep sleep
@@ -88,10 +97,10 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchoniza
 
 // utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
 // puts these in to the RTC memory which is preserved during deep-sleep
-RTC_DATA_ATTR uint16_t bootCount = 1;
-RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;
-RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED;
-RTC_DATA_ATTR bool longSleepModeActive = false;
+RTC_DATA_ATTR uint16_t bootCount = 1; //<! Boot count since power-on/HW reset
+RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0; //<! Boot count since last unsuccessful join
+RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED; //<! RTC time source
+RTC_DATA_ATTR bool longSleepModeActive = false; //<! Long sleep mode active flag
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
@@ -99,13 +108,13 @@ time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network ti
 
 // utilities & vars to support deep-sleep
 // Saved to/restored from Watchdog SCRATCH registers
-uint16_t bootCount;
-uint16_t bootCountSinceUnsuccessfulJoin;
+uint16_t bootCount; //<! Boot count since power-on/HW reset
+uint16_t bootCountSinceUnsuccessfulJoin; //<! Boot count since last unsuccessful join
 
 /// RTC time source
-E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data")));
+E_TIME_SOURCE rtcTimeSource __attribute__((section(".uninitialized_data"))); //<! RTC time source
 
-bool longSleepModeActive __attribute__((section(".uninitialized_data")));
+bool longSleepModeActive __attribute__((section(".uninitialized_data"))); //<! Long sleep mode active flag
 #endif
 
 void SystemContext::begin(void)
@@ -194,9 +203,7 @@ void SystemContext::setTime(time_t epoch, E_TIME_SOURCE source)
   rtcLastClockSync = epoch;
 }
 
-/**
- * \brief Save preferences to flash memory
- */
+// Save preferences to flash memory
 void SystemContext::savePreferences(void)
 {
   preferences.begin("BWS-LW", false);
@@ -269,17 +276,13 @@ void SystemContext::getTimeFromExtRTC(void)
 }
 #endif
 
-/**
- * \brief Check if the RTC is synchronized to a time source
- *
- * \return true     if the RTC is synchronized to a time source
- * \return false    if the RTC is not synchronized
- */
+// Check if the RTC is synchronized to a time source
 bool SystemContext::isRtcSynched(void)
 {
   return rtcTimeSource != E_TIME_SOURCE::E_UNSYNCHED;
 }
 
+// Get the RTC time source
 E_TIME_SOURCE SystemContext::getRtcTimeSource(void)
 {
   return rtcTimeSource;

@@ -46,6 +46,18 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file logging.h
+ *  \brief Replacement for esp32-hal-log.h on RP20240
+ *
+ * Replacement for
+ * https://github.com/espressif/arduino-esp32/blob/master/cores/esp32/esp32-hal-log.h
+ * on RP2040
+ * 
+ * - DEBUG_RP2040_PORT is set in Arduino IDE:
+ *   Tools->Debug port: "<Disabled>|<Serial>|<Serial1>|<Serial2>"
+ * - CORE_DEBUG_LEVEL has to be set manually below
+ */
+
 #ifndef LOGGING_H
 #define LOGGING_H
 

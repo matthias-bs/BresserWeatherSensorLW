@@ -39,6 +39,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file LoadSecrets.h
+ *  \brief Load LoRaWAN secrets from file 'secrets.json' on LittleFS, if available
+ */
+
 #include <Arduino.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>

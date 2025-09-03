@@ -51,6 +51,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file PayloadBresser.h
+ *  \brief LoRaWAN node application layer - Bresser sensors
+ */
+
 #if !defined(_PAYLOAD_BRESSER)
 #define _PAYLOAD_BRESSER
 
@@ -71,6 +75,12 @@
 #include "SystemContext.h"
 #include "logging.h"
 
+
+/*!
+ * \brief LoRaWAN node application layer - Bresser sensors
+ *
+ * Encodes data from Bresser sensors received via radio messages as LoRaWAN payload
+ */
 class PayloadBresser
 {
 public:
@@ -83,7 +93,7 @@ public:
     /// Weather Sensor Post-Processing Update Rate (0: auto, 1..255: minutes)
     uint8_t ws_postproc_interval = 0;
 
-    // Payload size in bytes
+    /// Payload size in bytes
     const uint8_t payloadSize[16] = {
         0,
         25, // SENSOR_TYPE_WEATHER<0|1|2> (max.)
@@ -104,6 +114,7 @@ public:
     };
 
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_INFO
+    /// Map sensor type ID to name
     const char * sensorTypes[16] = {
         "Weather",
         "Weather",
@@ -125,6 +136,7 @@ public:
 #endif
 
 private:
+    /// System context
     SystemContext *_sysCtx;
 
     /// Preferences (stored in flash memory)
@@ -174,6 +186,7 @@ public:
      * \brief Encode Bresser sensor data for LoRaWAN transmission
      *
      * \param appPayloadCfg LoRaWAN payload configuration bitmaps
+     * \param appStatus Application layer status (i.e. sensor battery status bits)
      * \param encoder LoRaWAN payload encoder object
      */
     void encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, LoraEncoder &encoder);

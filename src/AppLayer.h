@@ -55,6 +55,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+/*! \file AppLayer.h
+ *  \brief LoRaWAN node application layer
+ */
+
 #if !defined(_APPLAYER_H)
 #define _APPLAYER_H
 
