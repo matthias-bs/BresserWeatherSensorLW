@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['cb_5flog_5fd_0',['cb_log_d',['../_ble_sensors_8h.html#a3860cf498f465d29883eba8198764eee',1,'BleSensors.h']]],
-  ['cb_5flog_5fe_1',['cb_log_e',['../_ble_sensors_8h.html#a9c11a1390bfcd4b0b2e2ce039bdf45be',1,'BleSensors.h']]],
-  ['cb_5flog_5fi_2',['cb_log_i',['../_ble_sensors_8h.html#a339893fb678b184a69de96a6feef6d87',1,'BleSensors.h']]],
-  ['cb_5flog_5fv_3',['cb_log_v',['../_ble_sensors_8h.html#af069e06f969822182f391400aa80765f',1,'BleSensors.h']]],
-  ['cb_5flog_5fw_4',['cb_log_w',['../_ble_sensors_8h.html#a5cd832481ff28ae0f6551e6eb9639f92',1,'BleSensors.h']]],
-  ['clearscanresults_5',['clearScanResults',['../class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588',1,'BleSensors']]]
+  ['batt_5flevel_0',['batt_level',['../struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff',1,'BleDataS']]],
+  ['begin_1',['begin',['../class_app_layer.html#ac8292cd2853576c6178c018f25020820',1,'AppLayer::begin()'],['../class_ble_sensors.html#af496499868213e31c9757b0158e869a0',1,'BleSensors::begin()'],['../class_payload_analog.html#af359fb1d3381a74b71fa845f3675301a',1,'PayloadAnalog::begin()'],['../class_payload_b_l_e.html#a0d3896f610ae065f685dec5cf41c060f',1,'PayloadBLE::begin()'],['../class_payload_bresser.html#adb2aeefccdd9c9f759f7235a2a5c7dc1',1,'PayloadBresser::begin()'],['../class_payload_digital.html#a5e5f5fc4ee9833f2f2900870e7556b86',1,'PayloadDigital::begin()'],['../class_system_context.html#acafc50ac51197ddf4c29ccf145125422',1,'SystemContext::begin()']]],
+  ['ble_5fsensors_2',['BLE_SENSORS',['../_ble_sensors_8h.html#afe7b10510698e2f90c005470e4310cb9',1,'BleSensors.h']]],
+  ['ble_5fsensors_5ft_3',['ble_sensors_t',['../_ble_sensors_8h.html#aabeec3c2c34590507ead85e2297be92c',1,'BleSensors.h']]],
+  ['bleaddrinit_4',['bleAddrInit',['../class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e',1,'PayloadBLE']]],
+  ['bledatas_5',['BleDataS',['../struct_ble_data_s.html',1,'']]],
+  ['blesensors_6',['blesensors',['../class_ble_sensors.html',1,'BleSensors'],['../class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5',1,'BleSensors::BleSensors(std::vector&lt; std::string &gt; known_sensors)'],['../class_ble_sensors.html#a7c2b4d41c2144a40ed9fa1ddb9fc1cb0',1,'BleSensors::BleSensors(void)']]],
+  ['blesensors_2eh_7',['BleSensors.h',['../_ble_sensors_8h.html',1,'']]]
 ];

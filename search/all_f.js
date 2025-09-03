@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['uplinkdelay_0',['uplinkDelay',['../class_system_context.html#a7c2a0840817331b095fb21b4de194249',1,'SystemContext']]]
+  ['temperature_0',['temperature',['../struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1',1,'BleDataS']]]
 ];

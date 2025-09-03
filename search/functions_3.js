@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['decodedownlink_0',['decodeDownlink',['../class_app_layer.html#a3a16ef6e33cfd0ff29ee3248780cb3e8',1,'AppLayer']]]
+  ['clearscanresults_0',['clearScanResults',['../class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588',1,'BleSensors']]]
 ];

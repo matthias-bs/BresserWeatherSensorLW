@@ -1,10 +1,13 @@
 <map id="src/LoadNodeCfg.h" name="src/LoadNodeCfg.h">
-<area shape="rect" id="Node000001" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="12,5,156,31"/>
-<area shape="rect" id="Node000002" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="5,79,163,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,44,87,79,81,79,81,44"/>
-<area shape="rect" id="Node000003" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="25,225,143,251"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,117,55,153,54,172,59,191,77,224,72,226,54,193,48,173,49,151,66,115"/>
-<area shape="rect" id="Node000004" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="65,152,221,177"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,113,135,150,131,154,100,116"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="126,190,96,227,91,224,122,186"/>
+<area shape="rect" id="Node000001" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="81,5,225,31"/>
+<area shape="rect" id="Node000002" href="$_system_context_8cpp.html" title="System context for BresserWeatherSensorLW." alt="" coords="5,152,177,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,44,124,80,98,153,93,151,120,78,137,42"/>
+<area shape="rect" id="Node000003" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="134,79,291,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,40,205,77,201,80,169,43"/>
+<area shape="poly" id="edge6_Node000003_Node000002" title=" " alt="" coords="182,113,113,154,110,149,180,109"/>
+<area shape="rect" id="Node000004" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="214,225,331,251"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="222,117,243,176,268,224,263,226,238,178,217,119"/>
+<area shape="rect" id="Node000005" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="253,152,409,177"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="245,109,313,149,311,154,242,113"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="315,190,284,227,280,224,311,186"/>
 </map>
