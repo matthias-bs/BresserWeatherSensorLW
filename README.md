@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/matthias-bs/BresserWeatherSensorLW?maxAge=3600)](https://github.com/matthias-bs/BresserWeatherSensorLW/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/matthias-bs/BresserWeatherSensorLW/blob/main/LICENSE)
 
-Bresser 868 MHz Weather Sensor Radio Receiver based on ESP32/RP2040 and SX1262/SX1276 &mdash; sends data to a [LoRaWAN Network](https://lora-alliance.org/)
+Bresser 868 MHz Weather Sensor Radio Receiver based on ESP32/RP2040 and SX1262/SX1276/LR1121 &mdash; sends data to a [LoRaWAN Network](https://lora-alliance.org/)
 
 Moreover, this project provides a base for a generic LoRaWAN device, which transmits sensor data, digital or analog input signals.
 
