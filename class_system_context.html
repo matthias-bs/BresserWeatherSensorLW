@@ -144,8 +144,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>savePreferences</b> (
 <tr class="memitem:a525c50b9ae13e4a7d7922ee291599d80" id="r_a525c50b9ae13e4a7d7922ee291599d80"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#a525c50b9ae13e4a7d7922ee291599d80">isRtcSynched</a> (void)</td></tr>
 <tr class="memdesc:a525c50b9ae13e4a7d7922ee291599d80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the RTC is synchronized to a time source.  <br /></td></tr>
 <tr class="separator:a525c50b9ae13e4a7d7922ee291599d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec72440587ad41d0c5d7ea646fde86c9" id="r_aec72440587ad41d0c5d7ea646fde86c9"><td class="memItemLeft" align="right" valign="top"><a id="aec72440587ad41d0c5d7ea646fde86c9" name="aec72440587ad41d0c5d7ea646fde86c9"></a>
-E_TIME_SOURCE&#160;</td><td class="memItemRight" valign="bottom"><b>getRtcTimeSource</b> (void)</td></tr>
+<tr class="memitem:aec72440587ad41d0c5d7ea646fde86c9" id="r_aec72440587ad41d0c5d7ea646fde86c9"><td class="memItemLeft" align="right" valign="top">E_TIME_SOURCE&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#aec72440587ad41d0c5d7ea646fde86c9">getRtcTimeSource</a> (void)</td></tr>
+<tr class="memdesc:aec72440587ad41d0c5d7ea646fde86c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the RTC time source.  <br /></td></tr>
 <tr class="separator:aec72440587ad41d0c5d7ea646fde86c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abd70559c86f099e43b92bc6fb302a8e1" id="r_abd70559c86f099e43b92bc6fb302a8e1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#abd70559c86f099e43b92bc6fb302a8e1">rtcNeedsSync</a> (void)</td></tr>
 <tr class="memdesc:abd70559c86f099e43b92bc6fb302a8e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the RTC needs to be synchronized to a time source.  <br /></td></tr>
@@ -244,6 +244,27 @@ Here is the call graph for this function:</div>
 <p>Get the battery fill level. </p>
 <p>Get the battery fill level for LoRaWAN device status uplink. The LoRaWAN network server may periodically request this information.</p>
 <p>0 = external power source 1 = lowest (empty battery) 254 = highest (full battery) 255 = unable to measure </p>
+
+</div>
+</div>
+<a id="aec72440587ad41d0c5d7ea646fde86c9" name="aec72440587ad41d0c5d7ea646fde86c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec72440587ad41d0c5d7ea646fde86c9">&#9670;&#160;</a></span>getRtcTimeSource()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">E_TIME_SOURCE SystemContext::getRtcTimeSource </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the RTC time source. </p>
+<dl class="section return"><dt>Returns</dt><dd>E_TIME_SOURCE current RTC time source </dd></dl>
 
 </div>
 </div>
