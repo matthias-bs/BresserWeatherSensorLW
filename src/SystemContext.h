@@ -271,6 +271,11 @@ public:
      */
     bool isRtcSynched(void);
 
+    /**
+     * \brief Get the RTC time source
+     *
+     * \return E_TIME_SOURCE  current RTC time source
+     */
     E_TIME_SOURCE getRtcTimeSource(void);
 
     /**

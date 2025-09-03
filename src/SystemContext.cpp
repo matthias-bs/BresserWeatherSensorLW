@@ -280,6 +280,7 @@ bool SystemContext::isRtcSynched(void)
   return rtcTimeSource != E_TIME_SOURCE::E_UNSYNCHED;
 }
 
+// Get the RTC time source
 E_TIME_SOURCE SystemContext::getRtcTimeSource(void)
 {
   return rtcTimeSource;
