@@ -979,17 +979,53 @@ classDiagram
         /* BresserWeatherSensorLW.ino */
         +LORA_CHIP radio
         +LoRaWANNode node
-        -Preferences store // LoRaWAN preferences
-        -Preferences preferences // Device preferences
-        -LoraEncoder encoder
+        -Preferences store // LoRaWAN nonces
         -AppLayer appLayer
+        -SystemContext sysCtx
+        -appStatusUplinkPending
+        -lwStatusUplinkPending
+        -LWsession[]
         -setup()
         -loop()
-        -loadSecrets()
         -decodeDownlink()
         -sendCfgUplink()
     }
     BresserWeatherSensorLW <-- AppLayer
+    BresserWeatherSensorLW <-- SystemContext
+    AppLayer --> SystemContext
+
+    class SystemContext {
+        +begin()
+        +isFirstBoot()
+        +resetFailedJoinCount()
+        +sleepAfterFailedJoin()
+        +setTime()
+        +printDateTime()
+        +savePreferences()
+        +getVoltages()
+        +sleepIfSupplyLow()
+        +getBattlevel()
+        +sleepInterval()
+        +longSleepActive()
+        +sleepDuration()
+        +uplinkDelay()
+        +gotoSleep()
+        +getRtcTimeSource()
+        +isRtcSynched()
+        +rtcNeedsSync()
+        +sleep_interval
+        +sleep_interval_long
+        +lw_stat_interval
+        -voltage_eco_exit
+        -voltage_eco_enter
+        -voltage_critical
+        -battery_discharge_lim
+        -battery_charge_lim
+        -batteryVoltage
+        -supplyVoltage
+        -mcuVoltage
+    }
+
     class AppLayer {
         -Preferences appPrefs
         -appPayloadCfg[]
@@ -1020,7 +1056,7 @@ classDiagram
         -encodeWeatherSensor()
         -encodeThermoHygroSensor()
         -encodePoolThermometer()
-        -encodeSoilSensorint()
+        -encodeSoilSensor()
         -encodeLeakageSensor()
         -encodeAirPmSensor()
         -encodeLightningSensor()
