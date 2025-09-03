@@ -71,6 +71,12 @@
 #include "SystemContext.h"
 #include "logging.h"
 
+
+/*!
+ * \brief LoRaWAN node application layer - Bresser sensors
+ *
+ * Encodes data from Bresser sensors received via radio messages as LoRaWAN payload
+ */
 class PayloadBresser
 {
 public:

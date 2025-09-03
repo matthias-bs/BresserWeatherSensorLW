@@ -60,6 +60,12 @@
 #include <LoraMessage.h>
 #include "logging.h"
 
+
+/*!
+ * \brief LoRaWAN node application layer - BLE sensors
+ *
+ * Encodes data from Bluetooth Low Energy sensors as LoRaWAN payload
+ */
 class PayloadBLE
 {
 private:

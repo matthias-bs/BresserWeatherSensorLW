@@ -47,6 +47,11 @@
 #include "logging.h"
 
 
+/*!
+ * \brief LoRaWAN node application layer - analog channels
+ *
+ * Encodes data from analog input channels as LoRaWAN payload
+ */
 class PayloadAnalog
 {
 public:

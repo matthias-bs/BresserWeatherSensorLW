@@ -51,6 +51,11 @@
 #include <LoraMessage.h>
 #include "logging.h"
 
+/*!
+ * \brief LoRaWAN node application layer - 1-Wire sensors
+ *
+ * Encodes data from 1-Wire sensors as LoRaWAN payload
+ */
 class PayloadOneWire
 {
 public:
