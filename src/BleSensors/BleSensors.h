@@ -64,11 +64,11 @@
 
 //#define CB_LOGGING
 #if defined(CB_LOGGING)
-#define cb_log_i log_i
-#define cb_log_w log_w
-#define cb_log_d log_d
-#define cb_log_e log_e
-#define cb_log_v log_v
+#define cb_log_i log_i //!< Info
+#define cb_log_w log_w //!< Warn
+#define cb_log_d log_d //!< Debug
+#define cb_log_e log_e //!< Error
+#define cb_log_v log_v //!< Verbose
 #else
 #define cb_log_i {}
 #define cb_log_w {}
