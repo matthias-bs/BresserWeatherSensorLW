@@ -639,7 +639,7 @@ Many software parameters can be defined at compile time, i.e. in [BresserWeather
 | CMD_GET_WS_TIMEOUT            | {"cmd": "CMD_GET_WS_TIMEOUT"}                                             | {"ws_timeout": <ws_timeout>} |
 | CMD_SET_WS_TIMEOUT            | {"ws_timeout": <ws_timeout>}                                              | n.a.                         |
 | CMD_RESET_RAINGAUGE           | {"reset_flags": <reset_flags>}                                            | n.a.                         |
-| CMD_SCAN_SENSORS              | {"ws_scantime": <ws_scantime>}                                            | {"found_sensors": [{"id": \<id0\>, "decoder": \<decoder0\>, "type": \<type0\>, "ch": \<ch0\>, "data_flags": <data_flags0>, "rssi": \<rssi0\>}, ...]}
+| CMD_SCAN_SENSORS              | {"ws_scantime": <ws_scantime>}                                            | {"found_sensors": [{"id": \<id0\>, "decoder": \<decoder0\>, "type": \<type0\>, "ch": \<ch0\>, "flags": <data_flags0>, "rssi": \<rssi0\>}, ...]}
 | CMD_GET_SENSORS_INC           | {"cmd": "CMD_GET_SENSORS_INC"}                                            | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]} |
 | CMD_SET_SENSORS_INC           | {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}                    | n.a.                         |
 | CMD_GET_SENSORS_EXC           | {"cmd": "CMD_GET_SENSORS_EXC"}                                            | {"sensors_exc": [<sensors_exc0>, ..., <sensors_excN>]} |
