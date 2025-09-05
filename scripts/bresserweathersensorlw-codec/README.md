@@ -1,4 +1,4 @@
-# BresserWeatherSensorLW Codec
+# BresserWeatherSensorLW LoRaWAN Payload Codec
 
 LoRaWAN Codec API compliant codec for [BresserWeatherSensorLW](https://github.com/matthias-bs/BresserWeatherSensorLW).
 
