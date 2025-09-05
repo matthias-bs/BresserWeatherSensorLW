@@ -1,6 +1,6 @@
 {
     "name": "bresserweathersensorlw-codec",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "LoRaWAN Codec API compliant codec for BresserWeatherSensorLW",
     "main": "index.js",
     "specVersion": "1.0.0",
@@ -34,7 +34,10 @@
     "files": [
       "./index.js",
       "./downlink_formatter.js",
-      "./uplink_formatter.js"
+      "./uplink_formatter.js",
+      "./examples.json",
+      "./metainfo.json",
+      "./test/codec.test.js"
     ],
     "scripts": {
       "test": "node --test"
