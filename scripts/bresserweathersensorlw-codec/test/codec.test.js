@@ -126,13 +126,13 @@ test('decodeUplink() -> CMD_GET_APP_PAYLOAD_CFG response', () => {
     ]);
     const res = codec.decodeUplink({ bytes: uplinkBytes, fPort: 0x46 });
     assert.deepEqual(res.data.bytes, {
-            bresser: [
-                "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07",
-                "0x08", "0x09", "0x0a", "0x0b", "0x0c", "0x0d", "0x0e", "0x0f"
-            ], 
-            onewire: "0x1011", 
-            analog: "0x2021", 
-            digital: "0x30313233"
+        bresser: [
+            "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07",
+            "0x08", "0x09", "0x0a", "0x0b", "0x0c", "0x0d", "0x0e", "0x0f"
+        ],
+        onewire: "0x1011",
+        analog: "0x2021",
+        digital: "0x30313233"
     }, 'data should match expected value');
 });
 
@@ -411,9 +411,9 @@ test('encodeDownlink(<CMD_SET_APP_PAYLOAD_CFG>)', () => {
         bresser: [
             "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07",
             "0x08", "0x09", "0x0A", "0x0B", "0x0C", "0x0D", "0x0E", "0x0F"
-        ], 
-        onewire: "0x1011", 
-        analog: "0x2021", 
+        ],
+        onewire: "0x1011",
+        analog: "0x2021",
         digital: "0x30313233"
     };
     const res = codec.encodeDownlink({ data: downlinkData });
@@ -457,9 +457,11 @@ test('encodeDownlink({ ws_scantime: 180 })', () => {
 });
 
 test('encodeDownlink( <CMD_SET_SENSORS_INC> )', () => {
-    const downlinkData = { sensors_inc: [
-        "0x10111213", "0x20212223"
-    ] };
+    const downlinkData = {
+        sensors_inc: [
+            "0x10111213", "0x20212223"
+        ]
+    };
     const res = codec.encodeDownlink({ data: downlinkData });
     assert.ok(res.bytes.equals(Buffer.from([
         0x10, 0x11, 0x12, 0x13, 0x20, 0x21, 0x22, 0x23
@@ -470,9 +472,11 @@ test('encodeDownlink( <CMD_SET_SENSORS_INC> )', () => {
 });
 
 test('encodeDownlink( <CMD_SET_SENSORS_EXC> )', () => {
-    const downlinkData = { sensors_exc: [
-        "0x30313233", "0x40414243"
-    ] };
+    const downlinkData = {
+        sensors_exc: [
+            "0x30313233", "0x40414243"
+        ]
+    };
     const res = codec.encodeDownlink({ data: downlinkData });
     assert.ok(res.bytes.equals(Buffer.from([
         0x30, 0x31, 0x32, 0x33, 0x40, 0x41, 0x42, 0x43
@@ -509,9 +513,11 @@ test('encodeDownlink( <CMD_SET_BLE_CONFIG> )', () => {
 });
 
 test('encodeDownlink( <CMD_SET_BLE_ADDR> )', () => {
-    const downlinkData = { ble_addr: [
-        "A0:B0:C0:D0:E0:F0", "0A:0B:0C:0D:0E:0F"
-    ] };
+    const downlinkData = {
+        ble_addr: [
+            "A0:B0:C0:D0:E0:F0", "0A:0B:0C:0D:0E:0F"
+        ]
+    };
     const res = codec.encodeDownlink({ data: downlinkData });
     assert.ok(res.bytes.equals(Buffer.from([
         0xA0, 0xB0, 0xC0, 0xD0, 0xE0, 0xF0,
@@ -523,7 +529,7 @@ test('encodeDownlink( <CMD_SET_BLE_ADDR> )', () => {
 });
 
 /*
- * decodeDownlink()
+ * decodeDownlink() - Basics
  */
 test('decode downlink returns data object', () => {
     const downlinkBytes = Buffer.from([0x01, 0x2C]);
@@ -544,11 +550,250 @@ test('decodeDownlink() with unknown fPort', () => {
     assert.ok(res.warnings.length === 0, 'should be no warnings');
 });
 
-test('decodeDownlink() -> { sleep_interval: 300 }', () => {
+/*
+ * decodeDownlink() - CMD_GET_* commands
+ */
+test('decodeDownlink(<CMD_GET_DATETIME>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x20 });
+    console.log('decodeDownlink:', res); // Print the entire result object
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_LW_CONFIG>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x36 });
+    console.log('decodeDownlink:', res); // Print the entire result object
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_LW_STATUS>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x38 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_APP_STATUS_INTERVAL>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x40 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_SENSORS_STAT>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x42 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_APP_PAYLOAD_CFG>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x46 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_WS_TIMEOUT>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC0 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_SENSORS_INC>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC6 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_SENSORS_EXC>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC8 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_SENSORS_CFG>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xCA });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_BLE_CONFIG>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xD0 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_GET_BLE_ADDR>)', () => {
+    const downlinkBytes = Buffer.from([0x00]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xD2 });
+    assert.deepEqual(res.data, [0], 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+/*
+ * decodeDownlink() - CMD_SET_* commands
+ */
+test('decodeDownlink(<CMD_SET_DATETIME>)', () => {
+    const downlinkBytes = Buffer.from([0x68, 0xB9, 0xD5, 0x83]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x21 });
+    assert.deepEqual(res.data, { unixtime: '0x68b9d583' }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_SLEEP_INTERVAL>)', () => {
     const downlinkBytes = Buffer.from([0x01, 0x2C]);
     const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x31 });
-    console.log('decodeDownlink:', res); // Print the entire result object
     assert.deepEqual(res.data, { sleep_interval: 300 }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_SLEEP_INTERVAL_LONG>)', () => {
+    const downlinkBytes = Buffer.from([0x02, 0x58]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x33 });
+    assert.deepEqual(res.data, { sleep_interval_long: 600 }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_LW_STATUS_INTERVAL>)', () => {
+    const downlinkBytes = Buffer.from([0x40]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x35 });
+    assert.deepEqual(res.data, { lw_status_interval: 64 }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_APP_STATUS_INTERVAL>)', () => {
+    const downlinkBytes = Buffer.from([0x80]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x41 });
+    assert.deepEqual(res.data, { app_status_interval: 128 }, 'data should match expected value'); // FIXME: should be: "app_status_interval"
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_APP_PAYLOAD_CFG>)', () => {
+    const downlinkBytes = Buffer.from([
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+        0x10, 0x11,
+        0x20, 0x21,
+        0x30, 0x31, 0x32, 0x33
+    ]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0x47 });
+    assert.deepEqual(res.data, {
+        bresser: [
+            "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07",
+            "0x08", "0x09", "0x0a", "0x0b", "0x0c", "0x0d", "0x0e", "0x0f"
+        ],
+        onewire: "0x1011",
+        analog: "0x2021",
+        digital: "0x30313233"
+    }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_WS_TIMEOUT>)', () => {
+    const downlinkBytes = Buffer.from([0xFF]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC1 });
+    assert.deepEqual(res.data, { ws_timeout: 255 }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_RESET_RAINGAUGE>)', () => {
+    const downlinkBytes = Buffer.from([0x0F]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC3 });
+    assert.deepEqual(res.data, { reset_flags: '0xf' }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SCAN_SENSORS>)', () => {
+    const downlinkBytes = Buffer.from([0xC8]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC4 });
+    assert.deepEqual(res.data, { ws_scantime: 200 }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_SENSORS_INC>)', () => {
+    const downlinkBytes = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x10, 0x11, 0x12, 0x13]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC7 });
+    assert.deepEqual(res.data, {
+        sensors_inc: [
+            "0x00010203", "0x10111213"
+        ]
+    }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_SENSORS_EXC>)', () => {
+    const downlinkBytes = Buffer.from([0x20, 0x21, 0x22, 0x23, 0x30, 0x31, 0x32, 0x33]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xC9 });
+    assert.deepEqual(res.data, {
+        sensors_exc: [
+            "0x20212223", "0x30313233"
+        ]
+    }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_SENSORS_CFG>)', () => {
+    const downlinkBytes = Buffer.from([0x04, 0x0A, 0x0F]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xCB });
+    assert.deepEqual(res.data, {
+        max_sensors: 4, rx_flags: 10, en_decoders: 15
+    }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_BLE_CONFIG>)', () => {
+    const downlinkBytes = Buffer.from([0x01, 0x20]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xD1 });
+    assert.deepEqual(res.data, {
+        ble_active: 1, ble_scantime: 32
+    }, 'data should match expected value');
+    assert.ok(res.warnings.length === 0, 'should be no warnings');
+    assert.ok(res.errors.length === 0, 'should be no errors');
+});
+
+test('decodeDownlink(<CMD_SET_BLE_ADDR>)', () => {
+    const downlinkBytes = Buffer.from([
+        0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF
+    ]);
+    const res = codec.decodeDownlink({ bytes: downlinkBytes, fPort: 0xD3 });
+    assert.deepEqual(res.data, {
+        ble_addr: [
+            "aa:ab:ac:ad:ae:af", "ba:bb:bc:bd:be:bf"
+        ]
+    }, 'data should match expected value');
     assert.ok(res.warnings.length === 0, 'should be no warnings');
     assert.ok(res.errors.length === 0, 'should be no errors');
 });
