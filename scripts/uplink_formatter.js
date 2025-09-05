@@ -153,6 +153,7 @@
 // 20250209 Changed flags in found_sensors() from 8 to 16 bits
 //          Added ws_tglobe_c
 // 20250828 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
+// 20250905 Added module export
 //
 // ToDo:
 // -  
@@ -903,3 +904,5 @@ function decodeUplink(input) {
         errors: []
     };
 }
+
+module.exports.decodeUplink = decodeUplink;
