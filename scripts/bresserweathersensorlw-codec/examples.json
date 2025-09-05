@@ -1,0 +1,256 @@
+[
+    {
+        "name": "uplink_sensor_data",
+        "type": "uplink",
+        "description": "Regular sensor data uplink (port 1)",
+        "fPort": 1,
+        "payloadHex": "077E07EE2A06666667447007000700A80767",
+        "decoded": {
+            "ws_temp_c": "20.3",
+            "ws_humidity": 42,
+            "ws_rain_mm": "925.6",
+            "ws_wind_avg_ms": "0.7",
+            "ws_wind_gust_ms": "0.7",
+            "ws_wind_dir_deg": "196.0",
+            "th1_temp_c": "30.0",
+            "th1_humidity": 50,
+            "soil1_temp_c": "25.6",
+            "soil1_moisture": 40,
+            "a0_voltage_mv": 4169,
+            "ble0_temp_c": "30.7",
+            "ble0_humidity": 30,
+            "lgt_ev_time": {
+                "time": "2025-09-04T18:08:03.000Z",
+                "timestamp": 1757009283
+            },
+            "lgt_ev_events": 16,
+            "lgt_ev_dist_km": 8
+        }
+    },
+    {
+        "name": "cmd_get_datetime_response_rtc",
+        "type": "uplink",
+        "description": "Response to CMD_GET_DATETIME (RTC source)",
+        "fPort": 32,
+        "payloadHex": "647ED48001",
+        "decoded": {
+            "bytes": {
+                "unixtime": 1686033536,
+                "rtc_source": "RTC"
+            }
+        }
+    },
+    {
+        "name": "cmd_get_datetime_response_lora",
+        "type": "uplink",
+        "description": "Response to CMD_GET_DATETIME (LORA source)",
+        "fPort": 32,
+        "payloadHex": "647ED48002",
+        "decoded": {
+            "bytes": {
+                "unixtime": 1686033536,
+                "rtc_source": "LORA"
+            }
+        }
+    },
+    {
+        "name": "cmd_get_lw_config",
+        "type": "uplink",
+        "description": "Response to CMD_GET_LW_CONFIG",
+        "fPort": 54,
+        "payloadHex": "012C025880",
+        "decoded": {
+            "bytes": {
+                "sleep_interval": 300,
+                "sleep_interval_long": 600,
+                "lw_status_interval": 128
+            }
+        }
+    },
+    {
+        "name": "cmd_get_lw_status",
+        "type": "uplink",
+        "description": "Response to CMD_GET_LW_STATUS",
+        "fPort": 56,
+        "payloadHex": "740E00",
+        "decoded": {
+            "bytes": {
+                "ubatt_mv": 3700,
+                "long_sleep": 0
+            }
+        }
+    },
+    {
+        "name": "cmd_get_ws_timeout",
+        "type": "uplink",
+        "description": "Response to CMD_GET_WS_TIMEOUT",
+        "fPort": 192,
+        "payloadHex": "FF",
+        "decoded": {
+            "bytes": {
+                "ws_timeout": 255
+            }
+        }
+    },
+    {
+        "name": "cmd_get_sensors_stat",
+        "type": "uplink",
+        "description": "Sensor status bitmap (CMD_GET_SENSORS_STAT)",
+        "fPort": 66,
+        "payloadHex": "000102030405060708090a0b0c0d0e0f4041",
+        "decoded": {
+            "bytes": {
+                "sensor_status": {
+                    "bresser": [
+                        "0x00",
+                        "0x01",
+                        "0x02",
+                        "0x03",
+                        "0x04",
+                        "0x05",
+                        "0x06",
+                        "0x07",
+                        "0x08",
+                        "0x09",
+                        "0x0a",
+                        "0x0b",
+                        "0x0c",
+                        "0x0d",
+                        "0x0e",
+                        "0x0f"
+                    ],
+                    "ble": "0x4041"
+                }
+            }
+        }
+    },
+    {
+        "name": "cmd_get_app_payload_cfg",
+        "type": "uplink",
+        "description": "Response to CMD_GET_APP_PAYLOAD_CFG (app payload configuration)",
+        "fPort": 70,
+        "payloadHex": "000102030405060708090a0b0c0d0e0f101120313233",
+        "decoded": {
+            "bytes": {
+                "bresser": [
+                    "0x00",
+                    "0x01",
+                    "0x02",
+                    "0x03",
+                    "0x04",
+                    "0x05",
+                    "0x06",
+                    "0x07",
+                    "0x08",
+                    "0x09",
+                    "0x0a",
+                    "0x0b",
+                    "0x0c",
+                    "0x0d",
+                    "0x0e",
+                    "0x0f"
+                ],
+                "onewire": "0x1011",
+                "analog": "0x2021",
+                "digital": "0x30313233"
+            }
+        }
+    },
+    {
+        "name": "cmd_scan_sensors",
+        "type": "uplink",
+        "description": "Response to CMD_SCAN_SENSORS with one found sensor entry",
+        "fPort": 196,
+        "payloadHex": "FEEDBEEF1201341255",
+        "decoded": {
+            "bytes": {
+                "found_sensors": [
+                    {
+                        "id": "0xfeedbeef",
+                        "decoder": "6-in-1",
+                        "type": "Thermo-/Hygro-Sensor",
+                        "ch": 1,
+                        "flags": "0x1234",
+                        "rssi": -85
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "name": "downlink_encode_get_datetime",
+        "type": "downlink-encode",
+        "description": "Encode downlink command CMD_GET_DATETIME",
+        "input": {
+            "data": {
+                "cmd": "CMD_GET_DATETIME"
+            }
+        },
+        "output": {
+            "payloadHex": "00",
+            "fPort": 32
+        }
+    },
+    {
+        "name": "downlink_encode_set_datetime",
+        "type": "downlink-encode",
+        "description": "Encode downlink command CMD_SET_DATETIME (set epoch)",
+        "input": {
+            "data": {
+                "epoch": 1757009283
+            }
+        },
+        "output": {
+            "payloadHex": "68B9D583",
+            "fPort": 33
+        }
+    },
+    {
+        "name": "downlink_encode_set_sleep_interval",
+        "type": "downlink-encode",
+        "description": "Encode downlink CMD_SET_SLEEP_INTERVAL (300s)",
+        "input": {
+            "data": {
+                "sleep_interval": 300
+            }
+        },
+        "output": {
+            "payloadHex": "012C",
+            "fPort": 49
+        }
+    },
+    {
+        "name": "downlink_decode_set_sleep_interval",
+        "type": "downlink-decode",
+        "description": "Decode downlink CMD_SET_SLEEP_INTERVAL",
+        "fPort": 49,
+        "payloadHex": "012C",
+        "decoded": {
+            "sleep_interval": 300
+        }
+    },
+    {
+        "name": "downlink_encode_set_ws_timeout",
+        "type": "downlink-encode",
+        "description": "Encode downlink CMD_SET_WS_TIMEOUT (128s)",
+        "input": {
+            "data": {
+                "ws_timeout": 128
+            }
+        },
+        "output": {
+            "payloadHex": "80",
+            "fPort": 193
+        }
+    },
+    {
+        "name": "downlink_decode_set_ws_timeout",
+        "type": "downlink-decode",
+        "description": "Decode downlink CMD_SET_WS_TIMEOUT",
+        "fPort": 193,
+        "payloadHex": "80",
+        "decoded": {
+            "ws_timeout": 128
+        }
+    }
+]
