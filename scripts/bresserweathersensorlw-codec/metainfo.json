@@ -1,0 +1,42 @@
+{
+    "name": "bresserweathersensorlw-codec",
+    "version": "1.1.0",
+    "description": "LoRaWAN Codec API compliant codec for BresserWeatherSensorLW",
+    "main": "index.js",
+    "specVersion": "1.0.0",
+    "codec": {
+      "encodeDownlink": true,
+      "decodeDownlink": true,
+      "examples": true,
+      "jsonSchemas": false
+    },
+    "keywords": [
+      "lorawan",
+      "codec",
+      "uplink",
+      "downlink",
+      "bresser",
+      "weather-sensor",
+      "thethingsnetwork",
+      "ttn",
+      "helium-network"
+    ],
+    "author": "Matthias Prinke",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/matthias-bs/BresserWeatherSensorLW"
+    },
+    "bugs": {
+      "url": "https://github.com/matthias-bs/BresserWeatherSensorLW/issues"
+    },
+    "homepage": "https://github.com/matthias-bs/BresserWeatherSensorLW",
+    "files": [
+      "./index.js",
+      "./downlink_formatter.js",
+      "./uplink_formatter.js"
+    ],
+    "scripts": {
+      "test": "node --test"
+    }
+  }
