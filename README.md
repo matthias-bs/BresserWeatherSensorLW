@@ -68,7 +68,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [Optional Configuration](#optional-configuration)
   * [Enabling Debug Output](#enabling-debug-output)
   * [Test Run](#test-run)
-* [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
+* [](#lorawan-payload-formatters)
   * [Encoding of Unavailable or Invalid Data](#encoding-of-unavailable-or-invalid-data) 
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [MQTT Integration](#mqtt-integration)
@@ -389,6 +389,8 @@ Watch your board's debug output in the serial console and the LoRaWAN communicat
 ## LoRaWAN Payload Formatters
 
 Upload [Uplink Formatter](scripts/uplink_formatter.js) and [Downlink Formatter](scripts/downlink_formatter.js) scripts in your LoRaWAN network service provider's web console to allow decoding / encoding of raw data to / from JSON format.
+
+The npm package [bresserweathersensorlw-codec](https://www.npmjs.com/package/bresserweathersensorlw-codec) is generated from [scripts/bresserweathersensorlw-codec](https://github.com/matthias-bs/BresserWeatherSensorLW/tree/main/scripts/bresserweathersensorlw-codec).
 
 See [The Things Network MQTT Integration and Payload Formatters](https://github.com/matthias-bs/BresserWeatherSensorTTN/blob/main/README.md#the-things-network-mqtt-integration-payload-formatters) and [TS013-1.0.0 Payload Codec API](https://resources.lora-alliance.org/technical-specifications/ts013-1-0-0-payload-codec-api) for more details.
 
