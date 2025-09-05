@@ -56,6 +56,8 @@ bresserweathersensorlw-codec/
   ├── package.json
   ├── index.js
   ├── README.md
+  ├── examples.json
+  ├── metainfo.json
   ├── downlink_formatter.js
   ├── uplink_formatter.js
   └── test/
