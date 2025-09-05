@@ -69,7 +69,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
   * [Optional Configuration](#optional-configuration)
   * [Enabling Debug Output](#enabling-debug-output)
   * [Test Run](#test-run)
-* [](#lorawan-payload-formatters)
+* [LoRaWAN Payload Formatters](#lorawan-payload-formatters)
   * [Encoding of Unavailable or Invalid Data](#encoding-of-unavailable-or-invalid-data) 
   * [The Things Network Payload Formatters Setup](#the-things-network-payload-formatters-setup)
 * [MQTT Integration](#mqtt-integration)
