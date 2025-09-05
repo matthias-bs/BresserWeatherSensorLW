@@ -50,7 +50,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
 * External RTC (with Backup Battery) Integration (optional)
-* LoRaWAN Codec API compliant [uplink/downlink payload formatters](scripts/bresserweathersensorlw-codec/README.md)
+* LoRaWAN Codec API compliant [Uplink/Downlink Payload Formatters](scripts/bresserweathersensorlw-codec/README.md)
 
 ## Contents
 
