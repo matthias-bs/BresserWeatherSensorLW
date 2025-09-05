@@ -30,6 +30,6 @@
     "./uplink_formatter.js"
   ],
   "scripts": {
-    "test": "node test/codec.test.js"
+    "test": "node --test"
   }
 }
