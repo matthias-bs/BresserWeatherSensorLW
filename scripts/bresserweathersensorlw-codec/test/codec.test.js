@@ -106,7 +106,6 @@ test('decodeUplink() -> CMD_GET_SENSORS_STAT response', () => {
         0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x20, 0x21, 0x30, 0x31, 0x32, 0x33,
         0x40, 0x41, 0x42, 0x43, 0x50, 0x51]);
     const res = codec.decodeUplink({ bytes: uplinkBytes, fPort: 0x42 });
-    console.log('decodeUplink CMD_GET_SENSORS_STAT:', res.data.bytes.sensor_status);
     assert.deepEqual(res.data.bytes, {
         sensor_status: {
             bresser: [
@@ -114,6 +113,26 @@ test('decodeUplink() -> CMD_GET_SENSORS_STAT response', () => {
                 '0x08', '0x09', '0x0a', '0x0b', '0x0c', '0x0d', '0x0e', '0x0f'],
             ble: '0x4041'
         }
+    }, 'data should match expected value');
+});
+
+test('decodeUplink() -> CMD_GET_APP_PAYLOAD_CFG response', () => {
+    const uplinkBytes = Buffer.from([
+        0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+        0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
+        0x10, 0x11,
+        0x20, 0x21,
+        0x30, 0x31, 0x32, 0x33
+    ]);
+    const res = codec.decodeUplink({ bytes: uplinkBytes, fPort: 0x46 });
+    assert.deepEqual(res.data.bytes, {
+            bresser: [
+                "0x00", "0x01", "0x02", "0x03", "0x04", "0x05", "0x06", "0x07",
+                "0x08", "0x09", "0x0a", "0x0b", "0x0c", "0x0d", "0x0e", "0x0f"
+            ], 
+            onewire: "0x1011", 
+            analog: "0x2021", 
+            digital: "0x30313233"
     }, 'data should match expected value');
 });
 
