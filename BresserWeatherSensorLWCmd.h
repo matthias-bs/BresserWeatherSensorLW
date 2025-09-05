@@ -173,7 +173,7 @@
 // byte0: 0x00
 
 // Uplink (response):
-// byte0: status_interval[7:0]
+// byte0: app_status_interval[7:0]
 
 // CMD_SET_APP_STATUS_INTERVAL
 // ------------------------
@@ -182,7 +182,7 @@
 #define CMD_SET_APP_STATUS_INTERVAL 0x41
 
 // Downlink (command):
-// byte0: status_interval[7:0]
+// byte0: app_status_interval[7:0]
 
 // Uplink: n.a.
 
