@@ -15,6 +15,7 @@
 // port = CMD_SET_WS_TIMEOUT, {"timeout": <timeout_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL, {"sleep_interval": <interval_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
+// port = CMD_SET_LW_STATUS_INTERVAL, {"lw_status_interval": <interval_in_frames>}
 // port = CMD_GET_DATETIME, {"cmd": "CMD_GET_DATETIME"} / payload = 0x00
 // port = CMD_SET_DATETIME, {"epoch": <epoch>}
 // port = CMD_RESET_WS_POSTPROC, {"reset_flags": <flags>}
@@ -23,8 +24,8 @@
 // port = CMD_GET_LW_CONFIG, {"cmd": "CMD_GET_LW_CONFIG"} / payload = 0x00
 // port = CMD_GET_WS_TIMEOUT, {"cmd": "CMD_GET_WS_TIMEOUT" / payload = 0x00
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <ws_timeout>}
-// port = CMD_GET_STATUS_INTERVAL, {"cmd": "CMD_GET_STATUS_INTERVAL"} / payload = 0x00
-// port = CMD_SET_STATUS_INTERVAL, {"status_interval": <status_interval>}
+// port = CMD_GET_APP_STATUS_INTERVAL, {"cmd": "CMD_GET_APP_STATUS_INTERVAL"} / payload = 0x00
+// port = CMD_SET_APP_STATUS_INTERVAL, {"app_status_interval": <app_status_interval>}
 // port = CMD_GET_SENSORS_STAT, {"cmd": "CMD_GET_SENSORS_STAT"} / payload = 0x00
 // port = CMD_GET_SENSORS_INC, {"cmd": "CMD_GET_SENSORS_INC"} / payload = 0x00
 // port = CMD_SET_SENSORS_INC, {"sensors_inc": [<sensors_inc0>, ..., <sensors_incN>]}
@@ -49,7 +50,7 @@
 //
 // CMD_GET_WS_POSTPROC {"update_interval": <update_interval>}
 //
-// CMD_GET_STATUS_INTERVAL {"status_interval": <status_interval>}
+// CMD_GET_APP_STATUS_INTERVAL {"app_status_interval": <app_status_interval>}
 //
 // CMD_GET_SENSORS_STAT {"sensor_status": {bresser: [<bresser_stat0>, ..., <bresser_stat15>], "ble_stat": <ble_stat>}}
 //
@@ -72,7 +73,8 @@
 // <reset_flags>        : 0...15 (1: hourly / 2: daily / 4: weekly / 8: monthly) / "0x0"..."0xF"
 // <update_interval>    : Rain gauge / lightning counter post processing interval in minutes (1...255, 0: auto)
 // <rtc_source>         : 0x00: GPS / 0x01: RTC / 0x02: LORA / 0x03: unsynched / 0x04: set (source unknown)
-// <status_interval>    : Sensor status message uplink interval in no. of frames (0...255, 0: disabled)
+// <lw_status_interval> : LoRaWAN layer status message uplink interval in no. of frames (0...255, 0: disabled)
+// <app_status_interval>: App layer status message uplink interval in no. of frames (0...255, 0: disabled)
 // <sensors_incN>       : e.g. "0xDEADBEEF"
 // <sensors_excN>       : e.g. "0xDEADBEEF"
 // <max_sensors>        : max. number of Bresser sensors per receive cycle; 1...8
@@ -137,6 +139,9 @@
 // 20240722 Added CMD_SET_LW_STATUS_INTERVAL,
 //          renamed CMD_SET_STATUS_INTERVAL to CMD_SET_APP_STATUS_INTERVAL
 // 20250828 Added CMD_GET_WS_POSTPROC/CMD_SET_WS_POSTPROC
+// 20250905 Renamed status_interval to app_status_interval
+//          Renamed ble_timeout to ble_scantime
+//          Added module exports
 //
 // ToDo:
 // -  
@@ -681,7 +686,7 @@ function decodeDownlink(input) {
         case CMD_SET_APP_STATUS_INTERVAL:
             return {
                 data: {
-                    status_interval: uint8(input.bytes)
+                    app_status_interval: uint8(input.bytes)
                 }
             };
         case CMD_SET_SENSORS_INC:
@@ -723,7 +728,7 @@ function decodeDownlink(input) {
             return {
                 data: {
                     ble_active: uint8(input.bytes.slice(0, 1)),
-                    ble_timeout: uint8(input.bytes.slice(1, 2))
+                    ble_scantime: uint8(input.bytes.slice(1, 2))
                 }
             };
         default:
@@ -732,3 +737,6 @@ function decodeDownlink(input) {
             };
     }
 }
+
+module.exports.decodeDownlink = decodeDownlink;
+module.exports.encodeDownlink = encodeDownlink;
