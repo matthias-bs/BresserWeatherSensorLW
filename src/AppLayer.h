@@ -204,7 +204,7 @@ public:
      *
      * Use this if
      * - A sensor needs some time for warm-up or data acquisition
-     * - The data aquisition has to be done directly after startup
+     * - The data acquisition has to be done directly after startup
      * - The radio transceiver is used for sensor communication
      *   before starting LoRaWAN activities.
      *
