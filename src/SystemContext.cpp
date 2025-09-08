@@ -93,7 +93,7 @@ EXT_RTC ext_rtc; //<! External RTC instance
 // Variables which must retain their values after deep sleep
 #if defined(ESP32)
 // Stored in RTC RAM
-RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchonization to network time
+RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchronization to network time
 
 // utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
 // puts these in to the RTC memory which is preserved during deep-sleep
@@ -104,7 +104,7 @@ RTC_DATA_ATTR bool longSleepModeActive = false; //<! Long sleep mode active flag
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
-time_t rtcLastClockSync; //!< timestamp of last RTC synchonization to network time
+time_t rtcLastClockSync; //!< timestamp of last RTC synchronization to network time
 
 // utilities & vars to support deep-sleep
 // Saved to/restored from Watchdog SCRATCH registers
