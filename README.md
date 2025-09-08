@@ -256,7 +256,7 @@ If your setup is working &mdash; congratulations! Be nice and provide your insig
 
 #### Overview
 
-While the battery voltage measurement is not crutial for operation, it is still important if the device is powered from a battery.
+While the battery voltage measurement is not crucial for operation, it is still important if the device is powered from a battery.
 
 The battery voltage is used for:
 * Providing battery status to the LoRaWAN network server on request
