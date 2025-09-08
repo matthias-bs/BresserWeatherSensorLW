@@ -13,7 +13,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -136,7 +136,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // Minimum sleep interval (in seconds)
 #define SLEEP_INTERVAL_MIN 60
 
-// Sleep for SLEEP_INTERVAL seconds after succesful transmission
+// Sleep for SLEEP_INTERVAL seconds after successful transmission
 #define SLEEP_INTERVAL 360
 
 // Long sleep interval, MCU will sleep for SLEEP_INTERVAL_LONG seconds if battery voltage <= BATTERY_WEAK
@@ -234,7 +234,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
 // See https://docs.powerfeather.dev
 #define BATTERY_CAPACITY_MAH 2200 // battery capacity in mAh
-#define PF_TEMPERATURE_MEASUREMENT true // enable/diable temperature measurement
+#define PF_TEMPERATURE_MEASUREMENT true // enable/disable temperature measurement
 #define PF_SUPPLY_MAINTAIN_VOLTAGE 0 // ~maximum power point (MPP) voltage if using a solar panel; 0: disabled
 #define PF_BATTERY_FUEL_GAUGE true // enable/disable battery fuel gauge
 #define PF_MAX_CHARGE_CURRENT_MAH 50 // maximum charging current in mA
