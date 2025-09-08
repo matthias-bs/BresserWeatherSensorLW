@@ -35,7 +35,7 @@
 // History:
 //
 // 20230211 Created
-// 20240427 Added paramter activeScan to getData()
+// 20240427 Added parameter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250725 Fixed potential buffer overflow
 // 20250728 Fixed naming collision with ATC_MiThermometer
@@ -53,7 +53,7 @@
 namespace BleSensorsCallbacks
 {
   /*!
-   * \brief BLE scan calback class
+   * \brief BLE scan callback class
    */
   class ScanCallbacks : public NimBLEScanCallbacks
   {
