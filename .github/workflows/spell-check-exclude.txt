@@ -2,3 +2,4 @@
         if (dstStatus != DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK)
         (dstStatus != DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK) &&
     if (dstStatus == DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK)
+        dstStatus = distanceSensor.meassure();
