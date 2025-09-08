@@ -6,7 +6,7 @@ by [Davide D'Asaro](https://github.com/evon800c)
 
 I don’t know if my experience with LoRaWAN and my personal use of the BresserWeatherSensorLW project is interesting for anyone, but I am happy to share what I have realized for my experiment.
 
-LoRa and LoRaWAN and all other components that I have decided to use were completely new to me. My approch was very basic and I think that my description is not useful for advanced users. I think that it could be useful for users who are now starting the trip into this world.
+LoRa and LoRaWAN and all other components that I have decided to use were completely new to me. My approach was very basic and I think that my description is not useful for advanced users. I think that it could be useful for users who are now starting the trip into this world.
 
 When we start talking about LoRaWAN, we should also talk about its fundamental elements.<br>
 Some note from https://www.thethingsnetwork.org/docs/lorawan/architecture/
@@ -22,7 +22,7 @@ Instead of using a public LoRaWAN network (as for example TTN), I have decided t
 
 ### Network Server
 
-To implement a LoRaWAN Network Server, I have decided to use ChirpStack (https://www.chirpstack.io) installed on a virtual machine in my lab enviroment.
+To implement a LoRaWAN Network Server, I have decided to use ChirpStack (https://www.chirpstack.io) installed on a virtual machine in my lab environment.
 ChirpStack is an open source solution to implement a LoRaWAN Network Server. Documentation is available, clear and simple, so it is not necessary to explain it here.
 
 ### Gateway
@@ -77,7 +77,7 @@ For integrating ChirpStack and InfluxDB we need to:
 
 #### Create a Connection in ChirpStack to the Application Server (InfluxDB in our case)
 
-This can be done using a small number of simple paramenters, such as:
+This can be done using a small number of simple parameters, such as:
 
 - InfluxDB version 
 - API endpoint (write) &rarr; http://InfluxDB:8086/api/v2/write (as example)
@@ -138,3 +138,4 @@ On the same dashboard, you can add all visualizations/queries that you want.<br>
 From the dashboard, you can select the time frame that you need to analyze.
 
 ![Dashboard](images/image-19.png)
+

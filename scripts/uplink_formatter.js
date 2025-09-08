@@ -129,7 +129,7 @@
 // 20240528 Modified sensor data payload decoder
 // 20240529 Added uint8fp1 for UV index
 //          Added NaN results to decoding functions
-//          Added supression of NaN results in decoder
+//          Added suppression of NaN results in decoder
 // 20240530 Added SKIP_INVALID_SIGNALS
 //          Added BLE signals to decoder
 // 20240531 Fixed handling of arrays in decoder()

@@ -11,7 +11,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 //
 // 20230211 Created
 // 20240417 Added additional constructor and method setAddresses()
-// 20240427 Added paramter activeScan to getData()
+// 20240427 Added parameter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250808 Added specific logging macros in scan callback to avoid WDT reset
 //

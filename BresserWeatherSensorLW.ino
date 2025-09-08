@@ -125,7 +125,7 @@
 // - Set "Core Debug Level: Debug" for initial testing
 // - The lines with "#pragma message()" in the compiler output are not errors, but useful hints!
 // - The default LoRaWAN credentials are read at compile time from secrets.h (included in config.h),
-//   they can be overriden by the JSON file secrets.json placed in LittleFS
+//   they can be overridden by the JSON file secrets.json placed in LittleFS
 //   (Use https://github.com/earlephilhower/arduino-littlefs-upload for uploading.)
 // - Pin mapping of radio transceiver module is done in two places:
 //   - BresserWeatherSensorLW:       config.h
@@ -137,7 +137,7 @@
 //   this implementation uses Flash (via Preferences library)
 // - Storing LoRaWAN network session information speeds up the connection (join) after a restart -
 //   this implementation uses the ESP32's RTC RAM or a variable located in the RP2040's RAM, respectively.
-//   In the latter case, an uninitialzed linker section is used for this purpose.
+//   In the latter case, an uninitialized linker section is used for this purpose.
 // - The ESP32's Bluetooth LE interface is used to access sensor data (option)
 // - settimeofday()/gettimeofday() must be used to access the ESP32's RTC time
 // - Arduino ESP32 package has built-in time zone handling, see
@@ -274,7 +274,7 @@ int16_t lwActivate(LoRaWANNode &node)
     // moreover, Nonces didn't change so no need to re-save them
     if (state == RADIOLIB_ERR_NONE)
     {
-      log_d("Succesfully restored session - now activating");
+      log_d("Successfully restored session - now activating");
       state = node.activateOTAA();
       debug((state != RADIOLIB_LORAWAN_SESSION_RESTORED), "Failed to activate restored session", state, true);
 
