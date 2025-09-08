@@ -301,7 +301,7 @@ public:
      *   sleep_interval
      *
      * Additionally, the sleep interval is reduced from the
-     * default value to achieve a wake-up time alinged to
+     * default value to achieve a wake-up time aligned to
      * an integer multiple of the interval after a full hour.
      *
      * \return sleep duration in seconds
