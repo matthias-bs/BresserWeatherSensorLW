@@ -11,7 +11,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2023 Matthias Prinke
+// Copyright (c) 2025 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 // History:
 //
 // 20230211 Created
-// 20240427 Added paramter activeScan to getData()
+// 20240427 Added parameter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 //
 // ToDo:
