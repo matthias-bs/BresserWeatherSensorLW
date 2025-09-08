@@ -21,7 +21,7 @@
 //
 // Commands:
 // ----------
-// (see varants for ports below)
+// (see constants for ports below)
 // port = CMD_SET_WS_TIMEOUT, {"ws_timeout": <timeout_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL, {"sleep_interval": <interval_in_seconds>}
 // port = CMD_SET_SLEEP_INTERVAL_LONG, {"sleep_interval_long": <interval_in_seconds>}
