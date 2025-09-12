@@ -24,7 +24,7 @@ jobs:
           #- esp32:esp32:heltec_wifi_lora_32_V2
           - esp32:esp32:heltec_wifi_lora_32_V3
           #- esp32:esp32:featheresp32
-          #- esp32:esp32:m5stack_core2
+          - esp32:esp32:m5stack_core2
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
           - rp2040:rp2040:adafruit_feather:dbgport=Serial
@@ -87,7 +87,7 @@ jobs:
             "TheengsDecoder@1.9.9"
             "Preferences@2.1.0"
             "ArduinoJson@7.4.2"
-            "M5Unified@0.2.7"
+            "M5Unified@0.2.8"
             "powerfeather-sdk@1.1.0")
           for i in "${required_libs[@]}"
           do
