@@ -54,6 +54,8 @@
 
 namespace BleSensorsCallbacks
 {
+  constexpr size_t JSON_SERIALIZATION_BUFFER_SIZE = 256; //!< Buffer size for JSON serialization
+
   /*!
    * \brief BLE scan callback class
    */
@@ -126,7 +128,7 @@ namespace BleSensorsCallbacks
       {
         // Serialize into std::string
         std::string serialized;
-        serialized.reserve(256);
+        serialized.reserve(JSON_SERIALIZATION_BUFFER_SIZE);
         serializeJson(BLEdata, serialized);
         m_rawBLEJsons.push_back(std::move(serialized));
         m_rawIndexes.push_back(found_index);
@@ -204,7 +206,7 @@ unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
   {
     const std::string &serialized = scanCallbacks.m_rawBLEJsons[i];
     int idx = scanCallbacks.m_rawIndexes[i];
-    if (idx < 0 || idx >= (int)_known_sensors.size())
+    if (idx < 0 || idx >= (int)scanCallbacks.m_sensorData->size())
       continue;
 
     // Parse JSON
@@ -220,9 +222,9 @@ unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
 
     if (decoder.decodeBLEJson(BLEdata))
     {
-      if (CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG)
-      {
-        char buf[512];
+      if (CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG) {
+        constexpr size_t DEBUG_BUFFER_SIZE = 512;
+        char buf[DEBUG_BUFFER_SIZE];
         serializeJson(BLEdata, buf, sizeof(buf));
         cb_log_d("TheengsDecoder decoded device: %s", buf);
       }
