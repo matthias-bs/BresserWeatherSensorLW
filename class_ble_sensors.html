@@ -192,7 +192,7 @@ std::vector&lt; <a class="el" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85
           <td class="memname">unsigned BleSensors::getData </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>duration</em>, </td>
+          <td class="paramname"><em>scanTime</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -213,10 +213,12 @@ std::vector&lt; <a class="el" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">duration</td><td>Scan duration in seconds </td></tr>
-    <tr><td class="paramname">activeScan</td><td>0: passive scan / 1: active scan </td></tr>
+    <tr><td class="paramname">activeScan</td><td>0: passive scan / 1: active scan</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Number of known sensors found (max. size of known_sensors vector)</dd></dl>
+<p>Note: Decoding using TheengsDecoder is performed here after scanning, instead of during the NimBLE callback, to avoid heavy processing in the callback context, which can lead to the watchdog being triggered. </p>
 
 </div>
 </div>
