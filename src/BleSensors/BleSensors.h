@@ -39,9 +39,10 @@
 // 20240427 Added parameter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250808 Added specific logging macros in scan callback to avoid WDT reset
+// 20250926 Changed getData() to return number of known sensors found
 //
 // ToDo:
-// - 
+// -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -138,18 +139,20 @@ class BleSensors {
          * 
          * \param duration     Scan duration in seconds
          * \param activeScan   0: passive scan / 1: active scan
-         */                
+         * 
+         * \return Number of known sensors found (max. size of known_sensors vector)
+         */
         unsigned getData(uint32_t duration, bool activeScan = true);
         
         /*!
          * \brief Set sensor data invalid.
-         */                        
+         */
         void resetData(void);
         
         /*!
          * \brief Sensor data.
          */
-        std::vector<ble_sensors_t>  data;
+        std::vector<ble_sensors_t> data;
         
     protected:
         std::vector<std::string> _known_sensors; /// MAC addresses of known sensors
