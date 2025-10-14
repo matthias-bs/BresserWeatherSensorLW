@@ -6,6 +6,6 @@ var searchData=
   ['ble_5fsensors_5ft_3',['ble_sensors_t',['../_ble_sensors_8h.html#aabeec3c2c34590507ead85e2297be92c',1,'BleSensors.h']]],
   ['bleaddrinit_4',['bleAddrInit',['../class_payload_b_l_e.html#a37a8b17de19034803480562be7cab88e',1,'PayloadBLE']]],
   ['bledatas_5',['BleDataS',['../struct_ble_data_s.html',1,'']]],
-  ['blesensors_6',['blesensors',['../class_ble_sensors.html',1,'BleSensors'],['../class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5',1,'BleSensors::BleSensors(std::vector&lt; std::string &gt; known_sensors)'],['../class_ble_sensors.html#a7c2b4d41c2144a40ed9fa1ddb9fc1cb0',1,'BleSensors::BleSensors(void)']]],
+  ['blesensors_6',['blesensors',['../class_ble_sensors.html',1,'BleSensors'],['../class_ble_sensors.html#a53cb2a0c16f658f9928f79fa1d1ce04b',1,'BleSensors::BleSensors(std::vector&lt; std::string &gt; known_sensors, bool(*stopScanCb)()=nullptr)'],['../class_ble_sensors.html#ae99963052eaa938368fb0c5330972a42',1,'BleSensors::BleSensors(bool(*stopScanCb)()=nullptr)']]],
   ['blesensors_2eh_7',['BleSensors.h',['../_ble_sensors_8h.html',1,'']]]
 ];

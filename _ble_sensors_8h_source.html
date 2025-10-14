@@ -146,108 +146,113 @@ $(document).ready(function(){initNavTree('_ble_sensors_8h_source.html',''); init
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="comment">// 20250121 Updated for NimBLE-Arduino v2.x</span></div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="comment">// 20250808 Added specific logging macros in scan callback to avoid WDT reset</span></div>
 <div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><span class="comment">// 20250926 Changed getData() to return number of known sensors found</span></div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">//</span></div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">// ToDo:</span></div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">// -</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment">//</span></div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#if !defined(BLE_SENSORS) &amp;&amp; !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) \</span></div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">                          &amp;&amp; !defined(ARDUINO_ARCH_RP2040)</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#define BLE_SENSORS</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span> </div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &lt;NimBLEDevice.h&gt;</span>       </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#afe7b10510698e2f90c005470e4310cb9">   59</a></span><span class="preprocessor">#include &lt;decoder.h&gt;</span>            </div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="comment">// Extensive logging in the callback may lead to a watchdog reset</span></div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment">// see </span></div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment">// https://github.com/h2zero/NimBLE-Arduino/issues/329</span></div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment">// https://github.com/h2zero/NimBLE-Arduino/issues/351</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment">//#define CB_LOGGING</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#if defined(CB_LOGGING)</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#define cb_log_i log_i </span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">#define cb_log_w log_w </span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#define cb_log_d log_d </span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#define cb_log_e log_e </span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#define cb_log_v log_v </span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a339893fb678b184a69de96a6feef6d87">   74</a></span><span class="preprocessor">#define cb_log_i {} </span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a5cd832481ff28ae0f6551e6eb9639f92">   75</a></span><span class="preprocessor">#define cb_log_w {} </span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a3860cf498f465d29883eba8198764eee">   76</a></span><span class="preprocessor">#define cb_log_d {} </span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a9c11a1390bfcd4b0b2e2ce039bdf45be">   77</a></span><span class="preprocessor">#define cb_log_e {} </span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#af069e06f969822182f391400aa80765f">   78</a></span><span class="preprocessor">#define cb_log_v {} </span></div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span> </div>
-<div class="foldopen" id="foldopen00084" data-start="{" data-end="};">
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html">   84</a></span><span class="keyword">struct </span><a class="code hl_struct" href="struct_ble_data_s.html">BleDataS</a> {</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">   85</a></span>      <span class="keywordtype">bool</span>     <a class="code hl_variable" href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">valid</a>;              </div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">   86</a></span>      <span class="keywordtype">float</span>    <a class="code hl_variable" href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">temperature</a>;        </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">   87</a></span>      <span class="keywordtype">float</span>    <a class="code hl_variable" href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">humidity</a>;           </div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">   88</a></span>      uint8_t  <a class="code hl_variable" href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">batt_level</a>;         </div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">   89</a></span>      <span class="keywordtype">int</span>      <a class="code hl_variable" href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">rssi</a>;               </div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>};</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="comment">// 20251014 Added optional callback to abort scanning early</span></div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="comment">//</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="comment">// ToDo:</span></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="comment">// -</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="comment">//</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="preprocessor">#if !defined(BLE_SENSORS) &amp;&amp; !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) \</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">                          &amp;&amp; !defined(ARDUINO_ARCH_RP2040)</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#define BLE_SENSORS</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#include &lt;Arduino.h&gt;</span></div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="preprocessor">#include &lt;NimBLEDevice.h&gt;</span>       </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#afe7b10510698e2f90c005470e4310cb9">   60</a></span><span class="preprocessor">#include &lt;decoder.h&gt;</span>            </div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="comment">// Extensive logging in the callback may lead to a watchdog reset</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="comment">// see </span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span><span class="comment">// https://github.com/h2zero/NimBLE-Arduino/issues/329</span></div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment">// https://github.com/h2zero/NimBLE-Arduino/issues/351</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span> </div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment">//#define CB_LOGGING</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="preprocessor">#if defined(CB_LOGGING)</span></div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="preprocessor">#define cb_log_i log_i </span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="preprocessor">#define cb_log_w log_w </span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="preprocessor">#define cb_log_d log_d </span></div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="preprocessor">#define cb_log_e log_e </span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="preprocessor">#define cb_log_v log_v </span></div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a339893fb678b184a69de96a6feef6d87">   75</a></span><span class="preprocessor">#define cb_log_i {} </span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a5cd832481ff28ae0f6551e6eb9639f92">   76</a></span><span class="preprocessor">#define cb_log_w {} </span></div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a3860cf498f465d29883eba8198764eee">   77</a></span><span class="preprocessor">#define cb_log_d {} </span></div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#a9c11a1390bfcd4b0b2e2ce039bdf45be">   78</a></span><span class="preprocessor">#define cb_log_e {} </span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#af069e06f969822182f391400aa80765f">   79</a></span><span class="preprocessor">#define cb_log_v {} </span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="};">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html">   85</a></span><span class="keyword">struct </span><a class="code hl_struct" href="struct_ble_data_s.html">BleDataS</a> {</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">   86</a></span>      <span class="keywordtype">bool</span>     <a class="code hl_variable" href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">valid</a>;              </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">   87</a></span>      <span class="keywordtype">float</span>    <a class="code hl_variable" href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">temperature</a>;        </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">   88</a></span>      <span class="keywordtype">float</span>    <a class="code hl_variable" href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">humidity</a>;           </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">   89</a></span>      uint8_t  <a class="code hl_variable" href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">batt_level</a>;         </div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno"><a class="line" href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">   90</a></span>      <span class="keywordtype">int</span>      <a class="code hl_variable" href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">rssi</a>;               </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>};</div>
 </div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85e2297be92c">   92</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="struct_ble_data_s.html">BleDataS</a> <a class="code hl_struct" href="struct_ble_data_s.html">ble_sensors_t</a>; </div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno"><a class="line" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85e2297be92c">   93</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code hl_struct" href="struct_ble_data_s.html">BleDataS</a> <a class="code hl_struct" href="struct_ble_data_s.html">ble_sensors_t</a>; </div>
 <div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span> </div>
-<div class="foldopen" id="foldopen00098" data-start="{" data-end="};">
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno"><a class="line" href="class_ble_sensors.html">   98</a></span><span class="keyword">class </span><a class="code hl_class" href="class_ble_sensors.html">BleSensors</a> {</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    <span class="keyword">public</span>:</div>
-<div class="foldopen" id="foldopen00105" data-start="{" data-end="}">
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">  105</a></span>        <a class="code hl_function" href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">BleSensors</a>(std::vector&lt;std::string&gt; known_sensors) {</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            _known_sensors = known_sensors;</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>            <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>.resize(known_sensors.size());</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        };</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span> </div>
+<div class="foldopen" id="foldopen00099" data-start="{" data-end="};">
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno"><a class="line" href="class_ble_sensors.html">   99</a></span><span class="keyword">class </span><a class="code hl_class" href="class_ble_sensors.html">BleSensors</a> {</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00106" data-start="{" data-end="}">
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#a53cb2a0c16f658f9928f79fa1d1ce04b">  106</a></span>        <a class="code hl_function" href="class_ble_sensors.html#a53cb2a0c16f658f9928f79fa1d1ce04b">BleSensors</a>(std::vector&lt;std::string&gt; known_sensors, <span class="keywordtype">bool</span> (*stopScanCb)() = <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>            _known_sensors = known_sensors;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>            <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>.resize(known_sensors.size());</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>            _stopScanCb = stopScanCb;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        };</div>
 </div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span> </div>
-<div class="foldopen" id="foldopen00113" data-start="{" data-end="}">
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#a7c2b4d41c2144a40ed9fa1ddb9fc1cb0">  113</a></span>        <a class="code hl_function" href="class_ble_sensors.html#a7c2b4d41c2144a40ed9fa1ddb9fc1cb0">BleSensors</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        };</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="foldopen" id="foldopen00115" data-start="{" data-end="}">
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#ae99963052eaa938368fb0c5330972a42">  115</a></span>        <a class="code hl_function" href="class_ble_sensors.html#ae99963052eaa938368fb0c5330972a42">BleSensors</a>(<span class="keywordtype">bool</span> (*stopScanCb)() = <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>            <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>.resize(0);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>            _stopScanCb = stopScanCb;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        };</div>
 </div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span> </div>
-<div class="foldopen" id="foldopen00121" data-start="{" data-end="}">
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">  121</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">setAddresses</a>(std::vector&lt;std::string&gt; known_sensors) {</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>            _known_sensors = known_sensors;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>            <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>.resize(known_sensors.size());</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>        };</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
+<div class="foldopen" id="foldopen00125" data-start="{" data-end="}">
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">  125</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">setAddresses</a>(std::vector&lt;std::string&gt; known_sensors) {</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>            _known_sensors = known_sensors;</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>            <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>.resize(known_sensors.size());</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        };</div>
 </div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
-<div class="foldopen" id="foldopen00129" data-start="{" data-end="}">
-<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">  129</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">begin</a>(<span class="keywordtype">void</span>) {</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        };</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span> </div>
+<div class="foldopen" id="foldopen00133" data-start="{" data-end="}">
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">  133</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">begin</a>(<span class="keywordtype">void</span>) {</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        };</div>
 </div>
-<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        </div>
-<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588">clearScanResults</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        </div>
-<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>        <span class="keywordtype">unsigned</span> <a class="code hl_function" href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655">getData</a>(uint32_t duration, <span class="keywordtype">bool</span> activeScan = <span class="keyword">true</span>);</div>
-<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>        </div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6">resetData</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        </div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">  155</a></span>        std::vector&lt;ble_sensors_t&gt; <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>;</div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        </div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="keyword">protected</span>:</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        std::vector&lt;std::string&gt; _known_sensors; </div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>        NimBLEScan*              _pBLEScan;      </div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>};</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        </div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588">clearScanResults</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        </div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>        <span class="keywordtype">unsigned</span> <a class="code hl_function" href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655">getData</a>(uint32_t duration, <span class="keywordtype">bool</span> activeScan = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>        </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6">resetData</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        </div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno"><a class="line" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">  159</a></span>        std::vector&lt;ble_sensors_t&gt; <a class="code hl_variable" href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">data</a>;</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>        </div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>        std::vector&lt;std::string&gt; _known_sensors;  </div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>        NimBLEScan*              _pBLEScan;       </div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>        bool                    (*_stopScanCb)(); </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>};</div>
 </div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="aclass_ble_sensors_html"><div class="ttname"><a href="class_ble_sensors.html">BleSensors</a></div><div class="ttdoc">BLE Sensor (e.g. thermometer/hygrometer) client.</div><div class="ttdef"><b>Definition</b> BleSensors.h:98</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_a02b6268f0eb8262bd19d4647b34fd588"><div class="ttname"><a href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588">BleSensors::clearScanResults</a></div><div class="ttdeci">void clearScanResults(void)</div><div class="ttdoc">Delete results from BLEScan buffer to release memory.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:156</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_a0f691fc054f2f3ea6fea9c2c403fd1f5"><div class="ttname"><a href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">BleSensors::BleSensors</a></div><div class="ttdeci">BleSensors(std::vector&lt; std::string &gt; known_sensors)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> BleSensors.h:105</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_a7c2b4d41c2144a40ed9fa1ddb9fc1cb0"><div class="ttname"><a href="class_ble_sensors.html#a7c2b4d41c2144a40ed9fa1ddb9fc1cb0">BleSensors::BleSensors</a></div><div class="ttdeci">BleSensors(void)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> BleSensors.h:113</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_a7fba1205ae1c38058b1548cd14f9205c"><div class="ttname"><a href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">BleSensors::data</a></div><div class="ttdeci">std::vector&lt; ble_sensors_t &gt; data</div><div class="ttdoc">Sensor data.</div><div class="ttdef"><b>Definition</b> BleSensors.h:155</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_ae410003ea61c2eee2004a92d9395e928"><div class="ttname"><a href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">BleSensors::setAddresses</a></div><div class="ttdeci">void setAddresses(std::vector&lt; std::string &gt; known_sensors)</div><div class="ttdoc">Set BLE MAC addresses of known sensors.</div><div class="ttdef"><b>Definition</b> BleSensors.h:121</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_ae98eb8bb9a7cf676f340123abf89a1f6"><div class="ttname"><a href="class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6">BleSensors::resetData</a></div><div class="ttdeci">void resetData(void)</div><div class="ttdoc">Set sensor data invalid.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:162</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_af496499868213e31c9757b0158e869a0"><div class="ttname"><a href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">BleSensors::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Initialization.</div><div class="ttdef"><b>Definition</b> BleSensors.h:129</div></div>
-<div class="ttc" id="aclass_ble_sensors_html_afbf84629a4b746d732b66141f0387655"><div class="ttname"><a href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655">BleSensors::getData</a></div><div class="ttdeci">unsigned getData(uint32_t duration, bool activeScan=true)</div><div class="ttdoc">Get data from sensors by running a BLE scan.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:180</div></div>
-<div class="ttc" id="astruct_ble_data_s_html"><div class="ttname"><a href="struct_ble_data_s.html">BleDataS</a></div><div class="ttdoc">BLE sensor data.</div><div class="ttdef"><b>Definition</b> BleSensors.h:84</div></div>
-<div class="ttc" id="astruct_ble_data_s_html_a0eb69624bdc983a6ce9ba9c2e40c2d44"><div class="ttname"><a href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">BleDataS::rssi</a></div><div class="ttdeci">int rssi</div><div class="ttdoc">RSSI in dBm.</div><div class="ttdef"><b>Definition</b> BleSensors.h:89</div></div>
-<div class="ttc" id="astruct_ble_data_s_html_a271d5aafcdb97ea91e9183a1262911c1"><div class="ttname"><a href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">BleDataS::temperature</a></div><div class="ttdeci">float temperature</div><div class="ttdoc">temperature in degC</div><div class="ttdef"><b>Definition</b> BleSensors.h:86</div></div>
-<div class="ttc" id="astruct_ble_data_s_html_a4b203a7572b4a5bc2c67a719693ae358"><div class="ttname"><a href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">BleDataS::valid</a></div><div class="ttdeci">bool valid</div><div class="ttdoc">data valid</div><div class="ttdef"><b>Definition</b> BleSensors.h:85</div></div>
-<div class="ttc" id="astruct_ble_data_s_html_a625a619a3a728bfde61a48a14b0bbcff"><div class="ttname"><a href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">BleDataS::batt_level</a></div><div class="ttdeci">uint8_t batt_level</div><div class="ttdoc">battery level in %</div><div class="ttdef"><b>Definition</b> BleSensors.h:88</div></div>
-<div class="ttc" id="astruct_ble_data_s_html_abc21c394d7aba233293a6ba15237d780"><div class="ttname"><a href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">BleDataS::humidity</a></div><div class="ttdeci">float humidity</div><div class="ttdoc">humidity in %</div><div class="ttdef"><b>Definition</b> BleSensors.h:87</div></div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aclass_ble_sensors_html"><div class="ttname"><a href="class_ble_sensors.html">BleSensors</a></div><div class="ttdoc">BLE Sensor (e.g. thermometer/hygrometer) client.</div><div class="ttdef"><b>Definition</b> BleSensors.h:99</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_a02b6268f0eb8262bd19d4647b34fd588"><div class="ttname"><a href="class_ble_sensors.html#a02b6268f0eb8262bd19d4647b34fd588">BleSensors::clearScanResults</a></div><div class="ttdeci">void clearScanResults(void)</div><div class="ttdoc">Delete results from BLEScan buffer to release memory.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:167</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_a53cb2a0c16f658f9928f79fa1d1ce04b"><div class="ttname"><a href="class_ble_sensors.html#a53cb2a0c16f658f9928f79fa1d1ce04b">BleSensors::BleSensors</a></div><div class="ttdeci">BleSensors(std::vector&lt; std::string &gt; known_sensors, bool(*stopScanCb)()=nullptr)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> BleSensors.h:106</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_a7fba1205ae1c38058b1548cd14f9205c"><div class="ttname"><a href="class_ble_sensors.html#a7fba1205ae1c38058b1548cd14f9205c">BleSensors::data</a></div><div class="ttdeci">std::vector&lt; ble_sensors_t &gt; data</div><div class="ttdoc">Sensor data.</div><div class="ttdef"><b>Definition</b> BleSensors.h:159</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_ae410003ea61c2eee2004a92d9395e928"><div class="ttname"><a href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">BleSensors::setAddresses</a></div><div class="ttdeci">void setAddresses(std::vector&lt; std::string &gt; known_sensors)</div><div class="ttdoc">Set BLE MAC addresses of known sensors.</div><div class="ttdef"><b>Definition</b> BleSensors.h:125</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_ae98eb8bb9a7cf676f340123abf89a1f6"><div class="ttname"><a href="class_ble_sensors.html#ae98eb8bb9a7cf676f340123abf89a1f6">BleSensors::resetData</a></div><div class="ttdeci">void resetData(void)</div><div class="ttdoc">Set sensor data invalid.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:173</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_ae99963052eaa938368fb0c5330972a42"><div class="ttname"><a href="class_ble_sensors.html#ae99963052eaa938368fb0c5330972a42">BleSensors::BleSensors</a></div><div class="ttdeci">BleSensors(bool(*stopScanCb)()=nullptr)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition</b> BleSensors.h:115</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_af496499868213e31c9757b0158e869a0"><div class="ttname"><a href="class_ble_sensors.html#af496499868213e31c9757b0158e869a0">BleSensors::begin</a></div><div class="ttdeci">void begin(void)</div><div class="ttdoc">Initialization.</div><div class="ttdef"><b>Definition</b> BleSensors.h:133</div></div>
+<div class="ttc" id="aclass_ble_sensors_html_afbf84629a4b746d732b66141f0387655"><div class="ttname"><a href="class_ble_sensors.html#afbf84629a4b746d732b66141f0387655">BleSensors::getData</a></div><div class="ttdeci">unsigned getData(uint32_t duration, bool activeScan=true)</div><div class="ttdoc">Get data from sensors by running a BLE scan.</div><div class="ttdef"><b>Definition</b> BleSensors.cpp:191</div></div>
+<div class="ttc" id="astruct_ble_data_s_html"><div class="ttname"><a href="struct_ble_data_s.html">BleDataS</a></div><div class="ttdoc">BLE sensor data.</div><div class="ttdef"><b>Definition</b> BleSensors.h:85</div></div>
+<div class="ttc" id="astruct_ble_data_s_html_a0eb69624bdc983a6ce9ba9c2e40c2d44"><div class="ttname"><a href="struct_ble_data_s.html#a0eb69624bdc983a6ce9ba9c2e40c2d44">BleDataS::rssi</a></div><div class="ttdeci">int rssi</div><div class="ttdoc">RSSI in dBm.</div><div class="ttdef"><b>Definition</b> BleSensors.h:90</div></div>
+<div class="ttc" id="astruct_ble_data_s_html_a271d5aafcdb97ea91e9183a1262911c1"><div class="ttname"><a href="struct_ble_data_s.html#a271d5aafcdb97ea91e9183a1262911c1">BleDataS::temperature</a></div><div class="ttdeci">float temperature</div><div class="ttdoc">temperature in degC</div><div class="ttdef"><b>Definition</b> BleSensors.h:87</div></div>
+<div class="ttc" id="astruct_ble_data_s_html_a4b203a7572b4a5bc2c67a719693ae358"><div class="ttname"><a href="struct_ble_data_s.html#a4b203a7572b4a5bc2c67a719693ae358">BleDataS::valid</a></div><div class="ttdeci">bool valid</div><div class="ttdoc">data valid</div><div class="ttdef"><b>Definition</b> BleSensors.h:86</div></div>
+<div class="ttc" id="astruct_ble_data_s_html_a625a619a3a728bfde61a48a14b0bbcff"><div class="ttname"><a href="struct_ble_data_s.html#a625a619a3a728bfde61a48a14b0bbcff">BleDataS::batt_level</a></div><div class="ttdeci">uint8_t batt_level</div><div class="ttdoc">battery level in %</div><div class="ttdef"><b>Definition</b> BleSensors.h:89</div></div>
+<div class="ttc" id="astruct_ble_data_s_html_abc21c394d7aba233293a6ba15237d780"><div class="ttname"><a href="struct_ble_data_s.html#abc21c394d7aba233293a6ba15237d780">BleDataS::humidity</a></div><div class="ttdeci">float humidity</div><div class="ttdoc">humidity in %</div><div class="ttdef"><b>Definition</b> BleSensors.h:88</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

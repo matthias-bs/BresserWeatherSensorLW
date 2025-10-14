@@ -111,13 +111,13 @@ $(document).ready(function(){initNavTree('class_ble_sensors.html',''); initResiz
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0f691fc054f2f3ea6fea9c2c403fd1f5" id="r_a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#a0f691fc054f2f3ea6fea9c2c403fd1f5">BleSensors</a> (std::vector&lt; std::string &gt; known_sensors)</td></tr>
-<tr class="memdesc:a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
-<tr class="separator:a0f691fc054f2f3ea6fea9c2c403fd1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c2b4d41c2144a40ed9fa1ddb9fc1cb0" id="r_a7c2b4d41c2144a40ed9fa1ddb9fc1cb0"><td class="memItemLeft" align="right" valign="top"><a id="a7c2b4d41c2144a40ed9fa1ddb9fc1cb0" name="a7c2b4d41c2144a40ed9fa1ddb9fc1cb0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>BleSensors</b> (void)</td></tr>
-<tr class="memdesc:a7c2b4d41c2144a40ed9fa1ddb9fc1cb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:a7c2b4d41c2144a40ed9fa1ddb9fc1cb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53cb2a0c16f658f9928f79fa1d1ce04b" id="r_a53cb2a0c16f658f9928f79fa1d1ce04b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#a53cb2a0c16f658f9928f79fa1d1ce04b">BleSensors</a> (std::vector&lt; std::string &gt; known_sensors, bool(*stopScanCb)()=nullptr)</td></tr>
+<tr class="memdesc:a53cb2a0c16f658f9928f79fa1d1ce04b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <br /></td></tr>
+<tr class="separator:a53cb2a0c16f658f9928f79fa1d1ce04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae99963052eaa938368fb0c5330972a42" id="r_ae99963052eaa938368fb0c5330972a42"><td class="memItemLeft" align="right" valign="top"><a id="ae99963052eaa938368fb0c5330972a42" name="ae99963052eaa938368fb0c5330972a42"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>BleSensors</b> (bool(*stopScanCb)()=nullptr)</td></tr>
+<tr class="memdesc:ae99963052eaa938368fb0c5330972a42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:ae99963052eaa938368fb0c5330972a42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae410003ea61c2eee2004a92d9395e928" id="r_ae410003ea61c2eee2004a92d9395e928"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ble_sensors.html#ae410003ea61c2eee2004a92d9395e928">setAddresses</a> (std::vector&lt; std::string &gt; known_sensors)</td></tr>
 <tr class="memdesc:ae410003ea61c2eee2004a92d9395e928"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set BLE MAC addresses of known sensors.  <br /></td></tr>
 <tr class="separator:ae410003ea61c2eee2004a92d9395e928"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -147,8 +147,8 @@ std::vector&lt; <a class="el" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>BLE Sensor (e.g. thermometer/hygrometer) client. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0f691fc054f2f3ea6fea9c2c403fd1f5" name="a0f691fc054f2f3ea6fea9c2c403fd1f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f691fc054f2f3ea6fea9c2c403fd1f5">&#9670;&#160;</a></span>BleSensors()</h2>
+<a id="a53cb2a0c16f658f9928f79fa1d1ce04b" name="a53cb2a0c16f658f9928f79fa1d1ce04b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53cb2a0c16f658f9928f79fa1d1ce04b">&#9670;&#160;</a></span>BleSensors()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,8 +160,18 @@ std::vector&lt; <a class="el" href="_ble_sensors_8h.html#aabeec3c2c34590507ead85
           <td class="memname">BleSensors::BleSensors </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; std::string &gt;&#160;</td>
-          <td class="paramname"><em>known_sensors</em></td><td>)</td>
+          <td class="paramname"><em>known_sensors</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool(*)()&#160;</td>
+          <td class="paramname"><em>stopScanCb</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
