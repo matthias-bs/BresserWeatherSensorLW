@@ -42,6 +42,9 @@
 // 20250808 Added specific logging macros in scan callback to avoid WDT reset
 // 20250926 Moved decoding from callback to getData() to prevent WDT reset
 //          Modified getData() to return number of known sensors found
+// 20251013 Added abort of scanning by touch sensor
+// 20251014 Added optional callback to abort scanning early
+//          Replaced TouchTriggered by callback function pointer
 //
 // ToDo:
 // -
@@ -65,6 +68,7 @@ namespace BleSensorsCallbacks
     std::vector<std::string> m_knownBLEAddresses; //!< MAC addresses of known sensors
     std::vector<ble_sensors_t> *m_sensorData;     //!< Sensor data
     NimBLEScan *m_pBLEScan;                       //!< Pointer to the BLE scan object
+    bool (*m_stopScanCb)();                        //!< Pointer to optional callback function to stop scan early
 
     // Raw JSON payloads collected during scan for later decoding.
     std::vector<std::string> m_rawBLEJsons;
@@ -137,6 +141,13 @@ namespace BleSensorsCallbacks
         cb_log_v("Known BLE device queued for decoding at index %d", found_index);
       }
 
+      // Abort scanning if requested by callback
+      if (m_stopScanCb && m_stopScanCb())
+      {
+        log_i("Scan aborted.");
+        m_pBLEScan->stop();
+      }
+
       // Abort scanning because all known devices have been found
       if (m_devices_found == (int)m_knownBLEAddresses.size())
       {
@@ -190,6 +201,7 @@ unsigned BleSensors::getData(uint32_t scanTime, bool activeScan)
   scanCallbacks.m_knownBLEAddresses = _known_sensors;
   scanCallbacks.m_sensorData = &data;
   scanCallbacks.m_pBLEScan = _pBLEScan;
+  scanCallbacks.m_stopScanCb = _stopScanCb;
 
   // Ensure previous scan data cleared
   scanCallbacks.m_rawBLEJsons.clear();
