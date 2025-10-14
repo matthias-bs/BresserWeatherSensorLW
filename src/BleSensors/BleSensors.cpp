@@ -144,7 +144,7 @@ namespace BleSensorsCallbacks
       // Abort scanning if requested by callback
       if (m_stopScanCb && m_stopScanCb())
       {
-        log_i("Scan aborted.");
+        cb_log_i("Scan aborted.");
         m_pBLEScan->stop();
       }
 
