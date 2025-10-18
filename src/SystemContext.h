@@ -41,6 +41,7 @@
 // 20250820 Added getBattlevel()
 // 20250827 Added hysteresis for sleep interval switching
 // 20251017 Added getBattlevelPowerfeather()
+// 20251018 Added sleepIfSupplyLow for PowerFeather
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -183,6 +184,26 @@ public:
         }
     };
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+    void sleepIfSupplyLow(void)
+    {
+        Result res;
+        bool supply_good;
+
+        res = Board.checkSupplyGood(supply_good);
+        if ((res == Result::Ok) && supply_good)
+        {
+            return;
+        }
+        uint8_t soc = 0;
+        res = Board.getBatteryCharge(soc);
+        if (res == Result::Ok && soc <= PowerFeatherCfg.soc_critical)
+        {
+            log_i("Battery low!");
+            gotoSleep(sleepDuration());
+        }
+    };
+#else
     /**
      * \brief Sleep if battery voltage is low to prevent deep-discharging
      *
@@ -198,6 +219,7 @@ public:
             gotoSleep(sleepDuration());
         }
     };
+#endif
 
     /**
      * \brief Get the battery fill level
@@ -511,6 +533,7 @@ private:
         .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
         .soc_eco_enter = SOC_ECO_ENTER,
         .soc_eco_exit = SOC_ECO_EXIT,
+        .soc_critical = SOC_CRITICAL,
         .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
         .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
 #else
