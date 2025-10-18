@@ -288,6 +288,7 @@ public:
         return battLevel;
     };
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
     /**
      * \brief Get the battery fill level (for PowerFeather)
      *
@@ -323,6 +324,7 @@ public:
         }
         return 255; // Unable to measure
     };
+#endif
 
     /**
      * \brief Switch between normal and long sleep interval
