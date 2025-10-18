@@ -42,6 +42,7 @@
 // 20250827 Added hysteresis for sleep interval switching
 // 20251017 Added getBattlevelPowerfeather()
 // 20251018 Added sleepIfSupplyLow for PowerFeather
+//          Renamed mcuVoltage to busVoltage, changed busVoltage assignment
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -163,24 +164,30 @@ public:
     /**
      * \brief Get the voltages from ADC / Power Management Chip
      *
-     * The MCU voltage is evaluated to determine the state of the power supply.
+     * Bus voltage:
+     * Supply voltage (e.g. USB or external power) if available, otherwise battery voltage.
+     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V 
+     * LDO input range and by the connected 3.3V loads.
+     * Typically 5V nominal.
+     * 
+     * The bus voltage is evaluated to determine the state of the power supply.
      */
     void getVoltages(void)
     {
         batteryVoltage = getBatteryVoltage();
         supplyVoltage = getSupplyVoltage();
 
-        if (batteryVoltage != 0)
+        if (supplyVoltage > 3500)
         {
-            mcuVoltage = batteryVoltage; // Default: MCU voltage is the same as battery voltage
+            busVoltage = supplyVoltage; // Assume that supply voltage if available
         }
-        else if (supplyVoltage != 0)
+        else if (batteryVoltage > 2000)
         {
-            mcuVoltage = supplyVoltage; // Supply voltage is available, use it as MCU voltage
+            busVoltage = batteryVoltage; // Assume battery voltage if no supply voltage
         }
         else
         {
-            mcuVoltage = 0; // No battery or supply voltage available, cannot determine MCU
+            busVoltage = 0; // No battery or supply voltage available, cannot determine bus voltage
         }
     };
 
@@ -207,13 +214,13 @@ public:
     /**
      * \brief Sleep if battery voltage is low to prevent deep-discharging
      *
-     * Checks if the MCU voltage has reached the shut-off threshold and
+     * Checks if the bus voltage has reached the shut-off threshold and
      * enters sleep mode for battery deep-discharge protection.
      *
      */
     void sleepIfSupplyLow(void)
     {
-        if (mcuVoltage > 0 && mcuVoltage <= voltage_critical)
+        if (busVoltage > 0 && busVoltage <= voltage_critical)
         {
             log_i("Battery low!");
             gotoSleep(sleepDuration());
@@ -547,5 +554,5 @@ private:
     uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
     uint16_t batteryVoltage = 0; // Battery voltage in mV
     uint16_t supplyVoltage = 0;  // Supply voltage in mV
-    uint16_t mcuVoltage = 0;     // MCU supply voltage in mV (depending on the circuit)
+    uint16_t busVoltage = 0;     // bus voltage in mV (depending on the circuit)
 };

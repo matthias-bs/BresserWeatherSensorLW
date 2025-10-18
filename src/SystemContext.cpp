@@ -45,6 +45,7 @@
 // 20250829 Changed longSleepModeActive default to true
 // 20250830 Changed longSleepModeActive default to false
 // 20251017 Added PowerFeather variant of sleepInterval()
+// 20251018 Renamed mcuVoltage to busVoltage
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -246,16 +247,16 @@ uint32_t SystemContext::sleepInterval(void)
   return longSleepModeActive ? sleep_interval_long : sleep_interval;
 }
 #else
-// Switch between normal and long sleep interval depending on the MCU voltage
+// Switch between normal and long sleep interval depending on the bus voltage
 uint32_t SystemContext::sleepInterval(void)
 {
-  if (mcuVoltage > 0)
+  if (busVoltage > 0)
   {
-    if (!longSleepModeActive && mcuVoltage <= voltage_eco_enter)
+    if (!longSleepModeActive && busVoltage <= voltage_eco_enter)
     {
       longSleepModeActive = true;
     }
-    else if (longSleepModeActive && mcuVoltage > voltage_eco_exit)
+    else if (longSleepModeActive && busVoltage > voltage_eco_exit)
     {
       longSleepModeActive = false;
     }
