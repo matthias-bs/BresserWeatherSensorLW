@@ -79,6 +79,7 @@
  *     "max_charge_current": 50,
  *     "soc_eco_enter": 20,
  *     "soc_eco_exit": 25,
+ *     "soc_critical": 5,
  *     "temperature_measurement": false,
  *     "battery_fuel_gauge": true
  *   }

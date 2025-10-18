@@ -41,6 +41,7 @@
 // 20250827 Changed battery_low to voltage_critical
 //          Changed battery_weak to voltage_eco_enter/exit
 // 20251017 Added soc_eco_enter/exit
+// 20251018 Added soc_critical
 //
 // ToDo:
 // -
@@ -59,7 +60,6 @@ void loadNodeCfg(
     uint16_t &batt_charge_lim,
     struct sPowerFeatherCfg &powerFeatherCfg)
 {
-
 
     if (!LittleFS.begin(
 #if defined(ESP32)
@@ -103,27 +103,39 @@ void loadNodeCfg(
                     batt_discharge_lim = doc["battery_discharge_lim"];
                 if (!doc["battery_charge_lim"].isNull())
                     batt_charge_lim = doc["battery_charge_lim"];
-                if (!doc["powerfeather"].isNull()) {
+                if (!doc["powerfeather"].isNull())
+                {
                     JsonObject pf = doc["powerfeather"];
-                    if (!pf["battery_capacity"].isNull()) {
+                    if (!pf["battery_capacity"].isNull())
+                    {
                         powerFeatherCfg.battery_capacity = pf["battery_capacity"];
                     }
-                    if (!pf["supply_maintain_voltage"].isNull()) {
+                    if (!pf["supply_maintain_voltage"].isNull())
+                    {
                         powerFeatherCfg.supply_maintain_voltage = pf["supply_maintain_voltage"];
                     }
-                    if (!pf["max_charge_current"].isNull()) {
+                    if (!pf["max_charge_current"].isNull())
+                    {
                         powerFeatherCfg.max_charge_current = pf["max_charge_current"];
                     }
-                    if (!pf["soc_eco_enter"].isNull()) {
+                    if (!pf["soc_eco_enter"].isNull())
+                    {
                         powerFeatherCfg.soc_eco_enter = pf["soc_eco_enter"];
                     }
-                    if (!pf["soc_eco_exit"].isNull()) {
+                    if (!pf["soc_eco_exit"].isNull())
+                    {
                         powerFeatherCfg.soc_eco_exit = pf["soc_eco_exit"];
                     }
-                    if (!pf["temperature_measurement"].isNull()) {
+                    if (!pf["soc_critical"].isNull())
+                    {
+                        powerFeatherCfg.soc_critical = pf["soc_critical"];
+                    }
+                    if (!pf["temperature_measurement"].isNull())
+                    {
                         powerFeatherCfg.temperature_measurement = pf["temperature_measurement"];
                     }
-                    if (!pf["battery_fuel_gauge"].isNull()) {
+                    if (!pf["battery_fuel_gauge"].isNull())
+                    {
                         powerFeatherCfg.battery_fuel_gauge = pf["battery_fuel_gauge"];
                     }
                 }
@@ -144,6 +156,7 @@ void loadNodeCfg(
     log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
     log_d("  SOC eco exit:            %4d %%", powerFeatherCfg.soc_eco_exit);
     log_d("  SOC eco enter:           %4d %%", powerFeatherCfg.soc_eco_enter);
+    log_d("  SOC critical:            %4d %%", powerFeatherCfg.soc_critical);
     log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
     log_d("  Temperature measurement: %s", powerFeatherCfg.temperature_measurement ? "true" : "false");
     log_d("  Battery fuel gauge:      %s", powerFeatherCfg.battery_fuel_gauge ? "true" : "false");
