@@ -24,11 +24,11 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.2.1
+// RadioLib                             7.3.0
 // LoRa_Serialization                   3.3.1
-// BresserWeatherSensorReceiver         0.33.0
+// BresserWeatherSensorReceiver         0.34.0
 // OneWireNg                            0.14.0 (optional)
-// DallasTemperature                    4.0.3 (optional)
+// DallasTemperature                    4.0.5 (optional)
 // NimBLE-Arduino                       2.3.2 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
 // Theengs Decoder                      1.9.9 (optional)

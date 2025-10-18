@@ -24,7 +24,7 @@ jobs:
           #- esp32:esp32:heltec_wifi_lora_32_V2
           - esp32:esp32:heltec_wifi_lora_32_V3
           #- esp32:esp32:featheresp32
-          #- esp32:esp32:m5stack_core2
+          #- esp32:esp32:m5stack_core2 # Needs arduino-esp32 v3.0.7
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
           - rp2040:rp2040:adafruit_feather:dbgport=Serial
@@ -77,17 +77,17 @@ jobs:
           |
           #declare -a required_libs=("https://github.com/matthias-bs/BresserWeatherSensorReceiver.git"
           declare -a required_libs=(
-            "BresserWeatherSensorReceiver@0.33.1"
-            "RadioLib@7.2.1"
+            "BresserWeatherSensorReceiver@0.34.0"
+            "RadioLib@7.3.0"
             "LoRa Serialization@3.3.1"
             "OneWireNg@0.14.0"
-            "DallasTemperature@4.0.3"
-            "NimBLE-Arduino@2.3.2"
+            "DallasTemperature@4.0.5"
+            "NimBLE-Arduino@2.3.6"
             "ATC_MiThermometer@0.5.0"
-            "TheengsDecoder@1.9.9"
+            "TheengsDecoder@2.0.0"
             "Preferences@2.1.0"
             "ArduinoJson@7.4.2"
-            "M5Unified@0.2.7"
+            #"M5Unified@0.2.8"
             "powerfeather-sdk@1.1.0")
           for i in "${required_libs[@]}"
           do
@@ -105,7 +105,7 @@ jobs:
 
       - name: Checkout repository
         if: ${{ env.run-build == 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build sketch
         if: ${{ env.run-build == 'true' }}

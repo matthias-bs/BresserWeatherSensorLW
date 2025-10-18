@@ -39,9 +39,11 @@
 // 20240427 Added parameter activeScan to getData()
 // 20250121 Updated for NimBLE-Arduino v2.x
 // 20250808 Added specific logging macros in scan callback to avoid WDT reset
+// 20250926 Changed getData() to return number of known sensors found
+// 20251014 Added optional callback to abort scanning early
 //
 // ToDo:
-// - 
+// -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -101,15 +103,18 @@ class BleSensors {
          *
          * \param known_sensors    Vector of BLE MAC addresses of known sensors, e.g. {"11:22:33:44:55:66", "AA:BB:CC:DD:EE:FF"}
          */
-        BleSensors(std::vector<std::string> known_sensors) {
+        BleSensors(std::vector<std::string> known_sensors, bool (*stopScanCb)() = nullptr) {
             _known_sensors = known_sensors;
             data.resize(known_sensors.size());
+            _stopScanCb = stopScanCb;
         };
 
         /*!
          * \brief Constructor.
          */
-        BleSensors(void) {
+        BleSensors(bool (*stopScanCb)() = nullptr) {
+            data.resize(0);
+            _stopScanCb = stopScanCb;
         };
 
         /*!
@@ -138,21 +143,24 @@ class BleSensors {
          * 
          * \param duration     Scan duration in seconds
          * \param activeScan   0: passive scan / 1: active scan
-         */                
+         * 
+         * \return Number of known sensors found (max. size of known_sensors vector)
+         */
         unsigned getData(uint32_t duration, bool activeScan = true);
         
         /*!
          * \brief Set sensor data invalid.
-         */                        
+         */
         void resetData(void);
         
         /*!
          * \brief Sensor data.
          */
-        std::vector<ble_sensors_t>  data;
+        std::vector<ble_sensors_t> data;
         
     protected:
-        std::vector<std::string> _known_sensors; /// MAC addresses of known sensors
-        NimBLEScan*              _pBLEScan;      /// NimBLEScan object
+        std::vector<std::string> _known_sensors;  /// MAC addresses of known sensors
+        NimBLEScan*              _pBLEScan;       /// NimBLEScan object
+        bool                    (*_stopScanCb)(); /// Pointer to optional callback function to stop scan early
 };
 #endif
