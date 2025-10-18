@@ -279,6 +279,8 @@ Last, but not least, some boards provide a separate battery monitoring chip.
 
 Only the cases 1 and 2 will be covered here.
 
+(Also see [Wiki/Battery Voltage Measurement](https://github.com/matthias-bs/BresserWeatherSensorLW/wiki/Battery-Voltage-Measurement)).
+
 #### ADC Input Pin and Voltage Divider Ratio
 
 Find the voltage divider and the ADC input pin used for battery voltage measurement (if available) in your board's circuit diagram.
