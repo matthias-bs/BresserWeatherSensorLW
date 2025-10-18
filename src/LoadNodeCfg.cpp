@@ -40,6 +40,7 @@
 // 20241110 Fixed ArduinoJson deprecation warning
 // 20250827 Changed battery_low to voltage_critical
 //          Changed battery_weak to voltage_eco_enter/exit
+// 20251017 Added soc_eco_enter/exit
 //
 // ToDo:
 // -
@@ -113,6 +114,12 @@ void loadNodeCfg(
                     if (!pf["max_charge_current"].isNull()) {
                         powerFeatherCfg.max_charge_current = pf["max_charge_current"];
                     }
+                    if (!pf["soc_eco_enter"].isNull()) {
+                        powerFeatherCfg.soc_eco_enter = pf["soc_eco_enter"];
+                    }
+                    if (!pf["soc_eco_exit"].isNull()) {
+                        powerFeatherCfg.soc_eco_exit = pf["soc_eco_exit"];
+                    }
                     if (!pf["temperature_measurement"].isNull()) {
                         powerFeatherCfg.temperature_measurement = pf["temperature_measurement"];
                     }
@@ -134,6 +141,9 @@ void loadNodeCfg(
     log_d("PowerFeather");
     log_d("  Battery capacity:        %4d mAh", powerFeatherCfg.battery_capacity);
     log_d("  Supply maintain voltage: %4d mV", powerFeatherCfg.supply_maintain_voltage);
+    log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
+    log_d("  SOC eco exit:            %4d %%", powerFeatherCfg.soc_eco_exit);
+    log_d("  SOC eco enter:           %4d %%", powerFeatherCfg.soc_eco_enter);
     log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
     log_d("  Temperature measurement: %s", powerFeatherCfg.temperature_measurement ? "true" : "false");
     log_d("  Battery fuel gauge:      %s", powerFeatherCfg.battery_fuel_gauge ? "true" : "false");
