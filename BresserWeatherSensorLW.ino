@@ -315,7 +315,6 @@ int16_t lwActivate(LoRaWANNode &node)
   log_i("Joined");
 
   // reset the failed join count
-  //bootCountSinceUnsuccessfulJoin = 0;
   sysCtx.resetFailedJoinCount();
 
   delay(1000); // hold off off hitting the airwaves again too soon - an issue in the US
@@ -333,9 +332,12 @@ void setup()
 #endif
 
 #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
-  Serial.begin(115200);
-  Serial.setDebugOutput(true);
+  Serial.setDebugOutput(false);
+  Serial2.begin(115200, SERIAL_8N1, 42 /* RX pin */, 44 /* TX pin */);
+  Serial2.setDebugOutput(true);
+
   delay(2000); // give time to switch to the serial monitor
+  Serial2.println("Hello Serial2");
 #endif
   log_i("Setup");
 
