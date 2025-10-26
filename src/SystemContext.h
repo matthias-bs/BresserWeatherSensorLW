@@ -206,7 +206,7 @@ public:
         res = Board.getBatteryCharge(soc);
         if (res == Result::Ok && soc <= PowerFeatherCfg.soc_critical)
         {
-            log_i("Battery low!");
+            log_i("SOC = %d %% - battery low!", soc);
             gotoSleep(sleepDuration());
         }
     };
