@@ -24,14 +24,14 @@
 // Library dependencies (tested versions):
 // ---------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.3.0
-// LoRa_Serialization                   3.3.1
-// BresserWeatherSensorReceiver         0.34.0
+// RadioLib                             7.4.0
+// LoRa Serialization                   3.3.1
+// BresserWeatherSensorReceiver         0.36.1
 // OneWireNg                            0.14.0 (optional)
 // DallasTemperature                    4.0.5 (optional)
-// NimBLE-Arduino                       2.3.2 (optional)
+// NimBLE-Arduino                       2.3.6 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
-// Theengs Decoder                      1.9.9 (optional)
+// Theengs Decoder                      2.0.0 (optional)
 // RTClib (Adafruit)                    2.1.4 (optional)
 //
 // (installed from ZIP file:)
@@ -315,7 +315,6 @@ int16_t lwActivate(LoRaWANNode &node)
   log_i("Joined");
 
   // reset the failed join count
-  //bootCountSinceUnsuccessfulJoin = 0;
   sysCtx.resetFailedJoinCount();
 
   delay(1000); // hold off off hitting the airwaves again too soon - an issue in the US
@@ -335,6 +334,7 @@ void setup()
 #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
   Serial.begin(115200);
   Serial.setDebugOutput(true);
+
   delay(2000); // give time to switch to the serial monitor
 #endif
   log_i("Setup");
@@ -563,11 +563,11 @@ void setup()
     }
 
     uint32_t networkTime = 0;
-    uint8_t fracSecond = 0;
-    if (node.getMacDeviceTimeAns(&networkTime, &fracSecond, true) == RADIOLIB_ERR_NONE)
+    uint16_t milliseconds = 0;
+    if (node.getMacDeviceTimeAns(&networkTime, &milliseconds, true) == RADIOLIB_ERR_NONE)
     {
       log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
-      log_i("[LoRaWAN] DeviceTime second:\t1/%u", fracSecond);
+      log_i("[LoRaWAN] DeviceTime frac:\t%u ms", milliseconds);
       
       sysCtx.setTime(networkTime, E_TIME_SOURCE::E_LORA);
       log_d("RTC sync completed");
