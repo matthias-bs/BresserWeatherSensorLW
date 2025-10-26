@@ -61,6 +61,17 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+// Use Serial2 as debug port
+// #define DEBUG_PORT Serial2
+// #undef log_i
+// #define log_i(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+// #undef log_d
+// #define log_d(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+// #undef log_w
+// #define log_w(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+// #undef log_e
+// #define log_e(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+
 #if defined(ARDUINO_ARCH_RP2040)
 
     #if defined(DEBUG_RP2040_PORT)
