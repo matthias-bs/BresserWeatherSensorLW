@@ -39,6 +39,7 @@
 // 20240804 Added max_charge_current
 // 20250827 Changed battery_low to voltage_critical
 //          Changed battery_weak to voltage_eco_enter/exit
+// 20251017 Added soc_eco_enter/exit
 //
 // ToDo:
 // -
@@ -76,7 +77,10 @@
  *     "battery_capacity":, 2200
  *     "supply_maintain_voltage": 5500,
  *     "max_charge_current": 50,
- *     "temperature_measurement": true,
+ *     "soc_eco_enter": 20,
+ *     "soc_eco_exit": 25,
+ *     "soc_critical": 5,
+ *     "temperature_measurement": false,
  *     "battery_fuel_gauge": true
  *   }
  * }

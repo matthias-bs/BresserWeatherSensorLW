@@ -75,6 +75,8 @@
 //          Changed BATTERY_WEAK to VOLTAGE_ECO_ENTER/EXIT
 //          Removed BATTERY_RECOVERED
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
+// 20251017 Added SOC_ECO_ENTER/EXIT
+// 20251018 Added SOC_CRITICAL
 //
 // ToDo:
 // -
@@ -108,6 +110,9 @@ struct sPowerFeatherCfg {
   uint16_t battery_capacity; /// Battery capacity in mAh
   uint16_t supply_maintain_voltage; /// Supply voltage to maintain in mV
   uint16_t max_charge_current; /// Maximum charging current in mA
+  uint8_t soc_eco_enter; /// State of charge (%) to enter eco mode
+  uint8_t soc_eco_exit; /// State of charge (%) to exit eco mode
+  uint8_t soc_critical; /// State of charge (%) to enter critical mode
   bool temperature_measurement; /// Enable temperature measurement
   bool battery_fuel_gauge; /// Enable battery fuel gauge
 };
@@ -234,10 +239,13 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
 // See https://docs.powerfeather.dev
 #define BATTERY_CAPACITY_MAH 2200 // battery capacity in mAh
-#define PF_TEMPERATURE_MEASUREMENT true // enable/disable temperature measurement
+#define PF_TEMPERATURE_MEASUREMENT false // enable/disable temperature measurement
 #define PF_SUPPLY_MAINTAIN_VOLTAGE 0 // ~maximum power point (MPP) voltage if using a solar panel; 0: disabled
 #define PF_BATTERY_FUEL_GAUGE true // enable/disable battery fuel gauge
 #define PF_MAX_CHARGE_CURRENT_MAH 50 // maximum charging current in mA
+#define SOC_ECO_ENTER 20 // State of charge (%) to enter eco mode
+#define SOC_ECO_EXIT 25 // State of charge (%) to exit eco mode
+#define SOC_CRITICAL 3 // State of charge (%) to enter critical mode
 #if BATTERY_CAPACITY_MAH == 0
 #pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
 #endif

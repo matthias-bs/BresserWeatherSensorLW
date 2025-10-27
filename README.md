@@ -159,7 +159,7 @@ See [Parameters](#parameters) for more details.
   |  :hourglass:  | [Adafruit Feather ESP32S2 with Adafruit LoRa Radio FeatherWing](https://github.com/matthias-bs/BresserWeatherSensorReceiver#adafruit-feather-esp32s2-with-adafruit-lora-radio-featherwing)                                | Adafruit Feather ESP32-S2 | FEATHER_ESP32S2   | SX1276 (RFM95W) | **No Bluetooth available!**<br>Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
   |  :white_check_mark:  | [Thingpulse ePulse Feather](https://thingpulse.com/product/epulse-feather-low-power-esp32-development-board/) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | ThingPulse ePulse Feather | THINGPULSE_EPULSE_FEATHER   | SX1276 (RFM95W) | Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
   |  :x:         | [M5Stack Core2](https://docs.m5stack.com/en/core/core2) with [M5Stack Module LoRa868](https://docs.m5stack.com/en/module/lora868)   | M5Core2 | M5STACK_CORE2   | SX1276<br>(RA-01H) | Wiring on the LoRa868 Module: <br>DIO1 to GPIO35<br><br>"M5Unified" must be installed <br>`M5.begin()`is called to control power management<br><br>Linker error: IRAM section overflow |
-  |  :white_check_mark:  | [ESP32-S3 PowerFeather](https://powerfeather.dev/) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | ESP32-S3 PowerFeather | ESP32S3_POWERFEATHER | SX1276 (RFM95W) | Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01<br><br>"PowerFeather-SDK" must be installed<br>`Board.init(BATTERY_CAPACITY_MAH);` is called to control power management |
+  |  :white_check_mark:  | [ESP32-S3 PowerFeather](https://powerfeather.dev/) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | ESP32-S3 PowerFeather | ESP32S3_POWERFEATHER | SX1276 (RFM95W) | Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01<br><br>"PowerFeather-SDK" must be installed<br>`Board.init(BATTERY_CAPACITY_MAH);` is called to control power management<br><br>see [Wiki](wiki/PowerFeather) for additional hints |
   |  :white_check_mark:  | [Adafruit Feather RP2040](https://www.adafruit.com/product/4884) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | Adafruit Feather RP2040 | ADAFRUIT_FEATHER_RP2040   | SX1276 (RFM95W) | **No Bluetooth available!**<br>**Configuration: Choose an entry with "FS" in section __Flash Size__!**<br>Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
 
 :hourglass: &mdash; confirmation pending
@@ -279,7 +279,7 @@ Last, but not least, some boards provide a separate battery monitoring chip.
 
 Only the cases 1 and 2 will be covered here.
 
-(Also see [Wiki/Battery Voltage Measurement](https://github.com/matthias-bs/BresserWeatherSensorLW/wiki/Battery-Voltage-Measurement)).
+(Also see [Wiki: Battery Voltage Measurement](https://github.com/matthias-bs/BresserWeatherSensorLW/wiki/Battery-Voltage-Measurement)).
 
 #### ADC Input Pin and Voltage Divider Ratio
 
@@ -380,6 +380,7 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_SUPPLY_MAINTAIN_VOLTAGE` / <br>`powerfeather/supply_maintain_voltage` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_MAX_CHARGE_CURRENT_MAH` / <br>`powerfeather/max_charge_current` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                              |  X   |          |   X  |
+| `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
 
 ### Enabling Debug Output
 
@@ -785,6 +786,9 @@ The following parameters are available:
 | &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected)<br>see [PowerFeather Docs: `init()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-inituint16_t-capacity--0-batterytype-type--batterytypegeneric_3v7) | `0`    |
 | &nbsp;&nbsp;supply_maintain_voltage | see [PowerFeather Docs: `setSupplyMaintainVoltage()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setsupplymaintainvoltageuint16_t-voltage)<br>`0`: not set | `0` |
 | &nbsp;&nbsp;max_charge_current | see [PowerFeather Docs: `setBatteryChargingMaxCurrent()`](https://docs.powerfeather.dev/sdk/api/mainboard##result-setbatterychargingmaxcurrentuint16_t-current) | `50` |
+| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `20` |
+| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `25` |
+| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `5` |
 | &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `enableBatteryTempSense()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
 | &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
 

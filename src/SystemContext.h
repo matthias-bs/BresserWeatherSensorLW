@@ -40,6 +40,9 @@
 // 20250811 Replaced ESP32Time by POSIX functions
 // 20250820 Added getBattlevel()
 // 20250827 Added hysteresis for sleep interval switching
+// 20251017 Added getBattlevelPowerfeather()
+// 20251018 Added sleepIfSupplyLow for PowerFeather
+//          Renamed mcuVoltage to busVoltage, changed busVoltage assignment
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +85,7 @@ using namespace PowerFeather;
  *
  * Handles system initialization and management for the LoRaWAN node.
  * This includes hardware-specific setup, RTC management, and power-saving features.
- * 
+ *
  */
 class SystemContext
 {
@@ -161,55 +164,105 @@ public:
     /**
      * \brief Get the voltages from ADC / Power Management Chip
      *
-     * The MCU voltage is evaluated to determine the state of the power supply.
+     * Bus voltage:
+     * Supply voltage (e.g. USB or external power) if available, otherwise battery voltage.
+     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V 
+     * LDO input range and by the connected 3.3V loads.
+     * Typically 5V nominal.
+     * 
+     * The bus voltage is evaluated to determine the state of the power supply.
      */
     void getVoltages(void)
     {
         batteryVoltage = getBatteryVoltage();
         supplyVoltage = getSupplyVoltage();
 
-        if (batteryVoltage != 0)
+        if (supplyVoltage > 3500)
         {
-            mcuVoltage = batteryVoltage; // Default: MCU voltage is the same as battery voltage
+            busVoltage = supplyVoltage; // Assume that supply voltage if available
         }
-        else if (supplyVoltage != 0)
+        else if (batteryVoltage > 2000)
         {
-            mcuVoltage = supplyVoltage; // Supply voltage is available, use it as MCU voltage
+            busVoltage = batteryVoltage; // Assume battery voltage if no supply voltage
         }
         else
         {
-            mcuVoltage = 0; // No battery or supply voltage available, cannot determine MCU
+            busVoltage = 0; // No battery or supply voltage available, cannot determine bus voltage
         }
     };
 
-    /**
-     * \brief Sleep if battery voltage is low to prevent deep-discharging
-     *
-     * Checks if the MCU voltage has reached the shut-off threshold and
-     * enters sleep mode for battery deep-discharge protection.
-     *
-     */
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
     void sleepIfSupplyLow(void)
     {
-        if (mcuVoltage > 0 && mcuVoltage <= voltage_critical)
+        Result res;
+        bool supply_good;
+
+        res = Board.checkSupplyGood(supply_good);
+        if ((res == Result::Ok) && supply_good)
+        {
+            return;
+        }
+        uint8_t soc = 0;
+        res = Board.getBatteryCharge(soc);
+        log_i("SOC = %d %%", soc);
+        if (res == Result::Ok && soc <= PowerFeatherCfg.soc_critical)
         {
             log_i("Battery low!");
             gotoSleep(sleepDuration());
         }
     };
+#else
+    /**
+     * \brief Sleep if battery voltage is low to prevent deep-discharging
+     *
+     * Checks if the bus voltage has reached the shut-off threshold and
+     * enters sleep mode for battery deep-discharge protection.
+     *
+     */
+    void sleepIfSupplyLow(void)
+    {
+        if (busVoltage > 0 && busVoltage <= voltage_critical)
+        {
+            log_i("Battery low!");
+            gotoSleep(sleepDuration());
+        }
+    };
+#endif
 
     /**
      * \brief Get the battery fill level
-     * 
+     *
+     * Wrapper for board specific implementations.
+     *
      * Get the battery fill level for LoRaWAN device status uplink.
      * The LoRaWAN network server may periodically request this information.
-     * 
+     *
      * 0 = external power source
      * 1 = lowest (empty battery)
      * 254 = highest (full battery)
      * 255 = unable to measure
      */
     uint8_t getBattlevel(void)
+    {
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+        return getBattlevelPowerfeather();
+#else
+        return getBattlevelDefault();
+#endif
+    }
+
+    /**
+     * \brief Get the battery fill level (default implementation)
+     *
+     * Get the battery fill level for LoRaWAN device status uplink.
+     * The LoRaWAN network server may periodically request this information.
+     *
+     * 0 = external power source
+     * 1 = lowest (empty battery)
+     * 254 = highest (full battery)
+     * 255 = unable to measure
+     */
+    uint8_t getBattlevelDefault(void)
     {
         uint16_t voltage = batteryVoltage;
         uint16_t limit_low = battery_discharge_lim;
@@ -236,16 +289,55 @@ public:
         return battLevel;
     };
 
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+    /**
+     * \brief Get the battery fill level (for PowerFeather)
+     *
+     * Get the battery fill level for LoRaWAN device status uplink.
+     * The LoRaWAN network server may periodically request this information.
+     *
+     * 0 = external power source
+     * 1 = lowest (empty battery)
+     * 254 = highest (full battery)
+     * 255 = unable to measure
+     */
+    uint8_t getBattlevelPowerfeather(void)
+    {
+        Result res;
+        bool supply_good;
+
+        res = Board.checkSupplyGood(supply_good);
+        if ((res == Result::Ok) && supply_good)
+        {
+            return 0; // external power source
+        }
+
+        uint8_t soc = 0;
+        res = Board.getBatteryCharge(soc);
+        log_d("Battery SOC: %u %%", soc);
+        if (res == Result::Ok)
+        {
+            // Scale SOC (0-100%) to LoRaWAN battery level (1-254)
+            uint8_t level;
+            level = static_cast<uint8_t>(static_cast<float>(soc) / 100.0f * 254.0f);
+            level = (level == 0) ? 1 : level;
+            return level;
+        }
+        return 255; // Unable to measure
+    };
+#endif
+
     /**
      * \brief Switch between normal and long sleep interval
      *
      * Switch between normal and long sleep interval depending on the
-     * MCU voltage. The long sleep interval is used to save energy (eco mode).
-     * A hysteresis is implemented by using two voltage thresholds -
-     * voltage_eco_exit and voltage_eco_enter.
+     * system voltage (default) or battery state of charge (PowerFeather).
+     * The long sleep interval is used to save energy (eco mode).
+     * A hysteresis is implemented by using two voltage/SOC thresholds -
+     * <voltage|soc>_eco_exit and <voltage|soc>_eco_enter .
      *
-     * The normal sleep interval is used as default, e.g. if the MCU voltage
-     * is not available.
+     * The normal sleep interval is used as default, e.g. if
+     * the system voltage/battery SOC is not available.
      */
     uint32_t sleepInterval(void);
 
@@ -449,18 +541,21 @@ private:
         .battery_capacity = BATTERY_CAPACITY_MAH,
         .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
         .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
+        .soc_eco_enter = SOC_ECO_ENTER,
+        .soc_eco_exit = SOC_ECO_EXIT,
+        .soc_critical = SOC_CRITICAL,
         .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
         .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
 #else
     struct sPowerFeatherCfg PowerFeatherCfg = {0};
 #endif
 
-uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
-uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
-uint16_t voltage_critical = VOLTAGE_CRITICAL;
-uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
-uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
-uint16_t batteryVoltage = 0;  // Battery voltage in mV
-uint16_t supplyVoltage = 0;   // Supply voltage in mV
-uint16_t mcuVoltage = 0;      // MCU supply voltage in mV (depending on the circuit)
+    uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
+    uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
+    uint16_t voltage_critical = VOLTAGE_CRITICAL;
+    uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
+    uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
+    uint16_t batteryVoltage = 0; // Battery voltage in mV
+    uint16_t supplyVoltage = 0;  // Supply voltage in mV
+    uint16_t busVoltage = 0;     // bus voltage in mV (depending on the circuit)
 };

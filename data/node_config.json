@@ -9,7 +9,9 @@
         "battery_capacity": 2201,
         "supply_maintain_voltage": 4600,
         "max_charge_current": 1000,
-        "temperature_measurement": true,
+        "soc_eco_enter": 20,
+        "soc_eco_exit": 25,
+        "temperature_measurement": false,
         "battery_fuel_gauge": true
     }
 }

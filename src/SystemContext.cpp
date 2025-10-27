@@ -44,6 +44,8 @@
 // 20250827 Added hysteresis for sleep interval switching
 // 20250829 Changed longSleepModeActive default to true
 // 20250830 Changed longSleepModeActive default to false
+// 20251017 Added PowerFeather variant of sleepInterval()
+// 20251018 Renamed mcuVoltage to busVoltage
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -97,10 +99,10 @@ RTC_DATA_ATTR time_t rtcLastClockSync = 0; //!< timestamp of last RTC synchroniz
 
 // utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
 // puts these in to the RTC memory which is preserved during deep-sleep
-RTC_DATA_ATTR uint16_t bootCount = 1; //<! Boot count since power-on/HW reset
-RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0; //<! Boot count since last unsuccessful join
+RTC_DATA_ATTR uint16_t bootCount = 1;                                   //<! Boot count since power-on/HW reset
+RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin = 0;              //<! Boot count since last unsuccessful join
 RTC_DATA_ATTR E_TIME_SOURCE rtcTimeSource = E_TIME_SOURCE::E_UNSYNCHED; //<! RTC time source
-RTC_DATA_ATTR bool longSleepModeActive = false; //<! Long sleep mode active flag
+RTC_DATA_ATTR bool longSleepModeActive = false;                         //<! Long sleep mode active flag
 
 #else
 // Saved to/restored from Watchdog SCRATCH registers
@@ -108,7 +110,7 @@ time_t rtcLastClockSync; //!< timestamp of last RTC synchronization to network t
 
 // utilities & vars to support deep-sleep
 // Saved to/restored from Watchdog SCRATCH registers
-uint16_t bootCount; //<! Boot count since power-on/HW reset
+uint16_t bootCount;                      //<! Boot count since power-on/HW reset
 uint16_t bootCountSinceUnsuccessfulJoin; //<! Boot count since last unsuccessful join
 
 /// RTC time source
@@ -213,16 +215,48 @@ void SystemContext::savePreferences(void)
   preferences.end();
 }
 
-// Switch between normal and long sleep interval depending on the MCU voltage
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+// PowerFeather: Switch between normal and long sleep interval depending on the battery SOC
 uint32_t SystemContext::sleepInterval(void)
 {
-  if (mcuVoltage > 0)
+  Result res;
+  bool supply_good;
+
+  res = Board.checkSupplyGood(supply_good);
+  if ((res == Result::Ok) && supply_good)
   {
-    if (!longSleepModeActive && mcuVoltage <= voltage_eco_enter)
+    longSleepModeActive = false;
+  }
+  else
+  {
+    uint8_t soc = 0;
+    res = Board.getBatteryCharge(soc);
+
+    if (res == Result::Ok)
+    {
+      if (!longSleepModeActive && soc <= PowerFeatherCfg.soc_eco_enter)
+      {
+        longSleepModeActive = true;
+      }
+      else if (longSleepModeActive && soc >= PowerFeatherCfg.soc_eco_exit)
+      {
+        longSleepModeActive = false;
+      }
+    }
+  }
+  return longSleepModeActive ? sleep_interval_long : sleep_interval;
+}
+#else
+// Switch between normal and long sleep interval depending on the bus voltage
+uint32_t SystemContext::sleepInterval(void)
+{
+  if (busVoltage > 0)
+  {
+    if (!longSleepModeActive && busVoltage <= voltage_eco_enter)
     {
       longSleepModeActive = true;
     }
-    else if (longSleepModeActive && mcuVoltage > voltage_eco_exit)
+    else if (longSleepModeActive && busVoltage > voltage_eco_exit)
     {
       longSleepModeActive = false;
     }
@@ -230,6 +264,7 @@ uint32_t SystemContext::sleepInterval(void)
 
   return longSleepModeActive ? sleep_interval_long : sleep_interval;
 }
+#endif
 
 #if defined(EXT_RTC)
 // Synchronize the internal RTC with the external RTC
