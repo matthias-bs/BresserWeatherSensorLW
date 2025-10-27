@@ -30,7 +30,7 @@
     "NimBLE-Arduino": "h2zero/NimBLE-Arduino#semver:^2.3.6",
     "ATC_MiThermometer": "matthias-bs/ATC_MiThermometer#semver:^0.5.0",
     "TheengsDecoder": "theengs/decoder#semver:^2.0.0",
-    "Preferences": "vshymanskyy/Preferences#semver:^2.1.0",
+    "Preferences": "vshymanskyy/Preferences#semver:^2.2.2",
     "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.4.2"
   }
 }

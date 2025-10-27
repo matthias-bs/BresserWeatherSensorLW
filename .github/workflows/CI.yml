@@ -85,7 +85,7 @@ jobs:
             "NimBLE-Arduino@2.3.6"
             "ATC_MiThermometer@0.5.0"
             "TheengsDecoder@2.0.0"
-            "Preferences@2.1.0"
+            "Preferences@2.2.2"
             "ArduinoJson@7.4.2"
             #"M5Unified@0.2.8"
             "powerfeather-sdk@1.1.0")
