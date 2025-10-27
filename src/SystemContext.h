@@ -204,9 +204,10 @@ public:
         }
         uint8_t soc = 0;
         res = Board.getBatteryCharge(soc);
+        log_i("SOC = %d %%", soc);
         if (res == Result::Ok && soc <= PowerFeatherCfg.soc_critical)
         {
-            log_i("SOC = %d %% - battery low!", soc);
+            log_i("Battery low!");
             gotoSleep(sleepDuration());
         }
     };
