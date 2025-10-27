@@ -2,6 +2,7 @@ var class_system_context =
 [
     [ "begin", "class_system_context.html#acafc50ac51197ddf4c29ccf145125422", null ],
     [ "getBattlevel", "class_system_context.html#a93ec32abb29e02c3666bc1c23159d5fb", null ],
+    [ "getBattlevelDefault", "class_system_context.html#a072cfedacf175d97d7b75e9604dac513", null ],
     [ "getRtcTimeSource", "class_system_context.html#aec72440587ad41d0c5d7ea646fde86c9", null ],
     [ "getVoltages", "class_system_context.html#a034381c0ed1825e9214e6859dfccc271", null ],
     [ "gotoSleep", "class_system_context.html#ab93448ce50f353f3dd4dce14da5b0d8a", null ],

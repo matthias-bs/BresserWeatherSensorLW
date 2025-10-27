@@ -141,6 +141,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>savePreferences</b> (
 <tr class="memitem:a93ec32abb29e02c3666bc1c23159d5fb" id="r_a93ec32abb29e02c3666bc1c23159d5fb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#a93ec32abb29e02c3666bc1c23159d5fb">getBattlevel</a> (void)</td></tr>
 <tr class="memdesc:a93ec32abb29e02c3666bc1c23159d5fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the battery fill level.  <br /></td></tr>
 <tr class="separator:a93ec32abb29e02c3666bc1c23159d5fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a072cfedacf175d97d7b75e9604dac513" id="r_a072cfedacf175d97d7b75e9604dac513"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#a072cfedacf175d97d7b75e9604dac513">getBattlevelDefault</a> (void)</td></tr>
+<tr class="memdesc:a072cfedacf175d97d7b75e9604dac513"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the battery fill level (default implementation)  <br /></td></tr>
+<tr class="separator:a072cfedacf175d97d7b75e9604dac513"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adab68d5365b6b041da52686434ce5510" id="r_adab68d5365b6b041da52686434ce5510"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_system_context.html#adab68d5365b6b041da52686434ce5510">sleepInterval</a> (void)</td></tr>
 <tr class="memdesc:adab68d5365b6b041da52686434ce5510"><td class="mdescLeft">&#160;</td><td class="mdescRight">Switch between normal and long sleep interval.  <br /></td></tr>
 <tr class="separator:adab68d5365b6b041da52686434ce5510"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -248,6 +251,47 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Get the battery fill level. </p>
+<p>Wrapper for board specific implementations.</p>
+<p>Get the battery fill level for LoRaWAN device status uplink. The LoRaWAN network server may periodically request this information.</p>
+<p>0 = external power source 1 = lowest (empty battery) 254 = highest (full battery) 255 = unable to measure </p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="class_system_context_a93ec32abb29e02c3666bc1c23159d5fb_cgraph.png" border="0" usemap="#aclass_system_context_a93ec32abb29e02c3666bc1c23159d5fb_cgraph" alt=""/></div>
+<map name="aclass_system_context_a93ec32abb29e02c3666bc1c23159d5fb_cgraph" id="aclass_system_context_a93ec32abb29e02c3666bc1c23159d5fb_cgraph">
+<area shape="rect" title="Get the battery fill level." alt="" coords="5,13,216,38"/>
+<area shape="rect" href="class_system_context.html#a072cfedacf175d97d7b75e9604dac513" title="Get the battery fill level (default implementation)" alt="" coords="264,5,475,45"/>
+<area shape="poly" title=" " alt="" coords="216,23,251,23,251,28,216,28"/>
+</map>
+</div>
+
+</div>
+</div>
+<a id="a072cfedacf175d97d7b75e9604dac513" name="a072cfedacf175d97d7b75e9604dac513"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a072cfedacf175d97d7b75e9604dac513">&#9670;&#160;</a></span>getBattlevelDefault()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t SystemContext::getBattlevelDefault </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the battery fill level (default implementation) </p>
 <p>Get the battery fill level for LoRaWAN device status uplink. The LoRaWAN network server may periodically request this information.</p>
 <p>0 = external power source 1 = lowest (empty battery) 254 = highest (full battery) 255 = unable to measure </p>
 
@@ -299,7 +343,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Get the voltages from ADC / Power Management Chip. </p>
-<p>The MCU voltage is evaluated to determine the state of the power supply. </p>
+<p>Bus voltage: Supply voltage (e.g. USB or external power) if available, otherwise battery voltage. If no voltage converter is used, the permitted voltage range is limited by the 3.3V LDO input range and by the connected 3.3V loads. Typically 5V nominal.</p>
+<p>The bus voltage is evaluated to determine the state of the power supply. </p>
 
 </div>
 </div>
@@ -636,7 +681,7 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Sleep if battery voltage is low to prevent deep-discharging. </p>
-<p>Checks if the MCU voltage has reached the shut-off threshold and enters sleep mode for battery deep-discharge protection. </p>
+<p>Checks if the bus voltage has reached the shut-off threshold and enters sleep mode for battery deep-discharge protection. </p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -673,8 +718,8 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p>Switch between normal and long sleep interval. </p>
-<p>Switch between normal and long sleep interval depending on the MCU voltage. The long sleep interval is used to save energy (eco mode). A hysteresis is implemented by using two voltage thresholds - voltage_eco_exit and voltage_eco_enter.</p>
-<p>The normal sleep interval is used as default, e.g. if the MCU voltage is not available. </p>
+<p>Switch between normal and long sleep interval depending on the system voltage (default) or battery state of charge (PowerFeather). The long sleep interval is used to save energy (eco mode). A hysteresis is implemented by using two voltage/SOC thresholds - &lt;voltage|soc&gt;_eco_exit and &lt;voltage|soc&gt;_eco_enter .</p>
+<p>The normal sleep interval is used as default, e.g. if the system voltage/battery SOC is not available. </p>
 
 </div>
 </div>
