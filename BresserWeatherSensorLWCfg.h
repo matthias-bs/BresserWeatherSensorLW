@@ -245,7 +245,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #define PF_MAX_CHARGE_CURRENT_MAH 50 // maximum charging current in mA
 #define SOC_ECO_ENTER 20 // State of charge (%) to enter eco mode
 #define SOC_ECO_EXIT 25 // State of charge (%) to exit eco mode
-#define SOC_CRITICAL 5 // State of charge (%) to enter critical mode
+#define SOC_CRITICAL 3 // State of charge (%) to enter critical mode
 #if BATTERY_CAPACITY_MAH == 0
 #pragma message("Battery capacity set to 0 - battery voltage measurement disabled.")
 #endif
