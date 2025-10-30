@@ -16,7 +16,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You need [RadioLib v7.2.1](https://github.com/jgromes/RadioLib/releases/tag/7.2.1) or later
+* You need [RadioLib v7.4.0](https://github.com/jgromes/RadioLib/releases/tag/7.4.0) or later
 * You need [espressif/arduino-esp32 v3.X.Y](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
