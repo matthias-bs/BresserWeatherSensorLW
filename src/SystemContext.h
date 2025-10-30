@@ -43,6 +43,7 @@
 // 20251017 Added getBattlevelPowerfeather()
 // 20251018 Added sleepIfSupplyLow for PowerFeather
 //          Renamed mcuVoltage to busVoltage, changed busVoltage assignment
+// 20251030 Added sleepIfSupplyLow() for M5Core2 and getBattlevelM5core2()
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -166,10 +167,10 @@ public:
      *
      * Bus voltage:
      * Supply voltage (e.g. USB or external power) if available, otherwise battery voltage.
-     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V 
+     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V
      * LDO input range and by the connected 3.3V loads.
      * Typically 5V nominal.
-     * 
+     *
      * The bus voltage is evaluated to determine the state of the power supply.
      */
     void getVoltages(void)
@@ -211,6 +212,36 @@ public:
             gotoSleep(sleepDuration());
         }
     };
+#elif defined(ARDUINO_M5STACK_CORE2)
+    /**
+     * \brief Sleep if battery voltage is low to prevent deep-discharging
+     *
+     * Checks if the bus voltage has reached the shut-off threshold and
+     * enters sleep mode for battery deep-discharge protection.
+     *
+     */
+    void sleepIfSupplyLow(void)
+    {
+        int16_t vbus = M5.Power.getVBUSVoltage();
+        log_i("VBUS = %d mV", vbus);
+        int8_t soc = M5.Power.getBatteryLevel();
+        log_i("SOC = %d %%", soc);
+        // Charging is enabled by default
+        // void setBatteryCharge(true);
+        log_d("Charging: %u", M5.Power.isCharging());
+        log_d("Battery current = %d mA", M5.Power.getBatteryCurrent());
+
+        if (M5.Power.getVBUSVoltage() >= VOLTAGE_CRITICAL)
+        {
+            return;
+        }
+
+        if (soc <= SOC_CRITICAL)
+        {
+            log_i("Battery low!");
+            gotoSleep(sleepDuration());
+        }
+    };
 #else
     /**
      * \brief Sleep if battery voltage is low to prevent deep-discharging
@@ -246,6 +277,8 @@ public:
     {
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
         return getBattlevelPowerfeather();
+#elif defined(ARDUINO_M5STACK_CORE2)
+        return getBattlevelM5core2();
 #else
         return getBattlevelDefault();
 #endif
@@ -327,235 +360,265 @@ public:
     };
 #endif
 
+#if defined(ARDUINO_M5STACK_CORE2)
     /**
-     * \brief Switch between normal and long sleep interval
+     * \brief Get the battery fill level (for PowerFeather)
      *
-     * Switch between normal and long sleep interval depending on the
-     * system voltage (default) or battery state of charge (PowerFeather).
-     * The long sleep interval is used to save energy (eco mode).
-     * A hysteresis is implemented by using two voltage/SOC thresholds -
-     * <voltage|soc>_eco_exit and <voltage|soc>_eco_enter .
+     * Get the battery fill level for LoRaWAN device status uplink.
+     * The LoRaWAN network server may periodically request this information.
      *
-     * The normal sleep interval is used as default, e.g. if
-     * the system voltage/battery SOC is not available.
+     * 0 = external power source
+     * 1 = lowest (empty battery)
+     * 254 = highest (full battery)
+     * 255 = unable to measure
      */
-    uint32_t sleepInterval(void);
-
-    /**
-     * \brief Check if long sleep is active
-     *
-     * Check if the sleep interval is set to the long sleep interval.
-     * This flag is sent in a LoRaWAN uplink message.
-     *
-     * \return true if long sleep is active
-     * \return false if long sleep is not active
-     */
-    bool longSleepActive(void)
+    uint8_t getBattlevelM5core2(void)
     {
-        return (sleepInterval() == sleep_interval_long);
-    };
-
-    /**
-     * \brief Check if the RTC is synchronized to a time source
-     *
-     * \return true     if the RTC is synchronized to a time source
-     * \return false    if the RTC is not synchronized
-     */
-    bool isRtcSynched(void);
-
-    /**
-     * \brief Get the RTC time source
-     *
-     * \return E_TIME_SOURCE  current RTC time source
-     */
-    E_TIME_SOURCE getRtcTimeSource(void);
-
-    /**
-     * \brief Check if the RTC needs to be synchronized to a time source
-     *
-     * Checks if the RTC is synchronized to a time source
-     *
-     * If the RTC is not synchronized or if the last clock sync is older than
-     * CLOCK_SYNC_INTERVAL, it returns true.
-     *
-     * \return true     if the RTC needs to be synchronized
-     * \return false    if the RTC is synchronized and the last clock sync is within CLOCK_SYNC_INTERVAL
-     */
-    bool rtcNeedsSync(void);
-
-    /**
-     * \brief Compute sleep duration in seconds
-     *
-     * Minimum duration: SLEEP_INTERVAL_MIN
-     * If battery voltage is available and <= BATTERY_WEAK:
-     *   sleep_interval_long
-     * else
-     *   sleep_interval
-     *
-     * Additionally, the sleep interval is reduced from the
-     * default value to achieve a wake-up time aligned to
-     * an integer multiple of the interval after a full hour.
-     *
-     * \return sleep duration in seconds
-     */
-    uint32_t sleepDuration(void)
-    {
-        uint32_t sleep_interval = sleepInterval();
-
-        // If the real time is available, align the wake-up time to
-        // next non-fractional multiple of sleep_interval past the hour
-        if (isRtcSynched())
+        if (M5.Power.getVBUSVoltage() >= VOLTAGE_CRITICAL)
         {
-            struct tm timeinfo;
-            time_t t_now = time(nullptr);
-            localtime_r(&t_now, &timeinfo);
-
-            sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
+            return 0; // external power source
         }
 
-        sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
-        return sleep_interval;
+        uint8_t soc = M5.Power.getBatteryLevel();
+        log_d("Battery SOC: %u %%", soc);
+
+        // Scale SOC (0-100%) to LoRaWAN battery level (1-254)
+        uint8_t level;
+        level = static_cast<uint8_t>(static_cast<float>(soc) / 100.0f * 254.0f);
+        level = (level == 0) ? 1 : level;
+        return level;
     };
+#endif
+/**
+ * \brief Switch between normal and long sleep interval
+ *
+ * Switch between normal and long sleep interval depending on the
+ * system voltage (default) or battery state of charge (PowerFeather).
+ * The long sleep interval is used to save energy (eco mode).
+ * A hysteresis is implemented by using two voltage/SOC thresholds -
+ * <voltage|soc>_eco_exit and <voltage|soc>_eco_enter .
+ *
+ * The normal sleep interval is used as default, e.g. if
+ * the system voltage/battery SOC is not available.
+ */
+uint32_t sleepInterval(void);
 
-    /**
-     * \brief LoRaWAN uplink delay
-     *
-     * Uses MCU sleep mode if possible, otherwise delays for the given time.
-     *
-     * \param timeUntilUplink   time until next uplink in milliseconds
-     * \param uplinkInterval    planned uplink interval in seconds
-     */
-    void uplinkDelay(uint32_t timeUntilUplink, uint32_t uplinkInterval)
+/**
+ * \brief Check if long sleep is active
+ *
+ * Check if the sleep interval is set to the long sleep interval.
+ * This flag is sent in a LoRaWAN uplink message.
+ *
+ * \return true if long sleep is active
+ * \return false if long sleep is not active
+ */
+bool longSleepActive(void)
+{
+    return (sleepInterval() == sleep_interval_long);
+};
+
+/**
+ * \brief Check if the RTC is synchronized to a time source
+ *
+ * \return true     if the RTC is synchronized to a time source
+ * \return false    if the RTC is not synchronized
+ */
+bool isRtcSynched(void);
+
+/**
+ * \brief Get the RTC time source
+ *
+ * \return E_TIME_SOURCE  current RTC time source
+ */
+E_TIME_SOURCE getRtcTimeSource(void);
+
+/**
+ * \brief Check if the RTC needs to be synchronized to a time source
+ *
+ * Checks if the RTC is synchronized to a time source
+ *
+ * If the RTC is not synchronized or if the last clock sync is older than
+ * CLOCK_SYNC_INTERVAL, it returns true.
+ *
+ * \return true     if the RTC needs to be synchronized
+ * \return false    if the RTC is synchronized and the last clock sync is within CLOCK_SYNC_INTERVAL
+ */
+bool rtcNeedsSync(void);
+
+/**
+ * \brief Compute sleep duration in seconds
+ *
+ * Minimum duration: SLEEP_INTERVAL_MIN
+ * If battery voltage is available and <= BATTERY_WEAK:
+ *   sleep_interval_long
+ * else
+ *   sleep_interval
+ *
+ * Additionally, the sleep interval is reduced from the
+ * default value to achieve a wake-up time aligned to
+ * an integer multiple of the interval after a full hour.
+ *
+ * \return sleep duration in seconds
+ */
+uint32_t sleepDuration(void)
+{
+    uint32_t sleep_interval = sleepInterval();
+
+    // If the real time is available, align the wake-up time to
+    // next non-fractional multiple of sleep_interval past the hour
+    if (isRtcSynched())
     {
-        uint32_t uplinkIntervalMs = uplinkInterval * 1000UL;
-        uint32_t delayMs = max(timeUntilUplink, uplinkIntervalMs); // cannot send faster than duty cycle allows
+        struct tm timeinfo;
+        time_t t_now = time(nullptr);
+        localtime_r(&t_now, &timeinfo);
 
-        log_d("Sending uplink in %u s", delayMs / 1000);
+        sleep_interval = sleep_interval - ((timeinfo.tm_min * 60) % sleep_interval + timeinfo.tm_sec);
+    }
+
+    sleep_interval = max(sleep_interval, static_cast<uint32_t>(SLEEP_INTERVAL_MIN));
+    return sleep_interval;
+};
+
+/**
+ * \brief LoRaWAN uplink delay
+ *
+ * Uses MCU sleep mode if possible, otherwise delays for the given time.
+ *
+ * \param timeUntilUplink   time until next uplink in milliseconds
+ * \param uplinkInterval    planned uplink interval in seconds
+ */
+void uplinkDelay(uint32_t timeUntilUplink, uint32_t uplinkInterval)
+{
+    uint32_t uplinkIntervalMs = uplinkInterval * 1000UL;
+    uint32_t delayMs = max(timeUntilUplink, uplinkIntervalMs); // cannot send faster than duty cycle allows
+
+    log_d("Sending uplink in %u s", delayMs / 1000);
 #if defined(ESP32)
-        esp_sleep_enable_timer_wakeup(delayMs * 1000);
-        esp_light_sleep_start();
+    esp_sleep_enable_timer_wakeup(delayMs * 1000);
+    esp_light_sleep_start();
 #else
         delay(delayMs);
 #endif
-    };
+};
 
-    /**
-     * \brief Enter sleep mode
-     *
-     * On wake-up, the MCU will soft-reset and start from the beginning.
-     *
-     * \param seconds Sleep duration in seconds
-     */
-    void gotoSleep(uint32_t seconds)
-    {
+/**
+ * \brief Enter sleep mode
+ *
+ * On wake-up, the MCU will soft-reset and start from the beginning.
+ *
+ * \param seconds Sleep duration in seconds
+ */
+void gotoSleep(uint32_t seconds)
+{
 #if defined(ARDUINO_ARCH_RP2040)
-        gotoSleepRP2040(seconds);
+    gotoSleepRP2040(seconds);
 #elif defined(ESP32)
-        gotoSleepESP32(seconds);
+    gotoSleepESP32(seconds);
 #endif
-    };
+};
 
 #if defined(ARDUINO_M5STACK_CORE2)
-    void setupM5StackCore2(void);
+void setupM5StackCore2(void);
 #endif
 
 private:
 #if defined(EXT_RTC)
-    /**
-     * \brief Get the Time from external RTC
-     */
-    void getTimeFromExtRTC(void);
+/**
+ * \brief Get the Time from external RTC
+ */
+void getTimeFromExtRTC(void);
 #endif
 
 #if defined(EXT_RTC)
-    /**
-     * \brief Synchronize the internal RTC with the external RTC
-     */
-    void syncRTCWithExtRTC(void);
+/**
+ * \brief Synchronize the internal RTC with the external RTC
+ */
+void syncRTCWithExtRTC(void);
 #endif
 
 #if defined(ESP32)
-    /**
-     * \brief Enter sleep mode (ESP32 variant)
-     *
-     *  ESP32 deep sleep mode
-     *
-     * \param seconds sleep duration in seconds
-     */
-    void gotoSleepESP32(uint32_t seconds);
+/**
+ * \brief Enter sleep mode (ESP32 variant)
+ *
+ *  ESP32 deep sleep mode
+ *
+ * \param seconds sleep duration in seconds
+ */
+void gotoSleepESP32(uint32_t seconds);
 #endif
 
 #if defined(ARDUINO_ARCH_RP2040)
 
-    /*!
-     * \brief Enter sleep mode (RP2040 variant)
-     *
-     * The RP2040 RTC is set up to keep the time during the sleep interval and
-     * to wake up after the sleep interval.
-     *
-     * For compatibility with the ESP32 sleep mode, a SW reset is performed
-     * after the sleep interval.
-     *
-     * The SW reset also resets the RTC, so the time (along with other data to be retained)
-     * is saved in the watchdog scratch registers.
-     *
-     * \param seconds sleep duration in seconds
-     */
-    void gotoSleepRP2040(uint32_t seconds);
+/*!
+ * \brief Enter sleep mode (RP2040 variant)
+ *
+ * The RP2040 RTC is set up to keep the time during the sleep interval and
+ * to wake up after the sleep interval.
+ *
+ * For compatibility with the ESP32 sleep mode, a SW reset is performed
+ * after the sleep interval.
+ *
+ * The SW reset also resets the RTC, so the time (along with other data to be retained)
+ * is saved in the watchdog scratch registers.
+ *
+ * \param seconds sleep duration in seconds
+ */
+void gotoSleepRP2040(uint32_t seconds);
 
-    /*!
-     * \brief Restore RP2040 variables after sleep and SW reset
-     */
-    void restoreRP2040(void);
+/*!
+ * \brief Restore RP2040 variables after sleep and SW reset
+ */
+void restoreRP2040(void);
 #endif
 
 #if defined(ESP32)
-    /**
-     * \brief Print wakeup reason (ESP32 only)
-     *
-     * Abbreviated version from the Arduino-ESP32 package, see
-     * https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
-     * for the complete set of options.
-     */
-    void print_wakeup_reason()
+/**
+ * \brief Print wakeup reason (ESP32 only)
+ *
+ * Abbreviated version from the Arduino-ESP32 package, see
+ * https://espressif-docs.readthedocs-hosted.com/projects/arduino-esp32/en/latest/api/deepsleep.html
+ * for the complete set of options.
+ */
+void print_wakeup_reason()
+{
+    esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+    if (wakeup_reason == ESP_SLEEP_WAKEUP_TIMER)
     {
-        esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
-        if (wakeup_reason == ESP_SLEEP_WAKEUP_TIMER)
-        {
-            log_i("Wake from sleep");
-        }
-        else
-        {
-            log_i("Wake not caused by deep sleep: %u", wakeup_reason);
-        }
-    };
+        log_i("Wake from sleep");
+    }
+    else
+    {
+        log_i("Wake not caused by deep sleep: %u", wakeup_reason);
+    }
+};
 #endif
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-    void setupPowerFeather(struct sPowerFeatherCfg &cfg);
+void setupPowerFeather(struct sPowerFeatherCfg &cfg);
 #endif
 
 private:
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-    struct sPowerFeatherCfg PowerFeatherCfg = {
-        .battery_capacity = BATTERY_CAPACITY_MAH,
-        .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
-        .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
-        .soc_eco_enter = SOC_ECO_ENTER,
-        .soc_eco_exit = SOC_ECO_EXIT,
-        .soc_critical = SOC_CRITICAL,
-        .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
-        .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
+struct sPowerFeatherCfg PowerFeatherCfg = {
+    .battery_capacity = BATTERY_CAPACITY_MAH,
+    .supply_maintain_voltage = PF_SUPPLY_MAINTAIN_VOLTAGE,
+    .max_charge_current = PF_MAX_CHARGE_CURRENT_MAH,
+    .soc_eco_enter = SOC_ECO_ENTER,
+    .soc_eco_exit = SOC_ECO_EXIT,
+    .soc_critical = SOC_CRITICAL,
+    .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
+    .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
 #else
     struct sPowerFeatherCfg PowerFeatherCfg = {0};
 #endif
 
-    uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
-    uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
-    uint16_t voltage_critical = VOLTAGE_CRITICAL;
-    uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
-    uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
-    uint16_t batteryVoltage = 0; // Battery voltage in mV
-    uint16_t supplyVoltage = 0;  // Supply voltage in mV
-    uint16_t busVoltage = 0;     // bus voltage in mV (depending on the circuit)
-};
+uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;
+uint16_t voltage_eco_enter = VOLTAGE_ECO_ENTER;
+uint16_t voltage_critical = VOLTAGE_CRITICAL;
+uint16_t battery_discharge_lim = BATTERY_DISCHARGE_LIM;
+uint16_t battery_charge_lim = BATTERY_CHARGE_LIM;
+uint16_t batteryVoltage = 0; // Battery voltage in mV
+uint16_t supplyVoltage = 0;  // Supply voltage in mV
+uint16_t busVoltage = 0;     // bus voltage in mV (depending on the circuit)
+}
+;
