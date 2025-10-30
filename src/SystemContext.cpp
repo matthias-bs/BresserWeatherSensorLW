@@ -46,6 +46,8 @@
 // 20250830 Changed longSleepModeActive default to false
 // 20251017 Added PowerFeather variant of sleepInterval()
 // 20251018 Renamed mcuVoltage to busVoltage
+// 20251030 Added sleepInterval() for M5Core2, changed M5Core2 configuration
+//          for power saving
 //
 ///////////////////////////////////////////////////////////////////////////////
 
