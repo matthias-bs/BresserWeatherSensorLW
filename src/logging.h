@@ -64,7 +64,7 @@
 
 // Enable to use Serial2 as debug output port
 // This is useful to debug power management without powering/charging via USB
-#define SERIAL2_LOG_ENABLE
+// #define SERIAL2_LOG_ENABLE
 
 #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
 const char *pathToFileName(const char *path);
