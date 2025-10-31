@@ -40,6 +40,7 @@
 // 20250827 Changed battery_low to voltage_critical
 //          Changed battery_weak to voltage_eco_enter/exit
 // 20251017 Added soc_eco_enter/exit
+// 20251031 Added M5Stack configuration
 //
 // ToDo:
 // -
@@ -82,6 +83,11 @@
  *     "soc_critical": 5,
  *     "temperature_measurement": false,
  *     "battery_fuel_gauge": true
+ *   },
+ *   "m5stack": {
+ *     "soc_eco_enter": 20,
+ *     "soc_eco_exit": 25,
+ *     "soc_critical": 3
  *   }
  * }
  */
@@ -92,4 +98,6 @@ void loadNodeCfg(
     uint16_t &voltage_critical,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
-    struct sPowerFeatherCfg &powerFeatherCfg);
+    struct sPowerFeatherCfg &powerFeatherCfg,
+    struct sM5StackCfg &m5StackCfg
+);
