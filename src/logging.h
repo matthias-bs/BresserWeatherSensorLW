@@ -87,6 +87,7 @@ const char *pathToFileName(const char *path);
 #endif // CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
 
 #if defined(ARDUINO_ARCH_RP2040)
+    const char *pathToFileName(const char *path);
 
     #if defined(DEBUG_RP2040_PORT)
         #define DEBUG_PORT DEBUG_RP2040_PORT
