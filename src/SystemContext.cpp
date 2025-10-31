@@ -48,6 +48,7 @@
 // 20251018 Renamed mcuVoltage to busVoltage
 // 20251030 Added sleepInterval() for M5Core2, changed M5Core2 configuration
 //          for power saving
+// 20251031 Added M5Stack configuration for power saving
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -136,7 +137,8 @@ void SystemContext::begin(void)
       voltage_critical,
       battery_discharge_lim,
       battery_charge_lim,
-      PowerFeatherCfg);
+      PowerFeatherCfg,
+      M5StackCfg);
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   setupPowerFeather(PowerFeatherCfg);
@@ -253,11 +255,11 @@ uint32_t SystemContext::sleepInterval(void)
 uint32_t SystemContext::sleepInterval(void)
 {
   uint8_t soc = M5.Power.getBatteryLevel();
-  if (!longSleepModeActive && soc <= PowerFeatherCfg.soc_eco_enter)
+  if (!longSleepModeActive && soc <= M5StackCfg.soc_eco_enter)
   {
     longSleepModeActive = true;
   }
-  else if (longSleepModeActive && soc >= PowerFeatherCfg.soc_eco_exit)
+  else if (longSleepModeActive && soc >= M5StackCfg.soc_eco_exit)
   {
     longSleepModeActive = false;
   }
