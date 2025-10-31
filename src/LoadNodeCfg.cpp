@@ -42,6 +42,7 @@
 //          Changed battery_weak to voltage_eco_enter/exit
 // 20251017 Added soc_eco_enter/exit
 // 20251018 Added soc_critical
+// 20251031 Added M5Stack configuration
 //
 // ToDo:
 // -
@@ -58,7 +59,8 @@ void loadNodeCfg(
     uint16_t &voltage_critical,
     uint16_t &batt_discharge_lim,
     uint16_t &batt_charge_lim,
-    struct sPowerFeatherCfg &powerFeatherCfg)
+    struct sPowerFeatherCfg &powerFeatherCfg,
+    struct sM5StackCfg &m5StackCfg)
 {
 
     if (!LittleFS.begin(
@@ -139,6 +141,22 @@ void loadNodeCfg(
                         powerFeatherCfg.battery_fuel_gauge = pf["battery_fuel_gauge"];
                     }
                 }
+                if (!doc["m5stack"].isNull())
+                {
+                    JsonObject m5 = doc["m5stack"];
+                    if (!m5["soc_eco_enter"].isNull())
+                    {
+                        m5StackCfg.soc_eco_enter = m5["soc_eco_enter"];
+                    }
+                    if (!m5["soc_eco_exit"].isNull())
+                    {
+                        m5StackCfg.soc_eco_exit = m5["soc_eco_exit"];
+                    }
+                    if (!m5["soc_critical"].isNull())
+                    {
+                        m5StackCfg.soc_critical = m5["soc_critical"];
+                    }
+                }
             } // deserializeJson o.k.
         } // file read o.k.
         file.close();
@@ -160,4 +178,8 @@ void loadNodeCfg(
     log_d("  Max. charge current:     %4d mA", powerFeatherCfg.max_charge_current);
     log_d("  Temperature measurement: %s", powerFeatherCfg.temperature_measurement ? "true" : "false");
     log_d("  Battery fuel gauge:      %s", powerFeatherCfg.battery_fuel_gauge ? "true" : "false");
+    log_d("M5Stack");
+    log_d("  SOC eco exit:            %4d %%", m5StackCfg.soc_eco_exit);
+    log_d("  SOC eco enter:           %4d %%", m5StackCfg.soc_eco_enter);
+    log_d("  SOC critical:            %4d %%", m5StackCfg.soc_critical);
 } // loadNodeCfg()

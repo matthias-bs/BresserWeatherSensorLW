@@ -43,6 +43,8 @@
 // 20251017 Added getBattlevelPowerfeather()
 // 20251018 Added sleepIfSupplyLow for PowerFeather
 //          Renamed mcuVoltage to busVoltage, changed busVoltage assignment
+// 20251030 Added sleepIfSupplyLow() for M5Core2 and getBattlevelM5core2()
+// 20251031 Added M5Stack configuration for power saving
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -166,10 +168,10 @@ public:
      *
      * Bus voltage:
      * Supply voltage (e.g. USB or external power) if available, otherwise battery voltage.
-     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V 
+     * If no voltage converter is used, the permitted voltage range is limited by the 3.3V
      * LDO input range and by the connected 3.3V loads.
      * Typically 5V nominal.
-     * 
+     *
      * The bus voltage is evaluated to determine the state of the power supply.
      */
     void getVoltages(void)
@@ -211,6 +213,36 @@ public:
             gotoSleep(sleepDuration());
         }
     };
+#elif defined(ARDUINO_M5STACK_CORE2)
+    /**
+     * \brief Sleep if battery voltage is low to prevent deep-discharging
+     *
+     * Checks if the bus voltage has reached the shut-off threshold and
+     * enters sleep mode for battery deep-discharge protection.
+     *
+     */
+    void sleepIfSupplyLow(void)
+    {
+        int16_t vbus = M5.Power.getVBUSVoltage();
+        log_i("VBUS = %d mV", vbus);
+        int8_t soc = M5.Power.getBatteryLevel();
+        log_i("SOC = %d %%", soc);
+        // Charging is enabled by default
+        // void setBatteryCharge(true);
+        log_d("Charging: %u", M5.Power.isCharging());
+        log_d("Battery current = %d mA", M5.Power.getBatteryCurrent());
+
+        if (M5.Power.getVBUSVoltage() >= VOLTAGE_CRITICAL)
+        {
+            return;
+        }
+
+        if (soc <= M5StackCfg.soc_critical)
+        {
+            log_i("Battery low!");
+            gotoSleep(sleepDuration());
+        }
+    };
 #else
     /**
      * \brief Sleep if battery voltage is low to prevent deep-discharging
@@ -246,6 +278,8 @@ public:
     {
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
         return getBattlevelPowerfeather();
+#elif defined(ARDUINO_M5STACK_CORE2)
+        return getBattlevelM5core2();
 #else
         return getBattlevelDefault();
 #endif
@@ -327,6 +361,35 @@ public:
     };
 #endif
 
+#if defined(ARDUINO_M5STACK_CORE2)
+    /**
+     * \brief Get the battery fill level (for PowerFeather)
+     *
+     * Get the battery fill level for LoRaWAN device status uplink.
+     * The LoRaWAN network server may periodically request this information.
+     *
+     * 0 = external power source
+     * 1 = lowest (empty battery)
+     * 254 = highest (full battery)
+     * 255 = unable to measure
+     */
+    uint8_t getBattlevelM5core2(void)
+    {
+        if (M5.Power.getVBUSVoltage() >= VOLTAGE_CRITICAL)
+        {
+            return 0; // external power source
+        }
+
+        uint8_t soc = M5.Power.getBatteryLevel();
+        log_d("Battery SOC: %u %%", soc);
+
+        // Scale SOC (0-100%) to LoRaWAN battery level (1-254)
+        uint8_t level;
+        level = static_cast<uint8_t>(static_cast<float>(soc) / 100.0f * 254.0f);
+        level = (level == 0) ? 1 : level;
+        return level;
+    };
+#endif
     /**
      * \brief Switch between normal and long sleep interval
      *
@@ -546,8 +609,16 @@ private:
         .soc_critical = SOC_CRITICAL,
         .temperature_measurement = PF_TEMPERATURE_MEASUREMENT,
         .battery_fuel_gauge = PF_BATTERY_FUEL_GAUGE};
+    struct sM5StackCfg M5StackCfg = {0};
+#elif defined(ARDUINO_M5STACK_CORE2)
+    struct sPowerFeatherCfg PowerFeatherCfg = {0};
+    struct sM5StackCfg M5StackCfg = {
+        .soc_eco_enter = SOC_ECO_ENTER,
+        .soc_eco_exit = SOC_ECO_EXIT,
+        .soc_critical = SOC_CRITICAL};
 #else
     struct sPowerFeatherCfg PowerFeatherCfg = {0};
+    struct sM5StackCfg M5StackCfg = {0};
 #endif
 
     uint16_t voltage_eco_exit = VOLTAGE_ECO_EXIT;

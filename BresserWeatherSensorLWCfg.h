@@ -117,6 +117,12 @@ struct sPowerFeatherCfg {
   bool battery_fuel_gauge; /// Enable battery fuel gauge
 };
 
+// M5Stack specific configuration
+struct sM5StackCfg {
+  uint8_t soc_eco_enter; /// State of charge (%) to enter eco mode
+  uint8_t soc_eco_exit; /// State of charge (%) to exit eco mode
+  uint8_t soc_critical; /// State of charge (%) to enter critical mode
+};
 
 // Uplink message payload size
 // The maximum allowed for all data rates is 51 bytes.
@@ -252,6 +258,9 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // unused
 #define PIN_ADC_IN -1
 #elif defined(ARDUINO_M5STACK_CORE2)
+#define SOC_ECO_ENTER 20 // State of charge (%) to enter eco mode
+#define SOC_ECO_EXIT 25 // State of charge (%) to exit eco mode
+#define SOC_CRITICAL 3 // State of charge (%) to enter critical mode
 // Unused
 #define PIN_ADC_IN -1
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)

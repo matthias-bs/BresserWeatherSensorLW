@@ -46,6 +46,9 @@
 // 20250830 Changed longSleepModeActive default to false
 // 20251017 Added PowerFeather variant of sleepInterval()
 // 20251018 Renamed mcuVoltage to busVoltage
+// 20251030 Added sleepInterval() for M5Core2, changed M5Core2 configuration
+//          for power saving
+// 20251031 Added M5Stack configuration for power saving
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -134,7 +137,8 @@ void SystemContext::begin(void)
       voltage_critical,
       battery_discharge_lim,
       battery_charge_lim,
-      PowerFeatherCfg);
+      PowerFeatherCfg,
+      M5StackCfg);
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   setupPowerFeather(PowerFeatherCfg);
@@ -246,6 +250,21 @@ uint32_t SystemContext::sleepInterval(void)
   }
   return longSleepModeActive ? sleep_interval_long : sleep_interval;
 }
+#elif defined(ARDUINO_M5STACK_CORE2)
+// M5Core2: Switch between normal and long sleep interval depending on the battery SOC
+uint32_t SystemContext::sleepInterval(void)
+{
+  uint8_t soc = M5.Power.getBatteryLevel();
+  if (!longSleepModeActive && soc <= M5StackCfg.soc_eco_enter)
+  {
+    longSleepModeActive = true;
+  }
+  else if (longSleepModeActive && soc >= M5StackCfg.soc_eco_exit)
+  {
+    longSleepModeActive = false;
+  }
+  return longSleepModeActive ? sleep_interval_long : sleep_interval;
+} 
 #else
 // Switch between normal and long sleep interval depending on the bus voltage
 uint32_t SystemContext::sleepInterval(void)
@@ -412,12 +431,14 @@ void SystemContext::setupM5StackCore2(void)
 {
   auto cfg = M5.config();
   cfg.clear_display = true; // default=true. clear the screen when begin.
+  cfg.external_display.module_display = false; // default=true. use Module Display.
   cfg.output_power = true;  // default=true. use external port 5V output.
   cfg.internal_imu = false; // default=true. use internal IMU.
   cfg.internal_rtc = true;  // default=true. use internal RTC.
   cfg.internal_spk = false; // default=true. use internal speaker.
   cfg.internal_mic = false; // default=true. use internal microphone.
   M5.begin(cfg);
+  M5.Display.setBrightness(0); // set system LED brightness (0=off / 255=max)
 }
 #endif
 
