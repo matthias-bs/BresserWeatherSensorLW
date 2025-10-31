@@ -49,6 +49,7 @@
 // 20251030 Added sleepInterval() for M5Core2, changed M5Core2 configuration
 //          for power saving
 // 20251031 Added M5Stack configuration for power saving
+//          Added M5Stack RTC integration
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -160,7 +161,7 @@ void SystemContext::begin(void)
   }
   bootCount++;
 
-#if defined(EXT_RTC)
+#if defined(EXT_RTC) || defined(ARDUINO_M5STACK_CORE2)
   if (rtcNeedsSync())
   {
     getTimeFromExtRTC();
@@ -329,6 +330,50 @@ void SystemContext::getTimeFromExtRTC(void)
   }
 }
 #endif
+
+#if defined(ARDUINO_M5STACK_CORE2)
+// Synchronize the internal RTC with the external RTC
+void SystemContext::syncRTCWithExtRTC(void)
+{
+  auto dt = M5.Rtc.getDateTime();
+
+  // Convert DateTime to time_t
+  struct tm timeinfo;
+  timeinfo.tm_year = dt.date.year - 1900;
+  timeinfo.tm_mon = dt.date.month - 1;
+  timeinfo.tm_mday = dt.date.date;
+  timeinfo.tm_hour = dt.time.hours;
+  timeinfo.tm_min = dt.time.minutes;
+  timeinfo.tm_sec = dt.time.seconds;
+
+  time_t t = mktime(&timeinfo);
+
+  // Set the MCU's internal RTC (ESP32) or SW RTC (RP2040)
+  struct timeval tv = {t, 0}; // `t` is seconds, 0 is microseconds
+  settimeofday(&tv, nullptr);
+}
+#endif // ARDUINO_M5STACK_CORE2
+
+#if defined(ARDUINO_M5STACK_CORE2)
+void SystemContext::getTimeFromExtRTC(void)
+{
+  if (!M5.Rtc.begin())
+  {
+    log_w("M5 RTC not available");
+  }
+  else if (M5.Rtc.getVoltLow())
+  {
+    log_w("M5 RTC lost power");
+  }
+  else
+  {
+    syncRTCWithExtRTC();
+    rtcLastClockSync = time(nullptr);
+    rtcTimeSource = E_TIME_SOURCE::E_RTC;
+    log_i("Set time and date from RTC IC");
+  }
+}
+#endif // ARDUINO_M5STACK_CORE2
 
 // Check if the RTC is synchronized to a time source
 bool SystemContext::isRtcSynched(void)

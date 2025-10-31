@@ -45,6 +45,7 @@
 //          Renamed mcuVoltage to busVoltage, changed busVoltage assignment
 // 20251030 Added sleepIfSupplyLow() for M5Core2 and getBattlevelM5core2()
 // 20251031 Added M5Stack configuration for power saving
+//          Added M5Stack RTC integration
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -533,6 +534,20 @@ private:
 #if defined(EXT_RTC)
     /**
      * \brief Synchronize the internal RTC with the external RTC
+     */
+    void syncRTCWithExtRTC(void);
+#endif
+
+#if defined(ARDUINO_M5STACK_CORE2)
+    /**
+     * \brief Get the Time from M5Stack Core2 RTC
+     */
+    void getTimeFromExtRTC(void);
+#endif
+
+#if defined(ARDUINO_M5STACK_CORE2)
+    /**
+     * \brief Synchronize the internal RTC with the M5Stack Core2 RTC
      */
     void syncRTCWithExtRTC(void);
 #endif
