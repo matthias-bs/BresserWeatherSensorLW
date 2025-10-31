@@ -16,7 +16,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You need [RadioLib v7.2.1](https://github.com/jgromes/RadioLib/releases/tag/7.2.1) or later
+* You need [RadioLib v7.4.0](https://github.com/jgromes/RadioLib/releases/tag/7.4.0) or later
 * You need [espressif/arduino-esp32 v3.X.Y](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
@@ -158,7 +158,7 @@ See [Parameters](#parameters) for more details.
   |  :white_check_mark:  | [DFRobot FireBeetle ESP32 IoT Microcontroller](https://www.dfrobot.com/product-1590.html) with [FireBeetle Cover LoRa Radio 868MHz](https://www.dfrobot.com/product-1831.html) | FireBeetle-ESP32 |  DFROBOT_FIREBEETLE_ESP32 & DFROBOT_COVER_LORA | SX1276 (LoRa1276) | Wiring on the cover: <br>D2 to RESET<br>D3 to DIO0<br>D4 to CS<br>D5 to DIO1 |
   |  :hourglass:  | [Adafruit Feather ESP32S2 with Adafruit LoRa Radio FeatherWing](https://github.com/matthias-bs/BresserWeatherSensorReceiver#adafruit-feather-esp32s2-with-adafruit-lora-radio-featherwing)                                | Adafruit Feather ESP32-S2 | FEATHER_ESP32S2   | SX1276 (RFM95W) | **No Bluetooth available!**<br>Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
   |  :white_check_mark:  | [Thingpulse ePulse Feather](https://thingpulse.com/product/epulse-feather-low-power-esp32-development-board/) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | ThingPulse ePulse Feather | THINGPULSE_EPULSE_FEATHER   | SX1276 (RFM95W) | Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
-  |  :x:         | [M5Stack Core2](https://docs.m5stack.com/en/core/core2) with [M5Stack Module LoRa868](https://docs.m5stack.com/en/module/lora868)   | M5Core2 | M5STACK_CORE2   | SX1276<br>(RA-01H) | Wiring on the LoRa868 Module: <br>DIO1 to GPIO35<br><br>"M5Unified" must be installed <br>`M5.begin()`is called to control power management<br><br>Linker error: IRAM section overflow |
+  |  :white_check_mark:  | [M5Stack Core2](https://docs.m5stack.com/en/core/core2) with [M5Stack Module LoRa868](https://docs.m5stack.com/en/module/lora868)   | M5Core2 | M5STACK_CORE2   | SX1276<br>(RA-01H) | Wiring on the LoRa868 Module: <br>DIO1 to GPIO35<br><br>"M5Unified" must be installed <br>`M5.begin()`is called to control power management<br><br>See [#178](https://github.com/matthias-bs/BresserWeatherSensorLW/issues/178) |
   |  :white_check_mark:  | [ESP32-S3 PowerFeather](https://powerfeather.dev/) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | ESP32-S3 PowerFeather | ESP32S3_POWERFEATHER | SX1276 (RFM95W) | Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01<br><br>"PowerFeather-SDK" must be installed<br>`Board.init(BATTERY_CAPACITY_MAH);` is called to control power management<br><br>see [Wiki](wiki/PowerFeather) for additional hints |
   |  :white_check_mark:  | [Adafruit Feather RP2040](https://www.adafruit.com/product/4884) with [Adafruit LoRa Radio FeatherWing](https://www.adafruit.com/product/3231)     | Adafruit Feather RP2040 | ADAFRUIT_FEATHER_RP2040   | SX1276 (RFM95W) | **No Bluetooth available!**<br>**Configuration: Choose an entry with "FS" in section __Flash Size__!**<br>Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
 
@@ -380,6 +380,8 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `PF_BATTERY_FUEL_GAUGE` / <br>`powerfeather/battery_fuel_gauge` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_SUPPLY_MAINTAIN_VOLTAGE` / <br>`powerfeather/supply_maintain_voltage` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                                  |    X   |          |   X  |
 | `PF_MAX_CHARGE_CURRENT_MAH` / <br>`powerfeather/max_charge_current` | see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)                                                                              |  X   |          |   X  |
+| `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
+| **M5Stack specific Configuration**                                                                                          |
 | `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
 
 ### Enabling Debug Output
@@ -791,7 +793,10 @@ The following parameters are available:
 | &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `5` |
 | &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `enableBatteryTempSense()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
 | &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
-
+| m5stack/         | M5Stack specific (see [https://docs.m5stack.com/en/arduino/m5unified/power_class](https://docs.m5stack.com/en/arduino/m5unified/power_class)) |   |
+| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `20` |
+| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `25` |
+| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `5` |
 
 Modify the example [data/node_config.json](data/node_config.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
 
