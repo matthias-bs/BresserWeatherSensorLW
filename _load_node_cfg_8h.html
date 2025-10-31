@@ -150,16 +150,16 @@ This graph shows which files directly or indirectly include this file:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af8c08f2213a129d22f9d987b017bf50f" id="r_af8c08f2213a129d22f9d987b017bf50f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_load_node_cfg_8h.html#af8c08f2213a129d22f9d987b017bf50f">loadNodeCfg</a> (String &amp;tzinfo, uint16_t &amp;voltage_eco_exit, uint16_t &amp;voltage_eco_enter, uint16_t &amp;voltage_critical, uint16_t &amp;batt_discharge_lim, uint16_t &amp;batt_charge_lim, struct sPowerFeatherCfg &amp;powerFeatherCfg)</td></tr>
-<tr class="memdesc:af8c08f2213a129d22f9d987b017bf50f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available.  <br /></td></tr>
-<tr class="separator:af8c08f2213a129d22f9d987b017bf50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81122de98530124c3d85d4e1d4aedd86" id="r_a81122de98530124c3d85d4e1d4aedd86"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_load_node_cfg_8h.html#a81122de98530124c3d85d4e1d4aedd86">loadNodeCfg</a> (String &amp;tzinfo, uint16_t &amp;voltage_eco_exit, uint16_t &amp;voltage_eco_enter, uint16_t &amp;voltage_critical, uint16_t &amp;batt_discharge_lim, uint16_t &amp;batt_charge_lim, struct sPowerFeatherCfg &amp;powerFeatherCfg, struct sM5StackCfg &amp;m5StackCfg)</td></tr>
+<tr class="memdesc:a81122de98530124c3d85d4e1d4aedd86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available.  <br /></td></tr>
+<tr class="separator:a81122de98530124c3d85d4e1d4aedd86"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available. </p>
 <p>This configuration file is intended for hardware/deployment environment specific settings (e.g. battery voltage thresholds, timezone). </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="af8c08f2213a129d22f9d987b017bf50f" name="af8c08f2213a129d22f9d987b017bf50f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af8c08f2213a129d22f9d987b017bf50f">&#9670;&#160;</a></span>loadNodeCfg()</h2>
+<a id="a81122de98530124c3d85d4e1d4aedd86" name="a81122de98530124c3d85d4e1d4aedd86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81122de98530124c3d85d4e1d4aedd86">&#9670;&#160;</a></span>loadNodeCfg()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -204,7 +204,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">struct sPowerFeatherCfg &amp;&#160;</td>
-          <td class="paramname"><em>powerFeatherCfg</em>&#160;</td>
+          <td class="paramname"><em>powerFeatherCfg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">struct sM5StackCfg &amp;&#160;</td>
+          <td class="paramname"><em>m5StackCfg</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -216,7 +222,7 @@ Functions</h2></td></tr>
 
 <p>Load LoRaWAN node configuration 'node_config.json' from LittleFS, if available. </p>
 <p>Returns all values by reference. Keeps the original value(s) if file not found, cannot be parsed or any value is missing.</p>
-<p>JSON file format: { "timezone": "CET-1CEST,M3.5.0,M10.5.0/3", "voltage_eco_exit": 3580, "voltage_eco_enter": 3500, "voltage_critical": 3300, "battery_discharge_lim": 3200, "battery_charge_lim": 4200, "powerfeather": { "battery_capacity":, 2200 "supply_maintain_voltage": 5500, "max_charge_current": 50, "soc_eco_enter": 20, "soc_eco_exit": 25, "soc_critical": 5, "temperature_measurement": false, "battery_fuel_gauge": true } } </p>
+<p>JSON file format: { "timezone": "CET-1CEST,M3.5.0,M10.5.0/3", "voltage_eco_exit": 3580, "voltage_eco_enter": 3500, "voltage_critical": 3300, "battery_discharge_lim": 3200, "battery_charge_lim": 4200, "powerfeather": { "battery_capacity":, 2200 "supply_maintain_voltage": 5500, "max_charge_current": 50, "soc_eco_enter": 20, "soc_eco_exit": 25, "soc_critical": 5, "temperature_measurement": false, "battery_fuel_gauge": true }, "m5stack": { "soc_eco_enter": 20, "soc_eco_exit": 25, "soc_critical": 3 } } </p>
 
 </div>
 </div>

@@ -13,7 +13,7 @@ var NAVTREEINDEX0 =
 "_ble_sensors_8h.html#afe7b10510698e2f90c005470e4310cb9":[1,0,0,1,0,2],
 "_ble_sensors_8h_source.html":[1,0,0,1,0],
 "_load_node_cfg_8h.html":[1,0,0,4],
-"_load_node_cfg_8h.html#af8c08f2213a129d22f9d987b017bf50f":[1,0,0,4,0],
+"_load_node_cfg_8h.html#a81122de98530124c3d85d4e1d4aedd86":[1,0,0,4,0],
 "_load_node_cfg_8h_source.html":[1,0,0,4],
 "_load_secrets_8h.html":[1,0,0,5],
 "_load_secrets_8h.html#a6030d644521e863b191664ca3df5d40c":[1,0,0,5,0],
