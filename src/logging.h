@@ -112,27 +112,27 @@ const char *pathToFileName(const char *path);
     #define CORE_DEBUG_LEVEL ARDUHAL_LOG_LEVEL_DEBUG
 
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
-        #define log_e(...) { DEBUG_PORT.printf("[E][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.println(); }
+        #define log_e(...) { DEBUG_PORT.printf("[E][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_e(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_ERROR
-        #define log_w(...) { DEBUG_PORT.printf("[W][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_w(...) { DEBUG_PORT.printf("[W][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_w(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_WARN
-        #define log_i(...) { DEBUG_PORT.printf("[I][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_i(...) { DEBUG_PORT.printf("[I][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_i(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_INFO
-        #define log_d(...) { DEBUG_PORT.printf("[D][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_d(...) { DEBUG_PORT.printf("[D][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_d(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_DEBUG
-        #define log_v(...) { DEBUG_PORT.printf("[V][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_v(...) { DEBUG_PORT.printf("[V][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_v(...) {}
      #endif
