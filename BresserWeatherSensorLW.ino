@@ -113,10 +113,11 @@
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE, payloadSize to uplinkSize
 // 20250622 Updated to RadioLib v7.2.0, added custom delay (ESP32 light sleep)
 // 20250803 Added support for external RTC chips
-// 20250806 Refactored by adding SystemContext class, 
+// 20250806 Refactored by adding SystemContext class,
 //          moved system code from BresserWeatherSensorLW.ino
 // 20250820 Added initial sysCtx.getVoltages() call
 //          Moved battery level calculation to SystemContext
+// 20251031 Added logging via Serial2
 //
 // ToDo:
 // -
@@ -207,13 +208,11 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
 };
 #endif // ARDUINO_LILYGO_T3S3_LR1121
 
-
 /// System context
 SystemContext sysCtx;
 
 /// Application layer
 AppLayer appLayer(&sysCtx);
-
 
 // LoRaWAN specific variables which must retain their values after deep sleep
 #if defined(ESP32)
@@ -232,7 +231,6 @@ bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
 /// LoRaWAN Node status uplink pending
 bool lwStatusUplinkPending __attribute__((section(".uninitialized_data")));
 #endif
-
 
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
@@ -332,11 +330,30 @@ void setup()
 #endif
 
 #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
+#if !defined(SERIAL2_LOG_ENABLE)
   Serial.begin(115200);
   Serial.setDebugOutput(true);
+#else
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  // PowerFeather
+  Serial2.begin(115200, SERIAL_8N1, 44 /* TX */, 42 /* RX */);
+  Serial2.setDebugOutput(true);
+#elif defined(ARDUINO_M5STACK_CORE2)
+  // M5Stack Core2
+  // Port C
+  // GND - black
+  // 5V - red
+  // G13 (RX2) - yellow
+  // G14 (TX2) - white
+  Serial2.begin(115200, SERIAL_8N1, TX2, RX2);
+  Serial2.setDebugOutput(true);
+#else
+#error "SERIAL2_LOG_ENABLE defined but no Serial2 configuration for this board"
+#endif
+#endif // SERIAL2_LOG_ENABLE
 
   delay(2000); // give time to switch to the serial monitor
-#endif
+#endif         // CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
   log_i("Setup");
 
   sysCtx.begin();
@@ -565,10 +582,12 @@ void setup()
     uint32_t networkTime = 0;
     uint16_t milliseconds = 0;
     if (node.getMacDeviceTimeAns(&networkTime, &milliseconds, true) == RADIOLIB_ERR_NONE)
+      uint16_t milliseconds = 0;
+    if (node.getMacDeviceTimeAns(&networkTime, &milliseconds, true) == RADIOLIB_ERR_NONE)
     {
       log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
       log_i("[LoRaWAN] DeviceTime frac:\t%u ms", milliseconds);
-      
+
       sysCtx.setTime(networkTime, E_TIME_SOURCE::E_LORA);
       log_d("RTC sync completed");
       sysCtx.printDateTime();

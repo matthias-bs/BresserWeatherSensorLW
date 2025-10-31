@@ -40,6 +40,7 @@
 // 20230927 Created from BresserWeatherSensorReceiver
 // 20231004 Added function names and line numbers to ESP8266/RP2040 debug logging
 // 20231005 Allowed re-definition of CORE_DEBUG_LEVEL and log_* macros
+// 20251031 Added option for logging via Serial2
 //
 // ToDo:
 // - 
@@ -61,18 +62,32 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
+// Enable to use Serial2 as debug output port
+// This is useful to debug power management without powering/charging via USB
+// #define SERIAL2_LOG_ENABLE
+
+#if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
+const char *pathToFileName(const char *path);
+
+#if defined(SERIAL2_LOG_ENABLE)
+
 // Use Serial2 as debug port
-// #define DEBUG_PORT Serial2
-// #undef log_i
-// #define log_i(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
-// #undef log_d
-// #define log_d(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
-// #undef log_w
-// #define log_w(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
-// #undef log_e
-// #define log_e(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#define DEBUG_PORT Serial2
+#undef log_i
+#define log_i(...) { DEBUG_PORT.printf("[I][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#undef log_d
+#define log_d(...) { DEBUG_PORT.printf("[D][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#undef log_w
+#define log_w(...) { DEBUG_PORT.printf("[W][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#undef log_e
+#define log_e(...) { DEBUG_PORT.printf("[E][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#undef log_v
+#define log_v(...) { DEBUG_PORT.printf("[V][%s:%d] %s(): ", pathToFileName(__FILE__), __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+#endif // SERIAL2_LOG_ENABLE
+#endif // CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
 
 #if defined(ARDUINO_ARCH_RP2040)
+    const char *pathToFileName(const char *path);
 
     #if defined(DEBUG_RP2040_PORT)
         #define DEBUG_PORT DEBUG_RP2040_PORT
@@ -97,27 +112,27 @@
     #define CORE_DEBUG_LEVEL ARDUHAL_LOG_LEVEL_DEBUG
 
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
-        #define log_e(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.println(); }
+        #define log_e(...) { DEBUG_PORT.printf("[E][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_e(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_ERROR
-        #define log_w(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_w(...) { DEBUG_PORT.printf("[W][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_w(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_WARN
-        #define log_i(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_i(...) { DEBUG_PORT.printf("[I][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_i(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_INFO
-        #define log_d(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_d(...) { DEBUG_PORT.printf("[D][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_d(...) {}
      #endif
     #if defined(DEBUG_PORT) && CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_DEBUG
-        #define log_v(...) { DEBUG_PORT.printf("%s(), l.%d: ", __func__, __LINE__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
+        #define log_v(...) { DEBUG_PORT.printf("[V][%d] %s(): ", __LINE__, __func__); DEBUG_PORT.printf(__VA_ARGS__); DEBUG_PORT.println(); }
      #else
         #define log_v(...) {}
      #endif
