@@ -87,7 +87,7 @@ jobs:
             "TheengsDecoder@2.0.0"
             "Preferences@2.2.2"
             "ArduinoJson@7.4.2"
-            #"M5Unified@0.2.8"
+            #"M5Unified@0.2.10"
             "powerfeather-sdk@1.1.0")
           for i in "${required_libs[@]}"
           do
