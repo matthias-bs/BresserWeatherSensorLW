@@ -29,7 +29,7 @@
 // BresserWeatherSensorReceiver         0.36.2
 // OneWireNg                            0.14.0 (optional)
 // DallasTemperature                    4.0.5 (optional)
-// NimBLE-Arduino                       2.3.6 (optional)
+// NimBLE-Arduino                       2.3.7 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
 // Theengs Decoder                      2.0.0 (optional)
 // RTClib (Adafruit)                    2.1.4 (optional)
