@@ -54,8 +54,6 @@
 // 20250828 Changed time functions to POSIX, added sysCtx
 // 20251222 Updated sensor types defined in BresserWeatherSensorReceiver
 //
-// ToDo:
-// - Add handling of Professional Rain Gauge
 //
 ///////////////////////////////////////////////////////////////////////////////
 
