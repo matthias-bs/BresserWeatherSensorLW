@@ -52,6 +52,7 @@
 // 20250209 Added Weather Station 8-in-1
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250828 Changed time functions to POSIX, added sysCtx
+// 20251222 Updated sensor types defined in BresserWeatherSensorReceiver
 //
 // ToDo:
 // - Add handling of Professional Rain Gauge
@@ -126,7 +127,8 @@ void PayloadBresser::scanBresser(uint8_t ws_scantime, LoraEncoder &encoder)
         uint16_t flags = 0;
         if ((weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER0) ||
             (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER1) ||
-            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER2))
+            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER3) ||
+            (weatherSensor.sensor[i].s_type == SENSOR_TYPE_WEATHER8))
         {
             if (weatherSensor.sensor[i].w.temp_ok)
                 flags |= 0x1;
@@ -167,31 +169,32 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
 
     // Handle weather sensors - which only have one channel (ch 0) - first.
     // Configuration for SENSOR_TYPE_WEATHER0 is integrated into SENSOR_TYPE_WEATHER1.
-    // Configuration for SENSOR_TYPE_WEATHER2 uses flags in appPayloadCFG[1] and
+    // Configuration for SENSOR_TYPE_WEATHER8 uses flags in appPayloadCFG[1] and
     // appPayloadCfg[13].
     uint16_t flags = (appPayloadCfg[13] << 8) | appPayloadCfg[1];
     if (flags & 1)
     {
         // Try to find SENSOR_TYPE_WEATHER1
         int idx = weatherSensor.findType(SENSOR_TYPE_WEATHER1);
+        if (idx == -1) 
+        {
+            // Try to find SENSOR_TYPE_WEATHER3
+            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER3);
+        }
+        if (idx == -1)
+        {
+            // Try to find SENSOR_TYPE_WEATHER8
+            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER8);
+        }
         if (idx > -1)
         {
             rainGauge.set_max(100000);
         }
         else
         {
-            // Try to find SENSOR_TYPE_WEATHER2
-            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER2);
-            if (idx > -1)
-            {
-                rainGauge.set_max(100000);
-            }
-            else
-            {
-                // Try to find SENSOR_TYPE_WEATHER0
-                idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
-                rainGauge.set_max(1000);
-            }
+            // Try to find SENSOR_TYPE_WEATHER0
+            idx = weatherSensor.findType(SENSOR_TYPE_WEATHER0);
+            rainGauge.set_max(1000);
         }
 
 #ifdef RAINDATA_EN
@@ -231,8 +234,12 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         if (appPayloadCfg[type] == 0)
             continue;
 
+        // Skip Weather Sensor 3-in-1 (handled above)
+        if (type == SENSOR_TYPE_WEATHER3)
+            continue;
+
         // Skip Weather Sensor 8-in-1 (handled above)
-        if (type == SENSOR_TYPE_WEATHER2)
+        if (type == SENSOR_TYPE_WEATHER8)
             continue;
 
 #ifdef LIGHTNINGSENSOR_EN
