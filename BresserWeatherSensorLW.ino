@@ -26,8 +26,8 @@
 // (install via normal Arduino Library installer:)
 // RadioLib                             7.4.0
 // LoRa Serialization                   3.3.1
-// BresserWeatherSensorReceiver         0.36.2
-// OneWireNg                            0.14.0 (optional)
+// BresserWeatherSensorReceiver         0.37.0
+// OneWireNg                            0.14.1 (optional)
 // DallasTemperature                    4.0.5 (optional)
 // NimBLE-Arduino                       2.3.7 (optional)
 // ATC MiThermometer                    0.5.0 (optional)
