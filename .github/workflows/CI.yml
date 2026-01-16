@@ -27,6 +27,7 @@ jobs:
           #- esp32:esp32:m5stack_core2 # Needs arduino-esp32 v3.0.7
           - esp32:esp32:esp32s3_powerfeather
           - esp32:esp32:adafruit_feather_esp32s2
+          - esp32:esp32:XIAO_ESP32S3
           - rp2040:rp2040:adafruit_feather:dbgport=Serial
 
     runs-on: ubuntu-latest
@@ -77,8 +78,8 @@ jobs:
           |
           #declare -a required_libs=("https://github.com/matthias-bs/BresserWeatherSensorReceiver.git"
           declare -a required_libs=(
-            "BresserWeatherSensorReceiver@0.37.0"
-            "RadioLib@7.4.0"
+            "BresserWeatherSensorReceiver@0.38.0"
+            "RadioLib@7.5.0"
             "LoRa Serialization@3.3.1"
             "OneWireNg@0.14.1"
             "DallasTemperature@4.0.5"
