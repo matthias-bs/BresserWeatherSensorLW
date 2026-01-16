@@ -118,6 +118,9 @@
 // 20250820 Added initial sysCtx.getVoltages() call
 //          Moved battery level calculation to SystemContext
 // 20251031 Added logging via Serial2
+// 20260116 Fixed radio module initialization for LilyGo T3S3 boards using RadioLib 7.5.0
+//          if the radio object is created here (instead of in BresserWeatherSensorReceiver)
+//          Added configuration for Seeed Studio XIAO ESP32S3 with Wio-SX1262
 //
 // ToDo:
 // -
@@ -182,11 +185,17 @@ static Preferences store;
 extern RADIO_CHIP radio;
 
 #else
+
+#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+static SPIClass *spi = new SPIClass(SPI);
+
+// Create radio object with custom SPI configuration
+LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO, *spi);
+
+#else
 // Create radio object
 LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO);
 
-#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
-SPIClass *spi = nullptr;
 #endif
 #endif
 
@@ -391,9 +400,7 @@ void setup()
 #if !defined(RADIO_CHIP)
 #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
   // Use local radio object with custom SPI configuration
-  spi = new SPIClass(SPI);
   spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
-  radio = new Module(PIN_RECEIVER_CS, PIN_RECEIVER_IRQ, PIN_RECEIVER_RST, PIN_RECEIVER_GPIO, *spi);
 #endif
 #endif
 
@@ -412,6 +419,19 @@ void setup()
 
   // LR1121 TCXO Voltage 2.85~3.15V
   radio.setTCXO(3.0);
+#endif
+
+#if defined(ARDUINO_XIAO_ESP32S3)
+    // set RF switch control configuration
+    radio.setRfSwitchPins(38, RADIOLIB_NC);
+
+    // TCXO Voltage according to
+    // https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Wio-SX1262_Module_Datasheet.pdf
+    // 1.7~3.3V
+    //
+    // Set to 3.0V as in code example
+    // https://github.com/Seeed-Studio/one_channel_hub/blob/4cc771ac02da1bd18be67509f6b52d21bb0feabd/components/smtc_ral/bsp/sx126x/seeed_xiao_esp32s3_devkit_sx1262.c#L351
+    radio.setTCXO(3.0);
 #endif
 
 #if defined(ESP32)

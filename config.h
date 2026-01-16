@@ -48,6 +48,7 @@
 // 20250622 Updated to RadioLib v7.2.0
 //          Added customDelay()
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
+// 20260116 Added Seeed Studio XIAO ESP32S3 with Wio-SX1262
 //
 // ToDo:
 // - 
@@ -313,6 +314,17 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #endif
 
   #define USE_SX1276
+
+#elif defined(ARDUINO_XIAO_ESP32S3)
+  // Use pinning for Seeed Studio XIAO ESP32S3 with with Wio-SX1262
+  #define PIN_LORA_NSS      41
+  #define PIN_LORA_RST      42
+  #define PIN_LORA_IRQ      39
+  #define PIN_LORA_GPIO     40
+  #define PIN_LORA_DIO2     RADIOLIB_NC
+  #pragma message("ARDUINO_XIAO_ESP32S3 defined; assuming Wio-SX1262 will be used")
+
+  #define USE_SX1262
 
 #else
   #pragma message ("Unknown board - no automagic pinmap available")
