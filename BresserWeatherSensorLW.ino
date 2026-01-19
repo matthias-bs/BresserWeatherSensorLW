@@ -429,9 +429,8 @@ void setup()
     // https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Wio-SX1262_Module_Datasheet.pdf
     // 1.7~3.3V
     //
-    // Set to 3.0V as in code example
-    // https://github.com/Seeed-Studio/one_channel_hub/blob/4cc771ac02da1bd18be67509f6b52d21bb0feabd/components/smtc_ral/bsp/sx126x/seeed_xiao_esp32s3_devkit_sx1262.c#L351
-    radio.setTCXO(3.0);
+    // Set to 1.7V as recommended by Seeed Studio's Support
+    radio.setTCXO(1.7);
 #endif
 
 #if defined(ESP32)
