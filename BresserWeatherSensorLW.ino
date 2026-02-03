@@ -121,6 +121,7 @@
 // 20260116 Fixed radio module initialization for LilyGo T3S3 boards using RadioLib 7.5.0
 //          if the radio object is created here (instead of in BresserWeatherSensorReceiver)
 //          Added configuration for Seeed Studio XIAO ESP32S3 with Wio-SX1262
+// 20260202 Added using WeatherSensorReceiver namespace
 //
 // ToDo:
 // -
@@ -181,8 +182,8 @@ static Preferences store;
 #include "src/SystemContext.h"
 
 #if defined(RADIO_CHIP)
-// Use radio object from BresserWeatherSensorReceiver
-extern RADIO_CHIP radio;
+// Use radio object from WeatherSensorReceiver namespace
+using namespace WeatherSensorReceiver;
 
 #else
 
