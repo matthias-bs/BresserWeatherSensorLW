@@ -1,9 +1,11 @@
 <map id="src/DigitalSensor.h" name="src/DigitalSensor.h">
-<area shape="rect" id="Node000001" title="Base class for digital sensor integration." alt="" coords="99,5,241,31"/>
+<area shape="rect" id="Node000001" title="Base class for digital sensor integration." alt="" coords="188,5,331,31"/>
 <area shape="rect" id="Node000002" href="$_distance_sensor_8h.html" title="Ultrasonic distance sensor integration." alt="" coords="5,79,159,119"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,42,105,81,101,77,145,38"/>
-<area shape="rect" id="Node000003" href="$_payload_digital_8h.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="183,86,333,111"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,38,247,84,243,88,191,42"/>
-<area shape="rect" id="Node000004" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="199,167,317,192"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="261,125,261,166,255,166,255,125"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,39,126,81,124,76,220,34"/>
+<area shape="rect" id="Node000003" href="$_dyp_r01cw_8h.html" title="DYP&#45;R01CW laser distance sensor integration." alt="" coords="183,79,336,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="262,44,262,79,257,79,257,44"/>
+<area shape="rect" id="Node000004" href="$_payload_digital_8h.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="360,86,511,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="298,34,411,84,409,88,296,39"/>
+<area shape="rect" id="Node000005" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="377,167,494,192"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="438,125,438,166,433,166,433,125"/>
 </map>

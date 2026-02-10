@@ -1,0 +1,9 @@
+<map id="src/DistanceSensors/DypR01cw.h" name="src/DistanceSensors/DypR01cw.h">
+<area shape="rect" id="Node000001" title="DYP&#45;R01CW laser distance sensor integration." alt="" coords="88,5,241,45"/>
+<area shape="rect" id="Node000002" href="$_digital_sensor_8h.html" title="Base class for digital sensor integration." alt="" coords="5,101,137,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,48,96,93,93,89,142,44"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="161,93,355,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="187,44,229,82,226,86,184,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="36,181,107,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="74,126,74,167,69,167,69,126"/>
+</map>
