@@ -60,7 +60,15 @@ void DypR01cw::begin(void)
     if (!wireInitialized)
     {
 #if defined(DYP_R01CW_SDA) && defined(DYP_R01CW_SCL)
+    #if defined(ARDUINO_ARCH_RP2040)
+        // RP2040 requires setSDA/setSCL before begin()
+        Wire.setSDA(DYP_R01CW_SDA);
+        Wire.setSCL(DYP_R01CW_SCL);
+        Wire.begin();
+    #else
+        // ESP32 and other platforms support begin(sda, scl)
         Wire.begin(DYP_R01CW_SDA, DYP_R01CW_SCL);
+    #endif
 #else
         Wire.begin();
 #endif
