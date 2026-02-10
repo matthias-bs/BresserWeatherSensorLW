@@ -34,6 +34,7 @@
 // 20240520 Created
 // 20240524 Added payload size check, changed bitmap order
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
+// 20260210 Refactored sensor integration for cleaner separation
 //
 // ToDo:
 // -
@@ -42,20 +43,11 @@
 
 #include "PayloadDigital.h"
 
-#ifdef DISTANCESENSOR_EN
-#if defined(ESP32)
-/// Ultrasonic distance sensor
-static DistanceSensor_A02YYUW distanceSensor(&Serial2);
-#else
-/// Ultrasonic distance sensor
-static DistanceSensor_A02YYUW distanceSensor(&Serial1);
-#endif
-#endif
-
 void PayloadDigital::begin(void)
 {
 #ifdef DISTANCESENSOR_EN
-    initDistanceSensor();
+    m_distanceSensor = new DistanceSensor();
+    m_distanceSensor->begin();
 #endif
 }
 
@@ -72,7 +64,7 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
                 // Check if channel is enabled
                 if ((ch == DISTANCESENSOR_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
                 {
-                    uint16_t distance_mm = readDistanceSensor();
+                    uint16_t distance_mm = m_distanceSensor->read();
                     if (distance_mm > 0)
                     {
                         log_i("ch %02u: Distance:          %4d mm", ch, distance_mm);
@@ -89,56 +81,3 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         }
     }
 }
-
-#ifdef DISTANCESENSOR_EN
-void PayloadDigital::initDistanceSensor(void)
-{
-#if defined(ESP32)
-    Serial2.begin(9600, SERIAL_8N1, DISTANCESENSOR_RX, DISTANCESENSOR_TX);
-    pinMode(DISTANCESENSOR_PWR, OUTPUT);
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
-#elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
-    Serial1.setRX(DISTANCESENSOR_RX);
-    Serial1.setTX(DISTANCESENSOR_TX);
-    Serial1.begin(9600, SERIAL_8N1);
-    pinMode(DISTANCESENSOR_PWR, OUTPUT_12MA);
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
-#endif
-}
-
-uint16_t PayloadDigital::readDistanceSensor(void)
-{
-    // Sensor power on
-    digitalWrite(DISTANCESENSOR_PWR, HIGH);
-    delay(500);
-
-    int retries = 0;
-    DistanceSensor_A02YYUW_MEASSUREMENT_STATUS dstStatus;
-    do
-    {
-        dstStatus = distanceSensor.meassure();
-
-        if (dstStatus != DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK)
-        {
-            log_e("Distance Sensor Error: %d", dstStatus);
-        }
-    } while (
-        (dstStatus != DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK) &&
-        (++retries < DISTANCESENSOR_RETRIES));
-
-    uint16_t distance_mm;
-    if (dstStatus == DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK)
-    {
-        distance_mm = distanceSensor.getDistance();
-    }
-    else
-    {
-        distance_mm = 0;
-    }
-
-    // Sensor power off
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
-
-    return distance_mm;
-}
-#endif

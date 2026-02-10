@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-// PayloadDigital.h
+// DigitalSensor.h
 //
-// Read digital input channels and encode as LoRaWAN payload
+// Base class for digital sensor integration
 //
-// created: 05/2024
+// created: 02/2026
 //
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,59 +31,46 @@
 //
 // History:
 //
-// 20240520 Created
+// 20260210 Created
 //
 // ToDo:
 // -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/*! \file PayloadDigital.h
- *  \brief LoRaWAN node application layer - digital channels
+/*! \file DigitalSensor.h
+ *  \brief Base class for digital sensor integration
  */
 
-#if !defined(_PAYLOAD_DIGITAL)
-#define _PAYLOAD_DIGITAL
+#if !defined(_DIGITAL_SENSOR_H)
+#define _DIGITAL_SENSOR_H
 
-#include "../BresserWeatherSensorLWCfg.h"
-
-#include <LoraMessage.h>
-#include "logging.h"
-#include "DigitalSensor.h"
-
-#ifdef DISTANCESENSOR_EN
-#include "DistanceSensor.h"
-#endif
+#include <stdint.h>
 
 /*!
- * \brief LoRaWAN node application layer - digital channels
+ * \brief Base class for digital sensors
  *
- * Encodes data from digital input channels as LoRaWAN payload
+ * Provides interface for sensor initialization and data acquisition
  */
-class PayloadDigital
+class DigitalSensor
 {
 public:
     /*!
-     * \brief Constructor
+     * \brief Virtual destructor
      */
-    PayloadDigital(){};
+    virtual ~DigitalSensor() {}
 
     /*!
-     * \brief Digital channel startup code
+     * \brief Initialize the sensor
      */
-    void begin(void);
+    virtual void begin(void) = 0;
 
     /*!
-     * \brief Encode digital data channels for LoRaWAN transmission
-     *
-     * \param appPayloadCfg LoRaWAN payload configuration bitmaps
-     * \param encoder LoRaWAN payload encoder object
+     * \brief Read sensor data
+     * 
+     * \returns sensor reading (interpretation depends on sensor type)
      */
-    void encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder);
-
-private:
-#ifdef DISTANCESENSOR_EN
-    DigitalSensor *m_distanceSensor; //!< Distance sensor instance
-#endif
+    virtual uint16_t read(void) = 0;
 };
-#endif //_PAYLOAD_DIGITAL
+
+#endif // _DIGITAL_SENSOR_H
