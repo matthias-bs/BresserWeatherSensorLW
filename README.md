@@ -392,6 +392,27 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | **M5Stack specific Configuration**                                                                                          |
 | `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
 
+#### A02YYUW Ultrasonic Distance Sensor Configuration
+
+The A02YYUW ultrasonic distance sensor (DFRobot SEN0311) can be enabled and configured in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
+
+1. **Enable the sensor** by uncommenting:
+   ```cpp
+   #define A02YYUW_EN
+   ```
+
+2. **Configure the digital channel** used for the sensor (default is channel 8):
+   ```cpp
+   #define A02YYUW_CH 8
+   ```
+
+3. **Enable the digital channel** in the payload configuration to transmit sensor data (see [Payload Configuration](#payload-configuration))
+
+**Note:** Board-specific pin configurations (`A02YYUW_TX`, `A02YYUW_RX`, `A02YYUW_PWR`, `A02YYUW_RETRIES`) are provided for LORAWAN_NODE and ARDUINO_ADAFRUIT_FEATHER_RP2040 in the configuration file.
+
+**Library Installation:**
+- Install the [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) library via ZIP file
+
 #### DYP-R01CW Laser Distance Sensor Configuration
 
 The DYP-R01CW laser distance sensor can be enabled and configured in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
