@@ -45,7 +45,7 @@
 
 void PayloadDigital::begin(void)
 {
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
     m_distanceSensor = new DistanceSensor();
     m_distanceSensor->begin();
 #endif
@@ -77,9 +77,9 @@ void PayloadDigital::encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder)
         {
             if ((appPayloadCfg[APP_PAYLOAD_OFFS_DIGITAL + i] >> bit) & 0x1)
             {
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
                 // Check if channel is enabled
-                if ((ch == DISTANCESENSOR_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
+                if ((ch == A02YYUW_CH) && (encoder.getLength() <= MAX_UPLINK_SIZE - 2))
                 {
                     uint16_t distance_mm = m_distanceSensor->read();
                     if (distance_mm > 0)

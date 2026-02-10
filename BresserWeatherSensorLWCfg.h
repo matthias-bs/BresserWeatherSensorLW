@@ -205,13 +205,13 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // Enter your time zone (https://remotemonitoringsystems.ca/time-zone-abbreviations.php)
 #define TZINFO_STR "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"
 
-// Enable Ultrasonic Distance Sensor
+// Enable A02YYUW Ultrasonic Distance Sensor (DFRobot SEN0311)
 #if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
-// #define DISTANCESENSOR_EN
-// #define DISTANCESENSOR_CH 8
+// #define A02YYUW_EN
+// #define A02YYUW_CH 8
 #endif
 
-// Enable DYP-R01CW Laser Distance Sensor(s)
+// Enable DYP-R01CW Laser Distance Sensor(s) (DFRobot SEN0590)
 #if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 // #define DYP_R01CW_EN
 #endif
@@ -325,17 +325,17 @@ const uint8_t ADC3_SAMPLES = 10;
 #endif
 #endif
 
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
 #if defined(LORAWAN_NODE)
-#define DISTANCESENSOR_TX 0 // pull-up/open: processed value / low: real-time value
-#define DISTANCESENSOR_RX 26
-#define DISTANCESENSOR_PWR 25
-#define DISTANCESENSOR_RETRIES 5
+#define A02YYUW_TX 0 // pull-up/open: processed value / low: real-time value
+#define A02YYUW_RX 26
+#define A02YYUW_PWR 25
+#define A02YYUW_RETRIES 5
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
-#define DISTANCESENSOR_TX 0 // pull-up/open: processed value / low: real-time value
-#define DISTANCESENSOR_RX 1
-#define DISTANCESENSOR_PWR 7
-#define DISTANCESENSOR_RETRIES 8
+#define A02YYUW_TX 0 // pull-up/open: processed value / low: real-time value
+#define A02YYUW_RX 1
+#define A02YYUW_PWR 7
+#define A02YYUW_RETRIES 8
 #endif
 #endif
 
