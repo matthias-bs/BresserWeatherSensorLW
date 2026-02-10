@@ -51,7 +51,7 @@
 #include "logging.h"
 #include "DigitalSensor.h"
 
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
 #include "DistanceSensors/DistanceSensor.h"
 #endif
 
@@ -72,7 +72,7 @@ public:
      * \brief Constructor
      */
     PayloadDigital()
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
         : m_distanceSensor(nullptr)
 #endif
     {};
@@ -82,7 +82,7 @@ public:
      */
     ~PayloadDigital()
     {
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
         delete m_distanceSensor;
 #endif
 #ifdef DYP_R01CW_EN
@@ -108,7 +108,7 @@ public:
     void encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder);
 
 private:
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
     DigitalSensor *m_distanceSensor; //!< Distance sensor instance
 #endif
 #ifdef DYP_R01CW_EN

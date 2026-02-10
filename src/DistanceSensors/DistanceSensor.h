@@ -48,7 +48,7 @@
 #include "../DigitalSensor.h"
 #include "../../BresserWeatherSensorLWCfg.h"
 
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
 
 #include <DistanceSensor_A02YYUW.h>
 #include "../logging.h"
@@ -89,6 +89,6 @@ private:
     DistanceSensor_A02YYUW *m_sensor; //!< Pointer to sensor object
 };
 
-#endif // DISTANCESENSOR_EN
+#endif // A02YYUW_EN
 
 #endif // _DISTANCE_SENSOR_H

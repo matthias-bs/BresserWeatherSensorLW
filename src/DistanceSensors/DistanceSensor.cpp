@@ -40,7 +40,7 @@
 
 #include "DistanceSensor.h"
 
-#ifdef DISTANCESENSOR_EN
+#ifdef A02YYUW_EN
 
 DistanceSensor::DistanceSensor()
 {
@@ -59,22 +59,22 @@ DistanceSensor::~DistanceSensor()
 void DistanceSensor::begin(void)
 {
 #if defined(ESP32)
-    Serial2.begin(9600, SERIAL_8N1, DISTANCESENSOR_RX, DISTANCESENSOR_TX);
-    pinMode(DISTANCESENSOR_PWR, OUTPUT);
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
+    Serial2.begin(9600, SERIAL_8N1, A02YYUW_RX, A02YYUW_TX);
+    pinMode(A02YYUW_PWR, OUTPUT);
+    digitalWrite(A02YYUW_PWR, LOW);
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
-    Serial1.setRX(DISTANCESENSOR_RX);
-    Serial1.setTX(DISTANCESENSOR_TX);
+    Serial1.setRX(A02YYUW_RX);
+    Serial1.setTX(A02YYUW_TX);
     Serial1.begin(9600, SERIAL_8N1);
-    pinMode(DISTANCESENSOR_PWR, OUTPUT_12MA);
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
+    pinMode(A02YYUW_PWR, OUTPUT_12MA);
+    digitalWrite(A02YYUW_PWR, LOW);
 #endif
 }
 
 uint16_t DistanceSensor::read(void)
 {
     // Sensor power on
-    digitalWrite(DISTANCESENSOR_PWR, HIGH);
+    digitalWrite(A02YYUW_PWR, HIGH);
     delay(500);
 
     int retries = 0;
@@ -89,7 +89,7 @@ uint16_t DistanceSensor::read(void)
         }
     } while (
         (dstStatus != DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK) &&
-        (++retries < DISTANCESENSOR_RETRIES));
+        (++retries < A02YYUW_RETRIES));
 
     uint16_t distance_mm;
     if (dstStatus == DistanceSensor_A02YYUW_MEASSUREMENT_STATUS_OK)
@@ -102,9 +102,9 @@ uint16_t DistanceSensor::read(void)
     }
 
     // Sensor power off
-    digitalWrite(DISTANCESENSOR_PWR, LOW);
+    digitalWrite(A02YYUW_PWR, LOW);
 
     return distance_mm;
 }
 
-#endif // DISTANCESENSOR_EN
+#endif // A02YYUW_EN
