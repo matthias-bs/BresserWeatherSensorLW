@@ -36,6 +36,7 @@
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
+// DYP-R01CW                            1.0.0 (optional)
 //
 // created: 04/2024
 //

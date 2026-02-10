@@ -44,6 +44,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * OneWire Temperature Sensor Integration (optional)
 * ESP32/RP2040 Analog Digital Converter Integration (optional)
 * [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
+* [DYP-R01CW / DFRobot SEN0590 Laser Distance Sensor](https://wiki.dfrobot.com/Laser_Ranging_Sensor_4m_SKU_SEN0590) (20...4000mm) via I2C (optional, supports multiple sensors)
 * [Remote Configuration via LoRaWAN Downlink](#remote-configuration-commands--status-requests-via-lorawan)
 * Easy [Sensor Data Uplink Payload Configuration](#payload-configuration) 
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
@@ -390,6 +391,38 @@ Create an account and set up a device configuration in your LoRaWAN network prov
 | `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
 | **M5Stack specific Configuration**                                                                                          |
 | `SOC_CRITICAL`<br>`SOC_ECO_EXIT`<br>`SOC_ECO_ENTER` | Battery state of charge thresholds in % | X |   | X | 
+
+#### DYP-R01CW Laser Distance Sensor Configuration
+
+The DYP-R01CW laser distance sensor can be enabled and configured in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h):
+
+1. **Enable the sensor** by uncommenting:
+   ```cpp
+   #define DYP_R01CW_EN
+   ```
+
+2. **Configure I2C pins** (board-specific defaults are provided for LORAWAN_NODE and ARDUINO_ADAFRUIT_FEATHER_RP2040):
+   ```cpp
+   #define DYP_R01CW_SDA 21
+   #define DYP_R01CW_SCL 22
+   ```
+
+3. **Configure sensor I2C addresses** (supports multiple sensors):
+   ```cpp
+   #define DYP_R01CW_ADDRESSES \
+        {                       \
+            0xE8,               \
+            0xEA,               \
+            0xEC                \
+        }
+   ```
+   - Default address: `0xE8` (8-bit format)
+   - Supported addresses: `0xD0, 0xD2, 0xD4, 0xD6, 0xD8, 0xDA, 0xDC, 0xDE, 0xE0, 0xE2, 0xE4, 0xE6, 0xE8, 0xEA, 0xEC, 0xEE, 0xF8, 0xFA, 0xFC, 0xFE`
+
+4. **Enable digital channels** in the payload configuration to transmit sensor data (see [Payload Configuration](#payload-configuration))
+
+**Library Installation:**
+- Install the [DYP-R01CW](https://github.com/matthias-bs/DYP-R01CW) library via ZIP file or from the Arduino Library Manager
 
 ### Enabling Debug Output
 
@@ -1122,6 +1155,7 @@ Based on
 * [NimBLE-Arduino](https://github.com/h2zero/NimBLE-Arduino) by h2zero
 * [Theengs Decoder](https://github.com/theengs/decoder) by [Theengs Project](https://github.com/theengs)
 * [DistanceSensor_A02YYUW](https://github.com/pportelaf/DistanceSensor_A02YYUW) by Pablo Portela
+* [DYP-R01CW](https://github.com/matthias-bs/DYP-R01CW) by Matthias Prinke
 * [Preferences](https://github.com/vshymanskyy/Preferences) by Volodymyr Shymanskyy
 * [RTClib](https://github.com/adafruit/RTClib) by Adafruit 
 

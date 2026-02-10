@@ -55,6 +55,11 @@
 #include "DistanceSensors/DistanceSensor.h"
 #endif
 
+#ifdef DYP_R01CW_EN
+#include "DistanceSensors/DypR01cw.h"
+#include <vector>
+#endif
+
 /*!
  * \brief LoRaWAN node application layer - digital channels
  *
@@ -80,6 +85,13 @@ public:
 #ifdef DISTANCESENSOR_EN
         delete m_distanceSensor;
 #endif
+#ifdef DYP_R01CW_EN
+        for (auto sensor : m_dypR01cwSensors)
+        {
+            delete sensor;
+        }
+        m_dypR01cwSensors.clear();
+#endif
     }
 
     /*!
@@ -98,6 +110,9 @@ public:
 private:
 #ifdef DISTANCESENSOR_EN
     DigitalSensor *m_distanceSensor; //!< Distance sensor instance
+#endif
+#ifdef DYP_R01CW_EN
+    std::vector<DigitalSensor *> m_dypR01cwSensors; //!< DYP-R01CW sensor instances
 #endif
 };
 #endif //_PAYLOAD_DIGITAL
