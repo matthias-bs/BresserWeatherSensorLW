@@ -1,14 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
-// PayloadDigital.h
+// DistanceSensor.h
 //
-// Read digital input channels and encode as LoRaWAN payload
+// Ultrasonic distance sensor integration (A02YYUW / DFRobot SEN0311)
 //
-// created: 05/2024
+// created: 02/2026
 //
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,73 +31,64 @@
 //
 // History:
 //
-// 20240520 Created
+// 20260210 Created from PayloadDigital.cpp
 //
 // ToDo:
 // -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-/*! \file PayloadDigital.h
- *  \brief LoRaWAN node application layer - digital channels
+/*! \file DistanceSensor.h
+ *  \brief Ultrasonic distance sensor integration
  */
 
-#if !defined(_PAYLOAD_DIGITAL)
-#define _PAYLOAD_DIGITAL
+#if !defined(_DISTANCE_SENSOR_H)
+#define _DISTANCE_SENSOR_H
 
-#include "../BresserWeatherSensorLWCfg.h"
-
-#include <LoraMessage.h>
-#include "logging.h"
-#include "DigitalSensor.h"
+#include "../DigitalSensor.h"
+#include "../../BresserWeatherSensorLWCfg.h"
 
 #ifdef DISTANCESENSOR_EN
-#include "DistanceSensors/DistanceSensor.h"
-#endif
+
+#include <DistanceSensor_A02YYUW.h>
+#include "../logging.h"
 
 /*!
- * \brief LoRaWAN node application layer - digital channels
+ * \brief Ultrasonic distance sensor (A02YYUW / DFRobot SEN0311)
  *
- * Encodes data from digital input channels as LoRaWAN payload
+ * Handles initialization and data acquisition for ultrasonic distance sensor
  */
-class PayloadDigital
+class DistanceSensor : public DigitalSensor
 {
 public:
     /*!
      * \brief Constructor
      */
-    PayloadDigital()
-#ifdef DISTANCESENSOR_EN
-        : m_distanceSensor(nullptr)
-#endif
-    {};
+    DistanceSensor();
 
     /*!
      * \brief Destructor
      */
-    ~PayloadDigital()
-    {
-#ifdef DISTANCESENSOR_EN
-        delete m_distanceSensor;
-#endif
-    }
+    ~DistanceSensor();
 
     /*!
-     * \brief Digital channel startup code
-     */
-    void begin(void);
-
-    /*!
-     * \brief Encode digital data channels for LoRaWAN transmission
+     * \brief Initialize ultrasonic distance sensor
      *
-     * \param appPayloadCfg LoRaWAN payload configuration bitmaps
-     * \param encoder LoRaWAN payload encoder object
+     * Initialize UART and power enable pin
      */
-    void encodeDigital(uint8_t *appPayloadCfg, LoraEncoder &encoder);
+    void begin(void) override;
+
+    /*!
+     * \brief Read ultrasonic distance sensor data
+     * 
+     * \returns distance in mm (0 if invalid)
+     */
+    uint16_t read(void) override;
 
 private:
-#ifdef DISTANCESENSOR_EN
-    DigitalSensor *m_distanceSensor; //!< Distance sensor instance
-#endif
+    DistanceSensor_A02YYUW *m_sensor; //!< Pointer to sensor object
 };
-#endif //_PAYLOAD_DIGITAL
+
+#endif // DISTANCESENSOR_EN
+
+#endif // _DISTANCE_SENSOR_H

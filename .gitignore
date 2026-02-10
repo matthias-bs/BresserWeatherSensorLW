@@ -2,3 +2,4 @@ secrets.h
 secrets.json
 credentials.*
 build/
+_codeql_detected_source_root
