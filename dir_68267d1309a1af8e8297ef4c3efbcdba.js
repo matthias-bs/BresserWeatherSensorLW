@@ -2,8 +2,10 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
 [
     [ "adc", "dir_d42cd31cad36dcf7f292dad5354fce4d.html", "dir_d42cd31cad36dcf7f292dad5354fce4d" ],
     [ "BleSensors", "dir_31341dce0c4fcc025356cc89e0425b49.html", "dir_31341dce0c4fcc025356cc89e0425b49" ],
+    [ "DistanceSensors", "dir_277fd1a4310fd3e5d28637d434860a6f.html", "dir_277fd1a4310fd3e5d28637d434860a6f" ],
     [ "rp2040", "dir_8b4dbc5124bb379f1ead8478654312aa.html", "dir_8b4dbc5124bb379f1ead8478654312aa" ],
     [ "AppLayer.h", "_app_layer_8h.html", "_app_layer_8h" ],
+    [ "DigitalSensor.h", "_digital_sensor_8h.html", "_digital_sensor_8h" ],
     [ "LoadNodeCfg.h", "_load_node_cfg_8h.html", "_load_node_cfg_8h" ],
     [ "LoadSecrets.h", "_load_secrets_8h.html", "_load_secrets_8h" ],
     [ "logging.h", "logging_8h.html", null ],

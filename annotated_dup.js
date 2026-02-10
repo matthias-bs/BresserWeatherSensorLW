@@ -6,6 +6,7 @@ var annotated_dup =
     [ "AppLayer", "class_app_layer.html", "class_app_layer" ],
     [ "BleDataS", "struct_ble_data_s.html", "struct_ble_data_s" ],
     [ "BleSensors", "class_ble_sensors.html", "class_ble_sensors" ],
+    [ "DigitalSensor", "class_digital_sensor.html", "class_digital_sensor" ],
     [ "PayloadAnalog", "class_payload_analog.html", "class_payload_analog" ],
     [ "PayloadBLE", "class_payload_b_l_e.html", "class_payload_b_l_e" ],
     [ "PayloadBresser", "class_payload_bresser.html", "class_payload_bresser" ],

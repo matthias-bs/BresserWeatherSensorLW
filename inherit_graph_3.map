@@ -1,13 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$class_payload_analog.html" title="LoRaWAN node application layer &#45; analog channels." alt="" coords="11,5,129,31"/>
-<area shape="rect" id="Node000001" href="$class_app_layer.html" title="LoRaWAN node application layer." alt="" coords="183,104,265,129"/>
-<area shape="poly" id="edge2_Node000000_Node000001" title=" " alt="" coords="125,34,136,40,179,71,212,102,208,105,176,75,133,44,122,38"/>
-<area shape="rect" id="Node000002" href="$class_payload_b_l_e.html" title="LoRaWAN node application layer &#45; BLE sensors." alt="" coords="21,55,119,80"/>
-<area shape="poly" id="edge3_Node000002_Node000001" title=" " alt="" coords="124,82,184,101,182,106,123,87"/>
-<area shape="rect" id="Node000003" href="$class_payload_bresser.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="9,104,131,129"/>
-<area shape="poly" id="edge4_Node000003_Node000001" title=" " alt="" coords="145,114,183,114,183,119,145,119"/>
-<area shape="rect" id="Node000004" href="$class_payload_digital.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="12,153,128,179"/>
-<area shape="poly" id="edge5_Node000004_Node000001" title=" " alt="" coords="123,146,182,127,184,132,124,152"/>
-<area shape="rect" id="Node000005" href="$class_payload_one_wire.html" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="5,203,135,228"/>
-<area shape="poly" id="edge6_Node000005_Node000001" title=" " alt="" coords="120,195,133,188,176,157,208,128,212,131,179,161,136,192,123,199"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,172,38"/>
+<area shape="rect" id="Node000001" href="$class_ble_sensors_callbacks_1_1_scan_callbacks.html" title="BLE scan callback class." alt="" coords="220,5,377,45"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="186,23,220,23,220,28,186,28"/>
 </map>

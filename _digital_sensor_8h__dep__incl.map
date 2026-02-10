@@ -1,0 +1,9 @@
+<map id="src/DigitalSensor.h" name="src/DigitalSensor.h">
+<area shape="rect" id="Node000001" title="Base class for digital sensor integration." alt="" coords="99,5,241,31"/>
+<area shape="rect" id="Node000002" href="$_distance_sensor_8h.html" title="Ultrasonic distance sensor integration." alt="" coords="5,79,159,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,42,105,81,101,77,145,38"/>
+<area shape="rect" id="Node000003" href="$_payload_digital_8h.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="183,86,333,111"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,38,247,84,243,88,191,42"/>
+<area shape="rect" id="Node000004" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="199,167,317,192"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="261,125,261,166,255,166,255,125"/>
+</map>
