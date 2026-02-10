@@ -96,6 +96,8 @@ jobs:
           done
           gh repo clone matthias-bs/DistanceSensor_A02YYUW
           cp -r DistanceSensor_A02YYUW /home/runner/Arduino/libraries/
+          gh repo clone matthias-bs/DYP-R01CW
+          cp -r DYP-R01CW /home/runner/Arduino/libraries/
 
       - name: Install platform
         if: ${{ env.run-build == 'true' }}
