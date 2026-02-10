@@ -52,7 +52,7 @@
 #include "DigitalSensor.h"
 
 #ifdef DISTANCESENSOR_EN
-#include "DistanceSensor.h"
+#include "DistanceSensors/DistanceSensor.h"
 #endif
 
 /*!

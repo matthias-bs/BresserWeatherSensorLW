@@ -45,13 +45,13 @@
 #if !defined(_DISTANCE_SENSOR_H)
 #define _DISTANCE_SENSOR_H
 
-#include "DigitalSensor.h"
-#include "../BresserWeatherSensorLWCfg.h"
+#include "../DigitalSensor.h"
+#include "../../BresserWeatherSensorLWCfg.h"
 
 #ifdef DISTANCESENSOR_EN
 
 #include <DistanceSensor_A02YYUW.h>
-#include "logging.h"
+#include "../logging.h"
 
 /*!
  * \brief Ultrasonic distance sensor (A02YYUW / DFRobot SEN0311)
