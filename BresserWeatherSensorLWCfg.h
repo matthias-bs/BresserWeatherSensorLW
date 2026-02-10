@@ -211,6 +211,11 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // #define DISTANCESENSOR_CH 8
 #endif
 
+// Enable DYP-R01CW Laser Distance Sensor(s)
+#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+// #define DYP_R01CW_EN
+#endif
+
 
 // ADC for supply/battery voltage measurement
 // Defaults:
@@ -332,6 +337,27 @@ const uint8_t ADC3_SAMPLES = 10;
 #define DISTANCESENSOR_PWR 7
 #define DISTANCESENSOR_RETRIES 8
 #endif
+#endif
+
+#ifdef DYP_R01CW_EN
+// I2C pins for DYP-R01CW Laser Distance Sensor(s)
+#if defined(LORAWAN_NODE)
+#define DYP_R01CW_SDA 21
+#define DYP_R01CW_SCL 22
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+#define DYP_R01CW_SDA 2
+#define DYP_R01CW_SCL 3
+#endif
+
+// List of I2C addresses for DYP-R01CW sensors (8-bit format, e.g., 0xE8)
+// Default sensor address is 0xE8
+// Supported addresses: 0xD0, 0xD2, 0xD4, 0xD6, 0xD8, 0xDA, 0xDC, 0xDE, 
+//                      0xE0, 0xE2, 0xE4, 0xE6, 0xE8, 0xEA, 0xEC, 0xEE,
+//                      0xF8, 0xFA, 0xFC, 0xFE
+#define DYP_R01CW_ADDRESSES \
+     {                       \
+         0xE8                \
+     }
 #endif
 
 #ifdef ADC_EN
