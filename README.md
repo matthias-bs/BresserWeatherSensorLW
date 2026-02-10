@@ -44,7 +44,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * OneWire Temperature Sensor Integration (optional)
 * ESP32/RP2040 Analog Digital Converter Integration (optional)
 * [A02YYUW / DFRobot SEN0311 Ultrasonic Distance Sensor](https://wiki.dfrobot.com/_A02YYUW_Waterproof_Ultrasonic_Sensor_SKU_SEN0311) (30...4500mm) (optional)
-* [DYP-R01CW / DFRobot SEN0590 Laser Distance Sensor](https://wiki.dfrobot.com/Laser_Ranging_Sensor_4m_SKU_SEN0590) (20...4000mm) via I2C (optional, supports multiple sensors)
+* [DYP-R01CW / DFRobot SEN0590 Laser Distance Sensor](https://wiki.dfrobot.com/Laser_Ranging_Sensor_4m_SKU_SEN0590) (20...4000mm) (optional, supports multiple sensors)
 * [Remote Configuration via LoRaWAN Downlink](#remote-configuration-commands--status-requests-via-lorawan)
 * Easy [Sensor Data Uplink Payload Configuration](#payload-configuration) 
 * Implementation with Separation between LoRaWAN Network Layer and Application Layer for easy Repurposing
