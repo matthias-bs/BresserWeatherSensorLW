@@ -66,7 +66,21 @@ public:
     /*!
      * \brief Constructor
      */
-    PayloadDigital(){};
+    PayloadDigital()
+#ifdef DISTANCESENSOR_EN
+        : m_distanceSensor(nullptr)
+#endif
+    {};
+
+    /*!
+     * \brief Destructor
+     */
+    ~PayloadDigital()
+    {
+#ifdef DISTANCESENSOR_EN
+        delete m_distanceSensor;
+#endif
+    }
 
     /*!
      * \brief Digital channel startup code

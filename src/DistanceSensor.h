@@ -67,6 +67,11 @@ public:
     DistanceSensor();
 
     /*!
+     * \brief Destructor
+     */
+    ~DistanceSensor();
+
+    /*!
      * \brief Initialize ultrasonic distance sensor
      *
      * Initialize UART and power enable pin

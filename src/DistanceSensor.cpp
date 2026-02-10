@@ -51,6 +51,11 @@ DistanceSensor::DistanceSensor()
 #endif
 }
 
+DistanceSensor::~DistanceSensor()
+{
+    delete m_sensor;
+}
+
 void DistanceSensor::begin(void)
 {
 #if defined(ESP32)
