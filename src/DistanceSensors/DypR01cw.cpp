@@ -55,12 +55,17 @@ DypR01cw::~DypR01cw()
 
 void DypR01cw::begin(void)
 {
-    // Initialize I2C with custom pins if defined
+    // Initialize I2C with custom pins if defined (only once)
+    static bool wireInitialized = false;
+    if (!wireInitialized)
+    {
 #if defined(DYP_R01CW_SDA) && defined(DYP_R01CW_SCL)
-    Wire.begin(DYP_R01CW_SDA, DYP_R01CW_SCL);
+        Wire.begin(DYP_R01CW_SDA, DYP_R01CW_SCL);
 #else
-    Wire.begin();
+        Wire.begin();
 #endif
+        wireInitialized = true;
+    }
 
     // Initialize the sensor
     if (!m_sensor->begin(&Wire))
