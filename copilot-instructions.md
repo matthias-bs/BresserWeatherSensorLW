@@ -34,13 +34,20 @@ BresserWeatherSensorLW is a LoRaWAN-enabled weather sensor receiver for ESP32 an
    - `PayloadDigital`: Digital I/O handling
    - `PayloadOneWire`: Temperature sensor support
 
-4. **Configuration Files**
+4. **SystemContext (src/SystemContext.h/cpp)** - System state management
+   - Hardware-specific initialization
+   - RTC (Real-Time Clock) management
+   - Sleep interval handling
+   - Battery voltage monitoring
+   - Power-saving mode decisions
+
+5. **Configuration Files**
    - `config.h`: RadioLib/LoRaWAN radio configuration and pin mappings
    - `BresserWeatherSensorLWCfg.h`: Feature flags, timing, voltage thresholds
    - `secrets.h`: LoRaWAN credentials (template with dummy values)
    - `WeatherSensorCfg.h`: Sensor receiver configuration (from BresserWeatherSensorReceiver library)
 
-5. **Command Interface (BresserWeatherSensorLWCmd.h/cpp)**
+6. **Command Interface (BresserWeatherSensorLWCmd.h/cpp)**
    - LoRaWAN downlink command decoding
    - Status uplink encoding
    - Remote configuration support
@@ -184,13 +191,20 @@ Example pattern:
 
 ### 1. Application Layer Interface
 
-The `AppLayer` class provides the main interface between LoRaWAN and application logic:
+The `AppLayer` class provides the main interface between LoRaWAN and application logic. It uses multiple inheritance to compose functionality from specialized payload handlers:
 
+```cpp
+class AppLayer : public PayloadBresser, PayloadAnalog, PayloadDigital
+```
+
+Key methods:
 - `begin()`: Initialize sensors and preferences
 - `getPayloadStage1()`: First payload encoding pass (sensor data)
 - `getPayloadStage2()`: Second payload encoding pass (additional data)
 - `decodeDownlink()`: Process incoming LoRaWAN commands
 - `getAppStatusUplinkInterval()`: Return status update interval
+
+This composition pattern allows different sensor types to be easily enabled/disabled without changing core logic.
 
 ### 2. Payload Encoding
 
@@ -363,6 +377,20 @@ See `Debug_Output.md` for details.
    - Maintain API compatibility when possible
    - Document breaking changes clearly
    - Consider migration path for users
+
+7. **Prerequisites for Contributors**
+   - Not the first Arduino sketch to try - test with simpler sketches first
+   - Test BresserWeatherSensorReceiver standalone before integration
+   - Understand LoRaWAN fundamentals (see The Things Network documentation)
+   - Use RadioLib v7.5.0+ and arduino-esp32 v3.X.Y
+   - Read RadioLib LoRaWAN starter guide
+
+8. **Code Generation Guidelines**
+   - Always include MIT license header with copyright notice
+   - Maintain detailed history section in file headers
+   - Use Doxygen-style comments for public APIs
+   - Follow existing naming conventions strictly
+   - Add platform-specific guards for new features
 
 ## References
 
