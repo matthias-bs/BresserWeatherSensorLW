@@ -123,6 +123,7 @@
 //          if the radio object is created here (instead of in BresserWeatherSensorReceiver)
 //          Added configuration for Seeed Studio XIAO ESP32S3 with Wio-SX1262
 // 20260202 Added using WeatherSensorReceiver namespace
+// 20260215 Refactored SPI object to static allocation
 //
 // ToDo:
 // -
@@ -189,10 +190,10 @@ using namespace WeatherSensorReceiver;
 #else
 
 #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
-static SPIClass *spi = new SPIClass(SPI);
+static SPIClass spi = SPI;
 
 // Create radio object with custom SPI configuration
-LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO, *spi);
+LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO, spi);
 
 #else
 // Create radio object
@@ -402,7 +403,7 @@ void setup()
 #if !defined(RADIO_CHIP)
 #if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
   // Use local radio object with custom SPI configuration
-  spi->begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
+  spi.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
 #endif
 #endif
 
