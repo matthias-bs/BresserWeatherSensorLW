@@ -32,6 +32,6 @@
     "TheengsDecoder": "theengs/decoder#semver:^2.0.0",
     "Preferences": "vshymanskyy/Preferences#semver:^2.2.2",
     "ArduinoJson": "bblanchon/ArduinoJson#semver:^7.4.2",
-    "DYP-R01CW": "matthias-bs/DYP-R01CW#semver:^0.1.2"
+    "DYP-R01CW": "matthias-bs/DYP-R01CW#semver:^0.1.1"
   }
 }
