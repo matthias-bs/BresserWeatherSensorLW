@@ -21,29 +21,29 @@
 // OneWireNg by Piotr Stolarz (https://github.com/pstolarz/OneWireNg)
 // DallasTemperature / Arduino-Temperature-Control-Library by Miles Burton (https://github.com/milesburton/Arduino-Temperature-Control-Library)
 //
-// Library dependencies (tested versions):
-// ---------------------------------------
+// Library dependencies (see package.json for tested versions):
+// ------------------------------------------------------------
 // (install via normal Arduino Library installer:)
-// RadioLib                             7.5.0
-// LoRa Serialization                   3.3.1
-// BresserWeatherSensorReceiver         0.38.2
-// OneWireNg                            0.14.1 (optional)
-// DallasTemperature                    4.0.5 (optional)
-// NimBLE-Arduino                       2.3.7 (optional)
-// ATC MiThermometer                    0.5.0 (optional)
-// Theengs Decoder                      2.0.0 (optional)
-// RTClib (Adafruit)                    2.1.4 (optional)
+// RadioLib
+// LoRa Serialization
+// BresserWeatherSensorReceiver
+// OneWireNg                            (optional)
+// DallasTemperature                    (optional)
+// NimBLE-Arduino                       (optional)
+// ATC MiThermometer                    (optional)
+// Theengs Decoder                      (optional)
+// RTClib (Adafruit)                    (optional)
+// DYP-R01CW                            (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW               1.0.2 (optional)
-// DYP-R01CW                            0.1.1 (optional)
 //
 // created: 04/2024
 //
 //
 // MIT License
 //
-// Copyright (c) 2025 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
