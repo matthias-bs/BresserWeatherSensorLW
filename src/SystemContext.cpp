@@ -411,6 +411,8 @@ bool SystemContext::getGPSData(time_t &gpsTime)
   Serial2.begin(GPS_BAUDRATE, SERIAL_8N1, GPS_RX_PIN /* RX */, -1 /* TX */);
 
   unsigned long start = millis();
+  bool timeout = false;
+  
   while (!gps.time.isValid() && !gps.date.isValid())
   {
     while (Serial2.available() > 0)
@@ -418,8 +420,19 @@ bool SystemContext::getGPSData(time_t &gpsTime)
     if (millis() - start > GPS_TIMEOUT_SEC * 1000UL)
     {
       log_w("Timeout waiting for GPS data");
-      return false;
+      timeout = true;
+      break;
     }
+  }
+
+#if defined(SERIAL2_LOG_ENABLE)
+  Serial2.begin(115200, SERIAL_8N1, SERIAL2_LOG_TX_PIN, SERIAL2_LOG_RX_PIN);
+  Serial2.setDebugOutput(true);
+#endif // SERIAL2_LOG_ENABLE
+
+  if (timeout)
+  {
+    return false;
   }
 
   struct tm timeinfo;
