@@ -27,16 +27,16 @@
 // RadioLib
 // LoRa Serialization
 // BresserWeatherSensorReceiver
-// OneWireNg                            (optional)
-// DallasTemperature                    (optional)
-// NimBLE-Arduino                       (optional)
-// ATC MiThermometer                    (optional)
-// Theengs Decoder                      (optional)
-// RTClib (Adafruit)                    (optional)
-// DYP-R01CW                            (optional)
+// OneWireNg                    (optional)
+// DallasTemperature            (optional)
+// NimBLE-Arduino               (optional)
+// ATC MiThermometer            (optional)
+// Theengs Decoder              (optional)
+// RTClib (Adafruit)            (optional)
+// DYP-R01CW                    (optional)
 //
 // (installed from ZIP file:)
-// DistanceSensor_A02YYUW               1.0.2 (optional)
+// DistanceSensor_A02YYUW       (optional)
 //
 // created: 04/2024
 //
@@ -124,6 +124,7 @@
 //          Added configuration for Seeed Studio XIAO ESP32S3 with Wio-SX1262
 // 20260202 Added using WeatherSensorReceiver namespace
 // 20260215 Refactored SPI object to static allocation
+// 20260304 Added synchronization of RTC with GPS time (optional)
 //
 // ToDo:
 // -
@@ -346,26 +347,13 @@ void setup()
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 #else
-#if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  // PowerFeather
-  Serial2.begin(115200, SERIAL_8N1, 44 /* TX */, 42 /* RX */);
+  Serial2.begin(115200, SERIAL_8N1, SERIAL2_LOG_TX_PIN, SERIAL2_LOG_RX_PIN);
   Serial2.setDebugOutput(true);
-#elif defined(ARDUINO_M5STACK_CORE2)
-  // M5Stack Core2
-  // Port C
-  // GND - black
-  // 5V - red
-  // G13 (RX2) - yellow
-  // G14 (TX2) - white
-  Serial2.begin(115200, SERIAL_8N1, TX2, RX2);
-  Serial2.setDebugOutput(true);
-#else
-#error "SERIAL2_LOG_ENABLE defined but no Serial2 configuration for this board"
-#endif
 #endif // SERIAL2_LOG_ENABLE
 
   delay(2000); // give time to switch to the serial monitor
 #endif         // CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
+
   log_i("Setup");
 
   sysCtx.begin();
@@ -387,8 +375,37 @@ void setup()
   sysCtx.getVoltages();
   sysCtx.sleepIfSupplyLow();
 
+#if defined(GPS_EN)
+  // Check if clock was never synchronized or sync interval has expired
+  // and start GPS reception to get time from GPS if required.
+  // Start GPS before initializing the application layer to save time, as GPS startup can be slow.
+  if (sysCtx.rtcNeedsSync())
+  {
+    log_i("RTC sync required, starting GPS");
+    sysCtx.gpsPower(true);
+  }
+#endif
+
   // Initialize Application Layer - starts sensor reception
   appLayer.begin();
+
+#if defined(GPS_EN)
+  if (sysCtx.rtcNeedsSync())
+  {
+    time_t gpsTime;
+    if (sysCtx.getGPSData(gpsTime))
+    {
+      sysCtx.setTime(gpsTime, E_TIME_SOURCE::E_GPS);
+      log_d("RTC sync to GPS completed");
+      sysCtx.printDateTime();
+    }
+    else
+    {
+      log_w("Failed to get GPS data");
+    }
+    sysCtx.gpsPower(false);
+  }
+#endif // GPS_EN
 
   // build payload byte array (+ reserve to prevent overflow with configuration at run-time)
   uint8_t uplinkPayload[MAX_UPLINK_SIZE + 8];
@@ -425,15 +442,15 @@ void setup()
 #endif
 
 #if defined(ARDUINO_XIAO_ESP32S3)
-    // set RF switch control configuration
-    radio.setRfSwitchPins(38, RADIOLIB_NC);
+  // set RF switch control configuration
+  radio.setRfSwitchPins(38, RADIOLIB_NC);
 
-    // TCXO Voltage according to
-    // https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Wio-SX1262_Module_Datasheet.pdf
-    // 1.7~3.3V
-    //
-    // Set to 1.7V as recommended by Seeed Studio's Support
-    radio.setTCXO(1.7);
+  // TCXO Voltage according to
+  // https://files.seeedstudio.com/products/SenseCAP/Wio_SX1262/Wio-SX1262_Module_Datasheet.pdf
+  // 1.7~3.3V
+  //
+  // Set to 1.7V as recommended by Seeed Studio's Support
+  radio.setTCXO(1.7);
 #endif
 
 #if defined(ESP32)
@@ -449,12 +466,15 @@ void setup()
   log_d("Battery level: %u", battLevel);
   node.setDeviceStatus(battLevel);
 
+#if !defined(GPS_EN)
   // Check if clock was never synchronized or sync interval has expired
+  // and request time from LoRaWAN network
   if (sysCtx.rtcNeedsSync())
   {
     log_i("RTC sync required");
     node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
   }
+#endif
 
   // get payload immediately before uplink - not used here
   appLayer.getPayloadStage2(fPort, encoder);
@@ -611,7 +631,7 @@ void setup()
       log_i("[LoRaWAN] DeviceTime frac:\t%u ms", milliseconds);
 
       sysCtx.setTime(networkTime, E_TIME_SOURCE::E_LORA);
-      log_d("RTC sync completed");
+      log_d("RTC sync to LoRaWAN completed");
       sysCtx.printDateTime();
     }
 
