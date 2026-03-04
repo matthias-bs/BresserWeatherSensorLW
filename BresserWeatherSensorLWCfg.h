@@ -77,6 +77,8 @@
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
 // 20251017 Added SOC_ECO_ENTER/EXIT
 // 20251018 Added SOC_CRITICAL
+// 20260304 Added synchronization of RTC with GPS time (optional)
+//          Added SERIAL2_LOG definitions
 //
 // ToDo:
 // -
@@ -94,6 +96,27 @@
 
 // Enable logging for https://github.com/vshymanskyy/Preferences (used for RP2040)
 // #define NVS_LOG
+
+// Use Serial2 for logging -
+// intended for testing power management features or measuring
+// battery voltage or current without powering the device via USB.
+//#define SERIAL2_LOG_ENABLE
+#if defined(ARDUINO_ESP32S3_POWERFEATHER)
+  #define SERIAL2_LOG_TX_PIN 44
+  #define SERIAL2_LOG_RX_PIN -1
+#elif defined(ARDUINO_M5STACK_CORE2)
+  // M5Stack Core2
+  // Port C
+  // GND - black
+  // 5V - red
+  // G13 (RX2) - yellow
+  // G14 (TX2) - white
+  #define SERIAL2_LOG_TX_PIN TX2
+  #define SERIAL2_LOG_RX_PIN -1
+#else
+#error "SERIAL2_LOG_ENABLE defined but no Serial2 configuration for this board"
+#endif
+
 
 //--- Select Board ---
 #if defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
@@ -201,6 +224,11 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 
 // Enable Bresser Lightning Sensor
 #define LIGHTNINGSENSOR_EN
+
+#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
+// Enable GPS receiver (currently only for time synchronization)
+//#define GPS_EN
+#endif
 
 // Enter your time zone (https://remotemonitoringsystems.ca/time-zone-abbreviations.php)
 #define TZINFO_STR "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"
@@ -375,7 +403,54 @@ const uint8_t UBATT_SAMPLES = 10;
 
 // "Channel" appPayloadCfg
 #define UBATT_CH 0
-#endif
+
+#endif // ADC_EN
+
+#if defined(GPS_EN)
+// GPS configuration
+
+// timeout for GPS data reception (seconds)
+// Note:
+// GPS cold start runs while Application Layer receives sensor data.
+// The timeout only applies to the time between starting GPS data reception 
+// via serial port and receiving valid GPS data (default: only time and date).
+#define GPS_TIMEOUT_SEC 10
+
+#if defined(LORAWAN_NODE)
+// GPS baud rate
+//#define GPS_BAUDRATE        9600 // M5Stack Unit GPS V1.0
+#define GPS_BAUDRATE      115200 // M5Stack Unit GPS V1.1
+// GPS power enable pin (set to -1 if not used)
+#define GPS_PWR_EN_PIN      27 // D4
+// GPS power enable polarity: 1 = active high, 0 = active low
+#define GPS_PWR_EN_ACTIVE   1
+// GPS RX pin (set to -1 if not used)
+#define GPS_RX_PIN          9 // D5
+
+#elif defined(FIREBEETLE_ESP32_COVER_LORA)
+// GPS baud rate
+//#define GPS_BAUDRATE        9600 // M5Stack Unit GPS V1.0
+#define GPS_BAUDRATE      115200 // M5Stack Unit GPS V1.1
+// GPS power enable pin (set to -1 if not used)
+#define GPS_PWR_EN_PIN      4 // DO
+// GPS power enable polarity: 1 = active high, 0 = active low
+#define GPS_PWR_EN_ACTIVE   1
+// GPS RX pin (set to -1 if not used)
+#define GPS_RX_PIN          13 // D7
+
+#else
+// GPS baud rate
+#define GPS_BAUDRATE        0 // not used
+// GPS power enable pin (set to -1 if not used)
+#define GPS_PWR_EN_PIN      -1
+// GPS power enable polarity: 1 = active high, 0 = active low
+#define GPS_PWR_EN_ACTIVE   1
+// GPS RX pin (set to -1 if not used)
+#define GPS_RX_PIN          -1
+
+#endif // Board-specific GPS configuration
+
+#endif // GPS_EN
 
 #if defined(MITHERMOMETER_EN) || defined(THEENGSDECODER_EN)
 // BLE scan time in seconds
