@@ -34,6 +34,7 @@
 // Theengs Decoder              (optional)
 // RTClib (Adafruit)            (optional)
 // DYP-R01CW                    (optional)
+// TinyGPSPlus                  (optional)
 //
 // (installed from ZIP file:)
 // DistanceSensor_A02YYUW       (optional)
