@@ -5,3 +5,4 @@
         dstStatus = distanceSensor.meassure();
 // by Linar Yusupov
         dstStatus = m_sensor->meassure();
+  Serial.println(F("by Mikal Hart"));
