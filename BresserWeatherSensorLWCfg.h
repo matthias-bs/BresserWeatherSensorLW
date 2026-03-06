@@ -416,10 +416,12 @@ const uint8_t UBATT_SAMPLES = 10;
 // via serial port and receiving valid GPS data (default: only time and date).
 #define GPS_TIMEOUT_SEC 10
 
-#if defined(LORAWAN_NODE)
 // GPS baud rate
 //#define GPS_BAUDRATE        9600 // M5Stack Unit GPS V1.0
 #define GPS_BAUDRATE      115200 // M5Stack Unit GPS V1.1
+
+#if defined(LORAWAN_NODE)
+
 // GPS power enable pin (set to -1 if not used)
 #define GPS_PWR_EN_PIN      27 // D4
 // GPS power enable polarity: 1 = active high, 0 = active low
@@ -428,9 +430,7 @@ const uint8_t UBATT_SAMPLES = 10;
 #define GPS_RX_PIN          9 // D5
 
 #elif defined(FIREBEETLE_ESP32_COVER_LORA)
-// GPS baud rate
-//#define GPS_BAUDRATE        9600 // M5Stack Unit GPS V1.0
-#define GPS_BAUDRATE      115200 // M5Stack Unit GPS V1.1
+
 // GPS power enable pin (set to -1 if not used)
 #define GPS_PWR_EN_PIN      4 // DO
 // GPS power enable polarity: 1 = active high, 0 = active low
@@ -439,9 +439,6 @@ const uint8_t UBATT_SAMPLES = 10;
 #define GPS_RX_PIN          13 // D7
 
 #else
-// GPS baud rate
-#define GPS_BAUDRATE        0 // not used
-// GPS power enable pin (set to -1 if not used)
 #define GPS_PWR_EN_PIN      -1
 // GPS power enable polarity: 1 = active high, 0 = active low
 #define GPS_PWR_EN_ACTIVE   1
