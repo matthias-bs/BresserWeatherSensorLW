@@ -101,6 +101,8 @@
 // intended for testing power management features or measuring
 // battery voltage or current without powering the device via USB.
 //#define SERIAL2_LOG_ENABLE
+
+#if defined(SERIAL2_LOG_ENABLE)
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
   #define SERIAL2_LOG_TX_PIN 44
   #define SERIAL2_LOG_RX_PIN -1
@@ -116,7 +118,7 @@
 #else
 #error "SERIAL2_LOG_ENABLE defined but no Serial2 configuration for this board"
 #endif
-
+#endif // SERIAL2_LOG_ENABLE
 
 //--- Select Board ---
 #if defined(ARDUINO_DFROBOT_FIREBEETLE_ESP32)
