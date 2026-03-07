@@ -51,6 +51,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
 * External RTC (with Backup Battery) Integration (optional)
+* GPS Receiver as Time Source (optional)
 * LoRaWAN Codec API compliant [Uplink/Downlink Payload Formatters](scripts/bresserweathersensorlw-codec/README.md)
 
 ## Contents
@@ -326,6 +327,16 @@ The internal RTC retains operation while the MCU is in sleep mode. It can be set
    The integrated RTC chip with backup battery retains operation independently of the node's power supply. It must be set initially via WiFi and SNTP or manually when the LoRaWAN node is built (see [M5Unified/examples/Basic/Rtc/Rtc.ino](https://github.com/m5stack/M5Unified/blob/master/examples/Basic/Rtc/Rtc.ino)).
 
    The integrated RTC takes precedence over the LoRaWAN Network Time.
+
+5. GPS Receiver
+
+   An external GPS receiver is is used to acquire time and date.
+
+   The GPS data (NMEA format) is received via UART interface (`Serial2`). The GPS receiver's power supply is controlled by a GPIO pin.
+
+   If enabled by setting `GPS_EN` in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h), the GPS takes precedence over the LoRaWAN network time.
+
+   See [Wiki: Using GPS as a Time Source](wiki/Using-GPS-as-Time-Source) for additional information.
 
 ### LoRaWAN Network Service Configuration
 
@@ -1060,13 +1071,16 @@ classDiagram
         -setup()
         -loop()
         -decodeDownlink()
-        -sendCfgUplink()
+        -encodeCfgUplink()
     }
     BresserWeatherSensorLW <-- AppLayer
     BresserWeatherSensorLW <-- SystemContext
     AppLayer --> SystemContext
 
     class SystemContext {
+        +sleep_interval
+        +sleep_interval_long
+        +lw_stat_interval
         +begin()
         +isFirstBoot()
         +resetFailedJoinCount()
@@ -1085,9 +1099,8 @@ classDiagram
         +getRtcTimeSource()
         +isRtcSynched()
         +rtcNeedsSync()
-        +sleep_interval
-        +sleep_interval_long
-        +lw_stat_interval
+        +gpsPower() // GPS_EN
+        +getGPSData() // GPS_EN
         -voltage_eco_exit
         -voltage_eco_enter
         -voltage_critical
@@ -1095,10 +1108,11 @@ classDiagram
         -battery_charge_lim
         -batteryVoltage
         -supplyVoltage
-        -mcuVoltage
+        -busVoltage
     }
 
     class AppLayer {
+        -SystemContext _sysCtx
         -Preferences appPrefs
         -appPayloadCfg[]
         -appStatus[]
@@ -1118,8 +1132,11 @@ classDiagram
     AppLayer <|-- PayloadDigital
     AppLayer <|-- PayloadBLE
 
-    class PayloadBresser{
+    class PayloadBresser {
         +WeatherSensor weatherSensor
+        +ws_scantime
+        +ws_postproc_interval
+        -SystemContext _sysCtx
         +RainGauge rainGauge
         -Lightning lightningProc
         -Preferences appPrefs
@@ -1136,29 +1153,31 @@ classDiagram
         -encodeHchoVocSensor()
         -isSpaceLeft()
     }
-    class PayloadOneWire{
+    class PayloadOneWire {
         +getOneWireTemperature()
         +encodeOneWire()
     }
-    class PayloadAnalog{
+    class PayloadAnalog {
         +begin()
         +encodeAnalog()
     }
     class PayloadDigital {
         +begin()
         +encodeDigital()
+        -DigitalSensor m_distanceSensor
+        -DypR01cw m_dypR01cwSensors
     }
     class PayloadBLE {
+        +knownBLEAddresses
         -Preferences appPrefs
         -BleSensors bleSensors
         +begin()
         +setBleAddr()
-        +getBLEAddr()
+        +getBleAddr()
         +bleAddrInit()
         +encodeBLE()
     }
 ```
-<!-- ![Class Diagram](https://www.mermaidchart.com/raw/c78b97b9-ecd9-4fc6-a6fc-bba82e0facd7?theme=light&version=v0.1&format=svg) -->
 
 
 ## Doxygen Generated Source Code Documentation

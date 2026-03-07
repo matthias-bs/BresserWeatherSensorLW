@@ -159,7 +159,6 @@ public:
      */
     void begin(void)
     {
-        // bleAddrInit();
         PayloadBresser::begin();
 
         // Sensor scan requested,
