@@ -336,6 +336,8 @@ The internal RTC retains operation while the MCU is in sleep mode. It can be set
 
    If enabled by setting `GPS_EN` in [BresserWeatherSensorLWCfg.h](BresserWeatherSensorLWCfg.h), the GPS takes precedence over the LoRaWAN network time.
 
+   See [Wiki: Using GPS as a Time Source](wiki/Using-GPS-as-Time-Source) for additional information.
+
 ### LoRaWAN Network Service Configuration
 
 Create an account and set up a device configuration in your LoRaWAN network provider's web console, e.g. [The Things Network](https://www.thethingsnetwork.org/).
