@@ -199,6 +199,12 @@ void setup()
   bool timeout = false;
   bool serialdata = false; 
   
+  // CAUTION:
+  // gps.time.isValid() and gps.date.isValid() return true as soon as a field has been parsed from an NMEA sentence,
+  // regardless of whether the GPS module has actually acquired a fix. Therefore they can be true while day and month
+  // are still 0 (e.g. 00/00/00 00:00:00). Non-zero day and month values indicate that we have received valid GPS
+  // data with an actual fix.
+  // see https://github.com/mikalhart/TinyGPSPlus/issues/107
   while (!gps.time.isValid()) {
     while (Serial2.available() > 0) {
       serialdata = true;
