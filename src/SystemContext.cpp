@@ -436,7 +436,7 @@ bool SystemContext::getGPSData(time_t &gpsTime)
   }
 
   struct tm timeinfo;
-  log_i("GPS time: %04u-%02u-%02u- %02u:%02u:%02u",
+  log_i("GPS time: %04u-%02u-%02u %02u:%02u:%02u",
         gps.date.year(), gps.date.month(), gps.date.day(),
         gps.time.hour(), gps.time.minute(), gps.time.second());
   timeinfo.tm_year = gps.date.year() - 1900;
