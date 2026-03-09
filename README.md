@@ -330,7 +330,7 @@ The internal RTC retains operation while the MCU is in sleep mode. It can be set
 
 5. GPS Receiver
 
-   An external GPS receiver is is used to acquire time and date.
+   An external GPS receiver is used to acquire time and date.
 
    The GPS data (NMEA format) is received via UART interface (`Serial2`). The GPS receiver's power supply is controlled by a GPIO pin.
 
