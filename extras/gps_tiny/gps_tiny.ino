@@ -25,7 +25,7 @@
 //
 // Sequence:
 // 1. Wait (with GPS_TIMEOUT) for GPS data with valid time
-//   - If timeout, check if any data was received from GPS moduleat all. Stop.
+//   - If timeout, check if any data was received from GPS module at all. Stop.
 // 2. Receive NUM_UPDATES GPS time updates
 // 3. Disable GPS module
 // 4. Wait for TIME_DISABLED if any data can still be received from GPS module
