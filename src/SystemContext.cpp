@@ -439,6 +439,8 @@ bool SystemContext::getGPSData(time_t &gpsTime)
   log_i("GPS time: %04u-%02u-%02u %02u:%02u:%02u",
         gps.date.year(), gps.date.month(), gps.date.day(),
         gps.time.hour(), gps.time.minute(), gps.time.second());
+  setenv("TZ", "UTC", 1);
+  tzset();
   timeinfo.tm_year = gps.date.year() - 1900;
   timeinfo.tm_mon = gps.date.month() - 1;
   timeinfo.tm_mday = gps.date.day();
@@ -447,6 +449,8 @@ bool SystemContext::getGPSData(time_t &gpsTime)
   timeinfo.tm_sec = gps.time.second();
   timeinfo.tm_isdst = 0; // GPS time is in UTC, so DST is not in effect
   gpsTime = mktime(&timeinfo);
+  setenv("TZ", TZINFO_STR, 1);
+  tzset();
   return true;
 }
 #endif // GPS_EN
