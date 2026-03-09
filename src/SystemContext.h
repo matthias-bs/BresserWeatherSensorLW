@@ -344,6 +344,7 @@ public:
         }
         else
         {
+            pinMode(GPS_PWR_EN_PIN, OUTPUT);
             digitalWrite(GPS_PWR_EN_PIN, on ? LOW : HIGH);
         }
     };
