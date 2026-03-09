@@ -50,6 +50,7 @@
 //          for power saving
 // 20251031 Added M5Stack configuration for power saving
 //          Added M5Stack RTC integration
+// 20260304 Added gpsPower() and getGPSData() for GPS time sync
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -86,6 +87,11 @@ using namespace PowerFeather;
 #if defined(EXT_RTC)
 // Adafruit RTClib - https://github.com/adafruit/RTClib
 #include <RTClib.h>
+#endif
+
+#if defined(GPS_EN)
+#include <TinyGPSPlus.h>
+TinyGPSPlus gps;
 #endif
 
 /// Preferences (stored in flash memory)
@@ -265,7 +271,7 @@ uint32_t SystemContext::sleepInterval(void)
     longSleepModeActive = false;
   }
   return longSleepModeActive ? sleep_interval_long : sleep_interval;
-} 
+}
 #else
 // Switch between normal and long sleep interval depending on the bus voltage
 uint32_t SystemContext::sleepInterval(void)
@@ -396,6 +402,65 @@ bool SystemContext::rtcNeedsSync(void)
          ((time(nullptr) - rtcLastClockSync) > (CLOCK_SYNC_INTERVAL * 60));
 }
 
+#if defined(GPS_EN)
+bool SystemContext::getGPSData(time_t &gpsTime)
+{
+  gpsTime = 0;
+
+  log_d("Getting GPS data for RTC sync...");
+  Serial2.begin(GPS_BAUDRATE, SERIAL_8N1, GPS_RX_PIN /* RX */, -1 /* TX */);
+
+  unsigned long start = millis();
+  bool timeout = false;
+  
+  // CAUTION:
+  // gps.time.isValid() and gps.date.isValid() return true as soon as a field has been parsed from an NMEA sentence,
+  // regardless of whether the GPS module has actually acquired a fix. Therefore they can be true while day and month
+  // are still 0 (e.g. 00/00/00 00:00:00). Non-zero day and month values indicate that we have received valid GPS
+  // data with an actual fix.
+  // see https://github.com/mikalhart/TinyGPSPlus/issues/107
+  while (!(gps.time.isValid() && gps.date.isValid() && gps.date.day() != 0 && gps.date.month() != 0))
+  {
+    while (Serial2.available() > 0)
+      gps.encode(Serial2.read());
+    if (millis() - start > GPS_TIMEOUT_SEC * 1000UL)
+    {
+      log_w("Timeout waiting for GPS data");
+      timeout = true;
+      break;
+    }
+  }
+
+#if defined(SERIAL2_LOG_ENABLE)
+  Serial2.begin(115200, SERIAL_8N1, SERIAL2_LOG_TX_PIN, SERIAL2_LOG_RX_PIN);
+  Serial2.setDebugOutput(true);
+#endif // SERIAL2_LOG_ENABLE
+
+  if (timeout)
+  {
+    return false;
+  }
+
+  struct tm timeinfo;
+  log_i("GPS time: %04u-%02u-%02u %02u:%02u:%02u",
+        gps.date.year(), gps.date.month(), gps.date.day(),
+        gps.time.hour(), gps.time.minute(), gps.time.second());
+  setenv("TZ", "UTC", 1);
+  tzset();
+  timeinfo.tm_year = gps.date.year() - 1900;
+  timeinfo.tm_mon = gps.date.month() - 1;
+  timeinfo.tm_mday = gps.date.day();
+  timeinfo.tm_hour = gps.time.hour();
+  timeinfo.tm_min = gps.time.minute();
+  timeinfo.tm_sec = gps.time.second();
+  timeinfo.tm_isdst = 0; // GPS time is in UTC, so DST is not in effect
+  gpsTime = mktime(&timeinfo);
+  setenv("TZ", TZINFO_STR, 1);
+  tzset();
+  return true;
+}
+#endif // GPS_EN
+
 #if defined(ESP32)
 // Enter sleep mode (ESP32 variant)
 void SystemContext::gotoSleepESP32(uint32_t seconds)
@@ -469,23 +534,23 @@ void SystemContext::restoreRP2040(void)
   }
   bootCountSinceUnsuccessfulJoin = watchdog_hw->scratch[3] >> 16;
 }
-#endif
+#endif // defined(ARDUINO_ARCH_RP2040)
 
 #if defined(ARDUINO_M5STACK_CORE2)
 void SystemContext::setupM5StackCore2(void)
 {
   auto cfg = M5.config();
-  cfg.clear_display = true; // default=true. clear the screen when begin.
+  cfg.clear_display = true;                    // default=true. clear the screen when begin.
   cfg.external_display.module_display = false; // default=true. use Module Display.
-  cfg.output_power = true;  // default=true. use external port 5V output.
-  cfg.internal_imu = false; // default=true. use internal IMU.
-  cfg.internal_rtc = true;  // default=true. use internal RTC.
-  cfg.internal_spk = false; // default=true. use internal speaker.
-  cfg.internal_mic = false; // default=true. use internal microphone.
+  cfg.output_power = true;                     // default=true. use external port 5V output.
+  cfg.internal_imu = false;                    // default=true. use internal IMU.
+  cfg.internal_rtc = true;                     // default=true. use internal RTC.
+  cfg.internal_spk = false;                    // default=true. use internal speaker.
+  cfg.internal_mic = false;                    // default=true. use internal microphone.
   M5.begin(cfg);
   M5.Display.setBrightness(0); // set system LED brightness (0=off / 255=max)
 }
-#endif
+#endif // defined(ARDUINO_M5STACK_CORE2)
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
 void SystemContext::setupPowerFeather(struct sPowerFeatherCfg &cfg)
@@ -509,4 +574,4 @@ void SystemContext::setupPowerFeather(struct sPowerFeatherCfg &cfg)
   log_d("Battery current: %d mA", current);
 #endif
 }
-#endif
+#endif // defined(ARDUINO_ESP32S3_POWERFEATHER)

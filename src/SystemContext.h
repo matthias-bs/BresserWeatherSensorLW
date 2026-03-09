@@ -46,6 +46,7 @@
 // 20251030 Added sleepIfSupplyLow() for M5Core2 and getBattlevelM5core2()
 // 20251031 Added M5Stack configuration for power saving
 //          Added M5Stack RTC integration
+// 20260304 Added gpsPower() and getGPSData() for GPS time sync
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -324,6 +325,31 @@ public:
         return battLevel;
     };
 
+#if defined(GPS_EN)
+    /**
+     * @brief Control the GPS power
+     * 
+     * @param on true to turn on the GPS, false to turn off the GPS
+     */
+    void gpsPower(bool on)
+    {
+        if (GPS_PWR_EN_PIN < 0)
+        {
+            return; // GPS power control not available
+        }
+        if (GPS_PWR_EN_ACTIVE)
+        {
+            pinMode(GPS_PWR_EN_PIN, OUTPUT);
+            digitalWrite(GPS_PWR_EN_PIN, on ? HIGH : LOW);
+        }
+        else
+        {
+            pinMode(GPS_PWR_EN_PIN, OUTPUT);
+            digitalWrite(GPS_PWR_EN_PIN, on ? LOW : HIGH);
+        }
+    };
+#endif // GPS_EN
+
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
     /**
      * \brief Get the battery fill level (for PowerFeather)
@@ -360,7 +386,7 @@ public:
         }
         return 255; // Unable to measure
     };
-#endif
+#endif // ARDUINO_ESP32S3_POWERFEATHER
 
 #if defined(ARDUINO_M5STACK_CORE2)
     /**
@@ -390,7 +416,8 @@ public:
         level = (level == 0) ? 1 : level;
         return level;
     };
-#endif
+#endif // ARDUINO_M5STACK_CORE2
+
     /**
      * \brief Switch between normal and long sleep interval
      *
@@ -446,6 +473,16 @@ public:
      * \return false    if the RTC is synchronized and the last clock sync is within CLOCK_SYNC_INTERVAL
      */
     bool rtcNeedsSync(void);
+
+#if defined(GPS_EN)
+    /**
+     * \brief Get GPS data
+     *
+     * \param gpsTime Reference to store the GPS time
+     * \return true if GPS data is valid, false otherwise
+     */
+    bool getGPSData(time_t &gpsTime);
+#endif
 
     /**
      * \brief Compute sleep duration in seconds
@@ -585,7 +622,7 @@ private:
      * \brief Restore RP2040 variables after sleep and SW reset
      */
     void restoreRP2040(void);
-#endif
+#endif // ARDUINO_ARCH_RP2040
 
 #if defined(ESP32)
     /**
@@ -607,7 +644,7 @@ private:
             log_i("Wake not caused by deep sleep: %u", wakeup_reason);
         }
     };
-#endif
+#endif // ESP32
 
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
     void setupPowerFeather(struct sPowerFeatherCfg &cfg);
