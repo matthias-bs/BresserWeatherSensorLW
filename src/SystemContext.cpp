@@ -413,7 +413,7 @@ bool SystemContext::getGPSData(time_t &gpsTime)
   unsigned long start = millis();
   bool timeout = false;
   
-  while (!gps.time.isValid() && !gps.date.isValid())
+  while (!gps.time.isValid() || !gps.date.isValid())
   {
     while (Serial2.available() > 0)
       gps.encode(Serial2.read());
