@@ -104,7 +104,7 @@
 
 #if defined(SERIAL2_LOG_ENABLE)
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  #define SERIAL2_LOG_TX_PIN 44
+  #define SERIAL2_LOG_TX_PIN TX0 // 43
   #define SERIAL2_LOG_RX_PIN -1
 #elif defined(ARDUINO_M5STACK_CORE2)
   // M5Stack Core2
@@ -236,13 +236,13 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #define TZINFO_STR "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00"
 
 // Enable A02YYUW Ultrasonic Distance Sensor (DFRobot SEN0311)
-#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ESP32S3_POWERFEATHER)
 // #define A02YYUW_EN
 // #define A02YYUW_CH 8
 #endif
 
 // Enable DYP-R01CW Laser Distance Sensor(s) (DFRobot SEN0590)
-#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ESP32S3_POWERFEATHER)
 // #define DYP_R01CW_EN
 #endif
 
@@ -350,6 +350,8 @@ const uint8_t ADC3_SAMPLES = 10;
 #define PIN_ONEWIRE_BUS 5
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define PIN_ONEWIRE_BUS 6
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+#define PIN_ONEWIRE_BUS 17
 #else
 #define PIN_ONEWIRE_BUS 0
 #endif
@@ -366,6 +368,11 @@ const uint8_t ADC3_SAMPLES = 10;
 #define A02YYUW_RX 1
 #define A02YYUW_PWR 7
 #define A02YYUW_RETRIES 8
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+#define A02YYUW_TX TX // 44 - pull-up/open: processed value / low: real-time value
+#define A02YYUW_RX RX // 42
+#define A02YYUW_PWR 1
+#define A02YYUW_RETRIES 5
 #endif
 #endif
 
@@ -377,6 +384,9 @@ const uint8_t ADC3_SAMPLES = 10;
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define DYP_R01CW_SDA 2
 #define DYP_R01CW_SCL 3
+#elif defined(ARDUINO_ESP32S3_POWERFEATHER)
+#define DYP_R01CW_SDA SDA // 35
+#define DYP_R01CW_SCL SCL // 36
 #endif
 
 // List of I2C addresses for DYP-R01CW sensors (8-bit format, e.g., 0xE8)
