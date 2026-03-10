@@ -63,8 +63,6 @@
 #include <Arduino.h>
 #include <TinyGPSPlus.h>
 
-static const uint32_t SLEEP_TIME = 30;
-
 // Number of time updates before sleep
 #define NUM_UPDATES 20
 
