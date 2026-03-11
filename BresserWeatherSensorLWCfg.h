@@ -384,9 +384,9 @@ const uint8_t ADC3_SAMPLES = 10;
 
 #ifdef DYP_R01CW_EN
 // I2C pins for DYP-R01CW Laser Distance Sensor(s)
-#if defined(LORAWAN_NODE)
-#define DYP_R01CW_SDA 21
-#define DYP_R01CW_SCL 22
+#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
+#define DYP_R01CW_SDA SDA // 21
+#define DYP_R01CW_SCL SCL // 22
 #elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
 #define DYP_R01CW_SDA 2
 #define DYP_R01CW_SCL 3
