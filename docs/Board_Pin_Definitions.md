@@ -29,7 +29,6 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio chip | `USE_SX1276` | SX1276 selected |
 | OneWire bus | `PIN_ONEWIRE_BUS` | 15 |
 | ADC input (battery) | `PIN_ADC_IN` | -1 (external divider required) |
- 
 > **Note:** Required wiring: A to RST, B to DIO1, D to DIO0, E to CS
 
 ## ARDUINO_ADAFRUIT_FEATHER_ESP32_V2
