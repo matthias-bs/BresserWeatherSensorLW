@@ -163,7 +163,7 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | ADC control (V3) | `ADC_CTRL` | 37 |
 | UBATT divisor (V3) | `UBATT_DIV` | 0.2041 |
 
-## ARDUINO_HELTEC_WIRELESS_STICK / V3
+## ARDUINO_HELTEC_WIRELESS_STICK / ARDUINO_HELTEC_WIRELESS_STICK_V3
 
 | Interface | Define | Value / Notes |
 |---|---:|---|
