@@ -169,6 +169,9 @@ See [Parameters](#parameters) for more details.
 
 :white_check_mark: &mdash; confirmed
 
+> [!Note]
+> See [Board_Pin_Definitions.md](docs/Board_Pin_Defnitions.md) for predefined board specific pinouts.
+
 ### Predefined Board Configurations
 
 > [!NOTE]
