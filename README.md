@@ -48,7 +48,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
 * External RTC (with Backup Battery) Integration (optional)
-* GPS Receiver as Time Source (optional)
+* GPS Receiver as alternative Time Source (optional)
 * LoRaWAN Codec API compliant [Uplink/Downlink Payload Formatters](scripts/bresserweathersensorlw-codec/README.md)
 
 ## Contents
