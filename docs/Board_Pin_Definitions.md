@@ -43,6 +43,8 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio - DIO2 | `PIN_LORA_DIO2` | `RADIOLIB_NC` |
 | Radio chip | `USE_SX1276` | SX1276 selected |
 
+> **Note:** Required wiring on RFM95W FeatherWing: A to RST, B to DIO1, D to DIO0, E to CS
+
 ## ARDUINO_ESP32S3_POWERFEATHER
 
 | Interface | Define | Value / Notes |
