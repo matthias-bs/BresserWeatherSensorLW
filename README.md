@@ -19,9 +19,6 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * You need [RadioLib v7.5.0](https://github.com/jgromes/RadioLib/releases/tag/7.5.0) or later
 * You need [espressif/arduino-esp32 v3.X.Y](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
-* If you previously used [BresserWeatherSensorTTN](https://github.com/matthias-bs/BresserWeatherSensorTTN)
-   * The default payload configuration is different
-   * LoRaWAN downlink commands (and responses) are different
 * [Don't Panic](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#Don't_Panic)
 
   While the software has quite many configuration options, most users won't need any or just a few. See [Required Configuration](#required-configuration) for the bare minimum configuration (and maybe [Default Parameter Values](#default-parameter-values) & [Default Configuration](#default-configuration)).
@@ -51,7 +48,7 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * Loading of LoRaWAN Secrets from JSON File on LittleFS (optional)
 * Loading of Hardware/Deployment specific Configuration Parameters from JSON file on LittleFS (optional)
 * External RTC (with Backup Battery) Integration (optional)
-* GPS Receiver as Time Source (optional)
+* GPS Receiver as alternative Time Source (optional)
 * LoRaWAN Codec API compliant [Uplink/Downlink Payload Formatters](scripts/bresserweathersensorlw-codec/README.md)
 
 ## Contents
@@ -168,6 +165,9 @@ See [Parameters](#parameters) for more details.
 :hourglass: &mdash; confirmation pending
 
 :white_check_mark: &mdash; confirmed
+
+> [!Note]
+> See [Board_Pin_Definitions.md](docs/Board_Pin_Defnitions.md) for predefined board specific pinouts.
 
 ### Predefined Board Configurations
 
