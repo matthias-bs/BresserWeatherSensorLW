@@ -15,7 +15,7 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | ADC input (battery) | `PIN_ADC_IN` | A13 |
 | OneWire bus | `PIN_ONEWIRE_BUS` | 15 |
 
-> **Note:** Required wiring: A to RST, B to DIO1, D to DIO0, E to CS
+> **Note:** Required wiring on RFM95W FeatherWing: A to RST, B to DIO1, D to DIO0, E to CS
 
 ## ARDUINO_ADAFRUIT_FEATHER_ESP32S2
 
@@ -29,7 +29,8 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio chip | `USE_SX1276` | SX1276 selected |
 | OneWire bus | `PIN_ONEWIRE_BUS` | 15 |
 | ADC input (battery) | `PIN_ADC_IN` | -1 (external divider required) |
-> **Note:** Required wiring: A to RST, B to DIO1, D to DIO0, E to CS
+
+> **Note:** Required wiring on RFM95W FeatherWing: A to RST, B to DIO1, D to DIO0, E to CS
 
 ## ARDUINO_ADAFRUIT_FEATHER_ESP32_V2
 
@@ -60,7 +61,7 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | DYP-R01CW SDA | `DYP_R01CW_SDA` | SDA (35) |
 | DYP-R01CW SCL | `DYP_R01CW_SCL` | SCL (36) |
 
-> **Note:** Required wiring: A to RST, B to DIO1, D to DIO0, E to CS
+> **Note:** Required wiring  on RFM95W FeatherWing: A to RST, B to DIO1, D to DIO0, E to CS
 
 ## ARDUINO_ADAFRUIT_FEATHER_RP2040
 
@@ -79,7 +80,7 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | DYP-R01CW SDA | `DYP_R01CW_SDA` | 2 |
 | DYP-R01CW SCL | `DYP_R01CW_SCL` | 3 |
 
-> **Note:** Required wiring: A to RST, B to DIO1, D to DIO0, E to CS
+> **Note:** Required wiring  on RFM95W FeatherWing: A to RST, B to DIO1, D to DIO0, E to CS
 
 ## ARDUINO_TTGO_LORA32_V1 / ARDUINO_TTGO_LoRa32_V1
 
@@ -226,7 +227,7 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | GPS power enable | `GPS_PWR_EN_PIN` | 4 (DO) |
 | GPS RX | `GPS_RX_PIN` | 13 (D7) |
 
-> **Note:** Required wiring: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1
+> **Note:** Required wiring on FireBeetle Cover LoRa: D2 to RESET, D3 to DIO0, D4 to CS, D5 to DIO1
 
 ## ARDUINO_XIAO_ESP32S3
 
@@ -254,3 +255,4 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 Notes:
 - Wherever the original define uses board-symbolic names (e.g., `LORA_CS`, `LORA_RST`, `LORA_IRQ`, `SS`, `DIO0`), the table lists the symbolic name rather than a numeric GPIO because the numeric mapping is board/package-specific and defined elsewhere.
 - `RADIOLIB_NC` indicates a not-connected / not-used pin for that radio mapping.
+- An optional external RTC uses the board's default I²C bus pins ("Wire" interface; `SDA` & `SCL`)
