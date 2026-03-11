@@ -227,8 +227,8 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 // Enable Bresser Lightning Sensor
 #define LIGHTNINGSENSOR_EN
 
-#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
-// Enable GPS receiver (currently only for time synchronization)
+#if defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA) || defined(ARDUINO_POWERFEATHER_ESP32S3) \
+ || defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 //#define GPS_EN
 #endif
 
@@ -242,7 +242,8 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #endif
 
 // Enable DYP-R01CW Laser Distance Sensor(s) (DFRobot SEN0590)
-#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ESP32S3_POWERFEATHER)
+#if defined(LORAWAN_NODE) || defined(ARDUINO_ADAFRUIT_FEATHER_RP2040) || defined(ARDUINO_ESP32S3_POWERFEATHER) \
+ || defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 // #define DYP_R01CW_EN
 #endif
 
@@ -344,7 +345,7 @@ const uint8_t ADC3_SAMPLES = 10;
 #ifdef ONEWIRE_EN
 #if defined(ARDUINO_TTGO_LoRa32_V1)
 #define PIN_ONEWIRE_BUS 21
-#elif defined(ARDUINO_FEATHER_ESP32) || defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
+#elif defined(ARDUINO_FEATHER_ESP32) || defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2) || defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 #define PIN_ONEWIRE_BUS 15
 #elif defined(LORAWAN_NODE) || defined(FIREBEETLE_ESP32_COVER_LORA)
 #define PIN_ONEWIRE_BUS 5
@@ -373,6 +374,11 @@ const uint8_t ADC3_SAMPLES = 10;
 #define A02YYUW_RX RX // 42
 #define A02YYUW_PWR 1
 #define A02YYUW_RETRIES 5
+#elif defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
+#define A02YYUW_TX 12 // pull-up/open: processed value / low: real-time value
+#define A02YYUW_RX 13
+#define A02YYUW_PWR 4
+#define A02YYUW_RETRIES 5
 #endif
 #endif
 
@@ -387,6 +393,9 @@ const uint8_t ADC3_SAMPLES = 10;
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
 #define DYP_R01CW_SDA SDA // 35
 #define DYP_R01CW_SCL SCL // 36
+#elif defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
+#define DYP_R01CW_SDA SDA // 23
+#define DYP_R01CW_SCL SCL // 22
 #endif
 
 // List of I2C addresses for DYP-R01CW sensors (8-bit format, e.g., 0xE8)
@@ -449,6 +458,15 @@ const uint8_t UBATT_SAMPLES = 10;
 #define GPS_PWR_EN_ACTIVE   1
 // GPS RX pin (set to -1 if not used)
 #define GPS_RX_PIN          13 // D7
+
+#elif defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
+
+// GPS power enable pin (set to -1 if not used)
+#define GPS_PWR_EN_PIN      26
+// GPS power enable polarity: 1 = active high, 0 = active low
+#define GPS_PWR_EN_ACTIVE   1
+// GPS RX pin (set to -1 if not used)
+#define GPS_RX_PIN          2
 
 #else
 #define GPS_PWR_EN_PIN      -1
