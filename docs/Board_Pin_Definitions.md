@@ -209,8 +209,8 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | A02YYUW TX | `A02YYUW_TX` | 0 |
 | A02YYUW RX | `A02YYUW_RX` | 26 |
 | A02YYUW PWR | `A02YYUW_PWR` | 25 |
-| DYP-R01CW SDA | `DYP_R01CW_SDA` | 21 |
-| DYP-R01CW SCL | `DYP_R01CW_SCL` | 22 |
+| DYP-R01CW SDA | `DYP_R01CW_SDA` | SDA (21) |
+| DYP-R01CW SCL | `DYP_R01CW_SCL` | SCL (22) |
 | GPS power enable | `GPS_PWR_EN_PIN` | 27 (D4) |
 | GPS RX | `GPS_RX_PIN` | 9 (D5) |
 
@@ -226,6 +226,8 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio chip | `USE_SX1276` | SX1276 selected |
 | ADC input (battery) | `PIN_ADC_IN` | A0 |
 | OneWire bus | `PIN_ONEWIRE_BUS` | 5 |
+| DYP-R01CW SDA | `DYP_R01CW_SDA` | SDA (21) |
+| DYP-R01CW SCL | `DYP_R01CW_SCL` | SCL (22) |
 | GPS power enable | `GPS_PWR_EN_PIN` | 4 (DO) |
 | GPS RX | `GPS_RX_PIN` | 13 (D7) |
 
