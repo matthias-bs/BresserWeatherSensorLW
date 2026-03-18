@@ -27,7 +27,20 @@ jobs:
         run: npm test
         working-directory: scripts/bresserweathersensorlw-codec
 
+      - name: Check if version already exists on npm
+        id: check_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          PKG=$(node -p "require('./package.json').name")
+          if npm view "$PKG@$VERSION" > /dev/null 2>&1; then
+            echo "skip_publish=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_publish=false" >> $GITHUB_OUTPUT
+          fi
+        working-directory: scripts/bresserweathersensorlw-codec
+
       - name: Publish to NPM
+        if: steps.check_version.outputs.skip_publish == 'false'
         run: npm publish --access public
         working-directory: scripts/bresserweathersensorlw-codec
         env:
