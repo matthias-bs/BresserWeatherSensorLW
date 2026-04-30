@@ -8,7 +8,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@
 // 20250318 Renamed PAYLOAD_SIZE to MAX_UPLINK_SIZE
 // 20250828 Changed time functions to POSIX, added sysCtx
 // 20251222 Updated sensor types defined in BresserWeatherSensorReceiver
+// 20260430 Fix: Add check for enable bit in APP_PAYLOAD_CFG_TYPE09
 //
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -252,6 +253,11 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         // Lightning sensor has fixed channel (0)
         if (type == SENSOR_TYPE_LIGHTNING)
         {
+            // Skip if Lightning sensor is disabled
+            // (PAYLOAD_LIGHTNING_RAW and/or PAYLOAD_LIGHTNING_PROC may be set)
+            if (appPayloadCfg[SENSOR_TYPE_LIGHTNING] & 0x1 == 0)
+               continue;
+            
             int idx = weatherSensor.findType(type, 0);
             if ((idx > -1) && weatherSensor.sensor[idx].battery_ok)
             {
