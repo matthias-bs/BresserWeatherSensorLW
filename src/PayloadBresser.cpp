@@ -78,6 +78,7 @@ void PayloadBresser::begin(void)
     }
 
     weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
+    weatherSensor.setSensorsCfg(DATA_COMPLETE | DATA_ALL_SLOTS);
 
     if (weatherSensor.sensor.size() == 0)
         return;
