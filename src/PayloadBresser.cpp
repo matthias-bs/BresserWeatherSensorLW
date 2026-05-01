@@ -54,6 +54,7 @@
 // 20250828 Changed time functions to POSIX, added sysCtx
 // 20251222 Updated sensor types defined in BresserWeatherSensorReceiver
 // 20260430 Fix: Add check for enable bit in APP_PAYLOAD_CFG_TYPE09
+// 20260501 Fix: Changed setUpdateRate() parameter from seconds to minutes
 //
 //
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,7 +202,7 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         // Set raingauge post-processing update rate
         if (ws_postproc_interval == 0) {
             // auto update rate
-            rainGauge.setUpdateRate(_sysCtx->sleepInterval());
+            rainGauge.setUpdateRate(static_cast<uint8_t>(_sysCtx->sleepInterval() / 60));
         } else {
             rainGauge.setUpdateRate(ws_postproc_interval);
         }
@@ -246,7 +247,7 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         // Set lightning counter post-processing update rate
         if (ws_postproc_interval == 0) {
             // auto update rate
-            lightningProc.setUpdateRate(_sysCtx->sleepInterval());
+            lightningProc.setUpdateRate(static_cast<uint8_t>(_sysCtx->sleepInterval() / 60));
         } else {
             lightningProc.setUpdateRate(ws_postproc_interval);
         }
