@@ -78,6 +78,7 @@ void PayloadBresser::begin(void)
     }
 
     weatherSensor.begin(MAX_NUM_868MHZ_SENSORS);
+    weatherSensor.setRxCfg(DATA_COMPLETE | DATA_ALL_SLOTS);
 
     if (weatherSensor.sensor.size() == 0)
         return;
@@ -255,7 +256,7 @@ void PayloadBresser::encodeBresser(uint8_t *appPayloadCfg, uint8_t *appStatus, L
         {
             // Skip if Lightning sensor is disabled
             // (PAYLOAD_LIGHTNING_RAW and/or PAYLOAD_LIGHTNING_PROC may be set)
-            if (appPayloadCfg[SENSOR_TYPE_LIGHTNING] & 0x1 == 0)
+            if ((appPayloadCfg[SENSOR_TYPE_LIGHTNING] & 0x1) == 0)
                continue;
             
             int idx = weatherSensor.findType(type, 0);
