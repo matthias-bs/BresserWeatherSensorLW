@@ -42,6 +42,7 @@
 // 20240607 Changed ARDUINO_HELTEC_WIFI_LORA_32_V3 to uppercase
 // 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
 // 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2 (now all uppercase)
+// 20260515 Added getBatteryVoltage() support for Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3
 //
 // ToDo:
 // -
@@ -88,11 +89,12 @@ uint16_t getBatteryVoltage(void)
   // Here come the good guys...
   return getVoltage();
 
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
-     // Enable ADC input switch, measure voltage and disable ADC input switch
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(HELTEC_WIRELESS_STICK_LITE_V3) || defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+    // Enable ADC input switch, measure voltage and disable ADC input switch.
+    // ADC_CTRL_ENABLED polarity: LOW for V3/WSL3, HIGH for V4 (see BresserWeatherSensorLWCfg.h)
     uint16_t voltage;
     pinMode(ADC_CTRL, OUTPUT);
-    digitalWrite(ADC_CTRL, LOW);
+    digitalWrite(ADC_CTRL, ADC_CTRL_ENABLED);
     analogSetPinAttenuation(PIN_ADC_IN, ADC_0db);
     delay(100);
     voltage = getVoltage();

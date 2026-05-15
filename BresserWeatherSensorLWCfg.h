@@ -79,6 +79,8 @@
 // 20251018 Added SOC_CRITICAL
 // 20260304 Added synchronization of RTC with GPS time (optional)
 //          Added SERIAL2_LOG definitions
+// 20260515 Added ADC configuration for Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3:
+//          PIN_ADC_IN A0, ADC_CTRL GPIO37, ADC_CTRL_ENABLED polarity (LOW for V3/WSL3, HIGH for V4)
 //
 // ToDo:
 // -
@@ -275,7 +277,7 @@ const uint8_t MAX_DOWNLINK_SIZE = 51;
 #pragma message("No power-saving & deep-discharge protection implemented yet.")
 // On-board VB
 #define PIN_ADC_IN A0
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(HELTEC_WIRELESS_STICK_LITE_V3) || defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
 // On-board VB
 #define PIN_ADC_IN A0
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -413,9 +415,15 @@ const uint8_t ADC3_SAMPLES = 10;
 // Voltage divider R1 / (R1 + R2) -> V_meas = V(R1 + R2); V_adc = V(R1)
 #if defined(ARDUINO_THINGPULSE_EPULSE_FEATHER)
 const float UBATT_DIV = 0.6812;
-#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3)
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V3) || defined(HELTEC_WIRELESS_STICK_LITE_V3)
 #define ADC_CTRL 37
-// R17=100k, R14=390k => 100k / (100k + 390 k)
+#define ADC_CTRL_ENABLED LOW   // ADC switch enabled by driving LOW
+// R17=100k, R14=390k => 100k / (100k + 390k)
+const float UBATT_DIV = 0.2041;
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+#define ADC_CTRL 37
+#define ADC_CTRL_ENABLED HIGH  // ADC switch enabled by driving HIGH (inverted vs. V3/WSL3)
+// R17=100k, R14=390k => 100k / (100k + 390k)
 const float UBATT_DIV = 0.2041;
 #else
 const float UBATT_DIV = 0.5;
