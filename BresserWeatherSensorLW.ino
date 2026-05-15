@@ -126,6 +126,9 @@
 // 20260202 Added using WeatherSensorReceiver namespace
 // 20260215 Refactored SPI object to static allocation
 // 20260304 Added synchronization of RTC with GPS time (optional)
+// 20260515 Added support for Heltec WiFi LoRa 32(V4) and Heltec Wireless Stick Lite V3:
+//          custom SPI (FSPI) for WSL3, FEM control (GPIO7/GPIO2) for V4,
+//          DIO2-as-RF-switch and TCXO (1.8V) for both boards
 //
 // ToDo:
 // -
@@ -197,6 +200,15 @@ static SPIClass spi = SPI;
 // Create radio object with custom SPI configuration
 LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO, spi);
 
+#elif defined(HELTEC_WIRELESS_STICK_LITE_V3)
+// Use integer bus-number constructor to avoid Static Initialization Order Fiasco (SIOF):
+// copying the global SPI object may capture a NULL paramLock if SPI's constructor has not
+// run yet; the integer constructor always creates its own paramLock via xSemaphoreCreateMutex().
+static SPIClass spi(FSPI);
+
+// Create radio object with custom SPI configuration
+LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO, spi);
+
 #else
 // Create radio object
 LORA_CHIP radio = new Module(PIN_LORA_NSS, PIN_LORA_IRQ, PIN_LORA_RST, PIN_LORA_GPIO);
@@ -221,6 +233,26 @@ static const Module::RfSwitchMode_t rfswitch_table[] = {
     END_OF_MODE_TABLE,
 };
 #endif // ARDUINO_LILYGO_T3S3_LR1121
+
+#if defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+// Enable FEM (Front-End Module) power supply (VFEM_Ctrl, GPIO7) and FEM chip enable (CSD, GPIO2).
+// The RF path goes through the GC1109/KCT8103L FEM (RF power amplifier / LNA); without these
+// the signal path is blocked and neither transmission nor reception works.
+// See: https://github.com/meshtastic/firmware/blob/master/variants/esp32s3/heltec_v4/variant.h
+static void femEnable(void)
+{
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
+  pinMode(2, OUTPUT);
+  digitalWrite(2, HIGH);
+}
+
+static void femDisable(void)
+{
+  digitalWrite(7, LOW);
+  digitalWrite(2, LOW);
+}
+#endif // ARDUINO_HELTEC_WIFI_LORA_32_V4
 
 /// System context
 SystemContext sysCtx;
@@ -419,10 +451,15 @@ void setup()
   int16_t state = 0; // return value for calls to RadioLib
 
 #if !defined(RADIO_CHIP)
-#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121)
+#if defined(ARDUINO_LILYGO_T3S3_SX1262) || defined(ARDUINO_LILYGO_T3S3_SX1276) || defined(ARDUINO_LILYGO_T3S3_LR1121) || \
+    defined(HELTEC_WIRELESS_STICK_LITE_V3)
   // Use local radio object with custom SPI configuration
   spi.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS);
 #endif
+#endif
+
+#if defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+  femEnable();
 #endif
 
   radio.reset();
@@ -452,6 +489,16 @@ void setup()
   //
   // Set to 1.7V as recommended by Seeed Studio's Support
   radio.setTCXO(1.7);
+#endif
+
+#if defined(HELTEC_WIRELESS_STICK_LITE_V3) || defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+  // RF switch is controlled internally by SX1262 DIO2
+  // (SX126X_DIO2_AS_RF_SWITCH in Meshtastic heltec_wsl_v3/variant.h and heltec_v4/variant.h)
+  radio.setDio2AsRfSwitch(true);
+
+  // TCXO voltage according to
+  // https://github.com/meshtastic/firmware/blob/master/variants/esp32s3/heltec_wsl_v3/variant.h
+  radio.setTCXO(1.8);
 #endif
 
 #if defined(ESP32)

@@ -49,6 +49,7 @@
 //          Added customDelay()
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
 // 20260116 Added Seeed Studio XIAO ESP32S3 with Wio-SX1262
+// 20260515 Added Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3
 //
 // ToDo:
 // - 
@@ -255,6 +256,29 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #define PIN_LORA_GPIO     DIO1
   #define PIN_LORA_DIO2     DIO2
   #pragma message("ARDUINO_HELTEC_WIRELESS_STICK_V3")
+  #define USE_SX1262
+
+#elif defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
+  // https://heltec.org/project/wifi-lora-32-v4/
+  #define PIN_LORA_NSS      SS
+  #define PIN_LORA_RST      RST_LoRa
+  #define PIN_LORA_IRQ      DIO0
+  #define PIN_LORA_GPIO     BUSY_LoRa
+  #pragma message("ARDUINO_HELTEC_WIFI_LORA_32_V4")
+  #define USE_SX1262
+
+#elif defined(HELTEC_WIRELESS_STICK_LITE_V3)
+  // https://github.com/espressif/arduino-esp32/blob/master/variants/heltec_wireless_stick_lite_v3/pins_arduino.h
+  // Uses FSPI with non-default pins; define explicitly
+  #define LORA_CS           8
+  #define LORA_SCK          9
+  #define LORA_MOSI         10
+  #define LORA_MISO         11
+  #define PIN_LORA_NSS      LORA_CS
+  #define PIN_LORA_RST      RST_LoRa
+  #define PIN_LORA_IRQ      DIO0
+  #define PIN_LORA_GPIO     BUSY_LoRa
+  #pragma message("HELTEC_WIRELESS_STICK_LITE_V3")
   #define USE_SX1262
 
 // #elif defined(ARDUINO_heltec_wifi_kit_32_V2)
