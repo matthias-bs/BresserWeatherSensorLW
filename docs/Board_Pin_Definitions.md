@@ -164,7 +164,28 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio chip | `USE_SX1262` | SX1262 selected |
 | ADC input (V3) | `PIN_ADC_IN` | A0 |
 | ADC control (V3) | `ADC_CTRL` | 37 |
+| ADC control polarity | `ADC_CTRL_ENABLED` | `LOW` |
 | UBATT divisor (V3) | `UBATT_DIV` | 0.2041 |
+
+## ARDUINO_HELTEC_WIFI_LORA_32_V4
+
+| Interface | Define | Value / Notes |
+|---|---:|---|
+| Radio - CS (NSS) | `PIN_LORA_NSS` | `SS` (GPIO 8) |
+| Radio - RESET | `PIN_LORA_RST` | `RST_LoRa` (GPIO 12) |
+| Radio - IRQ / DIO0 | `PIN_LORA_IRQ` | `DIO0` (GPIO 14) |
+| Radio - GPIO / BUSY | `PIN_LORA_GPIO` | `BUSY_LoRa` (GPIO 13) |
+| Radio chip | `USE_SX1262` | SX1262 selected |
+| RF switch | `setDio2AsRfSwitch` | DIO2 controls TX/RX path |
+| TCXO voltage | `setTCXO(1.8)` | 1.8 V |
+| FEM power (VFEM_Ctrl) | `femEnable()` | GPIO 7, active HIGH |
+| FEM chip enable (CSD) | `femEnable()` | GPIO 2, active HIGH |
+| ADC input (battery) | `PIN_ADC_IN` | A0 (GPIO 1) |
+| ADC control | `ADC_CTRL` | 37 |
+| ADC control polarity | `ADC_CTRL_ENABLED` | `HIGH` (inverted vs. V3/WSL3) |
+| UBATT divisor | `UBATT_DIV` | 0.2041 (R=100 kΩ / 390 kΩ) |
+
+> **Note:** The GC1109/KCT8103L RF front-end module requires `femEnable()` (GPIO 7 + GPIO 2 driven HIGH) to be called once in `setup()`. DIO2 automatically switches the RF path between TX and RX.
 
 ## ARDUINO_HELTEC_WIRELESS_STICK / ARDUINO_HELTEC_WIRELESS_STICK_V3
 
@@ -176,6 +197,29 @@ This file groups radio, sensor, ADC and GPS pin defines per board (sourced from 
 | Radio - GPIO / DIO1 | `PIN_LORA_GPIO` | `DIO1` |
 | Radio - DIO2 | `PIN_LORA_DIO2` | `DIO2` |
 | Radio chip | `USE_SX1276` / `USE_SX1262` | V3 uses SX1262 |
+
+## HELTEC_WIRELESS_STICK_LITE_V3
+
+| Interface | Define | Value / Notes |
+|---|---:|---|
+| SPI bus | `SPIClass spi(FSPI)` | FSPI with non-default pins |
+| SPI SCK | `LORA_SCK` | 9 |
+| SPI MISO | `LORA_MISO` | 11 |
+| SPI MOSI | `LORA_MOSI` | 10 |
+| SPI CS | `LORA_CS` | 8 |
+| Radio - CS (NSS) | `PIN_LORA_NSS` | `LORA_CS` (GPIO 8) |
+| Radio - RESET | `PIN_LORA_RST` | `RST_LoRa` (GPIO 12) |
+| Radio - IRQ / DIO0 | `PIN_LORA_IRQ` | `DIO0` (GPIO 14) |
+| Radio - GPIO / BUSY | `PIN_LORA_GPIO` | `BUSY_LoRa` (GPIO 13) |
+| Radio chip | `USE_SX1262` | SX1262 selected |
+| RF switch | `setDio2AsRfSwitch` | DIO2 controls TX/RX path |
+| TCXO voltage | `setTCXO(1.8)` | 1.8 V |
+| ADC input (battery) | `PIN_ADC_IN` | A0 (GPIO 1) |
+| ADC control | `ADC_CTRL` | 37 |
+| ADC control polarity | `ADC_CTRL_ENABLED` | `LOW` (same as V3) |
+| UBATT divisor | `UBATT_DIV` | 0.2041 (R=100 kΩ / 390 kΩ) |
+
+> **Note:** The FSPI bus uses non-default pins; `spi.begin(LORA_SCK, LORA_MISO, LORA_MOSI, LORA_CS)` is called in `setup()`. The integer-constructor `SPIClass spi(FSPI)` is used to avoid the Static Initialization Order Fiasco (SIOF).
 
 ## ARDUINO_CUBECELL_BOARD / ARDUINO_CUBECELL_BOARD_V2
 

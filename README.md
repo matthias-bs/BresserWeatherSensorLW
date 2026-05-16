@@ -153,6 +153,8 @@ See [Parameters](#parameters) for more details.
   |  :hourglass:  | [Heltec Wireless Stick](https://heltec.org/project/wireless-stick/)   | Heltec Wireless Stick     | HELTEC_WIRELESS_STICK  |  SX1276  | - |
   |  :hourglass:  | [Heltec WiFi LoRa 32 V2](https://heltec.org/project/wifi-lora-32/)    | Heltec WiFi LoRa 32(V2)   | HELTEC_WIFI_LORA_32_V2 |  SX1276  | - |
   |  :white_check_mark:  | [Heltec WiFi LoRa 32 V3](https://heltec.org/project/wifi-lora-32-v3/) | Heltec WiFi LoRa 32(V3)   | HELTEC_WIFI_LORA_32_V3 |  SX1262  | - |
+  |  :hourglass:  | [Heltec WiFi LoRa 32 V4](https://heltec.org/project/wifi-lora-32-v4/) | Heltec WiFi LoRa 32(V4)   | HELTEC_WIFI_LORA_32_V4 |  SX1262  | - |
+  |  :hourglass:  | [Heltec Wireless Stick Lite V3](https://heltec.org/project/wireless-stick-lite-v2/) | Heltec Wireless Stick Lite(V3) | HELTEC_WIRELESS_STICK_LITE_V3 |  SX1262  | - |
   |  :white_check_mark:  | [LoRaWAN_Node](https://github.com/matthias-bs/LoRaWAN_Node)      | FireBeetle-ESP32 | DFROBOT_FIREBEETLE_ESP32 & LORAWAN_NODE     | SX1276 (RFM95W) | -      |
   |  :white_check_mark:  | [DFRobot FireBeetle ESP32 IoT Microcontroller](https://www.dfrobot.com/product-1590.html) with [FireBeetle Cover LoRa Radio 868MHz](https://www.dfrobot.com/product-1831.html) | FireBeetle-ESP32 |  DFROBOT_FIREBEETLE_ESP32 & DFROBOT_COVER_LORA | SX1276 (LoRa1276) | Wiring on the cover: <br>D2 to RESET<br>D3 to DIO0<br>D4 to CS<br>D5 to DIO1 |
   |  :hourglass:  | [Adafruit Feather ESP32S2 with Adafruit LoRa Radio FeatherWing](https://github.com/matthias-bs/BresserWeatherSensorReceiver#adafruit-feather-esp32s2-with-adafruit-lora-radio-featherwing)                                | Adafruit Feather ESP32-S2 | FEATHER_ESP32S2   | SX1276 (RFM95W) | **No Bluetooth available!**<br>Wiring on the Featherwing:<br>E to IRQ<br>D to CS<br>C to RST<br>A to DI01 |
@@ -167,7 +169,7 @@ See [Parameters](#parameters) for more details.
 :white_check_mark: &mdash; confirmed
 
 > [!Note]
-> See [Board_Pin_Definitions.md](docs/Board_Pin_Defnitions.md) for predefined board specific pinouts.
+> See [Board_Pin_Definitions.md](docs/Board_Pin_Definitions.md) for predefined board specific pinouts.
 
 ### Predefined Board Configurations
 
