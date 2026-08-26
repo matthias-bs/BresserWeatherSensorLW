@@ -177,8 +177,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     encoder.writeUint8(status);
     #if defined(ARDUINO_ESP32S3_POWERFEATHER)
     Result res;
-    uint16_t voltage;
-    int16_t current;
+    float voltage;
+    float current;
     uint8_t battery_soc;
     uint8_t battery_soh;
     uint16_t battery_cycles;
@@ -188,7 +188,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyVoltage(voltage);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(voltage);
+      encoder.writeUint16(static_cast<uint16_t>(voltage * 1000.0f + 0.5f));
     }
     else
     {
@@ -198,7 +198,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(current + 0x8000);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current + (current >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {
@@ -208,7 +208,7 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getBatteryCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(current + 0x8000);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current + (current >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {

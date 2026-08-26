@@ -92,6 +92,12 @@
 
 #include <stdint.h>
 
+// The ESP32 core uses a distinct marker for the PowerFeather V2 board.
+// Keep the existing project board paths enabled for both revisions.
+#if defined(ARDUINO_ESP32S3_POWERFEATHER_V2) && !defined(ARDUINO_ESP32S3_POWERFEATHER)
+#define ARDUINO_ESP32S3_POWERFEATHER
+#endif
+
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"
 // For other architectures than ESP32, see logging.h

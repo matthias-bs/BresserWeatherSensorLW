@@ -564,14 +564,14 @@ void SystemContext::setupPowerFeather(struct sPowerFeatherCfg &cfg)
   Board.enableBatteryFuelGauge(cfg.battery_fuel_gauge);      // Enable battery fuel gauge
   if (cfg.supply_maintain_voltage)
   {
-    Board.setSupplyMaintainVoltage(cfg.supply_maintain_voltage); // Set supply maintain voltage
+    Board.setSupplyMaintainVoltage(cfg.supply_maintain_voltage / 1000.0f); // Set supply maintain voltage
   }
   Board.enableBatteryCharging(true);                          // Enable battery charging
-  Board.setBatteryChargingMaxCurrent(cfg.max_charge_current); // Set max charging current
+  Board.setBatteryChargingMaxCurrent(static_cast<float>(cfg.max_charge_current)); // Set max charging current
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-  int16_t current;
+  float current;
   Board.getBatteryCurrent(current);
-  log_d("Battery current: %d mA", current);
+  log_d("Battery current: %.1f mA", current);
 #endif
 }
 #endif // defined(ARDUINO_ESP32S3_POWERFEATHER)

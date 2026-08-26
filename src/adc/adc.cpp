@@ -52,6 +52,19 @@
 #include "adc.h"
 #include "../logging.h"
 
+static uint16_t powerFeatherVoltageToMillivolts(float voltage)
+{
+  if (voltage <= 0.0f)
+  {
+    return 0;
+  }
+  if (voltage >= 65.535f)
+  {
+    return UINT16_MAX;
+  }
+  return static_cast<uint16_t>(voltage * 1000.0f + 0.5f);
+}
+
 #if defined(ARDUINO_M5STACK_CORE2)
 #include <M5Unified.h>
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -117,12 +130,13 @@ uint16_t getBatteryVoltage(void)
 
 #elif defined(ARDUINO_ESP32S3_POWERFEATHER)
   // battery monitoring chip
-  uint16_t voltage;
+  float voltage;
   Result res = Board.getBatteryVoltage(voltage);
   if (res == Result::Ok)
   {
-    log_d("Voltage = %dmV", voltage);
-    return voltage;
+    uint16_t voltage_mV = powerFeatherVoltageToMillivolts(voltage);
+    log_d("Voltage = %dmV", voltage_mV);
+    return voltage_mV;
   }
   else
   {
@@ -139,12 +153,13 @@ uint16_t getBatteryVoltage(void)
 uint16_t getSupplyVoltage(void)
 {
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
-  uint16_t voltage;
+  float voltage;
   Result res = Board.getSupplyVoltage(voltage);
   if (res == Result::Ok)
   {
-    log_d("Voltage = %dmV", voltage);
-    return voltage;
+    uint16_t voltage_mV = powerFeatherVoltageToMillivolts(voltage);
+    log_d("Voltage = %dmV", voltage_mV);
+    return voltage_mV;
   }
   else
   {
