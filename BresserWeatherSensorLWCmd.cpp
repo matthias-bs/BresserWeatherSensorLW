@@ -54,7 +54,6 @@
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
 #include <RadioLib.h>
-#include <cmath>
 #include "src/AppLayer.h"
 #include "src/SystemContext.h"
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
