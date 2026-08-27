@@ -49,6 +49,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
@@ -189,7 +190,11 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyVoltage(voltage);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(static_cast<uint16_t>(voltage * 1000.0f + 0.5f));
+      float voltage_mv = voltage * 1000.0f + 0.5f;
+      uint16_t voltage_raw = (!std::isnan(voltage_mv) && voltage_mv >= 0.0f && voltage_mv <= 65534.0f)
+          ? static_cast<uint16_t>(voltage_mv)
+          : INV_UINT16;
+      encoder.writeUint16(voltage_raw);
     }
     else
     {
