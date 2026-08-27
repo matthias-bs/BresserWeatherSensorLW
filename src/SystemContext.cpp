@@ -13,7 +13,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,7 @@
 // 20251031 Added M5Stack configuration for power saving
 //          Added M5Stack RTC integration
 // 20260304 Added gpsPower() and getGPSData() for GPS time sync
+// 20260826 Updated to powerfeather-sdk v2.1.4 (modified voltage/current API)
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -564,14 +565,14 @@ void SystemContext::setupPowerFeather(struct sPowerFeatherCfg &cfg)
   Board.enableBatteryFuelGauge(cfg.battery_fuel_gauge);      // Enable battery fuel gauge
   if (cfg.supply_maintain_voltage)
   {
-    Board.setSupplyMaintainVoltage(cfg.supply_maintain_voltage); // Set supply maintain voltage
+    Board.setSupplyMaintainVoltage(cfg.supply_maintain_voltage / 1000.0f); // Set supply maintain voltage
   }
   Board.enableBatteryCharging(true);                          // Enable battery charging
-  Board.setBatteryChargingMaxCurrent(cfg.max_charge_current); // Set max charging current
+  Board.setBatteryChargingMaxCurrent(static_cast<float>(cfg.max_charge_current)); // Set max charging current
 #if CORE_DEBUG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-  int16_t current;
+  float current;
   Board.getBatteryCurrent(current);
-  log_d("Battery current: %d mA", current);
+  log_d("Battery current: %.1f mA", current);
 #endif
 }
 #endif // defined(ARDUINO_ESP32S3_POWERFEATHER)

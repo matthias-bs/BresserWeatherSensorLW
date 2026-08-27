@@ -13,7 +13,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2025 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,8 +79,11 @@
 // 20251018 Added SOC_CRITICAL
 // 20260304 Added synchronization of RTC with GPS time (optional)
 //          Added SERIAL2_LOG definitions
-// 20260515 Added ADC configuration for Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3:
-//          PIN_ADC_IN A0, ADC_CTRL GPIO37, ADC_CTRL_ENABLED polarity (LOW for V3/WSL3, HIGH for V4)
+// 20260515 Added ADC configuration for Heltec WiFi LoRa 32(V4) and
+//          Wireless Stick Lite V3:
+//          PIN_ADC_IN A0, ADC_CTRL GPIO37, ADC_CTRL_ENABLED polarity
+//          (LOW for V3/WSL3, HIGH for V4)
+// 20260826 Added ARDUINO_ESP32S3_POWERFEATHER_V2
 //
 // ToDo:
 // -
@@ -91,6 +94,12 @@
 #define _LWCFG_H
 
 #include <stdint.h>
+
+// The ESP32 core uses a distinct marker for the PowerFeather V2 board.
+// Keep the existing project board paths enabled for both revisions.
+#if defined(ARDUINO_ESP32S3_POWERFEATHER_V2) && !defined(ARDUINO_ESP32S3_POWERFEATHER)
+#define ARDUINO_ESP32S3_POWERFEATHER
+#endif
 
 // Enable debug mode (debug messages via serial port)
 // Arduino IDE: Tools->Core Debug Level: "Debug|Verbose"

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// BresserWeatherSensorLWCmd.h
+// BresserWeatherSensorLWCmd.cpp
 //
 // LoRaWAN Command Interface
 //
@@ -11,7 +11,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,12 +42,14 @@
 // 20241227 Removed delay from encodeCfgUplink()
 // 20250806 Refactored by adding SystemContext class,
 //          replaced getLocalEpoch() (ESP32Time) with time() (POSIX)
+// 20260826 Updated to powerfeather-sdk v2.1.4 (modified voltage/current API)
 //
 // ToDo:
 // -
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
 #include "BresserWeatherSensorLWCfg.h"
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
@@ -177,8 +179,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     encoder.writeUint8(status);
     #if defined(ARDUINO_ESP32S3_POWERFEATHER)
     Result res;
-    uint16_t voltage;
-    int16_t current;
+    float voltage;
+    float current;
     uint8_t battery_soc;
     uint8_t battery_soh;
     uint16_t battery_cycles;
@@ -188,7 +190,11 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyVoltage(voltage);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(voltage);
+      float voltage_mv = voltage * 1000.0f + 0.5f;
+      uint16_t voltage_raw = (!std::isnan(voltage_mv) && voltage_mv >= 0.0f && voltage_mv <= 65534.0f)
+          ? static_cast<uint16_t>(voltage_mv)
+          : INV_UINT16;
+      encoder.writeUint16(voltage_raw);
     }
     else
     {
@@ -198,7 +204,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(current + 0x8000);
+      float current_clamped = (std::isnan(current) || current < -32768.0f) ? -32768.0f : (current > 32767.0f ? 32767.0f : current);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current_clamped + (current_clamped >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {
@@ -208,7 +215,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getBatteryCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(current + 0x8000);
+      float current_clamped = (std::isnan(current) || current < -32768.0f) ? -32768.0f : (current > 32767.0f ? 32767.0f : current);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current_clamped + (current_clamped >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {
