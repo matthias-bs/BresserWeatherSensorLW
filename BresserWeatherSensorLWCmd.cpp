@@ -54,6 +54,7 @@
 #include "BresserWeatherSensorLWCmd.h"
 #include <Preferences.h>
 #include <RadioLib.h>
+#include <cmath>
 #include "src/AppLayer.h"
 #include "src/SystemContext.h"
 #if defined(ARDUINO_ESP32S3_POWERFEATHER)
@@ -204,7 +205,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getSupplyCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current + (current >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
+      float current_clamped = (std::isnan(current) || current < -32768.0f) ? -32768.0f : (current > 32767.0f ? 32767.0f : current);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current_clamped + (current_clamped >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {
@@ -214,7 +216,8 @@ void encodeCfgUplink(uint8_t port, uint8_t *uplinkPayload, uint8_t &payloadSize)
     res = Board.getBatteryCurrent(current);
     if (res == Result::Ok)
     {
-      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current + (current >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
+      float current_clamped = (std::isnan(current) || current < -32768.0f) ? -32768.0f : (current > 32767.0f ? 32767.0f : current);
+      encoder.writeUint16(static_cast<uint16_t>(static_cast<int32_t>(current_clamped + (current_clamped >= 0.0f ? 0.5f : -0.5f)) + 0x8000));
     }
     else
     {
