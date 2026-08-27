@@ -52,10 +52,11 @@
 
 #include "adc.h"
 #include "../logging.h"
+#include <cmath>
 
 static uint16_t powerFeatherVoltageToMillivolts(float voltage)
 {
-  if (voltage <= 0.0f)
+  if (std::isnan(voltage) || voltage <= 0.0f)
   {
     return 0;
   }
