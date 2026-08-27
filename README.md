@@ -861,18 +861,18 @@ The following parameters are available:
 | battery_discharge_lim | Discharging voltage limit in mV<br>for battery level estimation         | `3200` |
 | battery_charge_lim    | Charging voltage limit in mV<br>for battery level estimation            | `4200` |
 | powerfeather/         | PowerFeather specific (see [https://docs.powerfeather.dev](https://docs.powerfeather.dev)) |   |
-| &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected)<br>see [PowerFeather Docs: `init()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-inituint16_t-capacity--0-batterytype-type--batterytypegeneric_3v7) | `0`    |
+| &nbsp;&nbsp;battery_capacity      | Battery capacity in mAh<br>(`0`: no battery connected)<br>see [PowerFeather Docs: `init()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-inituint16_t-capacity--0-batterytype-type--batterytypegeneric_3v7) | `2200`    |
 | &nbsp;&nbsp;supply_maintain_voltage | see [PowerFeather Docs: `setSupplyMaintainVoltage()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setsupplymaintainvoltageuint16_t-voltage)<br>`0`: not set | `0` |
-| &nbsp;&nbsp;max_charge_current | see [PowerFeather Docs: `setBatteryChargingMaxCurrent()`](https://docs.powerfeather.dev/sdk/api/mainboard##result-setbatterychargingmaxcurrentuint16_t-current) | `50` |
-| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `20` |
-| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `25` |
-| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `5` |
+| &nbsp;&nbsp;max_charge_current | see [PowerFeather Docs: `setBatteryChargingMaxCurrent()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-setbatterychargingmaxcurrentuint16_t-current) | `50` |
+| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `20` |
+| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `25` |
+| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `3` |
 | &nbsp;&nbsp;temperature_measurement | see [PowerFeather Docs: `enableBatteryTempSense()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatterytempsensebool-enable) | `true` |
 | &nbsp;&nbsp;battery_fuel_gauge      | see [PowerFeather Docs: `enableBatteryFuelGauge()`](https://docs.powerfeather.dev/sdk/api/mainboard#result-enablebatteryfuelgaugebool-enable) | `true` |
 | m5stack/         | M5Stack specific (see [https://docs.m5stack.com/en/arduino/m5unified/power_class](https://docs.m5stack.com/en/arduino/m5unified/power_class)) |   |
-| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `20` |
-| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `25` |
-| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `5` |
+| &nbsp;&nbsp;soc_eco_enter | SOC threshold in % for entering eco mode<br>(long sleep interval) | `20` |
+| &nbsp;&nbsp;soc_eco_exit  | SOC threshold in % for leaving eco mode<br>(long sleep interval)  | `25` |
+| &nbsp;&nbsp;soc_critical  | SOC threshold in % for deep-discharge protection<br>(power off) | `3` |
 
 Modify the example [data/node_config.json](data/node_config.json) as required and install it to the board's Flash memory using [earlephilhower/arduino-littlefs-upload](https://github.com/earlephilhower/arduino-littlefs-upload).
 
