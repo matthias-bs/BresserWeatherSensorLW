@@ -8,7 +8,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,7 @@
 // 20241203 Fixed getVoltage(): use parameter 'pin' instead of PIN_ADC_IN
 // 20250317 Removed ARDUINO_heltec_wifi_lora_32_V3 and ARDUINO_M5STACK_Core2 (now all uppercase)
 // 20260515 Added getBatteryVoltage() support for Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3
+// 20260826 Updated to powerfeather-sdk v2.1.4 (modified voltage/current API)
 //
 // ToDo:
 // -

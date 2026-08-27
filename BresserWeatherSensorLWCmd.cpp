@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// BresserWeatherSensorLWCmd.h
+// BresserWeatherSensorLWCmd.cpp
 //
 // LoRaWAN Command Interface
 //
@@ -11,7 +11,7 @@
 //
 // MIT License
 //
-// Copyright (c) 2024 Matthias Prinke
+// Copyright (c) 2026 Matthias Prinke
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,7 @@
 // 20241227 Removed delay from encodeCfgUplink()
 // 20250806 Refactored by adding SystemContext class,
 //          replaced getLocalEpoch() (ESP32Time) with time() (POSIX)
+// 20260826 Updated to powerfeather-sdk v2.1.4 (modified voltage/current API)
 //
 // ToDo:
 // -
