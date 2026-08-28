@@ -854,7 +854,7 @@ The following parameters are available:
 
 | Parameter             | Description | Default Value |
 | --------------------- | ----------------------------------------------------------------------- | -------------:|
-| timezone              | Time Zone<br>see [Time Zone Abbreviations](https://remotemonitoringsystems.ca/time-zone-abbreviations.php) | `"CET-1CEST-2,M3.5.0/02:00:00,`<br>M10.5.0/03:00:00"` |
+| timezone              | Time Zone<br>see [Time Zone Abbreviations](https://remotemonitoringsystems.ca/time-zone-abbreviations.php) | `"CET-1CEST-2,M3.5.0/02:00:00,`<br>`M10.5.0/03:00:00"`  |
 | voltage_eco_exit      | Voltage threshold in mV for leaving eco mode<br>(long sleep interval)  | `3580` |
 | voltage_eco_enter     | Voltage threshold in mV for entering eco mode<br>(long sleep interval)  | `3500` |
 | voltage_critical      | Voltage threshold in mV for deep-discharge protection<br>(power off)    | `3200` |
