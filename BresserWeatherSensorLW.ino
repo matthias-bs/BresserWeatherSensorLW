@@ -670,9 +670,9 @@ void setup()
     }
 
     uint32_t networkTime = 0;
-    uint16_t milliseconds = 0;
-    if (node.getMacDeviceTimeAns(&networkTime, &milliseconds, true) == RADIOLIB_ERR_NONE)
+    #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
       uint16_t milliseconds = 0;
+    #endif
     if (node.getMacDeviceTimeAns(&networkTime, &milliseconds, true) == RADIOLIB_ERR_NONE)
     {
       log_i("[LoRaWAN] DeviceTime Unix:\t %ld", networkTime);
