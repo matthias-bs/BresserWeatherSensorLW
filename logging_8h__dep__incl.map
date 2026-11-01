@@ -1,32 +1,32 @@
 <map id="src/logging.h" name="src/logging.h">
-<area shape="rect" id="Node000001" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="389,5,495,31"/>
-<area shape="rect" id="Node000002" href="$_load_node_cfg_8h.html" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="95,79,239,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="385,37,212,81,211,76,384,32"/>
-<area shape="rect" id="Node000003" href="$_system_context_8cpp.html" title="System context for BresserWeatherSensorLW." alt="" coords="5,225,177,251"/>
-<area shape="poly" id="edge18_Node000001_Node000003" title=" " alt="" coords="375,23,296,27,209,37,132,54,104,66,85,80,75,97,69,116,69,157,78,195,88,224,83,226,73,197,64,157,64,115,70,95,81,77,101,62,131,49,208,32,295,22,375,18"/>
-<area shape="rect" id="Node000004" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="133,152,290,177"/>
-<area shape="poly" id="edge19_Node000001_Node000004" title=" " alt="" coords="398,38,354,57,310,81,261,119,224,154,221,150,257,115,307,76,352,52,396,33"/>
-<area shape="rect" id="Node000006" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="253,225,409,251"/>
-<area shape="poly" id="edge13_Node000001_Node000006" title=" " alt="" coords="426,43,390,92,355,153,342,192,336,226,330,225,337,191,350,151,385,89,421,40"/>
-<area shape="rect" id="Node000007" href="$_load_secrets_8h.html" title="Load LoRaWAN secrets from file &#39;secrets.json&#39; on LittleFS, if available." alt="" coords="918,79,1054,104"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="509,25,906,76,918,78,918,83,906,81,508,30"/>
-<area shape="rect" id="Node000008" href="$_payload_analog_8h.html" title="LoRaWAN node application layer &#45; analog channels." alt="" coords="365,152,519,177"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="445,45,445,152,439,152,439,45"/>
-<area shape="rect" id="Node000009" href="$_payload_b_l_e_8h.html" title="LoRaWAN node application layer &#45; BLE sensors." alt="" coords="543,152,675,177"/>
-<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="468,38,597,150,594,154,464,42"/>
-<area shape="rect" id="Node000010" href="$_payload_digital_8h.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="596,225,747,251"/>
-<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="507,32,555,48,606,73,653,107,673,127,690,151,696,170,694,191,681,226,676,224,689,190,690,171,685,153,669,131,649,111,603,78,553,53,506,37"/>
-<area shape="rect" id="Node000011" href="$_payload_one_wire_8h.html" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="729,79,893,104"/>
-<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="509,29,752,76,751,81,508,35"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="150,116,123,153,106,192,97,226,91,224,101,191,118,151,145,113"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="184,114,206,150,202,153,180,117"/>
-<area shape="poly" id="edge7_Node000004_Node000003" title=" " alt="" coords="181,187,112,227,110,223,179,182"/>
-<area shape="rect" id="Node000005" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="471,299,589,324"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="216,191,224,222,232,236,242,249,258,259,281,268,341,283,471,302,471,307,340,288,280,273,256,264,239,253,227,239,219,224,211,192"/>
-<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="244,182,313,223,310,227,241,187"/>
-<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="377,253,498,296,497,301,375,258"/>
-<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="458,188,525,297,521,300,454,191"/>
-<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="598,191,539,300,534,297,593,188"/>
-<area shape="poly" id="edge15_Node000010_Node000005" title=" " alt="" coords="638,259,554,301,552,296,635,254"/>
-<area shape="poly" id="edge17_Node000011_Node000005" title=" " alt="" coords="813,118,809,149,800,185,785,221,761,253,722,280,677,298,631,308,589,312,588,307,630,303,675,293,719,275,757,249,780,219,795,183,804,148,808,117"/>
+<area shape="rect" id="Node000001" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="387,5,491,33"/>
+<area shape="rect" id="Node000002" href="$_load_node_cfg_8h.html" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="94,81,237,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="374,39,216,83,213,78,377,36"/>
+<area shape="rect" id="Node000003" href="$_system_context_8cpp.html" title="System context for BresserWeatherSensorLW." alt="" coords="5,232,177,260"/>
+<area shape="poly" id="edge18_Node000001_Node000003" title=" " alt="" coords="369,23,292,29,206,39,130,57,102,69,84,83,73,100,67,119,67,161,76,201,88,232,82,232,71,202,62,162,62,118,68,98,80,79,99,64,128,52,205,34,292,24,374,21"/>
+<area shape="rect" id="Node000004" href="$_system_context_8h.html" title="System context for BresserWeatherSensorLW." alt="" coords="132,157,288,184"/>
+<area shape="poly" id="edge19_Node000001_Node000004" title=" " alt="" coords="387,41,349,60,308,83,260,122,223,158,219,154,256,118,306,79,347,55,391,38"/>
+<area shape="rect" id="Node000006" href="$_payload_bresser_8h.html" title="LoRaWAN node application layer &#45; Bresser sensors." alt="" coords="251,232,406,260"/>
+<area shape="poly" id="edge13_Node000001_Node000006" title=" " alt="" coords="421,44,387,97,353,158,340,198,332,233,328,230,335,197,349,156,382,94,417,47"/>
+<area shape="rect" id="Node000007" href="$_load_secrets_8h.html" title="Load LoRaWAN secrets from file &#39;secrets.json&#39; on LittleFS, if available." alt="" coords="911,81,1047,109"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="507,26,899,78,914,83,908,83,899,84,507,32"/>
+<area shape="rect" id="Node000008" href="$_payload_analog_8h.html" title="LoRaWAN node application layer &#45; analog channels." alt="" coords="363,157,515,184"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="441,46,441,157,437,155,437,50"/>
+<area shape="rect" id="Node000009" href="$_payload_b_l_e_8h.html" title="LoRaWAN node application layer &#45; BLE sensors." alt="" coords="539,157,670,184"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="465,41,592,156,587,156,463,46"/>
+<area shape="rect" id="Node000010" href="$_payload_digital_8h.html" title="LoRaWAN node application layer &#45; digital channels." alt="" coords="592,232,742,260"/>
+<area shape="poly" id="edge14_Node000001_Node000010" title=" " alt="" coords="506,35,554,53,603,78,648,112,668,132,684,155,690,176,689,197,676,234,672,230,684,196,685,176,679,158,664,136,645,116,600,82,552,58,506,40"/>
+<area shape="rect" id="Node000011" href="$_payload_one_wire_8h.html" title="LoRaWAN node application layer &#45; 1&#45;Wire sensors." alt="" coords="724,81,887,109"/>
+<area shape="poly" id="edge16_Node000001_Node000011" title=" " alt="" coords="506,31,742,79,737,81,506,37"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="142,123,121,158,105,198,96,233,91,231,100,196,117,155,145,118"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="182,120,205,156,199,156,181,125"/>
+<area shape="poly" id="edge7_Node000004_Node000003" title=" " alt="" coords="174,195,114,234,111,230,178,191"/>
+<area shape="rect" id="Node000005" href="$_app_layer_8h.html" title="LoRaWAN node application layer." alt="" coords="468,308,584,336"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="213,197,223,230,230,245,241,258,257,268,279,277,338,293,470,315,464,315,337,298,277,282,254,273,237,262,226,248,218,232,210,202"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="244,190,310,232,305,232,243,195"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="378,263,493,307,488,308,377,268"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="455,195,521,308,515,307,452,200"/>
+<area shape="poly" id="edge12_Node000009_Node000005" title=" " alt="" coords="593,197,534,309,531,305,588,199"/>
+<area shape="poly" id="edge15_Node000010_Node000005" title=" " alt="" coords="631,267,552,310,550,305,626,268"/>
+<area shape="poly" id="edge17_Node000011_Node000005" title=" " alt="" coords="807,122,804,156,795,193,780,230,756,262,716,290,672,307,626,318,584,323,584,317,625,313,670,302,714,285,752,258,775,227,790,191,798,155,803,126"/>
 </map>

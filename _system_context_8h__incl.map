@@ -1,27 +1,27 @@
 <map id="src/SystemContext.h" name="src/SystemContext.h">
-<area shape="rect" id="Node000001" title="System context for BresserWeatherSensorLW." alt="" coords="514,5,671,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="223,159,307,185"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="553,33,491,54,422,81,352,118,294,154,291,149,349,113,420,76,489,49,552,28"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="681,79,745,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="613,28,682,69,680,74,611,33"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="769,79,880,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="631,28,775,72,773,77,629,33"/>
-<area shape="rect" id="Node000005" title=" " alt="" coords="574,159,809,185"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="598,30,608,64,627,103,647,127,668,149,665,152,643,131,622,105,603,66,593,32"/>
-<area shape="rect" id="Node000006" href="$_load_node_cfg_8h.html" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="433,79,555,104"/>
-<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="578,33,523,73,520,68,575,29"/>
-<area shape="rect" id="Node000009" href="$logging_8h.html" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="833,159,915,185"/>
-<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="602,29,629,65,649,85,670,102,709,122,742,131,778,138,821,149,830,152,828,157,820,155,776,143,741,137,707,127,667,106,645,89,625,69,598,33"/>
-<area shape="rect" id="Node000010" href="$adc_8h.html" title="ADC wrapper/convenience functions." alt="" coords="223,79,307,104"/>
-<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="541,33,321,81,320,75,539,28"/>
-<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="461,107,320,155,312,157,310,152,318,149,460,102"/>
-<area shape="poly" id="edge9_Node000006_Node000005" title=" " alt="" coords="524,102,651,152,649,157,522,106"/>
-<area shape="rect" id="Node000007" title=" " alt="" coords="331,159,414,185"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="478,106,403,154,400,150,475,102"/>
-<area shape="rect" id="Node000008" title=" " alt="" coords="439,159,549,185"/>
-<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="497,104,497,145,491,145,491,104"/>
-<area shape="poly" id="edge10_Node000006_Node000009" title=" " alt="" coords="555,98,679,118,821,149,832,152,830,157,820,155,678,124,554,103"/>
-<area shape="poly" id="edge12_Node000010_Node000002" title=" " alt="" coords="267,104,267,145,262,145,262,104"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="5,152,199,192"/>
-<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="242,106,155,148,152,144,240,102"/>
+<area shape="rect" id="Node000001" title="System context for BresserWeatherSensorLW." alt="" coords="509,5,665,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="221,165,304,193"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="544,33,483,56,419,83,351,121,294,159,292,154,348,117,416,79,481,51,539,34"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="675,81,738,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="609,31,675,73,670,73,608,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="762,81,873,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="628,31,764,76,759,76,628,36"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="569,165,802,193"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="591,31,603,67,621,107,640,132,661,156,656,154,636,135,617,110,598,69,588,35"/>
+<area shape="rect" id="Node000006" href="$_load_node_cfg_8h.html" title="Load LoRaWAN node configuration &#39;node_config.json&#39; from LittleFS, if available." alt="" coords="429,81,550,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="572,32,520,74,517,69,567,35"/>
+<area shape="rect" id="Node000009" href="$logging_8h.html" title="Replacement for esp32&#45;hal&#45;log.h on RP20240." alt="" coords="826,165,908,193"/>
+<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="596,31,624,69,643,89,664,106,703,127,737,136,772,142,816,154,825,160,819,159,814,159,771,147,735,141,701,132,661,111,639,93,620,72,593,36"/>
+<area shape="rect" id="Node000010" href="$adc_8h.html" title="ADC wrapper/convenience functions." alt="" coords="221,81,304,109"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="526,35,320,83,319,78,531,33"/>
+<area shape="poly" id="edge6_Node000006_Node000002" title=" " alt="" coords="454,109,318,159,311,162,310,157,317,154,449,110"/>
+<area shape="poly" id="edge9_Node000006_Node000005" title=" " alt="" coords="522,107,643,159,638,159,520,112"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="329,165,410,193"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="473,108,402,158,400,154,468,110"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="434,165,545,193"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="491,107,492,151,487,148,488,111"/>
+<area shape="poly" id="edge10_Node000006_Node000009" title=" " alt="" coords="550,101,674,121,816,154,826,160,821,159,814,159,673,126,550,106"/>
+<area shape="poly" id="edge12_Node000010_Node000002" title=" " alt="" coords="265,107,265,151,261,148,261,111"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="5,157,198,201"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="239,108,159,152,157,147,234,110"/>
 </map>

@@ -1,7 +1,7 @@
 <map id="src/adc/adc.h" name="src/adc/adc.h">
-<area shape="rect" id="Node000001" title="ADC wrapper/convenience functions." alt="" coords="75,5,182,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,86,89,111"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,33,71,78,67,75,115,29"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="113,79,307,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,29,183,67,179,71,139,33"/>
+<area shape="rect" id="Node000001" title="ADC wrapper/convenience functions." alt="" coords="74,5,180,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,90,89,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,32,72,80,68,77,112,35"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="112,81,304,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="141,31,179,70,173,70,139,36"/>
 </map>

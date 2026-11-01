@@ -1,0 +1,7 @@
+<map id="SystemContext::getVoltages" name="SystemContext::getVoltages">
+<area shape="rect" id="Node000001" title="Get the voltages from ADC / Power Management Chip." alt="" coords="5,32,212,60"/>
+<area shape="rect" id="Node000002" href="$adc_8cpp.html#af061f9227da53b913518a7719997c0e9" title="Get battery voltage." alt="" coords="260,5,399,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,31,247,29,241,30,212,36"/>
+<area shape="rect" id="Node000003" href="$adc_8cpp.html#a4a4d84c3e5cd589b99100c472fbcdc29" title="Get supply voltage." alt="" coords="262,57,397,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,55,249,62,244,62,212,60"/>
+</map>

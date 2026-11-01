@@ -1,0 +1,7 @@
+<map id="PayloadAnalog::encodeAnalog" name="PayloadAnalog::encodeAnalog">
+<area shape="rect" id="Node000001" title="Encode analog data channels for LoRaWAN transmission." alt="" coords="5,32,223,60"/>
+<area shape="rect" id="Node000002" href="$adc_8cpp.html#af061f9227da53b913518a7719997c0e9" title="Get battery voltage." alt="" coords="271,5,410,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,30,258,29,253,30,224,36"/>
+<area shape="rect" id="Node000003" href="$adc_8cpp.html#a4a4d84c3e5cd589b99100c472fbcdc29" title="Get supply voltage." alt="" coords="273,57,408,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,55,260,62,255,62,223,61"/>
+</map>
