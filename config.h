@@ -427,7 +427,11 @@ void customDelay(RadioLibTime_t ms) {
     ESP_ERROR_CHECK(gpio_wakeup_enable(static_cast<gpio_num_t>(RADIO_IRQ_PIN), GPIO_INTR_HIGH_LEVEL));
     ESP_ERROR_CHECK(esp_sleep_enable_gpio_wakeup());
     ESP_ERROR_CHECK(esp_sleep_enable_timer_wakeup(sleepDelayUs));
-    ESP_ERROR_CHECK(esp_light_sleep_start());
+    const esp_err_t sleepResult = esp_light_sleep_start();
+    if (sleepResult == ESP_ERR_SLEEP_REJECT) {
+        return;
+    }
+    ESP_ERROR_CHECK(sleepResult);
 
     if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_GPIO) {
         return;
