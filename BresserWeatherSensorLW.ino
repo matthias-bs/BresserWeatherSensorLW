@@ -388,20 +388,24 @@ int16_t lwActivate(LoRaWANNode &node)
   if (hasPersistence)
   {
     node.setCallbackRestorePersistence(restoreLoRaWANPersistence);
-    if (!sysCtx.isFirstBoot())
-    {
-      node.setCallbackRestoreSession(restoreLoRaWANSession);
-    }
   }
 
   state = node.loadBuffers();
-  if (state == RADIOLIB_ERR_SESSION_DISCARDED)
+  debug(state != RADIOLIB_ERR_NONE, "Restoring LoRaWAN persistence failed", state, true);
+
+  if (hasPersistence && !sysCtx.isFirstBoot())
   {
-    log_w("Stored LoRaWAN session was discarded; starting a new OTAA session");
-  }
-  else
-  {
-    debug(state != RADIOLIB_ERR_NONE, "Restoring LoRaWAN persistence failed", state, true);
+    node.setCallbackRestorePersistence(nullptr);
+    node.setCallbackRestoreSession(restoreLoRaWANSession);
+    state = node.loadBuffers();
+    if (state == RADIOLIB_ERR_SESSION_DISCARDED || state == RADIOLIB_ERR_CHECKSUM_MISMATCH)
+    {
+      log_w("Stored LoRaWAN session was invalid or discarded; starting a new OTAA session");
+    }
+    else
+    {
+      debug(state != RADIOLIB_ERR_NONE, "Restoring LoRaWAN session failed", state, true);
+    }
   }
 
   // If a session was restored, activateOTAA returns without transmitting a new join request.
