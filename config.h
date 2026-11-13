@@ -50,6 +50,7 @@
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
 // 20260116 Added Seeed Studio XIAO ESP32S3 with Wio-SX1262
 // 20260515 Added Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3
+// 20261113 Added radio IRQ as an additional ESP32 custom-delay wake source
 //
 // ToDo:
 // - 
@@ -63,6 +64,12 @@
 #include "secrets.h"
 #include "BresserWeatherSensorLWCfg.h"
 #include "WeatherSensorCfg.h"
+#if defined(ESP32)
+#include <driver/gpio.h>
+#include <esp_err.h>
+#include <esp_sleep.h>
+#include <esp_timer.h>
+#endif
 
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
@@ -384,6 +391,12 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #define LORA_CHIP RADIO_CHIP
 #endif
 
+#if defined(RADIO_CHIP)
+  #define RADIO_IRQ_PIN PIN_RECEIVER_IRQ
+#else
+  #define RADIO_IRQ_PIN PIN_LORA_IRQ
+#endif
+
 // Copy over the EUI's & keys in to the something that will not compile if incorrectly formatted
 uint64_t joinEUI =   RADIOLIB_LORAWAN_JOIN_EUI;
 uint64_t devEUI  =   RADIOLIB_LORAWAN_DEV_EUI;
@@ -400,19 +413,60 @@ uint8_t nwkKey[] = { 0 };
 // which will waste a lot of power. However, you can put your
 // microcontroller to sleep instead by customizing the function below,
 // and providing it to RadioLib via "node.setSleepFunction".
-// Note:
-// Implementation from
-// https://github.com/jgromes/RadioLib/discussions/1401#discussioncomment-12080631
 #if defined(ESP32)
 void customDelay(RadioLibTime_t ms) {
-    uint64_t start = millis();
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-    esp_sleep_enable_timer_wakeup((ms-2)*(uint64_t)1000);
-    esp_light_sleep_start();
+    if (ms == 0) {
+        return;
+    }
 
-    if(millis() < start + ms) {
-	    // if there's still some time left, do normal delay for remainder
-      vTaskDelay((start + ms - millis())/portTICK_PERIOD_MS);
+    const int64_t start = esp_timer_get_time();
+    const uint64_t requestedDelayUs = static_cast<uint64_t>(ms) * 1000ULL;
+    const uint64_t sleepDelayUs =
+        (ms > 2) ? static_cast<uint64_t>(ms - 2) * 1000ULL : requestedDelayUs;
+    constexpr uint64_t MIN_LIGHT_SLEEP_TIME_US = 10000ULL;
+
+    const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
+    // RadioLib installs the radio IRQ as a rising-edge interrupt.
+    const gpio_int_type_t radioIrqType = GPIO_INTR_POSEDGE;
+    const auto waitForDelayOrIrq = [&]() {
+        while (static_cast<uint64_t>(esp_timer_get_time() - start) < requestedDelayUs &&
+               gpio_get_level(radioIrqPin) == 0) {
+        }
+    };
+    if (sleepDelayUs < MIN_LIGHT_SLEEP_TIME_US) {
+        waitForDelayOrIrq();
+        return;
+    }
+
+    const auto restoreRadioIrq = [&]() {
+        ESP_ERROR_CHECK(gpio_set_intr_type(radioIrqPin, radioIrqType));
+        ESP_ERROR_CHECK(gpio_intr_enable(radioIrqPin));
+    };
+    const auto checkSleepError = [&restoreRadioIrq](esp_err_t error) {
+        if (error != ESP_OK) {
+            restoreRadioIrq();
+            ESP_ERROR_CHECK(error);
+        }
+    };
+    const auto sleepFor = [&](uint64_t delayUs) {
+        checkSleepError(gpio_intr_disable(radioIrqPin));
+        checkSleepError(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
+        checkSleepError(gpio_wakeup_enable(radioIrqPin, GPIO_INTR_HIGH_LEVEL));
+        checkSleepError(esp_sleep_enable_gpio_wakeup());
+        checkSleepError(esp_sleep_enable_timer_wakeup(delayUs));
+        const esp_err_t result = esp_light_sleep_start();
+        restoreRadioIrq();
+        return result;
+    };
+
+    const esp_err_t sleepResult = sleepFor(sleepDelayUs);
+    if (sleepResult == ESP_ERR_SLEEP_REJECT) {
+        return;
+    }
+    ESP_ERROR_CHECK(sleepResult);
+
+    if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_GPIO) {
+        waitForDelayOrIrq();
     }
 }
 #endif

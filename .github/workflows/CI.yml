@@ -79,8 +79,8 @@ jobs:
           |
           #declare -a required_libs=("https://github.com/matthias-bs/BresserWeatherSensorReceiver.git"
           declare -a required_libs=(
-            "BresserWeatherSensorReceiver@0.42.0"
-            "RadioLib@7.8.1"
+            "BresserWeatherSensorReceiver@0.44.0"
+            "RadioLib@8.0.0"
             "LoRa Serialization@3.3.1"
             "OneWireNg@0.14.1"
             "DallasTemperature@4.0.6"

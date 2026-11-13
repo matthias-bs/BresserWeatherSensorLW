@@ -54,8 +54,8 @@ BresserWeatherSensorLW is a LoRaWAN-enabled weather sensor receiver for ESP32 an
 
 ### Key Dependencies
 
-- **RadioLib (v7.5.0+)**: LoRaWAN communication
-- **BresserWeatherSensorReceiver (v0.38.2+)**: 868 MHz sensor data reception
+- **RadioLib (v8.0.0+)**: LoRaWAN communication
+- **BresserWeatherSensorReceiver (v0.44.0+)**: 868 MHz sensor data reception
 - **LoRa Serialization**: Efficient payload encoding
 - **ArduinoJson (v7.4.2)**: Configuration file parsing
 - **NimBLE-Arduino** (optional): BLE sensor support
@@ -382,7 +382,8 @@ See `Debug_Output.md` for details.
    - Not the first Arduino sketch to try - test with simpler sketches first
    - Test BresserWeatherSensorReceiver standalone before integration
    - Understand LoRaWAN fundamentals (see The Things Network documentation)
-   - Use RadioLib v7.5.0+ and arduino-esp32 v3.X.Y
+   - Use RadioLib v8.0.0+ and arduino-esp32 v3.X.Y
+   - Keep the ESP32 custom delay timer- and radio-IRQ-wakeable, and return immediately after an IRQ wake; do not install it for RP2040
    - Read RadioLib LoRaWAN starter guide
 
 8. **Code Generation Guidelines**
