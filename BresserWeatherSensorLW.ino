@@ -370,7 +370,7 @@ int16_t lwActivate(LoRaWANNode &node)
   debug(state != RADIOLIB_ERR_NONE, "Initialise node failed", state, true);
 
   log_d("Loading LoRaWAN persistence and session buffers");
-  if (!store.begin(LORAWAN_PREFERENCES_NAMESPACE, true))
+  if (!store.begin(LORAWAN_PREFERENCES_NAMESPACE, false))
   {
     debug(true, "Failed to open LoRaWAN persistence storage", RADIOLIB_ERR_UNKNOWN, true);
   }
