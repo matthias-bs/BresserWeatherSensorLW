@@ -423,10 +423,21 @@ void customDelay(RadioLibTime_t ms) {
     const uint64_t requestedDelayUs = static_cast<uint64_t>(ms) * 1000ULL;
     const uint64_t sleepDelayUs =
         (ms > 2) ? static_cast<uint64_t>(ms - 2) * 1000ULL : requestedDelayUs;
+    constexpr uint64_t MIN_LIGHT_SLEEP_TIME_US = 10000ULL;
 
     const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
     // RadioLib installs the radio IRQ as a rising-edge interrupt.
     const gpio_int_type_t radioIrqType = GPIO_INTR_POSEDGE;
+    const auto waitForDelayOrIrq = [&]() {
+        while (static_cast<uint64_t>(esp_timer_get_time() - start) < requestedDelayUs &&
+               gpio_get_level(radioIrqPin) == 0) {
+        }
+    };
+    if (sleepDelayUs < MIN_LIGHT_SLEEP_TIME_US) {
+        waitForDelayOrIrq();
+        return;
+    }
+
     const auto restoreRadioIrq = [&]() {
         ESP_ERROR_CHECK(gpio_set_intr_type(radioIrqPin, radioIrqType));
         ESP_ERROR_CHECK(gpio_intr_enable(radioIrqPin));
@@ -454,18 +465,8 @@ void customDelay(RadioLibTime_t ms) {
     }
     ESP_ERROR_CHECK(sleepResult);
 
-    while (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_GPIO) {
-        const uint64_t elapsedUs =
-            static_cast<uint64_t>(esp_timer_get_time() - start);
-        if (elapsedUs >= requestedDelayUs) {
-            return;
-        }
-
-        const esp_err_t remainingSleepResult = sleepFor(requestedDelayUs - elapsedUs);
-        if (remainingSleepResult == ESP_ERR_SLEEP_REJECT) {
-            return;
-        }
-        ESP_ERROR_CHECK(remainingSleepResult);
+    if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_GPIO) {
+        waitForDelayOrIrq();
     }
 }
 #endif
