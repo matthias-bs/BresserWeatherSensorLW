@@ -731,7 +731,7 @@ void setup()
       log_d("[LoRaWAN] Confirmed:\t%d", downlinkDetails.confirmed);
       log_d("[LoRaWAN] Confirming:\t%d", downlinkDetails.confirming);
       log_d("[LoRaWAN] Datarate:\t%d", downlinkDetails.datarate);
-      log_d("[LoRaWAN] Frequency:\t%7.3f MHz", downlinkDetails.freq);
+      log_d("[LoRaWAN] Frequency:\t%lu Hz", static_cast<unsigned long>(downlinkDetails.freq));
       log_d("[LoRaWAN] Output power:\t%d dBm", downlinkDetails.power);
       log_d("[LoRaWAN] Frame count:\t%u", downlinkDetails.fCnt);
       log_d("[LoRaWAN] fPort:\t\t%u", downlinkDetails.fPort);
