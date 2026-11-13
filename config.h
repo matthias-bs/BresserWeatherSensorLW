@@ -424,13 +424,11 @@ void customDelay(RadioLibTime_t ms) {
         (ms > 2) ? static_cast<uint64_t>(ms - 2) * 1000ULL : requestedDelayUs;
 
     const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
-    const gpio_int_type_t originalIrqType = gpio_get_intr_type(radioIrqPin);
-    const bool irqWasEnabled = originalIrqType != GPIO_INTR_DISABLE;
+    // RadioLib installs the radio IRQ as a rising-edge interrupt.
+    const gpio_int_type_t radioIrqType = GPIO_INTR_POSEDGE;
     const auto restoreRadioIrq = [&]() {
-        ESP_ERROR_CHECK(gpio_set_intr_type(radioIrqPin, originalIrqType));
-        if (irqWasEnabled) {
-            ESP_ERROR_CHECK(gpio_intr_enable(radioIrqPin));
-        }
+        ESP_ERROR_CHECK(gpio_set_intr_type(radioIrqPin, radioIrqType));
+        ESP_ERROR_CHECK(gpio_intr_enable(radioIrqPin));
     };
     const auto checkSleepError = [&restoreRadioIrq](esp_err_t error) {
         if (error != ESP_OK) {
