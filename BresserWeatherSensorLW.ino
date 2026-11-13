@@ -391,9 +391,17 @@ int16_t lwActivate(LoRaWANNode &node)
   }
 
   state = node.loadBuffers();
-  debug(state != RADIOLIB_ERR_NONE, "Restoring LoRaWAN persistence failed", state, true);
+  const bool persistenceRestored = state == RADIOLIB_ERR_NONE;
+  if (state == RADIOLIB_ERR_NONCES_DISCARDED)
+  {
+    log_w("Stored LoRaWAN nonces were discarded; starting a new OTAA session");
+  }
+  else
+  {
+    debug(!persistenceRestored, "Restoring LoRaWAN persistence failed", state, true);
+  }
 
-  if (hasPersistence && !sysCtx.isFirstBoot())
+  if (persistenceRestored && hasPersistence && !sysCtx.isFirstBoot())
   {
     node.setCallbackRestorePersistence(nullptr);
     node.setCallbackRestoreSession(restoreLoRaWANSession);
@@ -701,6 +709,10 @@ void setup()
         &downlinkDetails);
     debug(state < RADIOLIB_ERR_NONE, "Error in sendReceive", state, false);
     debug(persistenceStorageFailed, "Failed to store LoRaWAN persistence buffers", RADIOLIB_ERR_UNKNOWN, true);
+    if (state == RADIOLIB_ERR_NETWORK_NOT_JOINED)
+    {
+      memset(LWsession, 0, sizeof(LWsession));
+    }
 
     uplinkReq = 0;
 
