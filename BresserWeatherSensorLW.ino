@@ -129,6 +129,7 @@
 // 20260515 Added support for Heltec WiFi LoRa 32(V4) and Heltec Wireless Stick Lite V3:
 //          custom SPI (FSPI) for WSL3, FEM control (GPIO7/GPIO2) for V4,
 //          DIO2-as-RF-switch and TCXO (1.8V) for both boards
+// 20261113 Updated to RadioLib 8.0.0, including TCXO configuration and LoRaWAN buffer migration
 //
 // ToDo:
 // -
@@ -168,6 +169,7 @@
 // ESP32/RP2040 Preferences
 #include <Preferences.h>
 static Preferences store;
+static bool persistenceStorageFailed = false;
 
 // Logging macros for RP2040
 #include "src/logging.h"
@@ -278,6 +280,77 @@ bool appStatusUplinkPending __attribute__((section(".uninitialized_data")));
 bool lwStatusUplinkPending __attribute__((section(".uninitialized_data")));
 #endif
 
+namespace
+{
+constexpr char LORAWAN_PREFERENCES_NAMESPACE[] = "radiolib8";
+constexpr char LORAWAN_PERSISTENCE_KEY[] = "persistence";
+
+void storeLoRaWANPersistence(uint8_t *buffer, size_t length)
+{
+  if (!store.begin(LORAWAN_PREFERENCES_NAMESPACE, false))
+  {
+    log_e("Failed to open LoRaWAN persistence storage");
+    persistenceStorageFailed = true;
+    return;
+  }
+
+  const size_t written = store.putBytes(LORAWAN_PERSISTENCE_KEY, buffer, length);
+  store.end();
+  if (written != length)
+  {
+    log_e("Failed to write LoRaWAN persistence buffer");
+    persistenceStorageFailed = true;
+  }
+}
+
+void restoreLoRaWANPersistence(uint8_t *buffer, size_t length)
+{
+  if (!store.begin(LORAWAN_PREFERENCES_NAMESPACE, false))
+  {
+    log_e("Failed to open LoRaWAN persistence storage");
+    persistenceStorageFailed = true;
+    memset(buffer, 0, length);
+    return;
+  }
+
+  const size_t storedLength = store.getBytesLength(LORAWAN_PERSISTENCE_KEY);
+  const size_t read = storedLength == length ? store.getBytes(LORAWAN_PERSISTENCE_KEY, buffer, length) : 0;
+  store.end();
+
+  if (read != length)
+  {
+    log_e("Failed to read LoRaWAN persistence buffer");
+    persistenceStorageFailed = true;
+    memset(buffer, 0, length);
+  }
+}
+
+void storeLoRaWANSession(uint8_t *buffer, size_t length)
+{
+  if (length != sizeof(LWsession))
+  {
+    log_e("Unexpected LoRaWAN session buffer size");
+    persistenceStorageFailed = true;
+    return;
+  }
+
+  memcpy(LWsession, buffer, length);
+}
+
+void restoreLoRaWANSession(uint8_t *buffer, size_t length)
+{
+  if (length != sizeof(LWsession))
+  {
+    log_e("Unexpected LoRaWAN session buffer size");
+    persistenceStorageFailed = true;
+    memset(buffer, 0, length);
+    return;
+  }
+
+  memcpy(buffer, LWsession, length);
+}
+}
+
 /*!
  * \brief Activate node by restoring session or otherwise joining the network
  *
@@ -296,57 +369,54 @@ int16_t lwActivate(LoRaWANNode &node)
 
   debug(state != RADIOLIB_ERR_NONE, "Initialise node failed", state, true);
 
-  log_d("Recalling LoRaWAN nonces & session");
-  // ##### setup the flash storage
-  store.begin("radiolib");
-  // ##### if we have previously saved nonces, restore them and try to restore session as well
-  if (store.isKey("nonces"))
+  log_d("Loading LoRaWAN persistence and session buffers");
+  if (!store.begin(LORAWAN_PREFERENCES_NAMESPACE, true))
   {
-    uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
-    store.getBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // get them from the store
-    state = node.setBufferNonces(buffer);                               // send them to LoRaWAN
-    debug(state != RADIOLIB_ERR_NONE, "Restoring nonces buffer failed", state, false);
+    debug(true, "Failed to open LoRaWAN persistence storage", RADIOLIB_ERR_UNKNOWN, true);
+  }
 
-    // recall session from RTC deep-sleep preserved variable
-    state = node.setBufferSession(LWsession); // send them to LoRaWAN stack
+  const size_t persistenceLength = store.getBytesLength(LORAWAN_PERSISTENCE_KEY);
+  store.end();
+  const bool hasPersistence = persistenceLength != 0;
+  if (hasPersistence && persistenceLength != RADIOLIB_LORAWAN_PERSISTENCE_BUF_SIZE)
+  { // store has no key "nonces"
+    debug(true, "Stored LoRaWAN persistence buffer has an unexpected size", RADIOLIB_ERR_CHECKSUM_MISMATCH, true);
+  }
 
-    // if we have booted more than once we should have a session to restore, so report any failure
-    // otherwise no point saying there's been a failure when it was bound to fail with an empty LWsession var.
-    debug((state != RADIOLIB_ERR_NONE) && !sysCtx.isFirstBoot(), "Restoring session buffer failed", state, false);
-
-    // if Nonces and Session restored successfully, activation is just a formality
-    // moreover, Nonces didn't change so no need to re-save them
-    if (state == RADIOLIB_ERR_NONE)
+  node.setCallbackStorePersistence(storeLoRaWANPersistence);
+  node.setCallbackStoreSession(storeLoRaWANSession);
+  if (hasPersistence)
+  {
+    node.setCallbackRestorePersistence(restoreLoRaWANPersistence);
+    if (!sysCtx.isFirstBoot())
     {
-      log_d("Successfully restored session - now activating");
-      state = node.activateOTAA();
-      debug((state != RADIOLIB_LORAWAN_SESSION_RESTORED), "Failed to activate restored session", state, true);
-
-      // ##### close the store before returning
-      store.end();
-      return (state);
+      node.setCallbackRestoreSession(restoreLoRaWANSession);
     }
   }
+
+  state = node.loadBuffers();
+  if (state == RADIOLIB_ERR_SESSION_DISCARDED)
+  {
+    log_w("Stored LoRaWAN session was discarded; starting a new OTAA session");
+  }
   else
-  { // store has no key "nonces"
-    log_d("No Nonces saved - starting fresh.");
+  {
+    debug(state != RADIOLIB_ERR_NONE, "Restoring LoRaWAN persistence failed", state, true);
   }
 
-  // if we got here, there was no session to restore, so start trying to join
+  // If a session was restored, activateOTAA returns without transmitting a new join request.
   state = RADIOLIB_ERR_NETWORK_NOT_JOINED;
   while (state != RADIOLIB_LORAWAN_NEW_SESSION)
   {
     log_i("Join ('login') to the LoRaWAN Network");
     state = node.activateOTAA();
+    debug(persistenceStorageFailed, "Failed to store LoRaWAN persistence buffers", RADIOLIB_ERR_UNKNOWN, true);
 
-    // ##### save the join counters (nonces) to permanent store
-    log_d("Saving nonces to flash");
-    uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE];                   // create somewhere to store nonces
-    uint8_t *persist = node.getBufferNonces();                          // get pointer to nonces
-    memcpy(buffer, persist, RADIOLIB_LORAWAN_NONCES_BUF_SIZE);          // copy in to buffer
-    store.putBytes("nonces", buffer, RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // send them to the store
-
-    // we'll save the session after an uplink
+    if (state == RADIOLIB_LORAWAN_SESSION_RESTORED)
+    {
+      log_d("Successfully restored LoRaWAN session");
+      return state;
+    }
 
     if (state != RADIOLIB_LORAWAN_NEW_SESSION)
     {
@@ -468,7 +538,9 @@ void setup()
   // setup the radio based on the pinmap (connections) in config.h
   log_v("Initialise radio");
 
-  state = radio.begin();
+  ConfigLoRa_t radioConfig;
+  radioConfig.frequency = RADIOLIB_UNIT_MEGA(868);
+  state = radio.begin(radioConfig);
   debug(state != RADIOLIB_ERR_NONE, "Initialise radio failed", state, true);
 
 // Using local radio object
@@ -476,7 +548,7 @@ void setup()
   radio.setRfSwitchTable(rfswitch_dio_pins, rfswitch_table);
 
   // LR1121 TCXO Voltage 2.85~3.15V
-  radio.setTCXO(3.0);
+  radio.setTCXO(RadioLibTCXOVoltage_t::Voltage3V0);
 #endif
 
 #if defined(ARDUINO_XIAO_ESP32S3)
@@ -488,7 +560,7 @@ void setup()
   // 1.7~3.3V
   //
   // Set to 1.7V as recommended by Seeed Studio's Support
-  radio.setTCXO(1.7);
+  radio.setTCXO(RadioLibTCXOVoltage_t::Voltage1V7);
 #endif
 
 #if defined(HELTEC_WIRELESS_STICK_LITE_V3) || defined(ARDUINO_HELTEC_WIFI_LORA_32_V4)
@@ -498,7 +570,7 @@ void setup()
 
   // TCXO voltage according to
   // https://github.com/meshtastic/firmware/blob/master/variants/esp32s3/heltec_wsl_v3/variant.h
-  radio.setTCXO(1.8);
+  radio.setTCXO(RadioLibTCXOVoltage_t::Voltage1V8);
 #endif
 
 #if defined(ESP32)
@@ -624,6 +696,7 @@ void setup()
         nullptr,
         &downlinkDetails);
     debug(state < RADIOLIB_ERR_NONE, "Error in sendReceive", state, false);
+    debug(persistenceStorageFailed, "Failed to store LoRaWAN persistence buffers", RADIOLIB_ERR_UNKNOWN, true);
 
     uplinkReq = 0;
 
@@ -706,10 +779,6 @@ void setup()
       fsmStage = E_FSM_STAGE::E_DONE;
     }
   } while (fsmStage != E_FSM_STAGE::E_DONE);
-
-  // now save session to RTC memory
-  uint8_t *persist = node.getBufferSession();
-  memcpy(LWsession, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
 
   // wait until next uplink - observing legal & TTN Fair Use Policy constraints
   sysCtx.gotoSleep(sysCtx.sleepDuration());

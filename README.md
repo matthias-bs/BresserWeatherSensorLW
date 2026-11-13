@@ -16,7 +16,9 @@ This was originally a remake of [BresserWeatherSensorTTN](https://github.com/mat
 * If you are new to LoRaWAN
    * Check out [The Things Fundamentals on LoRaWAN](https://www.thethingsnetwork.org/docs/lorawan/)
    * Read the excellent article [RadioLib LoRaWAN on TTN starter script](https://github.com/jgromes/RadioLib/blob/master/examples/LoRaWAN/LoRaWAN_Starter/notes.md)
-* You need [RadioLib v7.5.0](https://github.com/jgromes/RadioLib/releases/tag/7.5.0) or later
+* You need [RadioLib v8.0.0](https://github.com/jgromes/RadioLib/releases/tag/8.0.0) or later in the 8.x series
+* The Receiver dependency is [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) v0.44.x
+* When upgrading from RadioLib 7.x, the LoRaWAN nonce/session buffer layout changes. This project stores v8 nonces separately and starts a fresh session; reset the used DevNonce state on your LoRaWAN network server before the next OTAA join, as described in the [RadioLib 8.0.0 release notes](https://github.com/jgromes/RadioLib/releases/tag/8.0.0).
 * You need [espressif/arduino-esp32 v3.X.Y](https://github.com/espressif/arduino-esp32)
 * Try and configure [BresserWeatherSensorReceiver](https://github.com/matthias-bs/BresserWeatherSensorReceiver) ([examples/BresserWeatherSensorBasic](https://github.com/matthias-bs/BresserWeatherSensorReceiver/tree/main/examples/BresserWeatherSensorBasic)) stand-alone before using it with BresserWeatherSensorLW
 * [Don't Panic](https://en.wikipedia.org/wiki/Phrases_from_The_Hitchhiker%27s_Guide_to_the_Galaxy#Don't_Panic)
