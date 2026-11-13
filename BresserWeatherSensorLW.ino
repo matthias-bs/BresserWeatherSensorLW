@@ -726,9 +726,6 @@ void setup()
       // print SNR (Signal-to-Noise Ratio)
       log_d("[LoRaWAN] SNR:\t\t%f dB", radio.getSNR());
 
-      // print frequency error
-      log_d("[LoRaWAN] Frequency error:\t%f Hz", radio.getFrequencyError());
-
       // print extra information about the event
       log_d("[LoRaWAN] Event information:");
       log_d("[LoRaWAN] Confirmed:\t%d", downlinkDetails.confirmed);
