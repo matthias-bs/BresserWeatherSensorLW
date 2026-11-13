@@ -423,11 +423,29 @@ void customDelay(RadioLibTime_t ms) {
     const uint64_t sleepDelayUs =
         (ms > 2) ? static_cast<uint64_t>(ms - 2) * 1000ULL : requestedDelayUs;
 
-    ESP_ERROR_CHECK(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
-    ESP_ERROR_CHECK(gpio_wakeup_enable(static_cast<gpio_num_t>(RADIO_IRQ_PIN), GPIO_INTR_HIGH_LEVEL));
-    ESP_ERROR_CHECK(esp_sleep_enable_gpio_wakeup());
-    ESP_ERROR_CHECK(esp_sleep_enable_timer_wakeup(sleepDelayUs));
+    const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
+    const gpio_int_type_t originalIrqType = gpio_get_intr_type(radioIrqPin);
+    const bool irqWasEnabled = originalIrqType != GPIO_INTR_DISABLE;
+    const auto restoreRadioIrq = [&]() {
+        ESP_ERROR_CHECK(gpio_set_intr_type(radioIrqPin, originalIrqType));
+        if (irqWasEnabled) {
+            ESP_ERROR_CHECK(gpio_intr_enable(radioIrqPin));
+        }
+    };
+    const auto checkSleepError = [&restoreRadioIrq](esp_err_t error) {
+        if (error != ESP_OK) {
+            restoreRadioIrq();
+            ESP_ERROR_CHECK(error);
+        }
+    };
+
+    checkSleepError(gpio_intr_disable(radioIrqPin));
+    checkSleepError(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
+    checkSleepError(gpio_wakeup_enable(radioIrqPin, GPIO_INTR_HIGH_LEVEL));
+    checkSleepError(esp_sleep_enable_gpio_wakeup());
+    checkSleepError(esp_sleep_enable_timer_wakeup(sleepDelayUs));
     const esp_err_t sleepResult = esp_light_sleep_start();
+    restoreRadioIrq();
     if (sleepResult == ESP_ERR_SLEEP_REJECT) {
         return;
     }
