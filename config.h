@@ -421,8 +421,7 @@ void customDelay(RadioLibTime_t ms) {
 
     const int64_t start = esp_timer_get_time();
     const uint64_t requestedDelayUs = static_cast<uint64_t>(ms) * 1000ULL;
-    const uint64_t sleepDelayUs =
-        (ms > 2) ? static_cast<uint64_t>(ms - 2) * 1000ULL : requestedDelayUs;
+    constexpr uint64_t SLEEP_GUARD_US = 2000ULL;
     constexpr uint64_t MIN_LIGHT_SLEEP_TIME_US = 10000ULL;
 
     const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
@@ -433,7 +432,8 @@ void customDelay(RadioLibTime_t ms) {
                gpio_get_level(radioIrqPin) == 0) {
         }
     };
-    if (sleepDelayUs < MIN_LIGHT_SLEEP_TIME_US) {
+    if (requestedDelayUs <= MIN_LIGHT_SLEEP_TIME_US + SLEEP_GUARD_US ||
+        gpio_get_level(radioIrqPin) != 0) {
         waitForDelayOrIrq();
         return;
     }
@@ -448,26 +448,24 @@ void customDelay(RadioLibTime_t ms) {
             ESP_ERROR_CHECK(error);
         }
     };
-    const auto sleepFor = [&](uint64_t delayUs) {
-        checkSleepError(gpio_intr_disable(radioIrqPin));
-        checkSleepError(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
-        checkSleepError(gpio_wakeup_enable(radioIrqPin, GPIO_INTR_HIGH_LEVEL));
-        checkSleepError(esp_sleep_enable_gpio_wakeup());
-        checkSleepError(esp_sleep_enable_timer_wakeup(delayUs));
-        const esp_err_t result = esp_light_sleep_start();
-        restoreRadioIrq();
-        return result;
-    };
+    checkSleepError(gpio_intr_disable(radioIrqPin));
+    checkSleepError(esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL));
+    checkSleepError(gpio_wakeup_enable(radioIrqPin, GPIO_INTR_HIGH_LEVEL));
+    checkSleepError(esp_sleep_enable_gpio_wakeup());
 
-    const esp_err_t sleepResult = sleepFor(sleepDelayUs);
-    if (sleepResult == ESP_ERR_SLEEP_REJECT) {
-        return;
+    const uint64_t elapsedUs = static_cast<uint64_t>(esp_timer_get_time() - start);
+    esp_err_t sleepResult = ESP_OK;
+    if (elapsedUs < requestedDelayUs &&
+        requestedDelayUs - elapsedUs > MIN_LIGHT_SLEEP_TIME_US + SLEEP_GUARD_US &&
+        gpio_get_level(radioIrqPin) == 0) {
+        checkSleepError(esp_sleep_enable_timer_wakeup(requestedDelayUs - elapsedUs - SLEEP_GUARD_US));
+        sleepResult = esp_light_sleep_start();
     }
-    ESP_ERROR_CHECK(sleepResult);
-
-    if (esp_sleep_get_wakeup_cause() != ESP_SLEEP_WAKEUP_GPIO) {
-        waitForDelayOrIrq();
+    restoreRadioIrq();
+    if (sleepResult != ESP_ERR_SLEEP_REJECT) {
+        ESP_ERROR_CHECK(sleepResult);
     }
+    waitForDelayOrIrq();
 }
 #endif
 
