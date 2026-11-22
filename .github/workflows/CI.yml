@@ -104,7 +104,11 @@ jobs:
         run:
           |
           arduino-cli core update-index ${{ format('{0}', steps.prep.outputs.index-url) }}
-          arduino-cli core install ${{ format('{0}:{1} {2}', steps.split.outputs._0, steps.split.outputs._1, steps.prep.outputs.index-url) }}
+          core_package="${{ format('{0}:{1}', steps.split.outputs._0, steps.split.outputs._1) }}"
+          if [[ "$core_package" == "esp32:esp32" ]]; then
+            core_package="${core_package}@3.3.13"
+          fi
+          arduino-cli core install "$core_package" ${{ format('{0}', steps.prep.outputs.index-url) }}
 
       - name: Checkout repository
         if: ${{ env.run-build == 'true' }}
