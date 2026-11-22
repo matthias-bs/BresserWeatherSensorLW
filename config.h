@@ -50,6 +50,7 @@
 // 20250830 Renamed DFROBOT_COVER_LORA to FIREBEETLE_ESP32_COVER_LORA
 // 20260116 Added Seeed Studio XIAO ESP32S3 with Wio-SX1262
 // 20260515 Added Heltec WiFi LoRa 32(V4) and Wireless Stick Lite V3
+// 20261113 Added radio IRQ as an additional ESP32 custom-delay wake source
 //
 // ToDo:
 // - 
@@ -63,6 +64,13 @@
 #include "secrets.h"
 #include "BresserWeatherSensorLWCfg.h"
 #include "WeatherSensorCfg.h"
+#if defined(ESP32)
+#include <stdlib.h>
+#include <driver/gpio.h>
+#include <esp_err.h>
+#include <esp_sleep.h>
+#include <esp_timer.h>
+#endif
 
 // How often to send an uplink - consider legal & FUP constraints - see notes
 const uint32_t uplinkIntervalSeconds = 5UL * 60UL;    // minutes x seconds
@@ -384,6 +392,12 @@ const uint8_t subBand = 0;  // For US915, change this to 2, otherwise leave on 0
   #define LORA_CHIP RADIO_CHIP
 #endif
 
+#if defined(RADIO_CHIP)
+  #define RADIO_IRQ_PIN PIN_RECEIVER_IRQ
+#else
+  #define RADIO_IRQ_PIN PIN_LORA_IRQ
+#endif
+
 // Copy over the EUI's & keys in to the something that will not compile if incorrectly formatted
 uint64_t joinEUI =   RADIOLIB_LORAWAN_JOIN_EUI;
 uint64_t devEUI  =   RADIOLIB_LORAWAN_DEV_EUI;
@@ -400,20 +414,78 @@ uint8_t nwkKey[] = { 0 };
 // which will waste a lot of power. However, you can put your
 // microcontroller to sleep instead by customizing the function below,
 // and providing it to RadioLib via "node.setSleepFunction".
-// Note:
-// Implementation from
-// https://github.com/jgromes/RadioLib/discussions/1401#discussioncomment-12080631
 #if defined(ESP32)
 void customDelay(RadioLibTime_t ms) {
-    uint64_t start = millis();
-    esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
-    esp_sleep_enable_timer_wakeup((ms-2)*(uint64_t)1000);
-    esp_light_sleep_start();
-
-    if(millis() < start + ms) {
-	    // if there's still some time left, do normal delay for remainder
-      vTaskDelay((start + ms - millis())/portTICK_PERIOD_MS);
+    if (ms == 0) {
+        return;
     }
+
+    const int64_t start = esp_timer_get_time();
+    const uint64_t requestedDelayUs = static_cast<uint64_t>(ms) * 1000ULL;
+    constexpr uint64_t SLEEP_GUARD_US = 2000ULL;
+    constexpr uint64_t MIN_LIGHT_SLEEP_TIME_US = 10000ULL;
+
+    const gpio_num_t radioIrqPin = static_cast<gpio_num_t>(RADIO_IRQ_PIN);
+    const auto waitForDelayOrIrq = [&]() {
+        while (gpio_get_level(radioIrqPin) == 0) {
+            const uint64_t elapsedUs = static_cast<uint64_t>(esp_timer_get_time() - start);
+            if (elapsedUs >= requestedDelayUs) {
+                break;
+            }
+            if (requestedDelayUs - elapsedUs > 1000ULL) {
+                // Poll frequently; delay(1) could postpone an IRQ response by an RTOS tick.
+                delayMicroseconds(100);
+            }
+        }
+    };
+    const auto restoreRadioIrq = [&]() {
+        const esp_err_t typeError = gpio_set_intr_type(radioIrqPin, GPIO_INTR_POSEDGE);
+        const esp_err_t enableError = gpio_intr_enable(radioIrqPin);
+        if (typeError != ESP_OK || enableError != ESP_OK) {
+            log_e("Failed to restore radio IRQ (type: %s, enable: %s)",
+                  esp_err_to_name(typeError), esp_err_to_name(enableError));
+            abort();
+        }
+    };
+    if (requestedDelayUs > MIN_LIGHT_SLEEP_TIME_US + SLEEP_GUARD_US &&
+        gpio_get_level(radioIrqPin) == 0) {
+        esp_err_t sleepError = gpio_intr_disable(radioIrqPin);
+        if (sleepError == ESP_OK) {
+            sleepError = esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+        }
+        if (sleepError == ESP_OK) {
+            sleepError = gpio_wakeup_enable(radioIrqPin, GPIO_INTR_HIGH_LEVEL);
+        }
+        if (sleepError == ESP_OK) {
+            sleepError = esp_sleep_enable_gpio_wakeup();
+        }
+
+        if (sleepError == ESP_OK) {
+            const uint64_t elapsedUs = static_cast<uint64_t>(esp_timer_get_time() - start);
+            if (elapsedUs < requestedDelayUs &&
+                requestedDelayUs - elapsedUs > MIN_LIGHT_SLEEP_TIME_US + SLEEP_GUARD_US &&
+                gpio_get_level(radioIrqPin) == 0) {
+                sleepError =
+                    esp_sleep_enable_timer_wakeup(requestedDelayUs - elapsedUs - SLEEP_GUARD_US);
+                if (sleepError == ESP_OK) {
+                    sleepError = esp_light_sleep_start();
+                }
+            }
+        }
+
+        const esp_err_t wakeupDisableError =
+            esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_ALL);
+        const esp_err_t gpioWakeupDisableError = gpio_wakeup_disable(radioIrqPin);
+        restoreRadioIrq();
+        if (sleepError != ESP_OK && sleepError != ESP_ERR_SLEEP_REJECT) {
+            log_w("LoRaWAN light sleep failed: %s", esp_err_to_name(sleepError));
+        }
+        if (wakeupDisableError != ESP_OK || gpioWakeupDisableError != ESP_OK) {
+            log_w("Failed to clear LoRaWAN sleep wake-up sources (source: %s, GPIO: %s)",
+                  esp_err_to_name(wakeupDisableError), esp_err_to_name(gpioWakeupDisableError));
+        }
+    }
+    waitForDelayOrIrq();
 }
 #endif
 
